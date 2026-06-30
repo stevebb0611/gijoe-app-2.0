@@ -1,0 +1,90 @@
+/* add-missing-figure.css — "add a figure missing from the catalog" (OPEN_QUESTIONS #8 · VARIANTS §7.6).
+   Single-purpose form: append a REAL missing catalog row (owner-as-admin). The custom/homemade
+   path + the two-path chooser were dropped. Loaded alongside add-figure.css — reuses
+   .af-modal / .af-foot / .af-nav / .af-in / .af-seclab / .af-okbtn etc. */
+
+/* back-link / breadcrumb */
+.afc-crumb { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: .5px; color: var(--ink-soft); margin: 0 0 16px; }
+.afc-crumb button { background: transparent; border: none; font: inherit; color: var(--accent); font-weight: 700;
+  cursor: pointer; padding: 0; }
+.afc-crumb button:hover { text-decoration: underline; }
+.afc-crumb span { opacity: .55; }
+
+/* form scaffold */
+.afc-form { display: flex; flex-direction: column; gap: 0; }
+.afc-banner { display: flex; align-items: flex-start; gap: 10px; padding: 11px 13px; margin-bottom: 18px;
+  border: 1.5px solid var(--ink); background: var(--paper); font-size: 11.5px; line-height: 1.5; color: var(--ink-soft); }
+.afc-banner b { color: var(--ink); }
+.afc-banner__mk { flex: none; font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: 1px;
+  border: 1.5px solid currentColor; padding: 2px 7px; margin-top: 1px; white-space: nowrap; }
+
+.afc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; }
+.afc-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.afc-field--wide { grid-column: 1 / -1; }
+.afc-lab { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; color: var(--ink-soft); }
+.afc-lab b { color: var(--ink); }
+.afc-lab em { font-style: normal; color: var(--ink-soft); opacity: .75; font-weight: 400; }
+.afc-req { color: var(--accent); font-weight: 700; }
+.afc-hint { font-size: 10px; line-height: 1.45; color: var(--ink-soft); }
+.afc-hint b { color: var(--ink); }
+
+.afc-sel { position: relative; display: flex; }
+.afc-sel select { width: 100%; appearance: none; background: var(--paper); border: 1.5px solid var(--ink);
+  padding: 9px 30px 9px 11px; font: inherit; font-family: var(--font-display); font-weight: 600; font-size: 13px;
+  color: var(--ink); cursor: pointer; }
+.afc-sel::after { content: "▾"; position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+  pointer-events: none; font-size: 11px; color: var(--ink-soft); }
+
+/* catalog id allocation */
+.afc-id { display: flex; align-items: stretch; gap: 0; border: 1.5px solid var(--ink); background: var(--paper); }
+.afc-id__code { font-family: var(--font-mono); font-weight: 700; font-size: 14px; letter-spacing: 1px; color: var(--ink);
+  padding: 9px 12px; flex: 1; display: flex; align-items: center; background: transparent; border: none; outline: none; }
+.afc-id__auto { font-family: var(--font-mono); font-weight: 700; font-size: 8px; letter-spacing: 1px; color: #fff;
+  background: var(--ok); border-left: 1.5px solid var(--ink); padding: 0 10px; display: flex; align-items: center; }
+
+/* section divider */
+.afc-section { margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--line-soft); }
+
+/* blueprint editor */
+.afc-blue { display: flex; flex-direction: column; gap: 6px; }
+.afc-brow { display: grid; grid-template-columns: 1fr 96px 30px; gap: 8px; align-items: center; }
+.afc-brow .af-in { padding: 7px 10px; font-size: 12px; }
+.afc-qty { display: flex; align-items: center; border: 1.5px solid var(--ink); background: var(--paper); }
+.afc-qty button { width: 28px; height: 34px; border: none; background: var(--paper); font-family: var(--font-mono);
+  font-weight: 700; font-size: 14px; color: var(--ink); cursor: pointer; }
+.afc-qty button:hover { background: var(--ink); color: var(--paper); }
+.afc-qty span { flex: 1; text-align: center; font-family: var(--font-mono); font-weight: 700; font-size: 13px; }
+.afc-del { width: 30px; height: 34px; border: 1.5px solid var(--line); background: var(--paper); color: var(--ink-soft);
+  font-size: 13px; cursor: pointer; }
+.afc-del:hover { border-color: var(--crimson); color: var(--crimson); }
+.afc-add { align-self: flex-start; font-family: var(--font-mono); font-weight: 700; font-size: 10px; letter-spacing: .5px;
+  color: var(--accent); background: var(--paper); border: 1.5px dashed var(--accent); padding: 7px 12px; cursor: pointer;
+  margin-top: 4px; }
+.afc-add:hover { background: var(--accent); color: #fff; }
+.afc-blue__empty { font-size: 11px; color: var(--ink-soft); font-style: italic; padding: 4px 0; }
+
+/* live "how it will read" preview */
+.afc-prev { display: flex; align-items: center; gap: 12px; border: 1.5px solid var(--ink); background: var(--paper);
+  padding: 11px 13px; margin-top: 18px; }
+.afc-prev__thumb { width: 46px; height: 46px; flex: none; border: 1.5px solid var(--ink); background-color: var(--card);
+  background-image: repeating-linear-gradient(45deg, transparent 0 7px, var(--line-soft) 7px 8px); }
+.afc-prev__name { font-family: var(--font-display); font-weight: 700; font-size: 17px; display: flex; align-items: center; gap: 9px; }
+.afc-prev__meta { font-size: 10px; color: var(--ink-soft); margin-top: 2px; }
+.afc-prev__lab { font-family: var(--font-mono); font-size: 8px; letter-spacing: 1.5px; color: var(--ink-soft);
+  display: block; margin-bottom: 3px; }
+.afc-tag { font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: 1px; padding: 2px 7px;
+  border: 1.5px solid var(--ink); }
+
+/* handoff confirmation */
+.afc-okwrap { text-align: center; padding: 22px 8px; }
+.afc-ok { width: 54px; height: 54px; border-radius: 50%; background: var(--ok); color: #fff; font-size: 26px;
+  display: grid; place-items: center; margin: 6px auto 14px; border: 2px solid var(--ink); }
+.afc-ok__h { font-family: var(--font-display); font-weight: 700; font-size: 20px; letter-spacing: .5px; }
+.afc-ok__sub { font-size: 12px; line-height: 1.55; color: var(--ink-soft); max-width: 380px; margin: 8px auto 0; }
+.afc-ok__sub b { color: var(--ink); }
+.afc-ok__btns { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+
+@media (max-width: 760px) {
+  .afc-grid { grid-template-columns: 1fr; }
+}

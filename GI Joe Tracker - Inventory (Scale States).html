@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GI Joe Tracker — Scale States</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f3eee2;
+    --ink: #211f1a;
+    --ink-soft: #56503f;
+    --line: rgba(33,31,26,.55);
+    --line-soft: rgba(33,31,26,.22);
+    --accent: #b8402f;
+    --ok: #5d7d4d;
+    --olive: #5f6b39;
+    --crimson: #8a2f24;
+    --card: #e9e2d2;
+    --font-display: 'Oswald', sans-serif;
+    --font-hand: 'Patrick Hand', cursive;
+    --font-mono: 'Space Mono', monospace;
+    --shadow: 3px 3px 0 var(--ink);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-mono); }
+
+  /* ===== top chrome ===== */
+  .top { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 22px; padding: 12px 26px; background: var(--ink); color: var(--paper); position: sticky; top: 0; z-index: 40; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand__mk { display: inline-flex; align-items: center; }
+  .brand__name { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: 1px; white-space: nowrap; }
+  .brand__sub { font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px; opacity: .6; white-space: nowrap; }
+  .search { background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.3); padding: 7px 12px; display: flex; gap: 8px; align-items: center; color: rgba(255,255,255,.55); font-size: 12px; max-width: 460px; }
+  .search input { flex: 1; background: transparent; border: none; outline: none; color: var(--paper); font: inherit; }
+  .search input::placeholder { color: rgba(255,255,255,.45); }
+  .kpis { display: flex; gap: 8px; }
+  .kpi { border: 1.5px solid rgba(255,255,255,.3); padding: 5px 12px; display: flex; flex-direction: column; min-width: 88px; }
+  .kpi__v { font-family: var(--font-display); font-weight: 700; font-size: 20px; line-height: 1; }
+  .kpi__v small { font-family: var(--font-mono); font-size: 11px; opacity: .55; font-weight: 400; }
+  .kpi__k { font-family: var(--font-mono); font-size: 8px; letter-spacing: 1px; opacity: .6; margin-top: 2px; }
+
+  /* ===== explainer banner ===== */
+  .note { background: var(--card); border-bottom: 2px solid var(--ink); padding: 14px 26px; display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap; }
+  .note__h { font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: .5px; text-transform: uppercase; }
+  .note__h .ref { font-family: var(--font-mono); font-size: 10px; color: var(--accent); letter-spacing: 1px; margin-left: 8px; }
+  .note__p { font-size: 12px; line-height: 1.5; color: var(--ink-soft); max-width: 560px; }
+  .note__hand { font-family: var(--font-hand); font-size: 17px; color: var(--accent); transform: rotate(-1.5deg); }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 4px; }
+  .legend__i { display: flex; align-items: center; gap: 7px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .5px; color: var(--ink-soft); }
+  .legend__sw { width: 22px; height: 22px; border: 1.5px solid var(--ink); flex: none; }
+  .sw-skel { background-color: var(--card); background-image: repeating-linear-gradient(45deg, transparent 0 7px, var(--line-soft) 7px 8px); }
+  .sw-photo { background: #c7bda6; }
+  .sw-none { background-color: var(--card); background-image: repeating-linear-gradient(45deg, transparent 0 5px, var(--line-soft) 5px 6px); opacity: .6; }
+
+  /* ===== toolbar ===== */
+  .bar { display: flex; align-items: center; gap: 14px; padding: 9px 26px; background: var(--paper); border-bottom: 2px solid var(--ink); flex-wrap: wrap; position: sticky; top: 57px; z-index: 30; }
+  .seg { display: inline-flex; border: 1.5px solid var(--ink); }
+  .seg button { font: inherit; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: .5px; padding: 5px 12px; background: var(--paper); color: var(--ink-soft); border: none; cursor: pointer; }
+  .seg button.is-on { background: var(--ink); color: var(--paper); }
+  .seg button + button { border-left: 1.5px solid var(--ink); }
+  .count { font-family: var(--font-mono); font-size: 10px; letter-spacing: .5px; color: var(--ink-soft); }
+  .count b { color: var(--ink); }
+  .spacer { flex: 1; }
+  .btn { font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: .5px; color: var(--ink); background: transparent; border: 1.5px solid var(--ink); padding: 6px 11px; cursor: pointer; }
+  .btn:hover { background: var(--card); }
+  .virt-tag { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; color: var(--ink-soft); border: 1.5px dashed var(--line); padding: 4px 9px; }
+  .virt-tag b { color: var(--accent); }
+
+  /* ===== year section ===== */
+  .body { padding: 0 26px 90px; }
+  .ysec { border-bottom: 2px solid var(--ink); }
+  .ysec__hd { display: grid; grid-template-columns: 92px 1fr auto; gap: 18px; align-items: center; padding: 12px; background: var(--ink); color: var(--paper); }
+  .ysec__yr { font-family: var(--font-display); font-weight: 700; font-size: 26px; letter-spacing: 1px; }
+  .ysec__meta { font-family: var(--font-mono); font-size: 10px; letter-spacing: .5px; opacity: .7; }
+  .ysec__chev { font-size: 14px; opacity: .8; }
+
+  /* ===== gallery grid ===== */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 16px; padding: 18px 4px 24px; }
+  .card { border: 2px solid var(--ink); background: var(--paper); box-shadow: var(--shadow); padding: 9px; display: flex; flex-direction: column; gap: 7px; position: relative; text-align: left; }
+  .card__corner { position: absolute; top: 8px; left: 8px; z-index: 2; }
+  .fac { font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: 1px; padding: 1px 5px; border: 1.5px solid var(--ink); color: #fff; display: inline-block; line-height: 1.3; }
+  .fac--joe { background: var(--olive); }
+  .fac--cobra { background: var(--crimson); }
+
+  .photo { aspect-ratio: 1 / 1; border: 1.5px solid var(--ink); position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center; }
+  /* skeleton (loading) */
+  .photo.is-loading { background-color: var(--card); background-image: repeating-linear-gradient(45deg, transparent 0 7px, var(--line-soft) 7px 8px); }
+  .photo.is-loading::after { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.45) 50%, transparent 70%);
+    transform: translateX(-100%); animation: shimmer 1.25s infinite; }
+  @keyframes shimmer { to { transform: translateX(100%); } }
+  .photo__spin { width: 18px; height: 18px; border: 2px solid var(--line-soft); border-top-color: var(--ink-soft); border-radius: 50%; animation: spin .8s linear infinite; opacity: .8; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  /* loaded thumbnail (placeholder for a real photo) */
+  .photo__img { position: absolute; inset: 0; opacity: 0; transition: opacity .4s ease;
+    display: flex; align-items: flex-end; padding: 6px; }
+  .photo.is-loaded .photo__img { opacity: 1; }
+  .photo.is-loading .photo__spin { display: block; }
+  .photo.is-loaded .photo__spin, .photo.is-empty .photo__spin { display: none; }
+  .photo__tag { font-family: var(--font-mono); font-size: 8px; letter-spacing: 1px; background: rgba(243,238,226,.85); padding: 1px 5px; border: 1px solid var(--line-soft); color: var(--ink-soft); }
+  /* permanent no-photo */
+  .photo.is-empty { background-color: var(--card); background-image: repeating-linear-gradient(45deg, transparent 0 5px, var(--line-soft) 5px 6px); }
+  .photo.is-empty .photo__none { font-family: var(--font-mono); font-size: 8px; letter-spacing: 1px; color: var(--ink-soft); background: var(--paper); padding: 2px 6px; border: 1px solid var(--line-soft); }
+
+  .card__name { font-family: var(--font-display); font-weight: 600; font-size: 14px; letter-spacing: .5px; line-height: 1.05; min-height: 1.05em; }
+  .card__var { font-family: var(--font-mono); font-size: 9px; letter-spacing: .5px; color: var(--ink-soft); }
+  .card__foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 4px; }
+  .card__own { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; color: var(--ink-soft); }
+  .ring { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--ink); display: grid; place-items: center; }
+  .ring__hole { width: 68%; height: 68%; border-radius: 50%; background: var(--paper); display: grid; place-items: center; }
+  .ring__pct { font-family: var(--font-display); font-weight: 700; font-size: 13px; line-height: 1; }
+  .ring__pct small { font-size: 7px; font-family: var(--font-mono); }
+
+  /* skeleton text lines while card metadata loads */
+  .skel-line { background-color: var(--card); background-image: repeating-linear-gradient(45deg, transparent 0 6px, var(--line-soft) 6px 7px); height: 13px; }
+  .skel-line.s2 { height: 9px; width: 60%; }
+
+  /* sentinel / loading more */
+  .more { padding: 26px; text-align: center; }
+  .more__spin { width: 22px; height: 22px; border: 2.5px solid var(--line-soft); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 10px; }
+  .more__t { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; color: var(--ink-soft); }
+  .more__t b { color: var(--ink); }
+</style>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="brand__mk" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 34 34" fill="none">
+          <rect x="3.5" y="8" width="27" height="18" rx="2" stroke="#f3eee2" stroke-width="2" stroke-linejoin="round" />
+          <line x1="3.5" y1="12.5" x2="30.5" y2="12.5" stroke="#f3eee2" stroke-width="2" />
+          <rect x="6.5" y="14.5" width="7.5" height="8.5" stroke="#f3eee2" stroke-width="2" stroke-linejoin="round" />
+          <line x1="17.5" y1="16" x2="27.5" y2="16" stroke="#f3eee2" stroke-width="2" stroke-linecap="round" />
+          <line x1="17.5" y1="19" x2="27.5" y2="19" stroke="#f3eee2" stroke-width="2" stroke-linecap="round" />
+          <path d="M29 21.5 H21 L22.7 24.5 H29 Z" fill="#f3eee2" />
+        </svg>
+      </span>
+      <div>
+        <div class="brand__name">G.I. JOE COLLECTION</div>
+        <div class="brand__sub">INVENTORY · SCALE STATES</div>
+      </div>
+    </div>
+    <div class="search"><span>⌕</span><input placeholder="Search 1,847 figures…" value=""></div>
+    <div class="kpis">
+      <div class="kpi"><div class="kpi__v">1,847</div><div class="kpi__k">FIGURES IN CATALOG</div></div>
+      <div class="kpi"><div class="kpi__v">312<small>/1847</small></div><div class="kpi__k">OWNED</div></div>
+      <div class="kpi"><div class="kpi__v">198</div><div class="kpi__k">COMPLETE</div></div>
+    </div>
+  </header>
+
+  <section class="note">
+    <div style="flex:1; min-width:280px;">
+      <div class="note__h">Gallery at scale <span class="ref">OPEN_QUESTIONS #4</span></div>
+      <p class="note__p">At 1,500–2,000+ figures the gallery is the cost center. The grid is <b>virtualized</b> (only the visible window mounts), photos <b>lazy-load thumbnails</b> with a reserved square so the grid never reflows, and each card resolves through three image states. Scroll to watch cards stream in.</p>
+    </div>
+    <div>
+      <div class="note__hand">three image states ↓</div>
+      <div class="legend">
+        <div class="legend__i"><span class="legend__sw sw-skel"></span>LOADING — hatch + shimmer + spinner</div>
+        <div class="legend__i"><span class="legend__sw sw-photo"></span>LOADED — thumbnail fades in</div>
+        <div class="legend__i"><span class="legend__sw sw-none"></span>NO PHOTO — permanent hatch</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="bar">
+    <div class="seg"><button>▤ LIST</button><button class="is-on">▦ GALLERY</button></div>
+    <span class="count">Showing <b id="shown">0</b> of <b>1,847</b></span>
+    <div class="spacer"></div>
+    <span class="virt-tag">VIRTUALIZED · <b id="mounted">0</b> nodes mounted</span>
+    <button class="btn">⤢ EXPAND ALL</button>
+  </div>
+
+  <div class="body" id="body"></div>
+
+  <div class="more" id="more">
+    <div class="more__spin"></div>
+    <div class="more__t">Loading next page · <b>page 4 of 39</b></div>
+  </div>
+
+<script>
+  const FACTIONS = ['joe','cobra'];
+  const NAMES = ['DUKE','SNAKE EYES','STALKER','SCARLETT','ROADBLOCK','FLINT','LADY JAYE','GUNG-HO','BAZOOKA','BLOWTORCH','COBRA COMMANDER','DESTRO','BARONESS','STORM SHADOW','FIREFLY','ZARTAN','MAJOR BLUDD','TOMAX','XAMOT','SCRAP-IRON','TORCH','RIPPER','BUZZER','COPPERHEAD','SERPENTOR','BEACH-HEAD','LOW-LIGHT','SCI-FI','MAINFRAME','DIAL-TONE','LIFELINE','LEATHERNECK','WET-SUIT','CROSS-COUNTRY'];
+  const VARS = ['v1 · 1982','v1 · 1983','v2 · 1985','v1 · 1984','v3 · 1986','v1 · 1985','v2 · 1987','Tiger Force','Night Force'];
+  const YEARS = [
+    { year: 1985, owned: 41, whole: 28, n: 18 },
+    { year: 1986, owned: 38, whole: 22, n: 16 },
+    { year: 1987, owned: 33, whole: 19, n: 14 },
+  ];
+  let mounted = 0, shown = 0;
+
+  function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
+
+  function makeCard(i, opts){
+    const fac = rnd(FACTIONS);
+    const card = document.createElement('div');
+    card.className = 'card';
+    const pct = Math.floor(Math.random()*100);
+    const owned = Math.random() < .35 ? 2 + Math.floor(Math.random()*2) : 1;
+    // ~18% of figures have no photo on file → permanent hatch
+    const noPhoto = Math.random() < 0.18;
+
+    card.innerHTML = `
+      <div class="card__corner"><span class="fac fac--${fac}">${fac==='joe'?'G.I. JOE':'COBRA'}</span></div>
+      <div class="photo is-loading">
+        <div class="photo__spin"></div>
+        <div class="photo__img" style="background:${swatch()}"><span class="photo__tag">THUMB ◾ 240px</span></div>
+      </div>
+      <div class="card__name">${rnd(NAMES)}</div>
+      <div class="card__var">${rnd(VARS)}</div>
+      <div class="card__foot">
+        <span class="card__own">OWNED ×${owned}</span>
+        <div class="ring"><div class="ring__hole"><div class="ring__pct">${pct}<small>%</small></div></div></div>
+      </div>`;
+
+    // simulate lazy image resolution: random delay, then loaded OR permanent-empty
+    const photo = card.querySelector('.photo');
+    const delay = 350 + Math.random()*1500;
+    setTimeout(() => {
+      photo.classList.remove('is-loading');
+      if (noPhoto) { 
+        photo.classList.add('is-empty');
+        photo.innerHTML = '<span class="photo__none">NO PHOTO</span>';
+      } else {
+        photo.classList.add('is-loaded');
+      }
+    }, delay);
+
+    return card;
+  }
+
+  function swatch(){
+    // muted thumbnail stand-ins (NOT drawn figures) — represent a loaded photo
+    const tones = ['#9a8f76','#8c8468','#a89c81','#7d7a63','#b0a487','#857c66','#6f6a55'];
+    return rnd(tones);
+  }
+
+  function buildYear(y){
+    const sec = document.createElement('section');
+    sec.className = 'ysec';
+    sec.innerHTML = `
+      <div class="ysec__hd">
+        <span class="ysec__yr">${y.year}</span>
+        <span class="ysec__meta">${y.owned} owned · ${y.whole} whole · series ${y.year-1982}</span>
+        <span class="ysec__chev">▾</span>
+      </div>`;
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+    sec.appendChild(grid);
+    for (let i=0;i<y.n;i++){
+      grid.appendChild(makeCard(i));
+      mounted++; shown++;
+    }
+    return sec;
+  }
+
+  const body = document.getElementById('body');
+  YEARS.forEach(y => body.appendChild(buildYear(y)));
+  document.getElementById('shown').textContent = shown;
+  document.getElementById('mounted').textContent = mounted;
+
+  // keep the mounted-node counter feeling alive (virtualization recycles nodes)
+  let base = mounted;
+  setInterval(() => {
+    const jitter = base + Math.floor(Math.random()*5) - 2;
+    document.getElementById('mounted').textContent = jitter;
+  }, 1400);
+</script>
+</body>
+</html>

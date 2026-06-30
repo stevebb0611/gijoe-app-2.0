@@ -1,0 +1,13 @@
+{
+  "name": "gijoe-tracker-handoff",
+  "version": "1.0.0",
+  "private": true,
+  "description": "G.I. Joe collection inventory + condition tracker — HTML/React-via-Babel design prototypes for local review. Design references, not production code.",
+  "scripts": {
+    "start": "serve .",
+    "dev": "serve ."
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}

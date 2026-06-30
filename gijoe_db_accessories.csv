@@ -1,0 +1,1804 @@
+﻿id,accessory_id,name,alt_name,category_id,type,color,pack_quantity,variant_notes,condition_id,is_electronic_working,notes,image_url,created_at,updated_at,year_released,host_figure,relationship_count
+1,A0001,Helmet (with holes),,1,Helmet,green,,,,,,,,,1982,Breaker (v1),12
+2,A0002,Communications Headset,,1,Helmet,black,,,,,,,,,1982,Breaker (v1),1
+3,A0003,TV-Radio Backpack,,1,Helmet,green,,,,,,,,,1982,Breaker (v1),1
+4,A0004,Dragunov (SVD) Sniper's Rifle,,8,Weapon Rifle,black,,,,,,,,,1982,Cobra (v1),2
+5,A0005,"""Venom"" Laser Pistol",,6,Weapon Pistol,black,,,,,,,,,1982,Cobra Commander (v1),2
+6,A0006,AK-47 Assault Rifle,,8,Weapon Rifle,black,,,,,,,,,1982,Cobra Officer (v1),2
+7,A0007,Visor,,2,Helmet Accessory,clear,,,,,,,,,1982,Flash (v1),5
+8,A0008,Power Pack Backpack,,3,Backpack,dark green,,,,,,,,,1982,Flash (v1),1
+9,A0009,XMLR-1A Laser Rifle,,8,Weapon Rifle,black,,,,,,,,,1982,Flash (v1),1
+10,A0010,Helmet (with holes),,1,Helmet,dark green,,,,,,,,,1982,Grand Slam (v1),5
+11,A0011,Combat Pack Backpack,,3,Backpack,dark green,,,,,,,,,1982,Grunt (v1),1
+12,A0012,M-16 Rifle,,8,Weapon Rifle,black,,,,,,,,,1982,Grunt (v1),1
+13,A0013,M-16 Heavy Machine Gun,,10,Weapon Machine Gun,black,,,,,,,,,1982,Rock 'n Roll (v1),1
+14,A0014,Bipod,,22,Weapon Accessory,black,,,,,,,,,1982,Rock 'n Roll (v1),1
+15,A0015,XK-1 Power Crossbow,,19,Weapon Bow/ Crossbow,black,,,,,,,,,1982,Scarlett (v1),1
+16,A0016,Ammo Pack Backpack,,3,Backpack,dark green,,,,,,,,,1982,Short-Fuze (v1),1
+17,A0017,M-1 81mm Medium Mortar (closed handle),,13,Weapon Bazooka/ Launcher,black,,,,,,,,,1982,Short-Fuze (v1),1
+18,A0018,M-1 81mm Medium Mortar (thin open handle),,13,Weapon Bazooka/ Launcher,black,,,,,,,,,1982,Short-Fuze (v1),1
+19,A0019,M-1 81mm Medium Mortar (thick open handle),,13,Weapon Bazooka/ Launcher,black,,,,,,,,,1982,Short-Fuze (v1),1
+20,A0020,Mortar Bipod Stand,,22,Weapon Accessory,black,,,,,,,,,1982,Short-Fuze (v1),1
+21,A0021,Uzi Submachine Gun (thin muzzle),,9,Weapon Submachine Gun,black,,,,,,,,,1982,Snake Eyes (v1),2
+22,A0022,Explosives pack,,37,Tactical Gear,black,,,,,,,,,1982,Snake Eyes (v1),1
+23,A0023,"M-32 ""Pulverizer"" Submachine Gun",,9,Weapon Submachine Gun,black,,,,,,,,,1982,Stalker (v1),2
+24,A0024,Helmet (with holes),,1,Helmet,light green,,,,,,,,,1982,Steeler (v1),6
+25,A0025,Binocular Headset,,2,Helmet Accessory,black,,,,,,,,,1982,Steeler (v1),1
+26,A0026,Ammo Pack Backpack,,3,Backpack,light green,,,,,,,,,1982,Zap (v1),1
+27,A0027,Bazooka (double handle),,13,Weapon Bazooka/ Launcher,light green,,,,,,,,,1982,Zap (v1),1
+28,A0028,Bazooka (single thin handle),,13,Weapon Bazooka/ Launcher,light green,,,,,,,,,1982,Zap (v1),1
+29,A0029,Bazooka (single thick handle),,13,Weapon Bazooka/ Launcher,dark green,,,,,,,,,1982,Zap (v1),1
+30,A0030,Flight Helmet,,1,Helmet,white/clear,,,,,,,,,1983,Ace (v1),1
+31,A0031,Helmet (with goggles molded),,1,Helmet,green,,,,,,,,,1983,Airborne (v1),1
+32,A0032,Helicopter Assault Trooper Backpack,,3,Backpack,tan,,,,,,,,,1983,Airborne (v1),2
+33,A0033,XM-16 Attack Rifle,,8,Weapon Rifle,black,,,,,,,,,1983,Airborne (v1),1
+34,A0034,Armed Attache Case Backpack,,3,Backpack,black,,,,,,,,,1983,Destro (v1),1
+35,A0035,High-Density Laser Gun,,6,Weapon Pistol,black,,,,,,,,,1983,Destro (v1),1
+36,A0036,Helmet (with flares molded),,1,Helmet,tan,,,,,,,,,1983,Doc (v1),1
+37,A0037,Rescue Flare Launcher,,33,Medical Equipment,black,,,,,,,,,1983,Doc (v1),1
+38,A0038,Stretcher,,33,Medical Equipment,dark gray,,,,,,,,,1983,Doc (v1),1
+39,A0039,Helmet (no holes),,1,Helmet,green,,,,,,,,,1983,Duke (v1),2
+40,A0040,Helmet (with holes),,1,Helmet,bright green,,,,,,,,,1983,Duke (v1),1
+41,A0041,"M-32 ""Pulverizer"" Submachine Gun",,9,Weapon Submachine Gun,green,,,,,,,,,1983,Duke (v1),1
+42,A0042,"M-32 ""Pulverizer"" Submachine Gun",,9,Weapon Submachine Gun,bright green,,,,,,,,,1983,Duke (v1),1
+43,A0043,Binocular,,37,Tactical Gear,black,,,,,,,,,1983,Duke (v1),3
+44,A0044,American Flag (decal),,39,Decal,--,,,,,,,,,1983,Duke (v1),1
+45,A0045,JUMP Jet Pack,,3,Backpack,green,,,,,,,,,1983,Grand Slam (v2),3
+46,A0046,Jet pack Laser Rifle,,8,Weapon Rifle,green,,,,,,,,,1983,Grand Slam (v2),3
+47,A0047,Cord,,41,Cord/ Pull/ Strap,black,,,,,,,,,1983,Grand Slam (v2),3
+48,A0048,Helmet (with holes),,1,Helmet,tan,,,,,,,,,1983,Grunt (v1),3
+49,A0049,Jungle Pack Backpack,,3,Backpack,teal,,,,,,,,,1983,Gung-Ho (v1),1
+50,A0050,XM-76 Grenade Launcher,,13,Weapon Bazooka/ Launcher,black,,,,,,,,,1983,Gung-Ho (v1),1
+51,A0051,Missile Backpack,,3,Backpack,black,,,,,,,,,1983,Major Bludd (v1),1
+52,A0052,Rocket Launcher,,6,Weapon Pistol,black,,,,,,,,,1983,Major Bludd (v1),1
+53,A0053,Polar Pack,,3,Backpack,white,,,,,,,,,1983,Snow Job (v1),1
+54,A0054,XMLR-3A Laser Rifle,,8,Weapon Rifle,black,,,,,,,,,1983,Snow Job (v1),1
+55,A0055,Ski,,34,Ski/ Snow Equipment,white,2,,,,,,,,1983,Snow Job (v1),1
+56,A0056,Ski Pole,,34,Ski/ Snow Equipment,black,2,,,,,,,,1983,Snow Job (v1),1
+57,A0057,Scuba Tank Backpack,,3,Backpack,gray,,,,,,,,,1983,Torpedo (v1),1
+58,A0058,Harpoon Rifle,,20,Weapon Harpoon/ Javelin/ Spear,black,,,,,,,,,1983,Torpedo (v1),1
+59,A0059,Swim Fin,,36,Swim/ Scuba Equipment,gray,2,,,,,,,,1983,Torpedo (v1),1
+60,A0060,Mine Detector Backpack,,3,Backpack,light green,,,,,,,,,1983,Tripwire (v1),1
+61,A0061,Mine Sweeper,,35,Specialized Equipment,black,,,,,,,,,1983,Tripwire (v1),2
+62,A0062,Land Mine,,31,Explosive Ordnance Disposal (EOD),light green,3,,,,,,,,1983,Tripwire (v1),1
+63,A0063,Backpack,,3,Backpack,black,,,,,,,,,1984,Baroness (v1),1
+64,A0064,Laser Rifle,,8,Weapon Rifle,black,,,,,,,,,1984,Baroness (v1),1
+65,A0065,Helmet,,1,Helmet,yellow,,,,,,,,,1984,Blowtorch (v1),1
+66,A0066,Helmet (with holes),,1,Helmet,yellow,,,,,,,,,1984,Blowtorch (v1),1
+67,A0067,Oxygen Mask,,2,Helmet Accessory,yellow,,,,,,,,,1984,Blowtorch (v1),1
+68,A0068,M-7 Manpack,,3,Backpack,yellow,,,,,,,,,1984,Blowtorch (v1),1
+69,A0069,Flamethrower,,11,Weapon Flamethrower,light green,,,,,,,,,1984,Blowtorch (v1),1
+70,A0070,Flamethrower,,11,Weapon Flamethrower,dark green,,,,,,,,,1984,Blowtorch (v1),1
+71,A0071,Helmet,,1,Helmet,tan,,,,,,,,,1984,Clutch (v2),3
+72,A0072,Bellows,,36,Swim/ Scuba Equipment,black,,,,,,,,,1984,Deep Six (v1),1
+73,A0073,One-Way Valve,,36,Swim/ Scuba Equipment,black,,,,,,,,,1984,Deep Six (v1),1
+74,A0074,Connector,,36,Swim/ Scuba Equipment,black,,,,,,,,,1984,Deep Six (v1),1
+75,A0075,Tubing,,46,Specialized Hose,clear,,,,,,,,,1984,Deep Six (v1),1
+76,A0076,Demolition Backpack,,3,Backpack,gray,,,,,,,,,1984,Firefly (v1),1
+77,A0077,Demolition Backpack Cover,,5,Backpack Accessory,gray,,,,,,,,,1984,Firefly (v1),1
+78,A0078,Submachine Gun,,9,Weapon Submachine Gun,light green,,,,,,,,,1984,Firefly (v1),1
+79,A0079,Submachine Gun,,9,Weapon Submachine Gun,dull green,,,,,,,,,1984,Firefly (v1),1
+80,A0080,Walkie-Talkie,,30,Comms/ Radio/ Tech,light green,,,,,,,,,1984,Firefly (v1),1
+81,A0081,Walkie-Talkie,,31,Comms/ Radio/ Tech,dull green,,,,,,,,,1984,Firefly (v1),1
+82,A0082,Helmet,,1,Helmet,black,,,,,,,,,1984,Mutt (v1),1
+83,A0083,Helmet (with holes),,1,Helmet,black,,,,,,,,,1984,Mutt (v1),1
+84,A0084,Face Mask,,2,Helmet Accessory,black,,,,,,,,,1984,Mutt (v1),2
+85,A0085,Mac-11 Submachine Gun,,9,Weapon Submachine Gun,black,,,,,,,,,1984,Mutt (v1),2
+86,A0086,Night Stick,,37,Tactical Gear,black,,,,,,,,,1984,Mutt (v1),2
+87,A0087,Leash,,27,Animal Accessory,black,,,,,,,,,1984,Mutt (v1),2
+88,A0088,"Dog, Junkyard",,26,Animal,black/ brown,,,,,,,,,1984,Mutt (v1),2
+89,A0089,Cross Country Backpack,,3,Backpack,light green,,,,,,,,,1984,Recando (v1),1
+90,A0090,Cross Country Packpack,,3,Backpack,dark green,,,,,,,,,1984,Recando (v1),1
+91,A0091,M-14E2X Rifle,,8,Weapon Rifle,light green,,,,,,,,,1984,Recando (v1),1
+92,A0092,M-14E2X Rifle,,8,Weapon Rifle,dark green,,,,,,,,,1984,Recando (v1),1
+93,A0093,Helmet,,1,Helmet,black,,,,,,,,,1984,Ripcord (v1),1
+94,A0094,Helmet (with holes),,1,Helmet,black,,,,,,,,,1984,Ripcord (v1),1
+95,A0095,Oxygen Mask,,2,Helmet Accessory,black,,,,,,,,,1984,Ripcord (v1),1
+96,A0096,Parachute Pack,,3,Backpack,light green,,,,,,,,,1984,Ripcord (v1),1
+97,A0097,SLR-W1L1 Rifle,,8,Weapon Rifle,light green,,,,,,,,,1984,Ripcord (v1),1
+98,A0098,SLR-W1L1 Rifle,,8,Weapon Rifle,dark green,,,,,,,,,1984,Ripcord (v1),1
+99,A0099,Machine Gunner Backpack,,3,Backpack,brown,,,,,,,,,1984,Roadblock (v1),1
+100,A0100,Ammo Box,,5,Backpack Accessory,brown,,,,,,,,,1984,Roadblock (v1),1
+101,A0101,M-2X Heavy Machine Gun,,10,Weapon Machine Gun,green,,,,,,,,,1984,Roadblock (v1),1
+102,A0102,M-2X Heavy Machine Gun,,10,Weapon Machine Gun,dark green,,,,,,,,,1984,Roadblock (v1),1
+103,A0103,Tripod,,22,Weapon Accessory,green,,,,,,,,,1984,Roadblock (v1),1
+104,A0104,Tripod,,22,Weapon Accessory,dark green,,,,,,,,,1984,Roadblock (v1),1
+105,A0105,RAR Pistol,,6,Weapon Pistol,black,,,,,,,,,1984,Scrap Iron (v1),1
+106,A0106,Missile System Top,,42,Launch System,black,,,,,,,,,1984,Scrap Iron (v1),1
+107,A0107,Missile System Bottom,,42,Launch System,black,,,,,,,,,1984,Scrap Iron (v1),1
+108,A0108,Missile System Base,,42,Launch System,black,,,,,,,,,1984,Scrap Iron (v1),1
+109,A0109,Missile System Legs,,42,Launch System,black,2,,,,,,,,1984,Scrap Iron (v1),1
+110,A0110,Missiles,,23,Missile,red,2,,,,,,,,1984,Scrap Iron (v1),1
+111,A0111,Remote Activator (thin handle),,41,Cord/ Pull/ Strap,black,,,,,,,,,1984,Scrap Iron (v1),1
+112,A0112,Remote Activator (thick handle),,41,Cord/ Pull/ Strap,black,,,,,,,,,1984,Scrap Iron (v1),1
+113,A0113,Arrow Cassette Pack,,3,Backpack,light green,,,,,,,,,1984,Spirit (v1),1
+114,A0114,Arrow Cassette Pack,,3,Backpack,dark green,,,,,,,,,1984,Spirit (v1),1
+115,A0115,Auto-Arrow Launcher,,8,Weapon Rifle,light green,,,,,,,,,1984,Spirit (v1),1
+116,A0116,Auto-Arrow Launcher,,8,Weapon Rifle,dark green,,,,,,,,,1984,Spirit (v1),1
+117,A0117,Belt,,28,Ammo/ Belt,green/red,,,,,,,,,1984,Spirit (v1),1
+118,A0118,"Freedom, Eagle",,26,Animal,brown,,,,,,,,,1984,Spirit (v1),2
+119,A0119,Freedom Claw,,26,Animal,brown,,,,,,,,,1984,Spirit (v1),2
+120,A0120,Quiver Backpack,,3,Backpack,black,,,,,,,,,1984,Storm Shadow (v1),1
+121,A0121,Long Bow,,19,Weapon Bow/ Crossbow,black,,,,,,,,,1984,Storm Shadow (v1),1
+122,A0122,Nunchaku Sticks,,18,Weapon Melee,black,,,,,,,,,1984,Storm Shadow (v1),1
+123,A0123,Wakizashi (Short Samurai Sword),,17,Weapon Sword,black,,,,,,,,,1984,Storm Shadow (v1),1
+124,A0124,Katana (Long Samurai Sword),,17,Weapon Sword,black,,,,,,,,,1984,Storm Shadow (v1),1
+125,A0125,Radio Headset,,2,Helmet Accessory,green,,,,,,,,,1984,Thunder (v1),1
+126,A0126,Radio Headset,,2,Helmet Accessory,dark green,,,,,,,,,1984,Thunder (v1),1
+127,A0127,Visor,,2,Helmet Accessory,black,,,,,,,,,1984,Thunder (v1),1
+128,A0128,Monocular,,37,Tactical Gear,black,,,,,,,,,1984,Thunder (v1),1
+129,A0129,Sledgehammer,,21,Weapon Specialized,gray,,,,,,,,,1984,Tollbooth (v1),1
+130,A0130,Face Mask Disguise,,37,Tactical Gear,fleshtone,,,,,,,,,1984,Zartan (v1),1
+131,A0131,Chest Armor,,29,Armor/ Shield,black/clear,,,,,,,,,1984,Zartan (v1),1
+132,A0132,Left Thigh Pad,,29,Armor/ Shield,black/clear,,,,,,,,,1984,Zartan (v1),1
+133,A0133,Right Thigh Pad,,29,Armor/ Shield,black/clear,,,,,,,,,1984,Zartan (v1),1
+134,A0134,Backpack,,3,Backpack,black,,,,,,,,,1984,Zartan (v1),1
+135,A0135,Pistol,,6,Weapon Pistol,black,,,,,,,,,1984,Zartan (v1),1
+136,A0136,Chest Armor Heat Sticker (single-sided),,39,Decal,--,,,,,,,,,1984,Zartan (v1),1
+137,A0137,Thigh Pad Heat Sticker (single-sided),,39,Decal,--,2,,,,,,,,1984,Zartan (v1),1
+138,A0138,Chest Armor Heat Sticker (double-sided),,39,Decal,--,2,,,,,,,,1984,Zartan (v1),1
+139,A0139,Thigh Pad Heat Sticker (double-sided),,39,Decal,--,2,,,,,,,,1984,Zartan (v1),1
+140,A0140,Air Hose,,47,Specialized Hose,black,,,,,,,,,1985,Airtight (v1),1
+141,A0141,Compressor Backpack,,3,Backpack,green,,,,,,,,,1985,Airtight (v1),1
+142,A0142,Chemical Sniffer,,35,Specialized Equipment,black,,,,,,,,,1985,Airtight (v1),1
+143,A0143,Mountain Pack Backpack,,3,Backpack,tan,,,,,,,,,1985,Apline (v1),1
+144,A0144,Barretta SMG-12 Pistol,,6,Weapon Pistol,black,,,,,,,,,1985,Apline (v1),1
+145,A0145,GRB-88 Grappling Launch Line Rifle,,8,Weapon Rifle,black,,,,,,,,,1985,Apline (v1),1
+146,A0146,Climbing Axe,,37,Tactical Gear,black,,,,,,,,,1985,Apline (v1),1
+147,A0147,Grappling Hook,,32,Grappling Hook,black,2,,,,,,,,1985,Apline (v1),1
+148,A0148,Tank Bracket Frame Backpack,,3,Backpack,gray,,,,,,,,,1985,Barbecue (v1),2
+149,A0149,Foam Tanks,,5,Backpack Accessory,orange,,,,,,,,,1985,Barbecue (v1),1
+150,A0150,Nozzle gun,,35,Specialized Equipment,gray,,,,,,,,,1985,Barbecue (v1),2
+151,A0151,Fire Axe,,37,Tactical Gear,gray/silver,,,,,,,,,1985,Barbecue (v1),1
+152,A0152,Helmet,,1,Helmet,green,,,,,,,,,1985,Bazooka (v1),1
+153,A0153,Missile Pack,,3,Backpack,green,,,,,,,,,1985,Bazooka (v1),1
+154,A0154,M.A.T. Missile Launcher,,13,Weapon Bazooka/ Launcher,black,,,,,,,,,1985,Bazooka (v1),2
+155,A0155,Backpack Frame,,3,Backpack,silver,,,,,,,,,1985,Buzzer (v1),1
+156,A0156,Gas Can,,5,Backpack Accessory,silver,,,,,,,,,1985,Buzzer (v1),1
+157,A0157,Diamond Toothed Chain Saw,,35,Weapon Specialized,silver,,,,,,,,,1985,Buzzer (v1),1
+158,A0158,Nunchuka Axe,,15,Weapon Blade,silver,,,,,,,,,1985,Buzzer (v1),1
+159,A0159,Helmet,,1,Helmet,gray,,,,,,,,,1985,Crankcase (v1),1
+160,A0160,Rifle,,8,Weapon Rifle,black,,,,,,,,,1985,Crankcase (v1),1
+161,A0161,Dress Backpack (solid back),,3,Backpack,light red,,,,,,,,,1985,Crimson Guard (v1),1
+162,A0162,Dress Backpack (solid back),,3,Backpack,dark red,,,,,,,,,1985,Crimson Guard (v1),1
+163,A0163,Dress Backpack (hollow back),,3,Backpack,light red,,,,,,,,,1985,Crimson Guard (v1),1
+164,A0164,AK-48AW Rifle with Bayonet,,6,Weapon Rifle,black,,,,,,,,,1985,Crimson Guard (v1),2
+165,A0165,Desert Field Pack,,3,Backpack,tan,,,,,,,,,1985,Dusty (v1),1
+166,A0166,FAMAS Submachine Gun,,9,Weapon Submachine Gun,black,,,,,,,,,1985,Dusty (v1),2
+167,A0167,Bipod,,22,Weapon Accessory,black,,,,,,,,,1985,Dusty (v1),2
+168,A0168,Air Hose,,46,Specialized Hose,black,,,,,,,,,1985,Eels (v1),1
+169,A0169,Air Tank Backpack,,3,Backpack,black,,,,,,,,,1985,Eels (v1),1
+170,A0170,Jet Pack,,5,Backpack Accessory,black,,,,,,,,,1985,Eels (v1),1
+171,A0171,JLS Double Harpoon with Stunner,,20,Weapon Harpoon/ Javelin/ Spear,black,,,,,,,,,1985,Eels (v1),1
+172,A0172,Flipper,,36,Swim/ Scuba Equipment,black,2,,,,,,,,1985,Eels (v1),3
+173,A0173,Infantry Field Pack,,3,Backpack,green,,,,,,,,,1985,Flint (v1),1
+174,A0174,I-12 Short Barrel Riot Shotgun,,7,Weapon Shotgun,green,,,,,,,,,1985,Flint (v1),1
+175,A0175,PASGT Helmet,,1,Helmet,green/brown,,,,,,,,,1985,Footloose (v1),1
+176,A0176,Backpack,,3,Backpack,tan,,,,,,,,,1985,Footloose (v1),1
+177,A0177,M-16 Rifle,,8,Weapon Rifle,black,,,,,,,,,1985,Footloose (v1),4
+178,A0178,M73-A1 LAW Rocket Launcher,,13,Weapon Bazooka/ Launcher,black,,,,,,,,,1985,Footloose (v1),2
+179,A0179,M-16 Attack Rifle with Scope,,8,Weapon Rifle,black,,,,,,,,,1985,Frostbite (v1),2
+180,A0180,Microphone,,2,Helmet Accessory,brown,,,,,,,,,1985,Heavy Metal (v1),1
+181,A0181,Submachine Gun,,9,Weapon Submachine Gun,black,,,,,,,,,1985,Heavy Metal (v1),2
+182,A0182,Pistol,,6,Weapon Pistol,silver,,,,,,,,,1985,Keel-Haul (v1),1
+183,A0183,Backpack,,3,Backpack,green,,,,,,,,,1985,Lady Jaye (v1),1
+184,A0184,Power Javelin,,20,Weapon Harpoon/ Javelin/ Spear,gray,,,,,,,,,1985,Lady Jaye (v1),1
+185,A0185,Surveillance Camera,,30,Comms/ Radio/ Tech,green,,,,,,,,,1985,Lady Jaye (v1),1
+186,A0186,Submachine Gun,,9,Weapon Submachine Gun,silver,,,,,,,,,1985,Lampreys (v1),1
+187,A0187,Backpack,,3,Backpack,gray,,,,,,,,,1985,Quick Kick (v1),1
+188,A0188,Backpack,,3,Backpack,dark gray,,,,,,,,,1985,Quick Kick (v1),1
+189,A0189,Samurai Sword,,17,Weapon Sword,silver,,,,,,,,,1985,Quick Kick (v1),1
+190,A0190,Samurai Sword,,17,Weapon Sword,silver (flimsy),,,,,,,,,1985,Quick Kick (v1),1
+191,A0191,Nunchuks,,18,Weapon Melee,silver,,,,,,,,,1985,Quick Kick (v1),1
+192,A0192,Nunchuks,,18,Weapon Melee,silver (flimsy),,,,,,,,,1985,Quick Kick (v1),1
+193,A0193,Backpack Frame,,3,Backpack,silver,,,,,,,,,1985,Ripper (v1),1
+194,A0194,Power Pack,,3,Backpack,silver,,,,,,,,,1985,Ripper (v1),1
+195,A0195,Power Jaws,,21,Weapon Specialized,silver,,,,,,,,,1985,Ripper (v1),1
+196,A0196,Assault Rifle with Metal Splitter,,8,Weapon Rifle,silver,,,,,,,,,1985,Ripper (v1),1
+197,A0197,Percussion Pistol,,6,Weapon Pistol,silver,,,,,,,,,1985,Shipwreck (v1),1
+198,A0198,Boarding Hooks,,32,Grappling Hook,silver,2,,,,,,,,1985,Shipwreck (v1),1
+199,A0199,Handle,,32,Grappling Hook,silver,,,,,,,,,1985,Shipwreck (v1),2
+200,A0200,Polly,,26,Animal,green/yellow,,,,,,,,,1985,Shipwreck (v1),1
+201,A0201,Polly Claw,,26,Animal,green,,,,,,,,,1985,Shipwreck (v1),1
+202,A0202,Backpack,,3,Backpack,black,,,,,,,,,1985,Snake Eyes (v2),1
+203,A0203,Uzi Submachine Gun (thick muzzle),,6,Weapon Pistol,black,,,,,,,,,1985,Snake Eyes (v2),2
+204,A0204,Sword,,17,Weapon Sword,black,,,,,,,,,1985,Snake Eyes (v2),1
+205,A0205,Timber,,26,Animal,gray,,,,,,,,,1985,Snake Eyes (v2),1
+206,A0206,Survival Backpack,,3,Backpack,white,,,,,,,,,1985,Snow Serpent (v1),1
+207,A0207,Parachute Pack,,28,Ammo/ Belt,blue,,,,,,,,,1985,Snow Serpent (v1),1
+208,A0208,AK-47 Assault Rifle,,8,Weapon Rifle,gray,,,,,,,,,1985,Snow Serpent (v1),1
+209,A0209,Snow Shoe,,34,Ski/ Snow Equipment,white,2,,,,,,,,1985,Snow Serpent (v1),1
+210,A0210,Anti-Tank EK99 Missile,,23,Missile,gray,,,,,,,,,1985,Snow Serpent (v1),1
+211,A0211,Missile Stand,,22,Weapon Accessory,gray,,,,,,,,,1985,Snow Serpent (v1),1
+212,A0212,Helmet,,1,Helmet,light blue,,,,,,,,,1985,Star Duster (v1),3
+213,A0213,Visor,,2,Helmet Accessory,black,,,,,,,,,1985,Star Duster (v1),3
+214,A0214,XM-76 Grenade Launcher,,13,Weapon Bazooka/ Launcher,silver,,,,,,,,,1985,Star Duster (v1),3
+215,A0215,Communications Backpack,,3,Backpack,black,,,,,,,,,1985,Tele-Viper (v1),2
+216,A0216,VS-11 Scanner Rifle,,8,Weapon Rifle,black,,,,,,,,,1985,Tele-Viper (v1),2
+217,A0217,Pistol,,6,Weapon Pistol,black,,,,,,,,,1985,Tomax (v1),2
+218,A0218,Sky Hook,,32,Grappling Hook,gray,,,,,,,,,1985,Tomax (v1),1
+219,A0219,BP-47 Tanks,,3,Backpack,silver,,,,,,,,,1985,Torch (v1),1
+220,A0220,Acetylene Torch,,21,Weapon Specialized,silver,,,,,,,,,1985,Torch (v1),1
+221,A0221,Mine Detector Backpack,,3,Backpack,gray,,,,,,,,,1985,Tripwire (v2),1
+222,A0222,Mine Sweeper,,35,Specialized Equipment,gray,,,,,,,,,1985,Tripwire (v2),1
+223,A0223,Land Mine,,31,Explosive Ordnance Disposal (EOD),gray,3,,,,,,,,1985,Tripwire (v2),1
+224,A0224,Listen 'n Fun Cassette Tape,,52,Cassette/ VHS,yellow,,,,,,,,,1985,Tripwire (v2),1
+225,A0225,Parachute pack (soft plastic),,3,Backpack,black,,,,,,,,,1986,A.V.A.C. (v1),1
+226,A0226,Parachute pack (hard plastic),,3,Backpack,black,,,,,,,,,1986,A.V.A.C. (v1),1
+227,A0227,Backpack,,3,Backpack,black,,,,,,,,,1986,B.A.T.S. (v1),1
+228,A0228,Right Hand Attachment,,21,Weapon Specialized,silver,,,,,,,,,1986,B.A.T.S. (v1),1
+229,A0229,Gripper Attachment,,21,Weapon Specialized,silver,,,,,,,,,1986,B.A.T.S. (v1),1
+230,A0230,Laser Attachment,,21,Weapon Specialized,silver,,,,,,,,,1986,B.A.T.S. (v1),1
+231,A0231,Torch Attachment,,21,Weapon Specialized,silver,,,,,,,,,1986,B.A.T.S. (v1),1
+232,A0232,Large Utility Backpack,,3,Backpack,black,,,,,,,,,1986,Beach Head (v1),1
+233,A0233,Ammo Case,,37,Tactical Gear,black,,,,,,,,,1986,Beach Head (v1),1
+234,A0234,9mm XF-7 Wasp Submachine Gun,,9,Weapon Submachine Gun,gray,,,,,,,,,1986,Beach Head (v1),1
+235,A0235,Helmet,,1,Helmet,green,,,,,,,,,1986,Claymore (v1),1
+236,A0236,Special Mission: Brazil Cassette Tape,,52,Cassette/ VHS,black,,,,,,,,,1986,Claymore (v1),1
+237,A0237,Anti-Scrambler Communications Backpack,,3,Backpack,gray,,,,,,,,,1986,Dial-Tone (v1),2
+238,A0238,Backpack Microphone,,5,Backpack Accessory,gray,,,,,,,,,1986,Dial-Tone (v1),2
+239,A0239,9mm Parabellum Submachine Pistol with Silencer,,9,Weapon Submachine Gun,gray,,,,,,,,,1986,Dial-Tone (v1),2
+240,A0240,.45 Caliber Pistol,,6,Weapon Pistol,gray,,,,,,,,,1986,Dr. Mindbender (v1),1
+241,A0241,Electric Prod,,21,Weapon Specialized,silver,,,,,,,,,1986,Dr. Mindbender (v1),1
+242,A0242,Generator,,22,Weapon Accessory,black,,,,,,,,,1986,Dr. Mindbender (v1),1
+243,A0243,Cobra Cape (patch),,40,Soft Goods,black/silver,,,,,,,,,1986,Dr. Mindbender (v1),1
+244,A0244,Cobra Cape (iron-on),,40,Soft Goods,black/silver,,,,,,,,,1986,Dr. Mindbender (v1),1
+245,A0245,Helmet,,1,Helmet,green,,,,,,,,,1986,Hawk (v2),1
+246,A0246,Fieldpack,,3,Backpack,green,,,,,,,,,1986,Hawk (v2),1
+247,A0247,Walther PPK/9mm Short Pistol,,6,Weapon Pistol,black,,,,,,,,,1986,Hawk (v2),1
+248,A0248,XM60E3 7.62mm Machine Gun,,10,Weapon Machine Gun,white,,,,,,,,,1986,Iceberg (v1),1
+249,A0249,Fieldpack Backpack,,3,Backpack,green,,,,,,,,,1986,Leatherneck (v1),2
+250,A0250,"M-16 ""Over/Under"" Rifle",,8,Weapon Rifle,gray,,,,,,,,,1986,Leatherneck (v1),2
+251,A0251,Airmask,,46,Specialized Hose,black,,,,,,,,,1986,Lifeline (v1),2
+252,A0252,Emergency Communications Backpack,,3,Backpack,silver,,,,,,,,,1986,Lifeline (v1),2
+253,A0253,Browning Double Action 9mm Pistol,,6,Weapon Pistol,silver,,,,,,,,,1986,Lifeline (v1),1
+254,A0254,Rescue Case,,33,Medical Equipment,white,,,,,,,,,1986,Lifeline (v1),2
+255,A0255,Microphone,,2,Helmet Accessory,black,,,,,,,,,1986,Lift-Ticket (v1),1
+256,A0256,Backpack,,3,Backpack,black,,,,,,,,,1986,Low-Light (v1),2
+257,A0257,Uzi Submachine Gun,,9,Weapon Submachine Gun,black,,,,,,,,,1986,Low-Light (v1),4
+258,A0258,Sniper Rifle,,8,Weapon Rifle,black,,,,,,,,,1986,Low-Light (v1),2
+259,A0259,Bipod,,22,Weapon Accessory,black,,,,,,,,,1986,Low-Light (v1),2
+260,A0260,BP75E Field Transmitter/Reciever Unit Backpack,,3,Backpack,gray,,,,,,,,,1986,Mainframe (v1),2
+261,A0261,Handheld Computer,,30,Comms/ Radio/ Tech,gray,,,,,,,,,1986,Mainframe (v1),2
+262,A0262,Telephone,,30,Comms/ Radio/ Tech,gray,,,,,,,,,1986,Mainframe (v1),2
+263,A0263,Harpoon Gun,,20,Weapon Harpoon/ Javelin/ Spear,gray,,,,,,,,,1986,Monkeywrench (v1),1
+264,A0264,L7A21 GPMG Heavy Machine Gun ,,10,Weapon Machine Gun,silver,,,,,,,,,1986,Roadblock (v2),1
+265,A0265,Tripod,,22,Weapon Accessory,silver,,,,,,,,,1986,Roadblock (v2),1
+266,A0266,Power Source Backpack,,3,Backpack,green,,,,,,,,,1986,Sci-Fi (v1),1
+267,A0267,XH86 LLOM Beam Laser Rifle,,12,Weapon Blaster/ Laser,black,,,,,,,,,1986,Sci-Fi (v1),1
+268,A0268,Snake Headdress,,3,Backpack,gold,,,,,,,,,1986,Serpentor (v1),1
+269,A0269,Dagger,,14,Weapon Knife,silver,,,,,,,,,1986,Serpentor (v1),1
+270,A0270,Cape,,40,Soft Goods,green,,,,,,,,,1986,Serpentor (v1),1
+271,A0271,Snake,,26,Animal,gold,,,,,,,,,1986,Serpentor (v1),1
+272,A0272,Snake,,26,Animal,bronze,,,,,,,,,1986,Serpentor (v1),1
+273,A0273,Snake,,26,Animal,dark brown,,,,,,,,,1986,Serpentor (v1),1
+274,A0274,Snake,,26,Animal,transulent brown,,,,,,,,,1986,Serpentor (v1),1
+275,A0275,Snake,,26,Animal,green,,,,,,,,,1986,Serpentor (v1),1
+276,A0276,Baton,,21,Weapon Specialized,brown,,,,,,,,,1986,Sgt. Slaughter,3
+277,A0277,Lacrosse Stick,,21,Weapon Specialized,black,,,,,,,,,1986,Thrasher ( v1),1
+278,A0278,Fieldpack Backpack,,3,Backpack,black,,,,,,,,,1986,Viper (v1),2
+279,A0279,RDT-7 Assault Rifle with Grenade Launcher,,8,Weapon Rifle,light gray,,,,,,,,,1986,Viper (v1),1
+280,A0280,Mouthpiece,,46,Specialized Hose,black,,,,,,,,,1986,Wet-Suit (v1),2
+281,A0281,Scuba Tank Backpack,,3,Backpack,orange,,,,,,,,,1986,Wet-Suit (v1),2
+282,A0282,Sea Sled,,36,Swim/ Scuba Equipment,orange,,,,,,,,,1986,Wet-Suit (v1),2
+283,A0283,Searchlight ,,35,Specialized Equipment,orange,,,,,,,,,1986,Wet-Suit (v1),2
+284,A0284,Grenade-Adorned Quiver Backpack,,3,Backpack,blue,,,,,,,,,1986,Zandar (v1),1
+285,A0285,Harpoon Rifle,,20,Weapon Harpoon/ Javelin/ Spear,black,,,,,,,,,1986,Zandar (v1),1
+286,A0286,Backpack,,3,Backpack,red,,,,,,,,,1986,Zarana (V1),1
+287,A0287,Razor Honed Spur Cutting Weapon,,21,Weapon Specialized,black,,,,,,,,,1986,Zarana (V1),1
+288,A0288,Microphone,,2,Helmet Accessory,silver,,,,,,,,,1987,Avalanche (v1),1
+289,A0289,P-480 Sub-Zero Stun Gun,,12,Weapon Blaster/ Laser,silver,,,,,,,,,1987,Avalanche (v1),1
+290,A0290,Helmet,,1,Helmet,gray,,,,,,,,,1987,Backstop (v1),1
+291,A0291,Pistol,,6,Weapon Pistol,silver,,,,,,,,,1987,Backstop (v1),1
+292,A0292,Air Hose,,46,Specialized Hose,silver,,,,,,,,,1987,Big Boa (v1),1
+293,A0293,Flexsteel-Mesh Boxing Glove (left),,18,Weapon Melee,red,,,,,,,,,1987,Big Boa (v1),1
+294,A0294,Flexsteel-Mesh Boxing Glove (right),,18,Weapon Melee,red,,,,,,,,,1987,Big Boa (v1),1
+295,A0295,Punching Bag,,43,Playset Feature,black/brown,,,,,,,,,1987,Big Boa (v1),1
+296,A0296,Punching Bag Stand,,43,Playset Feature,black,,,,,,,,,1987,Big Boa (v1),1
+297,A0297,Mouthpiece,,2,Helmet Accessory,green,,,,,,,,,1987,Blaster (v1),1
+298,A0298,DK-528 Infra-Green Laser Pistol,,12,Weapon Blaster/ Laser,silver,,,,,,,,,1987,Blaster (v1),1
+299,A0299,Visor,,2,Weapon Accessory,clear,,,,,,,,,1987,Blocker (v1),1
+300,A0300,XL-13 Light Refraction Submachine Laser,,12,Weapon Blaster/ Laser,silver,,,,,,,,,1987,Blocker (v1),1
+301,A0301,Quick-draw Shoulder Harness,,22,Weapon Accessory,brown,,,,,,,,,1987,Chuckles (v1),1
+302,A0302,Colt Combat Commander .45 pistol,,6,Weapon Pistol,black,,,,,,,,,1987,Chuckles (v1),1
+303,A0303,Mouthpiece,,46,Specialized Hose,black,,,,,,,,,1987,Cobra Commander (v3),1
+304,A0304,Life Support Backpack,,3,Backpack,silver,,,,,,,,,1987,Cobra Commander (v3),1
+305,A0305,Assault Pistol,,6,Weapon Pistol,black,,,,,,,,,1987,Cobra Commander (v3),2
+306,A0306,Parachute Pack,,3,Backpack,tan,,,,,,,,,1987,Crazylegs (v1),1
+307,A0307,EM-4 Assault Rifle,,8,Weapon Rifle,black,,,,,,,,,1987,Crazylegs (v1),2
+308,A0308,Rifle Stock,,22,Weapon Accessory,black,,,,,,,,,1987,Crazylegs (v1),2
+309,A0309,Breather Hose,,46,Specialized Hose,black,,,,,,,,,1987,Croc Master (v1),1
+310,A0310,Leash,,27,Animal Accessory,black,,,,,,,,,1987,Croc Master (v1),1
+311,A0311,Whip,,27,Animal Accessory,tan,,,,,,,,,1987,Croc Master (v1),1
+312,A0312,Crocodile,,26,Animal,green,,,,,,,,,1987,Croc Master (v1),1
+313,A0313,Reflected Light Pulse Modulator (Hypno-Shield),,29,Armor/ Shield,black,,,,,,,,,1987,Crystal Ball (v1),1
+314,A0314,Microphone,,2,Helmet Accessory,silver,,,,,,,,,1987,Dodger (v1),1
+315,A0315,Ultra-Sonic Photon Rifle (thin handle),,12,Weapon Blaster/ Laser,silver,,,,,,,,,1987,Dodger (v1),2
+316,A0316,Ultra-Sonic Photon Rifle (thick handle),,12,Weapon Blaster/ Laser,silver,,,,,,,,,1987,Dodger (v1),2
+317,A0317,Special Forces Field Commications Pack Backpack,,3,Backpack,green,,,,,,,,,1987,Falcon (v1),1
+318,A0318,Antenna,,5,Backpack Accessory,green,,,,,,,,,1987,Falcon (v1),1
+319,A0319,12-Gauge Pump Shotgun,,7,Weapon Shotgun,black,,,,,,,,,1987,Falcon (v1),2
+320,A0320,Bowie Survival Knife,,14,Weapon Knife,black,,,,,,,,,1987,Falcon (v1),2
+321,A0321,Face Shield,,2,Helmet Accessory,red/silver,,,,,,,,,1987,Fast Draw (v1),1
+322,A0322,Hose,,46,Specialized Hose,blue,,,,,,,,,1987,Fast Draw (v1),1
+323,A0323,FAFNIR Target Acquisition and Missile Delivery System Backpack,,3,Backpack,green,,,,,,,,,1987,Fast Draw (v1),1
+324,A0324,Hand Controls,,5,Backpack Accessory,white,2,,,,,,,,1987,Fast Draw (v1),1
+325,A0325,Missiles,,23,Missile,white,2,,,,,,,,1987,Fast Draw (v1),1
+326,A0326,Laser Gun,,12,Weapon Blaster/ Laser,red,,,,,,,,,1987,Golobulus (v1),1
+327,A0327,Non-Com Dress Sabre,,17,Weapon Sword,gold,,,,,,,,,1987,Gung-Ho (v2),1
+328,A0328,Rank and Stripes (decal),,39,Decal,--,,,,,,,,,1987,Gung-Ho (v2),1
+329,A0329,Flight Helmet,,1,Helmet,maroon,,,,,,,,,1987,Gyro Viper (v1),1
+330,A0330,Microphone,,2,Helmet Accessory,white,,,,,,,,,1987,Hard Top (v1),1
+331,A0331,Pistol,,6,Weapon Pistol,black,,,,,,,,,1987,Hard Top (v1),1
+332,A0332,Helmet,,1,Helmet,gray,,,,,,,,,1987,Ice Viper (v1),1
+333,A0333,Sai,,14,Weapon Knife,silver,2,,,,,,,,1987,Ice Viper (v1),1
+334,A0334,Backpack,,3,Backpack,black,,,,,,,,,1987,Jinx (v1),1
+335,A0335,Sword,,17,Weapon Sword,silver,2,,,,,,,,1987,Jinx (v1),1
+336,A0336,Naginata Staff,,18,Weapon Melee,silver,,,,,,,,,1987,Jinx (v1),1
+337,A0337,Helmet,,1,Helmet,green/silver,,,,,,,,,1987,Knockdown (v1),1
+338,A0338,Experimental Ground-to-Air Pistol,,12,Weapon Blaster/ Laser,silver,,,,,,,,,1987,Knockdown (v1),1
+339,A0339,Helmet,,1,Helmet,white,,,,,,,,,1987,Law & Order (v1),2
+340,A0340,M.P. Truncheon,,37,Tactical Gear,black,,,,,,,,,1987,Law & Order (v1),1
+341,A0341,Leash,,27,Animal Accessory,black,,,,,,,,,1987,Law & Order (v1),1
+342,A0342,"Order, German Shepherd",,26,Animal,black/brown,,,,,,,,,1987,Law & Order (v1),1
+343,A0343,Helmet,,1,Helmet,blue,,,,,,,,,1987,Maverick (v1),1
+344,A0344,Semi-Automatic Machine Pistol,,6,Weapon Pistol,silver,,,,,,,,,1987,Maverick (v1),1
+345,A0345,Backpack,,3,Backpack,black,,,,,,,,,1987,Mercer (v1),2
+346,A0346,.45 Caliber Pistol with Silencer,,6,Weapon Pistol,light gray,,,,,,,,,1987,Mercer (v1),1
+347,A0347,Bat Wings,,3,Backpack,dark gray,,,,,,,,,1987,Nemesis Enforcer (v1),1
+348,A0348,Tentacles,,3,Backpack,green,,,,,,,,,1987,Nemesis Enforcer (v1),1
+349,A0349,Survival Backpack,,3,Backpack,tan,,,,,,,,,1987,Outback (v1),1
+350,A0350,Heckler & Koch G3 Rifle,,8,Weapon Rifle,black,,,,,,,,,1987,Outback (v1),2
+351,A0351,Web Belt,,37,Tactical Gear,tan,,,,,,,,,1987,Outback (v1),1
+352,A0352,Flashlight,,37,Tactical Gear,green,,,,,,,,,1987,Outback (v1),1
+353,A0353,Space Helmet,,1,Helmet,white/yellow,,,,,,,,,1987,Payload (v1),1
+354,A0354,E.V.A. Backpack,,3,Backpack,white,,,,,,,,,1987,Payload (v1),1
+355,A0355,E.V.A. Control Arms,,5,Backpack Accessory,white,2,,,,,,,,1987,Payload (v1),1
+356,A0356,Antenna,,2,Helmet Accessory,silver,,,,,,,,,1987,Psyche-Out (v1),2
+357,A0357,Backpack,,3,Backpack,silver,,,,,,,,,1987,Psyche-Out (v1),1
+358,A0358,.45 Assault Pistol,,6,Weapon Pistol,silver,,,,,,,,,1987,Psyche-Out (v1),2
+359,A0359,Variable Wave Field Projector with ELF Sonic Generator,,30,Comms/ Radio/ Tech,silver,,,,,,,,,1987,Psyche-Out (v1),1
+360,A0360,Radar Dish Attachment for Wave Field Projector,,30,Comms/ Radio/ Tech,red,,,,,,,,,1987,Psyche-Out (v1),1
+361,A0361,Wrist Clip,,30,Comms/ Radio/ Tech,silver,2,,,,,,,,1987,Psyche-Out (v1),1
+362,A0362,"""Big Ear"" Sonic Receiver",,30,Comms/ Radio/ Tech,red,2,,,,,,,,1987,Psyche-Out (v1),1
+363,A0363,Ultralight Airfoil System (Wing Cape),,40,Soft Goods,brown,,,,,,,,,1987,Raptor (v1),1
+364,A0364,"Talon, Falcon",,26,Animal,brown,,,,,,,,,1987,Raptor (v1),1
+365,A0365,Talon Claw,,26,Animal,brown,,,,,,,,,1988,Raptor (v1),2
+366,A0366,Desert Field Pack,,3,Backpack,brown,,,,,,,,,1987,Red Dog (v1),1
+367,A0367,.45 Caliber Pistol,,6,Weapon Pistol,dark gray,,,,,,,,,1987,Red Dog (v1),1
+368,A0368,Antenna,,2,Helmet Accessory,red,,,,,,,,,1987,Royal Guard (v1),1
+369,A0369,Handgun,,6,Weapon Pistol,gray,,,,,,,,,1987,Royal Guard (v1),1
+370,A0370,Scythe,,12,Weapon Blade,silver,,,,,,,,,1987,Royal Guard (v1),1
+371,A0371,Helmet,,1,Helmet,brown,,,,,,,,,1987,Rumbler (v1),1
+372,A0372,Submachine Gun,,9,Weapon Submachine Gun,gray,,,,,,,,,1987,Rumbler (v1),1
+373,A0373,Pistol,,6,Weapon Pistol,silver,,,,,,,,,1987,Sea Slug (v1),1
+374,A0374,Microphone,,2,Helmet Accessory,black,,,,,,,,,1987,Sneak Peek (v1),2
+375,A0375,Binoculars,,37,Tactical Gear,black,,,,,,,,,1987,Sneak Peek (v1),2
+376,A0376,Variable Range Optical Field Scanning Device (Periscope),,30,Comms/ Radio/ Tech,green,,,,,,,,,1987,Sneak Peek (v1),1
+377,A0377,Periscope Handle,,30,Comms/ Radio/ Tech,green,,,,,,,,,1987,Sneak Peek (v1),1
+378,A0378,Periscope Clip,,30,Comms/ Radio/ Tech,green,,,,,,,,,1987,Sneak Peek (v1),1
+379,A0379,Walkie-Talkie,,30,Comms/ Radio/ Tech,black,,,,,,,,,1987,Sneak Peek (v1),2
+380,A0380,Knife,,14,Weapon Knife,gray,,,,,,,,,1987,Steam-Roller (v1),2
+381,A0381,Backpack,,3,Backpack,green,,,,,,,,,1987,Steel Brigade (v1),1
+382,A0382,XM-16 Attack Rifle,,8,Weapon Rifle,gray,,,,,,,,,1987,Steel Brigade (v1),2
+383,A0383,AK-48AW Rifle with Bayonet,,8,Weapon Rifle,dark gray,,,,,,,,,1987,Steel Brigade (v1),1
+384,A0384,Jungle Trooper Backpack,,3,Backpack,brown,,,,,,,,,1987,Taurus (v1),1
+385,A0385,Pistol with Stock,,6,Weapon Pistol,gray,,,,,,,,,1987,Taurus (v1),1
+386,A0386,Backpack,,3,Backpack,black,,,,,,,,,1987,Techno-Viper (v1),1
+387,A0387,Phase-Pulse Plasma Rifle,,8,Weapon Rifle,silver,,,,,,,,,1987,Techno-Viper (v1),1
+388,A0388,Hydraulic Clamp Arm,,21,Weapon Specialized,silver,,,,,,,,,1987,Techno-Viper (v1),1
+389,A0389,Forged Steel Sledgehammer Arm,,21,Weapon Specialized,silver,,,,,,,,,1987,Techno-Viper (v1),1
+390,A0390,Vario-Wrench Arm,,21,Weapon Specialized,silver,,,,,,,,,1987,Techno-Viper (v1),1
+391,A0391,Football Flail,,21,Weapon Specialized,black,,,,,,,,,1987,The Fridge (v1),1
+392,A0392,Tunnel Floodlight System Backpack,,3,Backpack,dark green,,,,,,,,,1987,Tunnel Rat (v1),1
+393,A0393,Air-Cooled 7.62 Calibre Machine Gun with Infrared Scope,,10,Weapon Machine Gun,black,,,,,,,,,1987,Tunnel Rat (v1),5
+394,A0394,Satchel Charge Bag,,37,Tactical Gear,dark green,,,,,,,,,1987,Tunnel Rat (v1),1
+395,A0395,Halogen Hand Lamp,,37,Tactical Gear,dark green,2,,,,,,,,1987,Tunnel Rat (v1),1
+396,A0396,Helmet,,1,Helmet,brown,,,,,,,,,1987,W.O.R.M.S. (v1),1
+397,A0397,Antenna,,2,Helmet Accessory,brown,,,,,,,,,1987,W.O.R.M.S. (v1),1
+398,A0398,Pistol,,6,Weapon Pistol,black,,,,,,,,,1987,Zanzibar (v1),1
+399,A0399,Hammer,,21,Weapon Specialized,brown,,,,,,,,,1987,Zanzibar (v1),1
+400,A0400,Spear,,20,Weapon Harpoon/ Javelin/ Spear,brown,,,,,,,,,1987,Zanzibar (v1),1
+401,A0401,Helmet,,1,Helmet,gray/yellow,,,,,,,,,1988,Astro-Viper (v1),1
+402,A0402,Jet Pack,,3,Backpack,silver,,,,,,,,,1988,Astro-Viper (v1),1
+403,A0403,Handles,,5,Backpack Accessory,silver,2,,,,,,,,1988,Astro-Viper (v1),1
+404,A0404,Laser Guns,,5,Backpack Accessory,silver,2,,,,,,,,1988,Astro-Viper (v1),1
+405,A0405,Helmet,,1,Helmet,brown,,,,,,,,,1988,Bazooka (v2),1
+406,A0406,Ammo Backpack,,3,Backpack,dark green,,,,,,,,,1988,Bazooka (v2),1
+407,A0407,Helmet,,1,Helmet,white/blue,,,,,,,,,1988,Blizzard (v1),1
+408,A0408,Backpack Sled,,36,Ski/ Snow Equipment,black,,,,,,,,,1988,Blizzard (v1),1
+409,A0409,Sled Handle,,36,Ski/ Snow Equipment,black,2,,,,,,,,1988,Blizzard (v1),1
+410,A0410,Pistol,,6,Weapon Pistol,white,,,,,,,,,1988,Blizzard (v1),2
+411,A0411,Machine Gun,,9,Weapon Submachine Gun,white,,,,,,,,,1988,Blizzard (v1),2
+412,A0412,Ski,,36,Ski/ Snow Equipment,black,2,,,,,,,,1988,Blizzard (v1),1
+413,A0413,Ice Shoe,,36,Ski/ Snow Equipment,black,2,,,,,,,,1988,Blizzard (v1),1
+414,A0414,Samurai Helmet,,1,Helmet,gray/red,,,,,,,,,1988,Budo (v1),1
+415,A0415,Backpack,,3,Backpack,brown,,,,,,,,,1988,Budo (v1),1
+416,A0416,Sai,,14,Weapon Knife,silver,,,,,,,,,1988,Budo (v1),1
+417,A0417,Ornamental Sword,,17,Weapon Sword,silver,,,,,,,,,1988,Budo (v1),2
+418,A0418,Crimson Sword,,17,Weapon Sword,red,,,,,,,,,1988,Budo (v1),1
+419,A0419,Thermo-Insulated Oxygenated Helmet,,1,Helmet,silver/red,,,,,,,,,1988,Charbroil (v1),1
+420,A0420,Pressurized Thermochemical Backpack,,3,Backpack,silver,,,,,,,,,1988,Charbroil (v1),1
+421,A0421,Flamethrower,,11,Weapon Flamethrower,silver,,,,,,,,,1988,Charbroil (v1),1
+422,A0422,Flame-Retardant Hose,,47,Specialized Hose,black,,,,,,,,,1988,Charbroil (v1),2
+423,A0423,Parachute Pack,,3,Backpack,black,,,,,,,,,1988,Crazylegs (v2),1
+424,A0424,Sheathed Sword,,17,Weapon Sword,gold,,,,,,,,,1988,Destro (v2),1
+425,A0425,Desert Field Pack,,3,Backpack,green,,,,,,,,,1988,Dusty (v2),1
+426,A0426,Infantry Field Pack,,3,Backpack,dark gray,,,,,,,,,1988,Flint (v2),1
+427,A0427,I-12 Short Barrel Riot Shotgun,,7,Weapon Shotgun,dark gray,,,,,,,,,1988,Flint (v2),1
+428,A0428,Scarf,,40,Soft Goods,red,,,,,,,,,1988,Ghostrider (v1),1
+429,A0429,Backpack,,3,Backpack,green,,,,,,,,,1988,Hardball (v1),1
+430,A0430,Multi-Shot Grenade Launcher,,13,Weapon Bazooka/ Launcher,gray,,,,,,,,,1988,Hardball (v1),1
+431,A0431,Grenade Launcher Chamber,,22,Weapon Accessory,gray,,,,,,,,,1988,Hardball (v1),1
+432,A0432,Submachine Gun,,9,Weapon Submachine Gun,black,,,,,,,,,1988,Hit & Run (v1),7
+433,A0433,Knife,,14,Weapon Knife,green,,,,,,,,,1988,Hit & Run (v1),2
+434,A0434,Duffle Bag (front),,37,Tactical Gear,black,,,,,,,,,1988,Hit & Run (v1),1
+435,A0435,Duffle Bag (back),,37,Tactical Gear,black,,,,,,,,,1988,Hit & Run (v1),1
+436,A0436,Crank Handle,,37,Tactical Gear,black,,,,,,,,,1988,Hit & Run (v1),1
+437,A0437,Grappling Hook,,32,Grappling Hook,black,,,,,,,,,1988,Hit & Run (v1),1
+438,A0438,Regulator Helmet,,1,Helmet,red/black,,,,,,,,,1988,Hydro-Viper (v1),1
+439,A0439,Scuba Pack,,3,Backpack,black,,,,,,,,,1988,Hydro-Viper (v1),1
+440,A0440,Harpoon Gun,,20,Weapon Harpoon/ Javelin/ Spear,black,,,,,,,,,1988,Hydro-Viper (v1),1
+441,A0441,Dagger,,14,Weapon Knife,black,,,,,,,,,1989,Hydro-Viper (v1),1
+442,A0442,Fathom Fins,,36,Swim/ Scuba Equipment,red,2,,,,,,,,1988,Hydro-Viper (v1),1
+443,A0443,Devil Ray,,26,Animal,black,,,,,,,,,1988,Hydro-Viper (v1),1
+444,A0444,Pistol,,6,Weapon Pistol,black,,,,,,,,,1988,Iron Grenadiers (v1),1
+445,A0445,Submachine Gun,,9,Weapon Submachine Gun,gold,,,,,,,,,1988,Iron Grenadiers (v1),1
+446,A0446,Sword,,17,Weapon Sword,translucent red,,,,,,,,,1988,Iron Grenadiers (v1),1
+447,A0447,Emergency Communications Backpack,,3,Backpack,black,,,,,,,,,1988,Lifeline (v2),1
+448,A0448,Browning Double Action 9mm Pistol,,6,Weapon Pistol,black,,,,,,,,,1988,Lifeline (v2),2
+449,A0449,Rescue Case,,33,Medical Equipment,green,,,,,,,,,1988,Lifeline (v2),1
+450,A0450,Night Vision Helmet,,1,Helmet,blue/red,,,,,,,,,1988,Lightfoot (v1),1
+451,A0451,Backpack,,3,Backpack,green,,,,,,,,,1988,Lightfoot (v1),1
+452,A0452,Mine Detector Unit,,35,Specialized Equipment,green,,,,,,,,,1988,Lightfoot (v1),1
+453,A0453,Hose (connector belt),,46,Specialized Hose,green,,,,,,,,,1988,Lightfoot (v1),1
+454,A0454,Robot,,30,Comms/ Radio/ Tech,orange,,,,,,,,,1988,Lightfoot (v1),1
+455,A0455,Special Forces Field Commications Pack Backpack,,3,Backpack,black,,,,,,,,,1988,Lt. Falcon (v1),1
+456,A0456,Antenna,,5,Backpack Accessory,black,,,,,,,,,1988,Lt. Falcon (v1),1
+457,A0457,Super 90 Shotgun,,7,Weapon Shotgun,black,,,,,,,,,1988,Muskrat (v1),8
+458,A0458,"""Machetta"" (machete)",,16,Weapon Machete,blue,,,,,,,,,1988,Muskrat (v1),1
+459,A0459,Swamp Skimmer,,44,Transportation,green/red,,,,,,,,,1988,Muskrat (v1),1
+460,A0460,Visor,,1,Helmet,pink,,,,,,,,,1988,Nullifier (v1),1
+461,A0461,Survival Backpack,,3,Backpack,black,,,,,,,,,1988,Outback (v2),1
+462,A0462,Web Belt,,37,Tactical Gear,black,,,,,,,,,1988,Outback (v2),1
+463,A0463,Flashlight,,37,Tactical Gear,black,,,,,,,,,1988,Outback (v2),1
+464,A0464,Backpack,,3,Backpack,black,,,,,,,,,1988,Psyche-Out (v2),1
+465,A0465,Variable Wave Field Projector with ELF Sonic Generator,,30,Comms/ Radio/ Tech,black,,,,,,,,,1988,Psyche-Out (v2),1
+466,A0466,Radar Dish Attachment for Wave Field Projector,,30,Comms/ Radio/ Tech,black,,,,,,,,,1988,Psyche-Out (v2),1
+467,A0467,Wrist Clip,,30,Comms/ Radio/ Tech,black,2,,,,,,,,1988,Psyche-Out (v2),1
+468,A0468,"""Big Ear"" Sonic Receiver",,30,Comms/ Radio/ Tech,black,2,,,,,,,,1988,Psyche-Out (v2),1
+469,A0469,Jungle Trooper Backpack,,3,Backpack,dark green,,,,,,,,,1988,Recando (v2),1
+470,A0470,M-14E2X Rifle,,8,Weapon Rifle,black,,,,,,,,,1988,Recando (v2),1
+471,A0471,Backpack,,3,Backpack,green,,,,,,,,,1988,Repeater (v1),1
+472,A0472,Electromechanical Machine Gun,,10,Weapon Machine Gun,black,,,,,,,,,1988,Repeater (v1),2
+473,A0473,Body Mount/ Stablizing Arm,,22,Weapon Accessory,black,,,,,,,,,1988,Repeater (v1),2
+474,A0474,High-Density Impact Pads (Shoulder-Pad Harness),,29,Armor/ Shield,black,,,,,,,,,1988,Road Pig (v1),1
+475,A0475,Spiked Forearm Battle Shield,,29,Armor/ Shield,black,,,,,,,,,1988,Road Pig (v1),1
+476,A0476,High-Powered Crossbow,,19,Weapon Bow/ Crossbow,black,,,,,,,,,1988,Road Pig (v1),1
+477,A0477,Cinderblock Hammer,,21,Weapon Specialized,gray,,,,,,,,,1988,Road Pig (v1),1
+478,A0478,Helmet,,1,Helmet,yellow/black,,,,,,,,,1988,Roadbloack (v3),1
+479,A0479,Machine Gunner Backpack,,3,Backpack,green,,,,,,,,,1988,Roadbloack (v3),1
+480,A0480,Ammo Box,,5,Backpack Accessory,green,,,,,,,,,1988,Roadbloack (v3),1
+481,A0481,M-2X Heavy Machine Gun,,10,Weapon Machine Gun,black,,,,,,,,,1988,Roadbloack (v3),1
+482,A0482,Tripod,,22,Weapon Accessory,black,,,,,,,,,1988,Roadbloack (v3),1
+483,A0483,Bubble helmet,,1,Helmet,clear,,,,,,,,,1988,Secto-Viper (v1),1
+484,A0484,Pistol,,6,Weapon Pistol,black,,,,,,,,,1988,Secto-Viper (v1),1
+485,A0485,Hat,,1,Helmet,light green,,,,,,,,,1988,Sgt. Slaughter (v3),1
+486,A0486,Backpack,,3,Backpack,dark blue,,,,,,,,,1988,Shockwave (v1),1
+487,A0487,.45 Caliber Pistol,,6,Weapon Pistol,dark blue,,,,,,,,,1988,Shockwave (v1),1
+488,A0488,Submachine Gun with Silencer,,9,Weapon Submachine Gun,dark blue,,,,,,,,,1988,Shockwave (v1),1
+489,A0489,Knife,,14,Weapon Knife,silver,,,,,,,,,1988,Shockwave (v1),2
+490,A0490,Helmet,,1,Helmet,reddish brown,,,,,,,,,1988,Skystriker (v1),1
+491,A0491,Radio Headset,,2,Helmet Accessory,reddish brown,,,,,,,,,1988,Skystriker (v1),1
+492,A0492,Visor,,2,Helmet Accessory,clear,,,,,,,,,1988,Skystriker (v1),1
+493,A0493,Variable Range Optical Field Scanning Device (Periscope),,30,Comms/ Radio/ Tech,black,,,,,,,,,1988,Sneak Peek (v2),1
+494,A0494,Periscope Handle,,30,Comms/ Radio/ Tech,black,,,,,,,,,1988,Sneak Peek (v2),1
+495,A0495,Periscope Clip,,30,Comms/ Radio/ Tech,black,,,,,,,,,1988,Sneak Peek (v2),1
+496,A0496,Helmet,,1,Helmet,tan/orange,,,,,,,,,1988,Spearhead & Max (v1),1
+497,A0497,Backpack,,3,Backpack,orange,,,,,,,,,1988,Spearhead & Max (v1),1
+498,A0498,Machine Gun with Bayonet,,10,Weapon Machine Gun,gray,,,,,,,,,1988,Spearhead & Max (v1),1
+499,A0499,Machete,,16,Weapon Machete,gray,,,,,,,,,1988,Spearhead & Max (v1),1
+500,A0500,"Max, Bobcat",,26,Animal,brown,,,,,,,,,1988,Spearhead & Max (v1),1
+501,A0501,Backpack,,3,Backpack,red,,,,,,,,,1988,Storm Shadow (v2),1
+502,A0502,Sword,,17,Weapon Sword,red,,,,,,,,,1988,Storm Shadow (v2),1
+503,A0503,Bow,,19,Weapon Bow/ Crossbow,black,,,,,,,,,1988,Storm Shadow (v2),1
+504,A0504,Claw,,15,Weapon Blade,black,,,,,,,,,1988,Storm Shadow (v2),1
+505,A0505,Helmet,,1,Helmet,chrome,,,,,,,,,1988,Super Trooper (v1),1
+506,A0506,9mm Parabellum Submachine Pistol with Silencer,,9,Weapon Submachine Gun,chrome,,,,,,,,,1988,Super Trooper (v1),1
+507,A0507,Shield,,29,Armor/ Shield,chrome,,,,,,,,,1988,Super Trooper (v1),1
+508,A0508,Enviromental Helmet,,1,Helmet,brown/blue,,,,,,,,,1988,Toxo-Viper (v1),1
+509,A0509,Enviromental Backpack,,3,Backpack,black,,,,,,,,,1988,Toxo-Viper (v1),1
+510,A0510,Pistol,,6,Weapon Pistol,black,,,,,,,,,1988,Toxo-Viper (v1),1
+511,A0511,Mine Detector Backpack,,3,Backpack,black,,,,,,,,,1988,Tripwire (v3),1
+512,A0512,Land Mine,,35,Specialized Equipment,black,3,,,,,,,,1988,Tripwire (v3),1
+513,A0513,Tunnel Floodlight System Backpack,,3,Backpack,black,,,,,,,,,1988,Tunnel Rat (v2),1
+514,A0514,Satchel Charge Bag,,37,Tactical Gear,black,,,,,,,,,1988,Tunnel Rat (v2),1
+515,A0515,Halogen Hand Lamp,,37,Tactical Gear,black,2,,,,,,,,1988,Tunnel Rat (v2),1
+516,A0516,High Frequency Communications Backpack,,3,Backpack,gold,,,,,,,,,1988,Voltar (v1),1
+517,A0517,Submachine Gun,,9,Weapon Submachine Gun,gold,,,,,,,,,1988,Voltar (v1),1
+518,A0518,Condor,,26,Animal,black/red,,,,,,,,,1988,Voltar (v1),1
+519,A0519,Condor Claw,,27,Animal Accessory,black,,,,,,,,,1988,Voltar (v1),1
+520,A0520,Helmet,,1,Helmet,dark green,,,,,,,,,1988,Wild Card (v1),1
+521,A0521,Sheath Backpack,,3,Backpack,gray,,,,,,,,,1988,Wild Card (v1),1
+522,A0522,Machete,,16,Weapon Machete,gray,,,,,,,,,1988,Wild Card (v1),1
+523,A0523,Revolver,,6,Weapon Pistol,black,,,,,,,,,1988,Windmill (v1),1
+524,A0524,Helmet,,1,Helmet,gold,,,,,,,,,1989,Aero-Viper (v1),1
+525,A0525,Face Shield,,1,Helmet,orange/blue,,,,,,,,,1989,Alley Viper (v1),1
+526,A0526,Backpack,,3,Backpack,black,,,,,,,,,1989,Alley Viper (v1),2
+527,A0527,Rifle,,8,Weapon Rifle,black,,,,,,,,,1989,Alley Viper (v1),1
+528,A0528,Grappling Hook ,,32,Grappling Hook,black,,,,,,,,,1989,Alley Viper (v1),1
+529,A0529,Shield,,29,Armor/ Shield,orange/blue,,,,,,,,,1989,Alley Viper (v1),1
+530,A0530,Helicopter Backpack,,3,Backpack,gray,,,,,,,,,1989,Annihilator (v1),1
+531,A0531,Helicopter Backpack Post,,3,Backpack Accessory,gray,,,,,,,,,1989,Annihilator (v1),1
+532,A0532,Helicopter Backpack Blade,,5,Backpack Accessory,gray,,,,,,,,,1989,Annihilator (v1),1
+533,A0533,Handgun,,8,Weapon Rifle,black,,,,,,,,,1989,Annihilator (v1),2
+534,A0534,Machine Gun (attached),,5,Backpack Accessory,black,,,,,,,,,1989,Annihilator (v1),1
+535,A0535,Handle (attached),,5,Backpack Accessory,black,,,,,,,,,1989,Annihilator (v1),1
+536,A0536,Monocular,,32,Tactical Gear,black,,,,,,,,,1989,Backstop (v1),1
+537,A0537,Triple Launcher Missile System Base,,13,Weapon Bazooka/ Launcher,green,,,,,,,,,1989,Backstop (v1),1
+538,A0538,Triple Launcher Missile System Tubes,,13,Weapon Bazooka/ Launcher,green,,,,,,,,,1989,Backstop (v1),1
+539,A0539,Missiles,,23,Missile,red,3,,,,,,,,1989,Backstop (v1),1
+540,A0540,Knife,,14,Weapon Knife,gray,,,,,,,,,1989,Backstop (v1),1
+541,A0541,Bandolier,,28,Ammo/ Belt,yellow,,,,,,,,,1989,Backstop (v1),1
+542,A0542,Foam Tanks,,3,Backpack,silver,,,,,,,,,1989,Barbecue (v2),1
+543,A0543,Fire Axe,,37,Tactical Gear,gray,,,,,,,,,1989,Barbecue (v2),1
+544,A0544,Thermo-Insulated Oxygenated Helmet,,1,Helmet,dark blue/red,,,,,,,,,1989,Charbroil (v2),1
+545,A0545,Pressurized Thermochemical Backpack,,3,Backpack,black,,,,,,,,,1989,Charbroil (v2),1
+546,A0546,Flamethrower,,11,Weapon Flamethrower,black,,,,,,,,,1989,Charbroil (v2),2
+547,A0547,Space Helmet (soft plastic),,1,Helmet,white/teal,,,,,,,,,1989,Countdown (v1),1
+548,A0548,Space Helmet (hard plastic),,1,Helmet,white/teal,,,,,,,,,1989,Countdown (v1),1
+549,A0549,Backpack,,3,Backpack,silver,,,,,,,,,1989,Countdown (v1),1
+550,A0550,Grappling Hook ,,32,Grappling Hook,silver,,,,,,,,,1989,Countdown (v1),1
+551,A0551,Counterweight,,32,Grappling Hook,silver,,,,,,,,,1989,Countdown (v1),1
+552,A0552,Pistol,,6,Weapon Pistol,silver,,,,,,,,,1989,Countdown (v1),1
+553,A0553,Underslung Gatling Gun,,10,Weapon Machine Gun,black,,,,,,,,,1989,Darklon (v1),1
+554,A0554,Antenna,,2,Helmet Accessory,white,,,,,,,,,1989,Dee-Jay (v1),1
+555,A0555,Comm-Tech Station/Loudspeaker Backpack,,3,Backpack,blue,,,,,,,,,1989,Dee-Jay (v1),1
+556,A0556,Laser Rifle,,12,Weapon Blaster/ Laser,red,,,,,,,,,1989,Dee-Jay (v1),1
+557,A0557,Plug,,37,Tactical Gear,white,2,,,,,,,,1989,Dee-Jay (v1),1
+558,A0558,Dive Helmet,,1,Helmet,orange,,,,,,,,,1989,Deep Six (v2),1
+559,A0559,Backpack,,3,Backpack,black,,,,,,,,,1989,Deep Six (v2),1
+560,A0560,Rifle,,8,Weapon Rifle,gray,,,,,,,,,1989,Deep Six (v2),1
+561,A0561,Buoy,,36,Swim/ Scuba Equipment,gray,,,,,,,,,1989,Deep Six (v2),1
+562,A0562,Pistol,,6,Weapon Pistol,black,,,,,,,,,1989,Dogfight (v1),1
+563,A0563,Helmet,,1,Helmet,red,,,,,,,,,1989,Downtown (v2),1
+564,A0564,Backpack,,3,Backpack,black,,,,,,,,,1989,Downtown (v2),1
+565,A0565,Revolver,,6,Weapon Pistol,black,,,,,,,,,1989,Downtown (v2),1
+566,A0566,Mortar,,13,Weapon Bazooka/ Launcher,black,,,,,,,,,1989,Downtown (v2),1
+567,A0567,Mortar Mount,,22,Weapon Accessory,black,,,,,,,,,1989,Downtown (v2),1
+568,A0568,Mortar Stand (Traversing Assembly),,22,Weapon Accessory,black,,,,,,,,,1989,Downtown (v2),1
+569,A0569,Mortar Shell,,31,Explosive Ordnance Disposal (EOD),black,6,,,,,,,,1989,Downtown (v2),1
+570,A0570,Helmet,,1,Helmet,black,,,,,,,,,1989,Footloose (v2),1
+571,A0571,Backpack,,3,Backpack,black,,,,,,,,,1989,Frag Viper (v1),1
+572,A0572,Submachine Gun,,9,Weapon Submachine Gun,black,,,,,,,,,1989,Frag Viper (v1),1
+573,A0573,Cesta Basket (Grenade Throwing Tool),,37,Tactical Gear,black,,,,,,,,,1989,Frag Viper (v1),1
+574,A0574,Grenade,,31,Explosive Ordnance Disposal (EOD),black,3,,,,,,,,1989,Frag Viper (v1),1
+575,A0575,Tube,,46,Specialized Hose,black,,,,,,,,,1989,Frag Viper (v1),1
+576,A0576,Hat,,1,Helmet,tan/orange,,,,,,,,,1989,Gnawgahyde (v1),1
+577,A0577,Quiver,,3,Backpack,black,,,,,,,,,1989,Gnawgahyde (v1),1
+578,A0578,Rifle,,8,Weapon Rifle,black,,,,,,,,,1989,Gnawgahyde (v1),2
+579,A0579,Bipod,,22,Weapon Accessory,black,,,,,,,,,1989,Gnawgahyde (v1),1
+580,A0580,Bow,,19,Weapon Bow/ Crossbow,black,,,,,,,,,1989,Gnawgahyde (v1),1
+581,A0581,Wrist Machete,,16,Weapon Machete,silver,,,,,,,,,1989,Gnawgahyde (v1),1
+582,A0582,Knife,,14,Weapon Knife,silver,,,,,,,,,1989,Gnawgahyde (v1),1
+583,A0583,Boar,,26,Animal,brown/white,,,,,,,,,1989,Gnawgahyde (v1),1
+584,A0584,Backpack,,3,Backpack,gray,,,,,,,,,1989,HEAT Viper (v1),1
+585,A0585,"""Fang"" Bazooka",,13,Weapon Bazooka/ Launcher,gray,,,,,,,,,1989,HEAT Viper (v1),1
+586,A0586,Bazooka Hose,,46,Specialized Hose,gray,,,,,,,,,1989,HEAT Viper (v1),1
+587,A0587,Bazooka Shell,,31,Explosive Ordnance Disposal (EOD),gray,6,,,,,,,,1989,HEAT Viper (v1),1
+588,A0588,Helmet,,1,Helmet,black,,,,,,,,,1989,Hot Seat (v1),1
+589,A0589,Night Vision Helmet,,1,Helmet,black,,,,,,,,,1989,Lightfoot (v2),1
+590,A0590,Backpack,,3,Backpack,black,,,,,,,,,1989,Lightfoot (v2),1
+591,A0591,Mine Detector Unit,,35,Specialized Equipment,black,,,,,,,,,1989,Lightfoot (v2),1
+592,A0592,Hose (connector belt),,45,Specialized Hose,black,,,,,,,,,1989,Lightfoot (v2),1
+593,A0593,Robot,,30,Comms/ Radio/ Tech,black,,,,,,,,,1989,Lightfoot (v2),1
+594,A0594,Helmet,,1,Helmet,light gray,,,,,,,,,1989,Long Range (v1),1
+595,A0595,Pistol,,6,Weapon Pistol,black,,,,,,,,,1989,Long Range (v1),1
+596,A0596,"""Machetta"" (machete)",,16,Weapon Machete,black,,,,,,,,,1989,Muskrat (v2),6
+597,A0597,Swamp Skimmer,,44,Transportation,black/gray,,,,,,,,,1989,Muskrat (v2),1
+598,A0598,Helmet (with holes),,1,Helmet,black,,,,,,,,,1989,Mutt (v2),1
+599,A0599,"Junkyard, dog",,26,Animal,black,,,,,,,,,1989,Mutt (v2),3
+600,A0600,Night Vision Goggle Visor,,1,Helmet,green,,,,,,,,,1989,Night-Viper (v1),1
+601,A0601,"Monocle Attachment to Visor	",,2,Helmet Accessory,green,,,,,,,,,1989,Night-Viper (v1),1
+602,A0602,Backpack,,3,Backpack,black,,,,,,,,,1989,Night-Viper (v1),1
+603,A0603,Rifle with Night Scope,,8,Weapon Rifle,black,,,,,,,,,1989,Night-Viper (v1),1
+604,A0604,Space Helmet,,1,Helmet,yellow/clear,,,,,,,,,1989,Payload (v2),1
+605,A0605,E.V.A. Backpack,,3,Backpack,gray,,,,,,,,,1989,Payload (v2),1
+606,A0606,E.V.A. Control Arms,,5,Backpack Accessory,gray,2,,,,,,,,1989,Payload (v2),1
+607,A0607,Backpack,,3,Backpack,black,,,,,,,,,1989,Python Copperhead (v2),1
+608,A0608,M-203 Attack Rifle w/ Grenade Launcher,,8,Weapon Rifle,black,,,,,,,,,1989,Python Copperhead (v2),1
+609,A0609,Dress Backpack,,3,Backpack,black,,,,,,,,,1989,Python Crimson Guard (v2),1
+610,A0610,AK-47 Rifle,,8,Weapon Rifle,white,,,,,,,,,1989,Python Trooper (v1),1
+611,A0611,RDT-7 Assault Rifle with Grenade Launcher,,8,Weapon Rifle,black,,,,,,,,,1989,Python Viper (v2),1
+612,A0612,Backpack,,3,Backpack,dark green,,,,,,,,,1989,Recoil (v1),1
+613,A0613,Antenna,,5,Backpack Accessory,dark green,,,,,,,,,1989,Recoil (v1),1
+614,A0614,Rifle,,8,Weapon Rifle,light blue,,,,,,,,,1989,Recoil (v1),1
+615,A0615,Pistol (Double Submachine Gun),,9,Weapon Submachine Gun,light blue,,,,,,,,,1989,Recoil (v1),1
+616,A0616,Mine Case (thin handle),,35,Specialized Equipment,green,,,,,,,,,1989,Recoil (v1),1
+617,A0617,Mine Case (thin handle),,35,Specialized Equipment,green,,,,,,,,,1989,Recoil (v1),1
+618,A0618,Backpack,,3,Backpack,black,,,,,,,,,1989,Repeater (v1),1
+619,A0619,Backpack,,3,Backpack,gray,,,,,,,,,1989,Rock & Roll (v2),1
+620,A0620,Rifle,,8,Weapon Rifle,gray,,,,,,,,,1989,Rock & Roll (v2),1
+621,A0621,Gatling Gun,,10,Weapon Machine Gun,gray,2,,,,,,,,1989,Rock & Roll (v2),1
+622,A0622,Bandoliers (Ammo Belt),,28,Ammo/ Belt,gray,2,,,,,,,,1989,Rock & Roll (v2),1
+623,A0623,Helmet,,1,Helmet,green/red,,,,,,,,,1989,Scoop (v1),1
+624,A0624,Microphone,,2,Helmet Accessory,green,,,,,,,,,1989,Scoop (v1),1
+625,A0625,Satellite Relay Station Backpack,,3,Backpack,gray,,,,,,,,,1989,Scoop (v1),1
+626,A0626,Pistol,,6,Weapon Pistol,black,,,,,,,,,1989,Scoop (v1),1
+627,A0627,Hi-Tech Camera,,30,Comms/ Radio/ Tech,gray,,,,,,,,,1989,Scoop (v1),1
+628,A0628,Backpack,,3,Backpack,black,,,,,,,,,1989,Shockwave (v2),1
+629,A0629,.45 Caliber Pistol,,6,Weapon Pistol,black,,,,,,,,,1989,Shockwave (v2),7
+630,A0630,Submachine Gun with Silencer,,9,Weapon Submachine Gun,black,,,,,,,,,1989,Shockwave (v2),3
+631,A0631,Knife,,14,Weapon Knife,black,,,,,,,,,1989,Shockwave (v2),3
+632,A0632,Backpack,,3,Backpack,black,,,,,,,,,1989,Snake Eyes (v3),1
+633,A0633,Uzi Submachine Gun,,9,Weapon Submachine Gun,gray,,,,,,,,,1989,Snake Eyes (v3),1
+634,A0634,Blow Gun,,21,Weapon Specialized,silver,,,,,,,,,1989,Snake Eyes (v3),1
+635,A0635,Sword with Decorative Blade and Clawed Pommel,,17,Weapon Sword,silver,,,,,,,,,1989,Snake Eyes (v3),1
+636,A0636,Nunchuks (middle),,18,Weapon Melee,silver,,,,,,,,,1989,Snake Eyes (v3),1
+637,A0637,Nunchuks (end),,18,Weapon Melee,silver,2,,,,,,,,1989,Snake Eyes (v3),1
+638,A0638,Helmet,,3,Backpack,black,,,,,,,,,1989,Spearhead & Max (v2),1
+639,A0639,Backpack,,3,Backpack,black,,,,,,,,,1989,Spearhead & Max (v2),1
+640,A0640,Machine Gun with Bayonet,,10,Weapon Machine Gun,black,,,,,,,,,1989,Spearhead & Max (v2),2
+641,A0641,Machete,,16,Weapon Machete,black,,,,,,,,,1989,Spearhead & Max (v2),2
+642,A0642,"Max, Bobcat",,26,Animal,black,,,,,,,,,1989,Spearhead & Max (v2),1
+643,A0643,Arrow Cassette Pack,,3,Backpack,black,,,,,,,,,1989,Spirit (v2),1
+644,A0644,Auto-Arrow Launcher,,8,Weapon Rifle,black,,,,,,,,,1989,Spirit (v2),1
+645,A0645,Belt,,28,Ammo/ Belt,black/brown,,,,,,,,,1989,Spirit (v2),1
+646,A0646,Mask,,1,Helmet,white,,,,,,,,,1989,Stalker (v2),1
+647,A0647,Rifle,,8,Weapon Rifle,white,,,,,,,,,1989,Stalker (v2),1
+648,A0648,Knife,,14,Weapon Knife,white,,,,,,,,,1989,Stalker (v2),1
+649,A0649,Kayak,,44,Transportation,white,,,,,,,,,1989,Stalker (v2),1
+650,A0650,Kayak Arm,,44,Transportation,white,,,,,,,,,1989,Stalker (v2),1
+651,A0651,Kayak Counterweight,,44,Transportation,white,,,,,,,,,1989,Stalker (v2),1
+652,A0652,Machine Gun,,10,Weapon Machine Gun,brown,,,,,,,,,1989,Stalker (v2),1
+653,A0653,Paddle,,44,Transportation,white,,,,,,,,,1989,Stalker (v2),1
+654,A0654,Face Shield,,1,Helmet,blue,,,,,,,,,1989,T.A.R.G.A.T. (v1),1
+655,A0655,Jetpack,,3,Backpack,gray,,,,,,,,,1989,T.A.R.G.A.T. (v1),1
+656,A0656,Joystick,,5,Backpack Accessory,gray,,,,,,,,,1989,T.A.R.G.A.T. (v1),1
+657,A0657,Laser Gun (rigid plastic),,12,Weapon Blaster/ Laser,gold,,,,,,,,,1989,T.A.R.G.A.T. (v1),1
+658,A0658,"Laser Gun (soft plastic, opened clip)",,12,Weapon Blaster/ Laser,gold,,,,,,,,,1989,T.A.R.G.A.T. (v1),1
+659,A0659,"Laser Gun (soft plastic, closed clip)",,12,Weapon Blaster/ Laser,gold,,,,,,,,,1989,T.A.R.G.A.T. (v1),1
+660,A0660,Pistol,,6,Weapon Pistol,black,,,,,,,,,1989,Track Viper (v1),2
+661,A0661,Helmet,,1,Helmet,black,,,,,,,,,1989,Wild Boar (v1),1
+662,A0662,Rifle,,8,Weapon Rifle,black,,,,,,,,,1989,Windchill (v1),2
+663,A0663,Ski,,34,Ski/ Snow Equipment,black,2,,,,,,,,1989,Windchill (v1),1
+664,A0664,Helmet,,1,Helmet,dark gray/red,,,,,,,,,1990,Airborne (v2),1
+665,A0665,Rifle,,8,Weapon Rifle,black,,,,,,,,,1990,Airborne (v2),2
+666,A0666,Parachute,,38,Parachute Case/ Parachute,silver,,,,,,,,,1990,Airborne (v2),6
+667,A0667,Parachute Case,,38,Parachute Case/ Parachute,gray,,,,,,,,,1990,Airborne (v2),1
+668,A0668,Helmet,,1,Helmet,silver,,,,,,,,,1990,Airwave (v1),1
+669,A0669,Visor,,2,Helmet Accessory,tan,,,,,,,,,1990,Airwave (v1),1
+670,A0670,Rifle,,8,Weapon Rifle,silver,,,,,,,,,1990,Airwave (v1),1
+671,A0671,Parachute Case,,38,Parachute Case/ Parachute,brown,,,,,,,,,1990,Airwave (v1),2
+672,A0672,Helmet,,1,Helmet,silver,,,,,,,,,1990,Altitude (v1),1
+673,A0673,Visor,,2,Helmet Accessory,gold,,,,,,,,,1990,Altitude (v1),1
+674,A0674,Pistol,,6,Weapon Pistol,black,,,,,,,,,1990,Altitude (v1),1
+675,A0675,Missile Launcher,,22,Weapon Accessory,black,,,,,,,,,1990,Altitude (v1),1
+676,A0676,Missile,,23,Missile,black,,,,,,,,,1990,Altitude (v1),1
+677,A0677,Parachute Case,,38,Parachute Case/ Parachute,green,,,,,,,,,1990,Altitude (v1),1
+678,A0678,Helmet,,1,Helmet,gray,,,,,,,,,1990,Ambush (v1),1
+679,A0679,Backpack,,3,Backpack,dark gray,,,,,,,,,1990,Ambush (v1),1
+680,A0680,Rifle,,8,Weapon Rifle,black,,,,,,,,,1990,Ambush (v1),2
+681,A0681,Grenade Launcher (Pistol),,6,Weapon Pistol,gray,,,,,,,,,1990,Ambush (v1),1
+682,A0682,Tent Pole (closed circle),,43,Playset Feature,brown,2,,,,,,,,1990,Ambush (v1),1
+683,A0683,Tent Pole (hook),,43,Playset Feature,brown,,,,,,,,,1990,Ambush (v1),1
+684,A0684,Tent Pole (double post),,43,Playset Feature,brown,,,,,,,,,1990,Ambush (v1),1
+685,A0685,Cape (mesh),,40,Soft Goods,green,,,,,,,,,1990,Ambush (v1),1
+686,A0686,Tent Cover (mesh),,40,Soft Goods,green,,,,,,,,,1990,Ambush (v1),1
+687,A0687,Helmet,,1,Helmet,black/silver,,,,,,,,,1990,Bullhorn (v1),1
+688,A0688,Backpack,,3,Backpack,gray,,,,,,,,,1990,Bullhorn (v1),1
+689,A0689,Rifle Stock,,8,Weapon Rifle,black,,,,,,,,,1990,Bullhorn (v1),1
+690,A0690,Rifle Barrel,,8,Weapon Rifle,black,,,,,,,,,1990,Bullhorn (v1),1
+691,A0691,Rifle Scope,,8,Weapon Rifle,black,,,,,,,,,1990,Bullhorn (v1),1
+692,A0692,Rifle,,8,Weapon Rifle,black,,,,,,,,,1990,Bullhorn (v1),5
+693,A0693,Gas Gun (Bullhorn Base),,6,Weapon Pistol,green,,,,,,,,,1990,Bullhorn (v1),1
+694,A0694,Megaphone (Bullhorn Attachment),,22,Weapon Accessory,green,,,,,,,,,1990,Bullhorn (v1),1
+695,A0695,Football Helmet (soft plastic),,1,Helmet,green,,,,,,,,,1990,Capt. Grid-Iron (v1),1
+696,A0696,Football Helmet (hard plastic),,1,Helmet,green,,,,,,,,,1990,Capt. Grid-Iron (v1),1
+697,A0697,Visor,,2,Helmet Accessory,clear,,,,,,,,,1990,Capt. Grid-Iron (v1),1
+698,A0698,Backpack,,3,Backpack,green,,,,,,,,,1990,Capt. Grid-Iron (v1),1
+699,A0699,Elbow Pads,,29,Armor/ Shield,orange,2,,,,,,,,1990,Capt. Grid-Iron (v1),1
+700,A0700,Pistol,,6,Weapon Pistol,gray,,,,,,,,,1990,Capt. Grid-Iron (v1),1
+701,A0701,Missile Launcher,,13,Weapon Bazooka/ Launcher,gray,,,,,,,,,1990,Capt. Grid-Iron (v1),1
+702,A0702,Missile,,23,Missile,gray,4,,,,,,,,1990,Capt. Grid-Iron (v1),1
+703,A0703,Football Grenades,,31,Explosive Ordnance Disposal (EOD),gray,3,,,,,,,,1990,Capt. Grid-Iron (v1),1
+704,A0704,Visor,,2,Helmet Accessory,orange,,,,,,,,,1990,Cold Front (v1),1
+705,A0705,Microphone,,2,Helmet Accessory,white,,,,,,,,,1990,Cold Front (v1),1
+706,A0706,Pistol,,6,Weapon Pistol,white,,,,,,,,,1990,Cold Front (v1),1
+707,A0707,Helmet,,1,Helmet,dark gray/light gray,,,,,,,,,1990,Decimator (v1),1
+708,A0708,Speargun,,20,Weapon Harpoon/ Javelin/ Spear,dark gray,,,,,,,,,1990,Decimator (v1),1
+709,A0709,Sonic Backpack (raised edges around buttons),,4,Backpack with Battery,black,,,,,,,,,1990,Dial-Tone (v3),1
+710,A0710,"Sonic Backpack (no edges around buttons)		",,4,Backpack with Battery,black,,,,,,,,,1990,Dial-Tone (v3),1
+711,A0711,Battery Cover,,5,Backpack Accessory,black,,,,,,,,,1990,Dial-Tone (v3),1
+712,A0712,Pistol,,6,Weapon Pistol,black,,,,,,,,,1990,Dial-Tone (v3),1
+713,A0713,Machine Gun,,10,Weapon Machine Gun,black,,,,,,,,,1990,Dial-Tone (v3),2
+714,A0714,Flamethrower,,11,Weapon Flamethrower,black,,,,,,,,,1990,Dial-Tone (v3),2
+715,A0715,Grenade Launcher,,13,Weapon Bazooka/ Launcher,black,,,,,,,,,1990,Dial-Tone (v3),1
+716,A0716,Grenade Launcher Cylinder,,22,Weapon Accessory,black,,,,,,,,,1990,Dial-Tone (v3),1
+717,A0717,Sonic Backpack (raised edges around buttons),,4,Backpack with Battery,blue,,,,,,,,,1990,Dodger (v2),1
+718,A0718,"Sonic Backpack (no edges around buttons)		",,4,Backpack with Battery,blue,,,,,,,,,1990,Dodger (v2),1
+719,A0719,Battery Cover,,5,Backpack Accessory,blue,,,,,,,,,1990,Dodger (v2),1
+720,A0720,Submachine Gun,,9,Weapon Submachine Gun,black,,,,,,,,,1990,Dodger (v2),2
+721,A0721,Rifle,,8,Weapon Rifle,black,,,,,,,,,1990,Dodger (v2),3
+722,A0722,Proton Rifle,,12,Weapon Blaster/ Laser,black,,,,,,,,,1990,Dodger (v2),1
+723,A0723,Laser Rifle,,12,Weapon Blaster/ Laser,black,,,,,,,,,1990,Dodger (v2),1
+724,A0724,Helmet,,1,Helmet,gray,,,,,,,,,1990,Drop Zone (v1),1
+725,A0725,Visor,,2,Helmet Accessory,brown,,,,,,,,,1990,Drop Zone (v1),1
+726,A0726,Gun Harness,,10,Weapon Machine Gun,brown,,,,,,,,,1990,Drop Zone (v1),1
+727,A0727,Helmet,,1,Helmet,green,,,,,,,,,1990,Freefall (v1),1
+728,A0728,Airmask,,2,Helmet Accessory,black,,,,,,,,,1990,Freefall (v1),1
+729,A0729,Backpack,,3,Backpack,dark gray,,,,,,,,,1990,Freefall (v1),1
+730,A0730,Rifle,,8,Weapon Rifle,dark gray,,,,,,,,,1990,Freefall (v1),1
+731,A0731,Sonic Backpack (raised edges around buttons),,4,Backpack with Battery,black,,,,,,,,,1990,Lampreys (v2),1
+732,A0732,"Sonic Backpack (no edges around buttons)		",,4,Backpack with Battery,black,,,,,,,,,1990,Lampreys (v2),1
+733,A0733,Battery Cover,,5,Backpack Accessory,black,,,,,,,,,1990,Lampreys (v2),1
+734,A0734,Laser Pistol,,12,Weapon Blaster/ Laser,black,,,,,,,,,1990,Lampreys (v2),3
+735,A0735,Helmet,,1,Helmet,silver,,,,,,,,,1990,Laser-Viper (v1),1
+736,A0736,Backpack,,3,Backpack,silver,,,,,,,,,1990,Laser-Viper (v1),1
+737,A0737,Control Arm,,5,Backpack Accessory,silver,,,,,,,,,1990,Laser-Viper (v1),1
+738,A0738,Laser Gun Base,,5,Backpack Accessory,silver,2,,,,,,,,1990,Laser-Viper (v1),1
+739,A0739,Laser Gun Barrel,,5,Backpack Accessory,silver,2,,,,,,,,1990,Laser-Viper (v1),1
+740,A0740,Sonic Backpack (raised edges around buttons),,4,Backpack with Battery,brown,,,,,,,,,1990,Law (v2),1
+741,A0741,"Sonic Backpack (no edges around buttons)		",,4,Backpack with Battery,brown,,,,,,,,,1990,Law (v2),1
+742,A0742,Battery Cover,,5,Backpack Accessory,brown,,,,,,,,,1990,Law (v2),1
+743,A0743,Pistol,,6,Weapon Pistol,black,,,,,,,,,1990,Law (v2),1
+744,A0744,Rifle,,12,Weapon Blaster/ Laser,black,,,,,,,,,1990,Law (v2),1
+745,A0745,L7A21 GPMG Heavy Machine Gun ,,10,Weapon Machine Gun,black,,,,,,,,,1990,Law (v2),1
+746,A0746,Tripod,,22,Weapon Accessory,black,,,,,,,,,1990,Law (v2),1
+747,A0747,Helmet,,1,Helmet,gold,,,,,,,,,1990,Major Storm (v1),1
+748,A0748,Pistol,,6,Weapon Pistol,gold,,,,,,,,,1990,Major Storm (v1),1
+749,A0749,Helmet,,1,Helmet,light gray,,,,,,,,,1990,Metal-Head (v1),1
+750,A0750,Backpack Frame,,3,Backpack,light gray,,,,,,,,,1990,Metal-Head (v1),1
+751,A0751,Pistol,,6,Weapon Pistol,light gray,,,,,,,,,1990,Metal-Head (v1),1
+752,A0752,Missile Launcher,,5,Backpack Accessory,light gray,,,,,,,,,1990,Metal-Head (v1),1
+753,A0753,Missile Pack (small holes),,5,Backpack Accessory,light gray,2,,,,,,,,1990,Metal-Head (v1),1
+754,A0754,Missile Pack (large holes),,5,Backpack Accessory,light gray,2,,,,,,,,1990,Metal-Head (v1),1
+755,A0755,Missiles,,23,Missile,yellow,6,,,,,,,,1990,Metal-Head (v1),1
+756,A0756,Backpack,,3,Backpack,maroon,,,,,,,,,1990,Night-Creeper (v1),1
+757,A0757,Crossbow,,19,Weapon Bow/ Crossbow,black,,,,,,,,,1990,Night-Creeper (v1),1
+758,A0758,Kris (wavy),,17,Weapon Sword,black,,,,,,,,,1990,Night-Creeper (v1),1
+759,A0759,Sword (barbed),,17,Weapon Sword,black,,,,,,,,,1990,Night-Creeper (v1),1
+760,A0760,Helmet,,1,Helmet,gold,,,,,,,,,1990,Overlord (v1),1
+761,A0761,Claw,,15,Weapon Blade,gold,2,,,,,,,,1990,Overlord (v1),1
+762,A0762,Backpack,,3,Backpack,white,,,,,,,,,1990,Pathfinder (v1),1
+763,A0763,Machine Gun,,10,Weapon Machine Gun,white,2,,,,,,,,1990,Pathfinder (v1),1
+764,A0764,Ammo Belt,,28,Ammo/ Belt,grey,2,,,,,,,,1990,Pathfinder (v1),1
+765,A0765,Weed Eater,,37,Tactical Gear,black,,,,,,,,,1990,Pathfinder (v1),1
+766,A0766,Blade,,37,Tactical Gear,silver,,,,,,,,,1990,Pathfinder (v1),1
+767,A0767,Rifle,,8,Weapon Rifle,black,,,,,,,,,1990,Rampart (v1),1
+768,A0768,Stand (post),,22,Weapon Accessory,black,,,,,,,,,1990,Rampart (v1),1
+769,A0769,Stand (insert),,22,Weapon Accessory,black,,,,,,,,,1990,Rampart (v1),1
+770,A0770,Missile Launcher,,13,Weapon Bazooka/ Launcher,light gray,,,,,,,,,1990,Rampart (v1),1
+771,A0771,Missiles,,23,Missile,black,2,,,,,,,,1990,Rampart (v1),1
+772,A0772,Control Cable,,22,Weapon Accessory,gray,,,,,,,,,1990,Rampart (v1),1
+773,A0773,Backpack,,3,Backpack,dark gray,,,,,,,,,1990,Range-Viper (v1),1
+774,A0774,Grenade Launcher,,13,Weapon Bazooka/ Launcher,black,,,,,,,,,1990,Range-Viper (v1),1
+775,A0775,Grenade Chamber,,22,Weapon Accessory,black,,,,,,,,,1990,Range-Viper (v1),1
+776,A0776,Missile Launcher,,13,Weapon Bazooka/ Launcher,gray,,,,,,,,,1990,Range-Viper (v1),1
+777,A0777,Missile,,23,Missile,gray,,,,,,,,,1990,Range-Viper (v1),1
+778,A0778,Knife,,14,Weapon Knife,black,,,,,,,,,1990,Range-Viper (v1),1
+779,A0779,Helmet,,1,Helmet,bright green,,,,,,,,,1990,Rapid Fire (v1),1
+780,A0780,9mm Parabellum Submachine Pistol with Silencer,,9,Weapon Submachine Gun,bright green,,,,,,,,,1990,Rapid Fire (v1),1
+781,A0781,Video Cassette Tape,,52,Cassette/ VHS,black,,,,,,,,,1990,Rapid Fire (v1),1
+782,A0782,Backpack,,3,Backpack,black,,,,,,,,,1990,Rock-Viper (v1),1
+783,A0783,Grappling Hook ,,32,Grappling Hook,black,,,,,,,,,1990,Rock-Viper (v1),1
+784,A0784,Pistol,,6,Weapon Pistol,tan,,,,,,,,,1990,Rock-Viper (v1),1
+785,A0785,Rifle,,8,Weapon Rifle,tan,,,,,,,,,1990,Rock-Viper (v1),1
+786,A0786,Backpack,,3,Backpack,purple,,,,,,,,,1990,S.A.W. Viper (v1),1
+787,A0787,Machine Gun,,10,Weapon Machine Gun,black,,,,,,,,,1990,S.A.W. Viper (v1),1
+788,A0788,Bipod,,22,Weapon Accessory,black,,,,,,,,,1990,S.A.W. Viper (v1),1
+789,A0789,Ammo Belt,,28,Ammo/ Belt,gray,,,,,,,,,1990,S.A.W. Viper (v1),1
+790,A0790,Helmet,,1,Helmet,brown/silver,,,,,,,,,1990,Salvo (v1),1
+791,A0791,Missile Pack,,13,Weapon Bazooka/ Launcher,brown,,,,,,,,,1990,Salvo (v1),1
+792,A0792,Missiles,,23,Missile,brown,5,,,,,,,,1990,Salvo (v1),1
+793,A0793,Mine Launcher,,13,Weapon Bazooka/ Launcher,brown,,,,,,,,,1990,Salvo (v1),1
+794,A0794,Mines,,31,Explosive Ordnance Disposal (EOD),brown,5,,,,,,,,1990,Salvo (v1),1
+795,A0795,Cache,,37,Tactical Gear,black,,,,,,,,,1990,Salvo (v1),1
+796,A0796,Helmet,,1,Helmet,dark gray/black,,,,,,,,,1990,Skydive (v1),1
+797,A0797,Pistol,,6,Weapon Pistol,grey,,,,,,,,,1990,Skydive (v1),1
+798,A0798,Rifle,,8,Weapon Rifle,grey,,,,,,,,,1990,Skydive (v1),1
+799,A0799,Parachute Case,,38,Parachute Case/ Parachute,blue,,,,,,,,,1990,Skydive (v1),1
+800,A0800,Helmet,,1,Helmet,gray/black,,,,,,,,,1990,Static Line (v1),1
+801,A0801,Handgun,,6,Weapon Pistol,silver,,,,,,,,,1990,Static Line (v1),1
+802,A0802,Gun Harness,,10,Weapon Machine Gun,silver,,,,,,,,,1990,Static Line (v1),1
+803,A0803,Parachute Case,,38,Parachute Case/ Parachute,white,,,,,,,,,1990,Static Line (v1),1
+804,A0804,Field Medic Radio Pack,,3,Backpack,green,,,,,,,,,1990,Stretcher (v1),1
+805,A0805,Antenna,,5,Backpack Accessory,green,,,,,,,,,1990,Stretcher (v1),1
+806,A0806,Microphone,,30,Comms/ Radio/ Tech,dark gray,,,,,,,,,1990,Stretcher (v1),1
+807,A0807,Flare Gun,,37,Tactical Gear,dark gray,,,,,,,,,1990,Stretcher (v1),1
+808,A0808,Sled,,44,Transportation,light gray,,,,,,,,,1990,Stretcher (v1),1
+809,A0809,Windshield,,44,Transportation,clear,,,,,,,,,1990,Stretcher (v1),1
+810,A0810,Control Stick,,44,Transportation,light gray,,,,,,,,,1990,Stretcher (v1),1
+811,A0811,Backpack,,3,Backpack,white,,,,,,,,,1990,Sub-Zero (v1),1
+812,A0812,Machine Gun,,10,Weapon Machine Gun,gray,,,,,,,,,1990,Sub-Zero (v1),1
+813,A0813,Bipod,,22,Weapon Accessory,gray,,,,,,,,,1990,Sub-Zero (v1),1
+814,A0814,Ammo Belt,,28,Ammo/ Belt,gold,,,,,,,,,1990,Sub-Zero (v1),1
+815,A0815,Mortar,,13,Weapon Bazooka/ Launcher,white,,,,,,,,,1990,Sub-Zero (v1),1
+816,A0816,Mortar Stand,,22,Weapon Accessory,white,,,,,,,,,1990,Sub-Zero (v1),1
+817,A0817,Mortar Shell,,31,Explosive Ordnance Disposal (EOD),gray,4,,,,,,,,1990,Sub-Zero (v1),1
+818,A0818,Snowshoe,,34,Ski/ Snow Equipment,gray,2,,,,,,,,1990,Sub-Zero (v1),1
+819,A0819,Helmet,,1,Helmet,light gray,,,,,,,,,1990,Topside (v1),1
+820,A0820,Backpack,,3,Backpack,light gray,,,,,,,,,1990,Topside (v1),1
+821,A0821,Bipod,,22,Weapon Accessory,light gray,,,,,,,,,1990,Topside (v1),1
+822,A0822,Submachine Gun,,9,Weapon Submachine Gun,white,,,,,,,,,1990,Topside (v1),1
+823,A0823,Missile,,23,Missile,red,3,,,,,,,,1990,Topside (v1),1
+824,A0824,Sonic Backpack (raised edges around buttons),,4,Backpack with Battery,green,,,,,,,,,1991,Tunnel Rat (v3),1
+825,A0825,"Sonic Backpack (no edges around buttons)		",,4,Backpack with Battery,green,,,,,,,,,1991,Tunnel Rat (v3),1
+826,A0826,Battery Cover,,5,Backpack Accessory,green,,,,,,,,,1991,Tunnel Rat (v3),1
+827,A0827,Experimental Ground-to-Air Pistol,,12,Weapon Blaster/ Laser,black,,,,,,,,,1991,Tunnel Rat (v3),1
+828,A0828,Anti-Tank EK99 Missile,,23,Missile,black,,,,,,,,,1991,Tunnel Rat (v3),1
+829,A0829,Missile Stand,,22,Weapon Accessory,black,,,,,,,,,1991,Tunnel Rat (v3),1
+830,A0830,Mask,,1,Helmet,gray,,,,,,,,,1990,Undertow (v1),1
+831,A0831,Harpoon,,20,Weapon Harpoon/ Javelin/ Spear,black,,,,,,,,,1990,Undertow (v1),1
+832,A0832,Flippers,,36,Swim/ Scuba Equipment,gray,2,,,,,,,,1990,Undertow (v1),1
+833,A0833,Sled,,44,Transportation,dark gray,,,,,,,,,1990,Undertow (v1),1
+834,A0834,Missile,,23,Missile,red,,,,,,,,,1990,Undertow (v1),1
+835,A0835,Barracuda,,26,Animal,silver,,,,,,,,,1990,Undertow (v1),1
+836,A0836,Helmet,,1,Helmet,gray/silver,,,,,,,,,1990,Updraft (v1),1
+837,A0837,Pistol,,6,Weapon Pistol,dark gray,,,,,,,,,1990,Updraft (v1),1
+838,A0838,Sonic Backpack (raised edges around buttons),,4,Backpack with Battery,gold,,,,,,,,,1991,Viper (v3),1
+839,A0839,"Sonic Backpack (no edges around buttons)		",,4,Backpack with Battery,gold,,,,,,,,,1991,Viper (v3),1
+840,A0840,Battery Cover,,5,Backpack Accessory,gold,,,,,,,,,1991,Viper (v3),1
+841,A0841,.45 Caliber Pistol,,6,Weapon Pistol,gold,,,,,,,,,1991,Viper (v3),1
+842,A0842,Submachine Gun,,9,Weapon Submachine Gun,gold,,,,,,,,,1991,Viper (v3),1
+843,A0843,Laser Pistol,,12,Weapon Blaster/ Laser,gold,,,,,,,,,1991,Viper (v3),1
+844,A0844,Mortar,,13,Weapon Bazooka/ Launcher,gold,,,,,,,,,1991,Viper (v3),1
+845,A0845,Mortar Mount,,22,Weapon Accessory,gold,,,,,,,,,1991,Viper (v3),1
+846,A0846,Mortar Stand (Traversing Assembly),,22,Weapon Accessory,gold,,,,,,,,,1991,Viper (v3),1
+847,A0847,Right Hand Attachment,,21,Weapon Specialized,orange,,,,,,,,,1991,B.A.T. (v2),1
+848,A0848,Grenade Launcher Attachment,,21,Weapon Specialized,orange,,,,,,,,,1991,B.A.T. (v2),1
+849,A0849,Backpack/ Spring-Loaded Missile Launcher,,3,Backpack,black/green,,,,,,,,,1991,B.A.T. (v2),1
+850,A0850,Missile,,25,Spring-Loaded Missile,bright green,,,,,,,,,1991,B.A.T. (v2),1
+851,A0851,Backpack,,3,Backpack,dark green,,,,,,,,,1991,Big Ben (v1),1
+852,A0852,Machine Gun,,10,Weapon Machine Gun,black,,,,,,,,,1991,Big Ben (v1),2
+853,A0853,Bipod,,22,Weapon Accessory,black,,,,,,,,,1991,Big Ben (v1),2
+854,A0854,Grenade Pouch,,37,Tactical Gear,dark green,,,,,,,,,1991,Big Ben (v1),1
+855,A0855,Grenade Pouch Strap,,37,Tactical Gear,dark gray,,,,,,,,,1991,Big Ben (v1),1
+856,A0856,Grenade,,31,Explosive Ordnance Disposal (EOD),black,2,,,,,,,,1991,Big Ben (v1),1
+857,A0857,Helmet,,1,Helmet,gold/orange,,,,,,,,,1991,Cesspool (v1),1
+858,A0858,Breather,,2,Helmet Accessory,gold,,,,,,,,,1991,Cesspool (v1),1
+859,A0859,Backpack,,3,Backpack,purple,,,,,,,,,1991,Cesspool (v1),1
+860,A0860,Water Tank,,3,Backpack,orange,,,,,,,,,1991,Cesspool (v1),1
+861,A0861,Rifle (water),,8,Weapon Rifle,purple,,,,,,,,,1991,Cesspool (v1),1
+862,A0862,Hose,,47,Water Hose,orange,,,,,,,,,1991,Cesspool (v1),1
+863,A0863,Acid Assisted Chainsaw,,21,Weapon Specialized,gold,,,,,,,,,1991,Cesspool (v1),1
+864,A0864,Helmet,,1,Helmet,yellow/green,,,,,,,,,1991,Clean-Sweep (v1),1
+865,A0865,Backpack,,3,Backpack,bright green,,,,,,,,,1991,Clean-Sweep (v1),1
+866,A0866,Pistol,,6,Weapon Pistol,bright green,,,,,,,,,1991,Clean-Sweep (v1),1
+867,A0867,Sweeper,,13,Weapon Bazooka/ Launcher,yellow,,,,,,,,,1991,Clean-Sweep (v1),1
+868,A0868,Plunger,,22,Weapon Accessory,green,,,,,,,,,1991,Clean-Sweep (v1),1
+869,A0869,Control Panel,,30,Comms/ Radio/ Tech,bright green,,,,,,,,,1991,Clean-Sweep (v1),1
+870,A0870,Visor,,2,Helmet Accessory,blue,,,,,,,,,1991,Cloudburst (v1),1
+871,A0871,Submachine Gun,,9,Weapon Submachine Gun,red/pink,,,,,,,,,1991,Cloudburst (v1),1
+872,A0872,Machine Gun,,10,Weapon Machine Gun,gold,,,,,,,,,1991,Cobra Commander (v4),2
+873,A0873,Spring-Loaded Flying Surveillance Weapon Launcher,,24,Spring-Loaded Launcher,blue,,,,,,,,,1991,Cobra Commander (v4),1
+874,A0874,Glider Body,,44,Transportation,blue/orange,,,,,,,,,1991,Cobra Commander (v4),1
+875,A0875,Glider Wings,,44,Transportation,blue/orange,,,,,,,,,1991,Cobra Commander (v4),1
+876,A0876,Bipod,,22,Weapon Accessory,orange,,,,,,,,,1991,Cobra Commander (v4),1
+877,A0877,Backpack,,3,Backpack,black,,,,,,,,,1991,Crimson Guard Immortal (v1),1
+878,A0878,Double-Barreled Missile Launcher,,13,Weapon Bazooka/ Launcher,black,2,,,,,,,,1991,Crimson Guard Immortal (v1),1
+879,A0879,Missiles,,31,Explosive Ordnance Disposal (EOD),black,6,,,,,,,,1991,Crimson Guard Immortal (v1),1
+880,A0880,Ammo Belt,,28,Ammo/ Belt,black,,,,,,,,,1991,Crimson Guard Immortal (v1),1
+881,A0881,Backpack,,3,Backpack,black,,,,,,,,,1991,Desert Scorpion (v1),1
+882,A0882,Missile Rack,,5,Backpack Accessory,black,,,,,,,,,1991,Desert Scorpion (v1),1
+883,A0883,Machine Pistol,,9,Weapon Submachine Gun,black,,,,,,,,,1991,Desert Scorpion (v1),1
+884,A0884,Missile,,23,Missile,light orange,,,,,,,,,1991,Desert Scorpion (v1),1
+885,A0885,Digger Device,,37,Tactical Gear,black,2,,,,,,,,1991,Desert Scorpion (v1),1
+886,A0886,Scorpion,,26,Animal,black,,,,,,,,,1991,Desert Scorpion (v1),1
+887,A0887,Backpack,,3,Backpack,brown,,,,,,,,,1991,Dusty (v3),1
+888,A0888,9mm Pistol,,6,Weapon Pistol,brown,,,,,,,,,1991,Dusty (v3),1
+889,A0889,Submachine Gun,,9,Weapon Submachine Gun,brown,,,,,,,,,1991,Dusty (v3),1
+890,A0890,Submachine Gun Stock,,22,Weapon Accessory,brown,,,,,,,,,1991,Dusty (v3),1
+891,A0891,"Sandstorm, Coyote",,26,Animal,gray,,,,,,,,,1991,Dusty (v3),1
+892,A0892,Helmet,,1,Helmet,yellow,,,,,,,,,1991,Flint (v3),1
+893,A0893,Backpack,,3,Backpack,blue,,,,,,,,,1991,Flint (v3),1
+894,A0894,Water Tank,,3,Backpack,orange,,,,,,,,,1991,Flint (v3),1
+895,A0895,Rifle,,8,Weapon Rifle,blue,,,,,,,,,1991,Flint (v3),1
+896,A0896,Rifle (water),,8,Weapon Rifle,blue,,,,,,,,,1991,Flint (v3),1
+897,A0897,Hose,,47,Water Hose,orange,,,,,,,,,1991,Flint (v3),1
+898,A0898,Helmet,,1,Helmet,gold,,,,,,,,,1991,General Hawk (v3),1
+899,A0899,Visor,,2,Helmet Accessory,clear,,,,,,,,,1991,General Hawk (v3),1
+900,A0900,Jetpack,,3,Backpack,dark gray,,,,,,,,,1991,General Hawk (v3),1
+901,A0901,Rifle,,8,Weapon Rifle,dark gray,,,,,,,,,1991,General Hawk (v3),1
+902,A0902,Missile,,23,Missile,gold,4,,,,,,,,1991,General Hawk (v3),1
+903,A0903,Helmet,,1,Helmet,green/black,,,,,,,,,1991,Grunt (v3),1
+904,A0904,Rifle (with holes),,8,Weapon Rifle,black,,,,,,,,,1991,Grunt (v3),1
+905,A0905,Spring-Loaded Missile Launcher,,24,Spring-Loaded Launcher,black/orange,,,,,,,,,1991,Grunt (v3),1
+906,A0906,Bipod,,23,Weapon Accessory,orange,,,,,,,,,1991,Grunt (v3),1
+907,A0907,Missile,,25,Spring-Loaded Missile,bright orange,,,,,,,,,1991,Grunt (v3),1
+908,A0908,Backpack,,3,Backpack,green,,,,,,,,,1991,Heavy Duty (v1),1
+909,A0909,Site,,5,Backpack Accessory,red,,,,,,,,,1991,Heavy Duty (v1),1
+910,A0910,Missile Launcher Base,,13,Weapon Bazooka/ Launcher,green,,,,,,,,,1991,Heavy Duty (v1),1
+911,A0911,Center Mount Cannon ,,13,Weapon Bazooka/ Launcher,black,,,,,,,,,1991,Heavy Duty (v1),1
+912,A0912,Spring-Loaded Missile Launcher,,24,Spring-Loaded Launcher,green,2,,,,,,,,1991,Heavy Duty (v1),1
+913,A0913,Missile,,25,Spring-Loaded Missile,light green,2,,,,,,,,1991,Heavy Duty (v1),1
+914,A0914,Backpack,,3,Backpack,black,,,,,,,,,1991,Incinerators (v1),1
+915,A0915,Flamethrower,,11,Weapon Flamethrower,silver,,,,,,,,,1991,Incinerators (v1),1
+916,A0916,Catapult Incendiary Grenade Launcher,,13,Weapon Bazooka/ Launcher,silver,,,,,,,,,1991,Incinerators (v1),1
+917,A0917,Catapult Arm,,42,Launch System,silver,,,,,,,,,1991,Incinerators (v1),1
+918,A0918,Catapult Lever,,42,Launch System,silver,,,,,,,,,1991,Incinerators (v1),1
+919,A0919,Flame Canister ,,31,Explosive Ordnance Disposal (EOD),orange,2,,,,,,,,1991,Incinerators (v1),1
+920,A0920,Rifle with attached Claw,,8,Weapon Rifle,black,,,,,,,,,1991,Interrogator (v1),1
+921,A0921,Helmet,,1,Helmet,black,,,,,,,,,1991,Low-Light (v3),2
+922,A0922,Visor,,2,Helmet Accessory,black,,,,,,,,,1991,Low-Light (v3),2
+923,A0923,Backpack,,3,Backpack,black,,,,,,,,,1991,Low-Light (v3),1
+924,A0924,Rifle,,8,Weapon Rifle,black,,,,,,,,,1991,Low-Light (v3),1
+925,A0925,Knife,,14,Weapon Knife,black,,,,,,,,,1991,Low-Light (v3),1
+926,A0926,Flashlight,,37,Tactical Gear,black,,,,,,,,,1991,Low-Light (v3),1
+927,A0927,Sonic Backpack,,4,Backpack with Battery,blue,,,,,,,,,1991,Lt. Falcon (v2),1
+928,A0928,Battery Cover,,5,Backpack Accessory,black,,,,,,,,,1991,Lt. Falcon (v2),1
+929,A0929,Copter Blade attachment for Backpack,,5,Backpack Accessory,black,,,,,,,,,1991,Lt. Falcon (v2),1
+930,A0930,Laser Rifle,,12,Weapon Blaster/ Laser,black,,,,,,,,,1991,Lt. Falcon (v2),1
+931,A0931,Machine Gun,,10,Weapon Machine Gun,black,,,,,,,,,1991,Lt. Falcon (v2),1
+932,A0932,Helmet,,1,Helmet,bright green,,,,,,,,,1991,Major Altitude (v1),1
+933,A0933,Rifle,,8,Weapon Rifle,silver,,,,,,,,,1991,Major Altitude (v1),1
+934,A0934,Sonic Jet Pack Backpack,,4,Backpack with Battery,gray,,,,,,,,,1991,Major Bludd (v2),1
+935,A0935,Battery Cover,,5,Backpack Accessory,gray,,,,,,,,,1991,Major Bludd (v2),1
+936,A0936,Laser Machine Gun,,12,Weapon Blaster/ Laser,yellow,,,,,,,,,1991,Major Bludd (v2),1
+937,A0937,Sonic Disruptor Cannon,,12,Weapon Blaster/ Laser,gray,,,,,,,,,1991,Major Bludd (v2),1
+938,A0938,Muzzle,,22,Weapon Accessory,silver,,,,,,,,,1991,Major Bludd (v2),1
+939,A0939,Sonic Disruptor Cannon,,12,Weapon Blaster/ Laser,gray,,,,,,,,,1991,Major Bludd (v2),1
+940,A0940,Muzzle,,22,Weapon Accessory,silver,,,,,,,,,1991,Major Bludd (v2),1
+941,A0941,Rifle,,8,Weapon Rifle,orange,,,,,,,,,1991,Mercer (v2),1
+942,A0942,Rifle,,8,Weapon Rifle,orange,,,,,,,,,1991,Mercer (v2),1
+943,A0943,Spring-Loaded Missile Launcher,,24,Spring-Loaded Launcher,blue/orange,,,,,,,,,1991,Mercer (v2),1
+944,A0944,Missile,,25,Spring-Loaded Missile,orange,,,,,,,,,1991,Mercer (v2),1
+945,A0945,Crossbow,,19,Weapon Bow/ Crossbow,purple,,,,,,,,,1991,Night Vulture (v1),1
+946,A0946,Helmet,,1,Helmet,blue/yellow,,,,,,,,,1991,Ozone (v1),1
+947,A0947,Backpack,,3,Backpack,bright green,,,,,,,,,1991,Ozone (v1),1
+948,A0948,Water Tank,,3,Backpack,yellow,,,,,,,,,1991,Ozone (v1),1
+949,A0949,Vacuum Gun,,21,Weapon Specialized,bright green,,,,,,,,,1991,Ozone (v1),1
+950,A0950,Rifle (water),,8,Weapon Rifle,bright green,,,,,,,,,1991,Ozone (v1),1
+951,A0951,Hose,,47,Water Hose,orange,,,,,,,,,1991,Ozone (v1),1
+952,A0952,Microphone,,2,Helmet Accessory,black,,,,,,,,,1992,Psyche-Out (v3),1
+953,A0953,Sonic Backpack (raised peg on side),,4,Backpack with Battery,gray,,,,,,,,,1992,Psyche-Out (v3),1
+954,A0954,Sonic Backpack (hole on side),,4,Backpack with Battery,gray,,,,,,,,,1992,Psyche-Out (v3),1
+955,A0955,Battery Cover,,5,Backpack Accessory,gray,,,,,,,,,1992,Psyche-Out (v3),1
+956,A0956,Antenna,,5,Backpack Accessory,black,,,,,,,,,1992,Psyche-Out (v3),1
+957,A0957,Radar Dish,,5,Backpack Accessory,black,,,,,,,,,1992,Psyche-Out (v3),1
+958,A0958,Radar Screen,,5,Backpack Accessory,black,,,,,,,,,1992,Psyche-Out (v3),1
+959,A0959,E.C.M. (Laser Rifle),,12,Weapon Blaster/ Laser,blue,,,,,,,,,1992,Psyche-Out (v3),1
+960,A0960,"E.C.M. (small, attach to Psyche-Out)",,30,Comms/ Radio/ Tech,blue,2,,,,,,,,1992,Psyche-Out (v3),1
+961,A0961,"E.C.M. (large, attach to rifle)",,30,Comms/ Radio/ Tech,blue,,,,,,,,,1992,Psyche-Out (v3),1
+962,A0962,Hat,,1,Helmet,blue,,,,,,,,,1991,Red Star (v1),1
+963,A0963,Backpack,,3,Backpack,brown,,,,,,,,,1991,Red Star (v1),1
+964,A0964,Antenna,,5,Backpack Accessory,black,,,,,,,,,1991,Red Star (v1),1
+965,A0965,Soviet AK-103 Assault Rifle,,8,Weapon Rifle,black,,,,,,,,,1991,Red Star (v1),1
+966,A0966,Mini Gatling Gun,,10,Weapon Machine Gun,black,,,,,,,,,1991,Red Star (v1),1
+967,A0967,Gun Barrel,,10,Weapon Machine Gun,black,,,,,,,,,1991,Red Star (v1),1
+968,A0968,Ammo Belt,,28,Ammo/ Belt,black,,,,,,,,,1991,Red Star (v1),1
+969,A0969,Knife,,14,Weapon Knife,black,,,,,,,,,1991,Red Star (v1),1
+970,A0970,Spring-Loaded Missile Launcher,,24,Spring-Loaded Launcher,black,,,,,,,,,1991,Red Star (v1),1
+971,A0971,Missile,,25,Spring-Loaded Missile,red,,,,,,,,,1991,Red Star (v1),1
+972,A0972,Sonic Backpack,,4,Backpack with Battery,bright green,,,,,,,,,1991,Road Pig (v2),1
+973,A0973,Battery Cover,,5,Backpack Accessory,bright green,,,,,,,,,1991,Road Pig (v2),1
+974,A0974,High-Density Impact Pads (Shoulder-Pad Harness),,29,Armor/ Shield,orange,,,,,,,,,1991,Road Pig (v2),1
+975,A0975,Machine Gun,,10,Weapon Machine Gun,orange,,,,,,,,,1991,Road Pig (v2),1
+976,A0976,Double-Barreled Flamethrower,,11,Weapon Flamethrower,orange,,,,,,,,,1991,Road Pig (v2),1
+977,A0977,Sonic Backpack,,4,Backpack with Battery,green,,,,,,,,,1991,Rock 'N Roll (v3),1
+978,A0978,Battery Cover,,5,Backpack Accessory,green,,,,,,,,,1991,Rock 'N Roll (v3),1
+979,A0979,M-60 Machine Gun,,10,Weapon Machine Gun,brown,,,,,,,,,1991,Rock 'N Roll (v3),1
+980,A0980,Mortar Launcher,,13,Weapon Bazooka/ Launcher,brown,,,,,,,,,1991,Rock 'N Roll (v3),1
+981,A0981,Gun Support (Cone Stand),,22,Weapon Accessory,green,,,,,,,,,1991,Rock 'N Roll (v3),1
+982,A0982,Helmet,,1,Helmet,black/silver,,,,,,,,,1991,Sci-Fi (v2),1
+983,A0983,Backpack,,3,Backpack,silver,,,,,,,,,1991,Sci-Fi (v2),1
+984,A0984,Laser Rifle,,12,Weapon Blaster/ Laser,silver,,,,,,,,,1991,Sci-Fi (v2),3
+985,A0985,Spring-Loaded Missile Launcher,,24,Spring-Loaded Launcher,silver,,,,,,,,,1991,Sci-Fi (v2),1
+986,A0986,Missile,,25,Spring-Loaded Missile,yellow,,,,,,,,,1991,Sci-Fi (v2),1
+987,A0987,Pistol,,6,Weapon Pistol,blue,,,,,,,,,1991,Sky Creeper (v1),1
+988,A0988,Visor,,2,Helmet Accessory,blue,,,,,,,,,1991,Skymate (v1),1
+989,A0989,Boomerang,,21,Weapon Specialized,red/pink,,,,,,,,,1991,Skymate (v1),1
+990,A0990,Bow,,19,Weapon Bow/ Crossbow,yellow,,,,,,,,,1991,Skymate (v1),1
+991,A0991,Backpack,,3,Backpack,purple,,,,,,,,,1991,Sludge Viper (v1),2
+992,A0992,Pistol,,6,Weapon Pistol,purple,,,,,,,,,1991,Sludge Viper (v1),2
+993,A0993,Sludge Gun (water),,13,Weapon Bazooka/ Launcher,purple,,,,,,,,,1991,Sludge Viper (v1),1
+994,A0994,Sludge Gun Plunger,,22,Weapon Accessory,red,,,,,,,,,1991,Sludge Viper (v1),1
+995,A0995,Machine Gun,,10,Weapon Machine Gun,red,,,,,,,,,1991,Snake Eyes (v4),1
+996,A0996,Backpack/ Spring-Loaded Missile Launcher,,3,Backpack,blue,,,,,,,,,1991,Snake Eyes (v4),1
+997,A0997,Grappling Hook ,,32,Grappling Hook,red,,,,,,,,,1991,Snake Eyes (v4),1
+998,A0998,Sword,,17,Weapon Sword,red,2,,,,,,,,1991,Snake Eyes (v4),1
+999,A0999,Backpack,,3,Backpack,purple,,,,,,,,,1991,Snow Serpent (v2),1
+1000,A1000,Pistol,,6,Weapon Pistol,white,,,,,,,,,1991,Snow Serpent (v2),1
+1001,A1001,Rifle,,8,Weapon Rifle,white,,,,,,,,,1991,Snow Serpent (v2),1
+1002,A1002,Spring-Loaded Missile Launcher,,24,Spring-Loaded Launcher,purple,,,,,,,,,1991,Snow Serpent (v2),1
+1003,A1003,Missile,,25,Spring-Loaded Missile,white,,,,,,,,,1991,Snow Serpent (v2),1
+1004,A1004,Snowboard,,34,Ski/ Snow Equipment,purple,,,,,,,,,1991,Snow Serpent (v2),1
+1005,A1005,Sludge Gun (water),,13,Weapon Bazooka/ Launcher,green,,,,,,,,,1991,Toxo-Viper (v2),1
+1006,A1006,Sludge Gun Plunger,,22,Weapon Accessory,black,,,,,,,,,1991,Toxo-Viper (v2),1
+1007,A1007,Visor,,2,Helmet Accessory,black,,,,,,,,,1991,Tracker (v1),1
+1008,A1008,Submachine Gun,,9,Weapon Submachine Gun,orange,,,,,,,,,1991,Tracker (v1),1
+1009,A1009,Inflatable Covert Insertion Raft,,44,Transportation,orange,,,,,,,,,1991,Tracker (v1),1
+1010,A1010,Oars,,44,Transportation,orange,2,,,,,,,,1991,Tracker (v1),1
+1011,A1011,Helmet,,1,Helmet,gray,,,,,,,,,1992,Zap (v2),1
+1012,A1012,Helmet,,1,Helmet,silver,,,,,,,,,1992,Zap (v2),1
+1013,A1013,Sonic Backpack,,4,Backpack with Battery,gray,,,,,,,,,1992,Zap (v2),1
+1014,A1014,Battery Cover,,5,Backpack Accessory,gray,,,,,,,,,1992,Zap (v2),1
+1015,A1015,Backpack Gun,,5,Backpack Accessory,gray,,,,,,,,,1992,Zap (v2),1
+1016,A1016,Backpack Gun,,5,Backpack Accessory,silver,,,,,,,,,1992,Zap (v2),1
+1017,A1017,Double Barreled Rocket Launcher,,13,Weapon Bazooka/ Launcher,gray,,,,,,,,,1992,Zap (v2),1
+1018,A1018,Double Barreled Rocket Launcher,,13,Weapon Bazooka/ Launcher,silver,,,,,,,,,1992,Zap (v2),1
+1019,A1019,Sonic Rocket Launcher,,13,Weapon Bazooka/ Launcher,gray,,,,,,,,,1992,Zap (v2),1
+1020,A1020,Sonic Rocket Launcher,,13,Weapon Bazooka/ Launcher,silver,,,,,,,,,1992,Zap (v2),1
+1021,A1021,Muzzle attachment to Sonic Rocket Launcher,,22,Weapon Accessory,gray,,,,,,,,,1992,Zap (v2),1
+1022,A1022,Muzzle attachment to Sonic Rocket Launcher,,22,Weapon Accessory,silver,,,,,,,,,1992,Zap (v2),1
+1023,A1023,Helmet,,1,Helmet,white/green,,,,,,,,,1992,Ace (v2),1
+1024,A1024,Airmask,,2,Helmet Accessory,black,,,,,,,,,1992,Ace (v2),1
+1025,A1025,Deflector Face Shield,,1,Helmet,clear,,,,,,,,,1992,Air Devil (v1),1
+1026,A1026,Aerial Assault Hand Rifle,,6,Weapon Pistol,black,,,,,,,,,1992,Air Devil (v1),1
+1027,A1027,Backpack,,3,Backpack,yellow,,,,,,,,,1992,Barbecue (v3),1
+1028,A1028,Water Tank,,3,Backpack,red,,,,,,,,,1992,Barbecue (v3),1
+1029,A1029,Rifle (water),,8,Weapon Rifle,yellow,,,,,,,,,1992,Barbecue (v3),1
+1030,A1030,Hose,,47,Water Hose,orange,,,,,,,,,1992,Barbecue (v3),1
+1031,A1031,"Titanium Reinforced, Concussion-Proof Helmet",,1,Helmet,gold/red,,,,,,,,,1992,Barricade (v1),2
+1032,A1032,Backpack,,3,Backpack,blue,,,,,,,,,1992,Barricade (v1),2
+1033,A1033,Sophisticated Z-99 Battlefield Side Arm,,9,Weapon Submachine Gun,blue,,,,,,,,,1992,Barricade (v1),2
+1034,A1034,"Eight Barreled, Multi-Shot, ""Never Miss"" Machine Gun",,24,Spring-Loaded Launcher,blue,,,,,,,,,1992,Barricade (v1),2
+1035,A1035,"High-Powered ""Wall Smasher"" Battering Ram",,25,Spring-Loaded Missile,yellow,,,,,,,,,1992,Barricade (v1),2
+1036,A1036,Standard Soviet Army Field Pack Backpack,,3,Backpack,black,,,,,,,,,1992,Big Bear (v1),1
+1037,A1037,AK-88 Fully Automatic Attack Rifle,,8,Weapon Rifle,black,,,,,,,,,1992,Big Bear (v1),1
+1038,A1038,"Dual barrelled, Low-Noise Bazooka Launcher",,24,Spring-Loaded Launcher,black,,,,,,,,,1992,Big Bear (v1),1
+1039,A1039,Z2EE4-00 Shinokof Surface-to-Air Missile,,25,Spring-Loaded Missile,yellow,,,,,,,,,1992,Big Bear (v1),1
+1040,A1040,Z2EE4-00 Shinokof Surface-to-Air Missile (with post),,24,Spring-Loaded Missile,yellow,,,,,,,,,1992,Big Bear (v1),1
+1041,A1041,Heavy Artillery Operator's Helmet,,1,Helmet,green,,,,,,,,,1992,Bullet-Proof (v1),1
+1042,A1042,Microphone,,2,Helmet Accessory,green,,,,,,,,,1992,Bullet-Proof (v1),1
+1043,A1043,Combat Ready Backpack with Chemical Warfare Mask,,3,Backpack,green,,,,,,,,,1992,Bullet-Proof (v1),2
+1044,A1044,Fully Automatic GP-88 Field Rifle,,8,Weapon Rifle,green,,,,,,,,,1992,Bullet-Proof (v1),2
+1045,A1045,"Portable, Recoilless Missile Launcher",,24,Spring-Loaded Launcher,green,,,,,,,,,1992,Bullet-Proof (v1),1
+1046,A1046,Heat-Seeking Surface-to-Air Missile,,25,Spring-Loaded Missile,green,,,,,,,,,1992,Bullet-Proof (v1),2
+1047,A1047,Talking Sonic Backpack with Battery Cover (attached to figure),,4,Backpack with Battery,black,,,,,,,,,1992,Cobra Commander (v5),1
+1048,A1048,Rifle,,6,Weapon Rifle,black,,,,,,,,,1992,Cobra Commander (v5),1
+1049,A1049,Long RangeDual Missile Launcher,,13,Weapon Bazooka/ Launcher,black,,,,,,,,,1992,Cobra Commander (v5),1
+1050,A1050,Missile,,23,Missile,black,2,,,,,,,,1992,Cobra Commander (v5),1
+1051,A1051,"BM-201 Short Stock, Fully Automatic Boarding Rifle",,8,Weapon Rifle,white,,,,,,,,,1992,Cutter (v2),1
+1052,A1052,High-Powered Missile Launcher,,24,Spring-Loaded Launcher,orange,,,,,,,,,1992,Cutter (v2),1
+1053,A1053,Tripod,,22,Weapon Accessory,white,,,,,,,,,1992,Cutter (v2),1
+1054,A1054,Perfect Strike Grappling Hook ,,25,Spring-Loaded Missile,white,,,,,,,,,1992,Cutter (v2),1
+1055,A1055,"Long Neck, Steel Reinforced Flashlight",,37,Tactical Gear,white,,,,,,,,,1992,Cutter (v2),1
+1056,A1056,Underwater AVB-40 Laser Gun,,12,Weapon Blaster/ Laser,black,,,,,,,,,1992,Deep Six (v3),1
+1057,A1057,Flippers,,36,Swim/ Scuba Equipment,pink,2,,,,,,,,1992,Deep Six (v3),1
+1058,A1058,"Finback, Dolphin",,26,Animal,gray,,,,,,,,,1992,Deep Six (v3),1
+1059,A1059,"Finback, Killer Whale (prototype)",,26,Animal,black,,,,,,,,,1992,Deep Six (v3),1
+1060,A1060,"Laser-Powered, Rapid-Fire ""Burp"" Machine Gun",,8,Weapon Rifle,black,,,,,,,,,1992,Destro (v3),3
+1061,A1061,"High-Tech, Computer Controlled Disc Launcher",,42,Launch System,black,,,,,,,,,1992,Destro (v3),1
+1062,A1062,"Razor Sharp, Armor-Cutting Disc",,15,Weapon Blade,red,2,,,,,,,,1992,Destro (v3),1
+1063,A1063,Battle Axe,,15,Weapon Blade,silver,,,,,,,,,1992,Dice (v1),1
+1064,A1064,Double Bladed Bo Staff,,18,Weapon Melee,silver,,,,,,,,,1992,Dice (v1),1
+1065,A1065,Samurai Jungle Attack Sword,,17,Weapon Sword,blue,,,,,,,,,1992,Dojo (v1),1
+1066,A1066,Sickle,,15,Weapon Blade,blue,,,,,,,,,1992,Dojo (v1),1
+1067,A1067,Steel-Piercing Blade,,15,Weapon Blade,blue,,,,,,,,,1992,Dojo (v1),1
+1068,A1068,Modern Army Infantry Helmet,,1,Helmet,tan,,,,,,,,,1992,Duke (v3),1
+1069,A1069,Semi-Automatic Commando Rifle,,9,Weapon Submachine Gun,brown,,,,,,,,,1992,Duke (v3),1
+1070,A1070,Steel Piercing Combat Knife,,8,Weapon Rifle,brown,,,,,,,,,1992,Duke (v3),1
+1071,A1071,"High-powered, Quick-Launch Missile Cannon",,24,Spring-Loaded Launcher,tan,,,,,,,,,1992,Duke (v3),1
+1072,A1072,Seat attachment for Cannon,,22,Weapon Accessory,red,,,,,,,,,1992,Duke (v3),1
+1073,A1073,Cannon Tripod,,22,Weapon Accessory,brown,,,,,,,,,1992,Duke (v3),1
+1074,A1074,"Surface-to-Surface ""Zap"" Missile",,25,Spring-Loaded Missile,red,,,,,,,,,1992,Duke (v3),1
+1075,A1075,"Nautical Spear Gun with 3-Prong, Hull Puncturing Spear",,20,Weapon Harpoon/ Javelin/ Spear,yellow,,,,,,,,,1992,Eels (v2),1
+1076,A1076,Stabilizer Foot Fin for Power Swimming,,36,Swim/ Scuba Equipment,silver,2,,,,,,,,1992,Eels (v2),1
+1077,A1077,Rapid Fire X8-Torpedo Launcher/ Shark Design,,24,Spring-Loaded Launcher,silver,,,,,,,,,1992,Eels (v2),1
+1078,A1078,Shark Jaw,,22,Weapon Accessory,silver,,,,,,,,,1992,Eels (v2),1
+1079,A1079,Shark Fin,,22,Weapon Accessory,silver,,,,,,,,,1992,Eels (v2),1
+1080,A1080,Shark Tail,,22,Weapon Accessory,silver,,,,,,,,,1992,Eels (v2),1
+1081,A1081,"Silent-Running, High-Impact Torpedo",,25,Spring-Loaded Missile,yellow,,,,,,,,,1992,Eels (v2),1
+1082,A1082,Standard Cobra NA-55 Assault Rifle,,8,Weapon Rifle,bright green,,,,,,,,,1992,Firefly (v2),2
+1083,A1083,Blade Launcher,,42,Launch System,gold,,,,,,,,,1992,Firefly (v2),1
+1084,A1084,"Spinning Lethal, Blade Launcher Armament",,15,Weapon Blade,bright green,,,,,,,,,1992,Firefly (v2),2
+1085,A1085,Zipcord Pull-Tool,,41,Cord/ Pull/ Strap,bright green,,,,,,,,,1992,Firefly (v2),2
+1086,A1086,Long Barrel Laser Rifle with Mini-Machete Bayonet,,8,Weapon Rifle,blue,,,,,,,,,1992,Flak-Viper (v1),1
+1087,A1087,"Electronic-Firing, Dual Missile Launcher Backpack",,3,Backpack,green,,,,,,,,,1992,Flak-Viper (v1),1
+1088,A1088,High Altitude Tail-Biter Missile,,23,Missile,blue,2,,,,,,,,1992,Flak-Viper (v1),1
+1089,A1089,"Official World War II Sytled, U.S. Military Officer's Cap",,1,Helmet,brown,,,,,,,,,1992,General Flagg (v1),2
+1090,A1090,Short-Stock M-21 Automatic Combat Rifle,,8,Weapon Rifle,black,,,,,,,,,1992,General Flagg (v1),2
+1091,A1091,Catapult Base,,42,Launch System,green,,,,,,,,,1992,General Flagg (v1),2
+1092,A1092,Catapult Arm,,42,Launch System,green,,,,,,,,,1992,General Flagg (v1),2
+1093,A1093,Catapult Lever,,42,Launch System,black,,,,,,,,,1992,General Flagg (v1),2
+1094,A1094,Missile,,23,Missile,black,,,,,,,,,1992,General Flagg (v1),2
+1095,A1095,Talking Sonic Backpack with Battery Cover (attached to figure),,4,Backpack with Battery,gold,,,,,,,,,1992,General Hawk (v2),1
+1096,A1096,Antenna,,5,Backpack Accessory,gold,,,,,,,,,1992,General Hawk (v2),1
+1097,A1097,.45-Caliber Battlefield Pistol,,6,Weapon Pistol,gold,,,,,,,,,1992,General Hawk (v2),1
+1098,A1098,Rifle with Scope,,8,Weapon Rifle,gold,,,,,,,,,1992,General Hawk (v2),1
+1099,A1099,Backpack,,3,Backpack,black,,,,,,,,,1992,Gung-Ho (v3),1
+1100,A1100,M-60 Heavy Machine Gun,,10,Weapon Machine Gun,black,,,,,,,,,1992,Gung-Ho (v3),3
+1101,A1101,"Heat-Seeking, Lightweight Rocket Launcher",,24,Spring-Loaded Launcher,black,,,,,,,,,1992,Gung-Ho (v3),2
+1102,A1102,Missile,,25,Spring-Loaded Missile,blue,,,,,,,,,1992,Gung-Ho (v3),2
+1103,A1103,"American Flag ""Old Glory""",,43,Playset Feature,red/white/blue,,,,,,,,,1992,Gung-Ho (v3),2
+1104,A1104,Portable Drug Lab Backpack with Computer Readout Terminals,,3,Backpack,black,,,,,,,,,1992,Headhunters (v1),1
+1105,A1105,"Sawed-Off, Double-Barreled Shotgun",,7,Weapon Shotgun,black,,,,,,,,,1992,Headhunters (v1),1
+1106,A1106,"Long Range, Pinpoint Accurate Missile Launcher",,24,Spring-Loaded Launcher,purple,,,,,,,,,1992,Headhunters (v1),2
+1107,A1107,"Metal-Piercing, Supercharged Warhead",,25,Spring-Loaded Missile,black,,,,,,,,,1992,Headhunters (v1),1
+1108,A1108,"Continuous Fire, Mega-Blast Combat Rifle",,8,Weapon Rifle,gold,,,,,,,,,1992,Headman (v1),2
+1109,A1109,Armaments Launcher System,,24,Spring-Loaded Launcher,transparent red,,,,,,,,,1992,Headman (v1),1
+1110,A1110,"""Wipe-Out"" Missile",,25,Spring-Loaded Missile,gold,,,,,,,,,1992,Headman (v1),2
+1111,A1111,Rapid-Fire Rifle with Telescopic Sight,,8,Weapon Rifle,purple,,,,,,,,,1992,Heli-Vipers (v1),1
+1112,A1112,U.S Army .9mm Semi-Automatic Pistol,,6,Weapon Pistol,black,,,,,,,,,1992,Mutt & Junkyard (v3),2
+1113,A1113,Dual-Firing Net Launcher,,24,Spring-Loaded Launcher,blue,,,,,,,,,1992,Mutt & Junkyard (v3),1
+1114,A1114,Dual-Firing Net Projectile,,25,Spring-Loaded Missile,green/black,,,,,,,,,1992,Mutt & Junkyard (v3),1
+1115,A1115,Sword,,17,Weapon Sword,light gray,2,,,,,,,,1992,Cobra Ninja (v1),1
+1116,A1116,Sword,,17,Weapon Sword,dark gray,2,,,,,,,,1992,Cobra Ninja (v1),1
+1117,A1117,Double-Edged Samurai Warrior Sword,,17,Weapon Sword,black,,,,,,,,,1992,Nunchuk (v1),1
+1118,A1118,Banzai Oak Nunchaku with Non-Breakable Chain,,18,Weapon Melee,black,,,,,,,,,1992,Nunchuk (v1),1
+1119,A1119,Psychic Sensor Talking Sonic Backpack,,4,Backpack with Battery,red,,,,,,,,,1992,Overkill (v1),1
+1120,A1120,Right Hand Attachment,,21,Weapon Specialized,red,,,,,,,,,1992,Overkill (v1),1
+1121,A1121,"Claw Attachment with Mind Control, Memory Drain Unit",,21,Weapon Specialized,red,,,,,,,,,1992,Overkill (v1),1
+1122,A1122,Rifle,,8,Weapon Rifle,red,,,,,,,,,1992,Overkill (v1),1
+1123,A1123,M-90 Continuous Fire Machine Gun with Infrared Scope,,10,Weapon Machine Gun,black,,,,,,,,,1992,Roadblock (v4) ,1
+1124,A1124,"Specially Designed ""Roadblock"" Battle Knife",,14,Weapon Knife,black,,,,,,,,,1992,Roadblock (v4) ,2
+1125,A1125,Advanced Rotor Machine Gun Launcher System,,42,Launch System,blue,,,,,,,,,1992,Roadblock (v4) ,1
+1126,A1126,Spinning Tri-Blaster Propeller Ordnance,,31,Explosive Ordnance Disposal (EOD),black,,,,,,,,,1992,Roadblock (v4) ,1
+1127,A1127,"Shock-Proof, Full Head Protection Helmet",,1,Helmet,black,,,,,,,,,1992,Shockwave (v3),1
+1128,A1128,M-33 Automatic Combat Machine Gun,,8,Weapon Rifle,black,,,,,,,,,1992,Shockwave (v3),1
+1129,A1129,Light-Blast Battering Ram Tank,,24,Spring-Loaded Launcher,yellow,,,,,,,,,1992,Shockwave (v3),1
+1130,A1130,"Tactical Strike, Armor-Piercing Ram Missile",,25,Spring-Loaded Missile,black,,,,,,,,,1992,Shockwave (v3),1
+1131,A1131,Wide Butterfly Battle Knife,,14,Weapon Knife,black,,,,,,,,,1992,Slice (v1),2
+1132,A1132,Jab Hook Heavy Sword,,17,Weapon Sword,black,,,,,,,,,1992,Slice (v1),1
+1133,A1133,"Lightweight ""Chief's"" Assault Gun (Pistol)",,6,Weapon Pistol,black,,,,,,,,,1992,Spirit (v3),1
+1134,A1134,Sonic Backpack,,4,Backpack with Battery,tan,,,,,,,,,1992,Stalker (v3),1
+1135,A1135,Pistol,,6,Weapon Pistol,black,,,,,,,,,1992,Stalker (v3),1
+1136,A1136,.30 Caliber M-19 Combat Rifle,,8,Weapon Rifle,black,,,,,,,,,1992,Stalker (v3),1
+1137,A1137,Backpack,,3,Backpack,dark green,,,,,,,,,1992,Steel Brigade (v2),1
+1138,A1138,Rifle,,8,Weapon Rifle,dark gray,,,,,,,,,1992,Steel Brigade (v2),1
+1139,A1139,Stainless Steel Ninja Master's Sword,,17,Weapon Sword,white,,,,,,,,,1992,Storm Shadow (v3),2
+1140,A1140,Nunchaku Defense Weapon (Sickle),,15,Weapon Blade,white,,,,,,,,,1992,Storm Shadow (v3),1
+1141,A1141,Ancient Ninjitsu Warrior Sword,,17,Weapon Sword,light blue,,,,,,,,,1992,T'Jbang (v1),1
+1142,A1142,"Curved style, Double-Edge Battle Axe",,15,Weapon Blade,light blue,,,,,,,,,1992,T'Jbang (v1),1
+1143,A1143,Sludge Gun (water),,12,Weapon Bazooka/ Launcher,green,,,,,,,,,1992,Toxo-Zombie (v1),1
+1144,A1144,Sludge Gun Plunger,,22,Weapon Accessory,black,,,,,,,,,1992,Toxo-Zombie (v1),1
+1145,A1145,Air-Tight Underwater Helmet with 360-Degree Radar,,1,Helmet,yellow,,,,,,,,,1992,Wet-Suit (v3),1
+1146,A1146,"Hydro-Charged, Undersea Spear Rifle",,20,Weapon Harpoon/ Javelin/ Spear,yellow,,,,,,,,,1992,Wet-Suit (v3),1
+1147,A1147,"Snug Fit, Deep Water Flipper",,36,Swim/ Scuba Equipment,yellow,2,,,,,,,,1992,Wet-Suit (v3),1
+1148,A1148,Low Drag Nautical Jet Sled with Heads-Up Display,,24,Spring-Loaded Launcher,black/yellow,,,,,,,,,1992,Wet-Suit (v3),1
+1149,A1149,Missile,,25,Spring-Loaded Missile,orange,3,,,,,,,,1992,Wet-Suit (v3),2
+1150,A1150,19th Century U.S. Cavalry Officer's Hat ,,1,Helmet,blue,,,,,,,,,1992,Wild Bill (v2),2
+1151,A1151,Backpack,,3,Backpack,brown,,,,,,,,,1992,Wild Bill (v2),2
+1152,A1152,Real Wooden Stock Colt .46 Side Arm,,6,Weapon Pistol,brown,,,,,,,,,1992,Wild Bill (v2),2
+1153,A1153,Knife,,14,Weapon Knife,brown,,,,,,,,,1992,Wild Bill (v2),2
+1154,A1154,Shoulder-Mounted CRT-92A Missile Launcher,,24,Spring-Loaded Launcher,blue,,,,,,,,,1992,Wild Bill (v2),2
+1155,A1155,Missile,,25,Spring-Loaded Missile,brown,,,,,,,,,1992,Wild Bill (v2),2
+1156,A1156,Pressurized Flight Helmet with Shatter-Proof Shield,,1,Helmet,black/green,,,,,,,,,1993,Ace (v3),1
+1157,A1157,Special Blast-Proof Trooper Helmet with Adjustable Visor,,1,Helmet,black,,,,,,,,,1993,Alley Viper (v2),1
+1158,A1158,Rilfe,,8,Weapon Rifle,black,,,,,,,,,1993,Alley Viper (v2),1
+1159,A1159,Computerized Missile Launcher with Urban-Assault Gun,,24,Spring-Loaded Launcher,yellow,,,,,,,,,1993,Alley Viper (v2),2
+1160,A1160,Missile,,25,Spring-Loaded Missile,black,2,,,,,,,,1993,Alley Viper (v2),3
+1161,A1161,Cobra Laser-Proof Shield,,29,Armor/ Shield,black,,,,,,,,,1993,Alley Viper (v2),1
+1162,A1162,Helmet,,1,Helmet,tan,,,,,,,,,1993,Ambush (v2),1
+1163,A1163,Pistol,,6,Weapon Pistol,green,,,,,,,,,1993,Ambush (v2),1
+1164,A1164,Rifle,,8,Weapon Rifle,green,,,,,,,,,1993,Ambush (v2),1
+1165,A1165,Laser Pistol,,12,Weapon Blaster/ Laser,green,,,,,,,,,1993,Ambush (v2),1
+1166,A1166,Heavy Machine Gun with Scope,,8,Weapon Rifle,green,,,,,,,,,1993,Ambush (v2),1
+1167,A1167,Knife,,14,Weapon Knife,green,,,,,,,,,1993,Ambush (v2),1
+1168,A1168,Machete,,16,Weapon Machete,green,,,,,,,,,1993,Ambush (v2),1
+1169,A1169,Helmet,,1,Helmet,gray/green,,,,,,,,,1993,Astro Viper (v2),1
+1170,A1170,XL-14 Machine Gun with Infrared Sight,,8,Weapon Rifle,orange,,,,,,,,,1993,Astro Viper (v2),1
+1171,A1171,Laser Rifle with Infrared Scope,,8,Weapon Rifle,orange,,,,,,,,,1993,Astro Viper (v2),1
+1172,A1172,"Razor-sharp, Serrated Battle Knife",,14,Weapon Knife,orange,,,,,,,,,1993,Astro Viper (v2),1
+1173,A1173,Missile Launching Astrosmasher Gun (loop on bottom),,24,Spring-Loaded Launcher,gold,,,,,,,,,1993,Astro Viper (v2),1
+1174,A1174,Missile Launching Astrosmasher Gun (no loop on bottom),,24,Spring-Loaded Launcher,gold,,,,,,,,,1993,Astro Viper (v2),1
+1175,A1175,Missile,,25,Spring-Loaded Missile,orange,2,,,,,,,,1993,Astro Viper (v2),1
+1176,A1176,Laser Pistol,,6,Weapon Pistol,yellow,,,,,,,,,1993,B.A.A.T. (v1),3
+1177,A1177,Uzi Submachine Gun,,9,Weapon Submachine Gun,yellow,,,,,,,,,1993,B.A.A.T. (v1),3
+1178,A1178,Submachine Gun,,9,Weapon Submachine Gun,yellow,,,,,,,,,1994,B.A.A.T. (v1),3
+1179,A1179,Laser Rifle,,8,Weapon Rifle,yellow,,,,,,,,,1993,B.A.A.T. (v1),3
+1180,A1180,Knife,,14,Weapon Knife,yellow,,,,,,,,,1993,B.A.A.T. (v1),3
+1181,A1181,Cyber-Tech Launcher,,24,Spring-Loaded Launcher,red,,,,,,,,,1993,B.A.A.T. (v1),1
+1182,A1182,Missile,,25,Spring-Loaded Missile,yellow,2,,,,,,,,1993,B.A.A.T. (v1),2
+1183,A1183,Multi-burst Machine Gun with Built-In Silencer,,9,Weapon Submachine Gun,black,,,,,,,,,1993,Backblast (v2),3
+1184,A1184,Rifle,,8,Weapon Rifle,black,,,,,,,,,1993,Backblast (v2),4
+1185,A1185,Knife,,14,Weapon Knife,black,,,,,,,,,1993,Backblast (v2),3
+1186,A1186,"Impact Exploding, Mega-Blast Rocket Launcher ",,24,Spring-Loaded Launcher,black,,,,,,,,,1993,Backblast (v2),1
+1187,A1187,Missile,,25,Spring-Loaded Missile,black,2,,,,,,,,1993,Backblast (v2),3
+1188,A1188,Boxing Glove (Left),,18,Weapon Melee,red,,,,,,,,,1993,Balrog (v1),1
+1189,A1189,Boxing Glove (Right),,18,Weapon Melee,red,,,,,,,,,1993,Balrog (v1),1
+1190,A1190,Rifle,,8,Weapon Rifle,black,,,,,,,,,1993,Balrog (v1),1
+1191,A1191,Knockout Launch,,24,Spring-Loaded Launcher,red,,,,,,,,,1993,Balrog (v1),2
+1192,A1192,Missile,,25,Spring-Loaded Missile,black,2,,,,,,,,1993,Balrog (v1),2
+1193,A1193,Grappling Hook,,32,Grappling Hook,black,,,,,,,,,1993,Balrog (v1),2
+1194,A1194,Razor-Edged Katana Sword,,17,Weapon Sword,pink,,,,,,,,,1993,Banzai (v1),1
+1195,A1195,Sword,,17,Weapon Sword,pink,,,,,,,,,1993,Banzai (v1),1
+1196,A1196,Wide Butterfly Battle Knife,,14,Weapon Knife,pink,,,,,,,,,1993,Banzai (v1),1
+1197,A1197,Two-Pronged Knife,,14,Weapon Knife,pink,2,,,,,,,,1993,Banzai (v1),1
+1198,A1198,Sickle,,15,Weapon Blade,pink,,,,,,,,,1993,Banzai (v1),1
+1199,A1199,Axe,,15,Weapon Blade,pink,,,,,,,,,1993,Banzai (v1),1
+1200,A1200,Assault rifle,,8,Weapon Rifle,bright green,,,,,,,,,1993,Bazooka (v3),1
+1201,A1201,Rifle,,8,Weapon Rifle,bright green,,,,,,,,,1993,Bazooka (v3),1
+1202,A1202,Standard Issue 9mm Submachine Gun,,9,Weapon Submachine Gun,bright green,,,,,,,,,1993,Bazooka (v3),1
+1203,A1203,Bazooka with Multi-Spectrum Tracking System and Ammo Pack,,24,Spring-Loaded Launcher,blue,,,,,,,,,1993,Bazooka (v3),1
+1204,A1204,Missile,,25,Spring-Loaded Missile,bright green,2,,,,,,,,1993,Bazooka (v3),1
+1205,A1205,Pistol,,6,Weapon Pistol,yellow,,,,,,,,,1993,Beach-Head (v2),2
+1206,A1206,G.I. Joe Special Issue Double Submachine Gun,,9,Weapon Submachine Gun,yellow,,,,,,,,,1993,Beach-Head (v2),2
+1207,A1207,Rifle,,8,Weapon Rifle,yellow,,,,,,,,,1993,Beach-Head (v2),2
+1208,A1208,Knife,,14,Weapon Knife,yellow,,,,,,,,,1993,Beach-Head (v2),2
+1209,A1209,Specially Vented Missile Blaster with Attached Combat Knife,,24,Spring-Loaded Launcher,black,,,,,,,,,1993,Beach-Head (v2),2
+1210,A1210,Missile,,25,Spring-Loaded Missile,yellow,2,,,,,,,,1993,Beach-Head (v2),2
+1211,A1211,Missile Launcher,,24,Spring-Loaded Launcher,red,,,,,,,,,1993,Bio-Vipers (v1),1
+1212,A1212,Missile,,25,Spring-Loaded Missile,black,,,,,,,,,1993,Bio-Vipers (v1),1
+1213,A1213,Pistol,,6,Weapon Pistol,purple,,,,,,,,,1993,Blanka (v1),1
+1214,A1214,Rifle,,8,Weapon Rifle,purple,,,,,,,,,1993,Blanka (v1),1
+1215,A1215,Knife,,14,Weapon Knife,purple,,,,,,,,,1993,Blanka (v1),1
+1216,A1216,Beast Blaster,,24,Spring-Loaded Launcher,orange,,,,,,,,,1993,Blanka (v1),1
+1217,A1217,Missile,,25,Spring-Loaded Missile,purple,2,,,,,,,,1993,Blanka (v1),1
+1218,A1218,Helmet,,1,Helmet,orange,,,,,,,,,1993,Blast-Off (v1),1
+1219,A1219,Armor Mold,,29,Armor/ Shield,red,,,,,,,,,1993,Blast-Off (v1),1
+1220,A1220,Submachine Gun,,9,Weapon Submachine Gun,blue,,,,,,,,,1993,Blast-Off (v1),2
+1221,A1221,Large Rifle,,8,Weapon Rifle,blue,,,,,,,,,1993,Blast-Off (v1),2
+1222,A1222,Knife,,14,Weapon Knife,blue,,,,,,,,,1993,Blast-Off (v1),2
+1223,A1223,Heat Resistant Launcher with Attached Incinerator,,24,Spring-Loaded Launcher,orange,,,,,,,,,1993,Blast-Off (v1),1
+1224,A1224,Missile,,25,Spring-Loaded Missile,blue,2,,,,,,,,1993,Blast-Off (v1),2
+1225,A1225,Bio-Armor Putty,,48,Putty,blue,,,,,,,,,1993,Blast-Off (v1),1
+1226,A1226,Samurai Helmet,,1,Helmet,blue/orange,,,,,,,,,1993,Budo (v2),1
+1227,A1227,Heavy Artillery Operator's Helmet,,1,Helmet,green,,,,,,,,,1993,Bullet-Proof (v2),1
+1228,A1228,Missile Launching Bullet Gun,,24,Spring-Loaded Launcher,green,,,,,,,,,1993,Bullet-Proof (v2),1
+1229,A1229,Razor-Edged Katana Sword,,17,Weapon Sword,white,,,,,,,,,1993,Bushido (v1),2
+1230,A1230,Sword,,17,Weapon Sword,white,,,,,,,,,1993,Bushido (v1),1
+1231,A1231,Wide Butterfly Battle Knife,,14,Weapon Knife,white,,,,,,,,,1993,Bushido (v1),1
+1232,A1232,Two-Pronged Knife,,14,Weapon Knife,white,2,,,,,,,,1993,Bushido (v1),1
+1233,A1233,Sickle,,15,Weapon Blade,white,,,,,,,,,1993,Bushido (v1),1
+1234,A1234,Axe,,15,Weapon Blade,white,,,,,,,,,1993,Bushido (v1),1
+1235,A1235,Sword,,17,Weapon Sword,yellow,,,,,,,,,1993,Chun Li (v1),1
+1236,A1236,Sword,,17,Weapon Sword,yellow,,,,,,,,,1993,Chun Li (v1),1
+1237,A1237,Sword,,17,Weapon Sword,yellow,,,,,,,,,1993,Chun Li (v1),1
+1238,A1238,Knife,,14,Weapon Knife,yellow,,,,,,,,,1993,Chun Li (v1),1
+1239,A1239,Claw,,15,Weapon Blade,yellow,2,,,,,,,,1993,Chun Li (v1),1
+1240,A1240,Nunchuks,,18,Weapon Melee,yellow,,,,,,,,,1993,Chun Li (v1),1
+1241,A1241,Armor Mold,,29,Armor/ Shield,yellow,,,,,,,,,1993,Clutch (v3),1
+1242,A1242,Armor-Piercing Silencer Gun,,9,Weapon Submachine Gun,black,,,,,,,,,1993,Clutch (v3),6
+1243,A1243,Rifle,,8,Weapon Rifle,black,,,,,,,,,1993,Clutch (v3),6
+1244,A1244,Mega-Concussion Missile Cannon with Infrared Sight,,24,Spring-Loaded Launcher,yellow,,,,,,,,,1993,Clutch (v3),1
+1245,A1245,Missile,,25,Spring-Loaded Missile,black,2,,,,,,,,1993,Clutch (v3),11
+1246,A1246,Bio-Armor Putty,,48,Putty,yellow,,,,,,,,,1993,Clutch (v3),1
+1247,A1247,Pistol/Small Rifle,,6,Weapon Pistol,silver,,,,,,,,,1993,Cobra Commander (v6),1
+1248,A1248,CC-1 Repeating Machine Gun with Built-In Silencer,,10,Weapon Machine Gun,silver,,,,,,,,,1993,Cobra Commander (v6),2
+1249,A1249,Rifle,,8,Weapon Rifle,silver,,,,,,,,,1993,Cobra Commander (v6),1
+1250,A1250,Flamethrower,,11,Weapon Flamethrower,silver,,,,,,,,,1993,Cobra Commander (v6),1
+1251,A1251,"Long range, ""Cobra Cannon"" missile launcher",,24,Spring-Loaded Launcher,red,,,,,,,,,1993,Cobra Commander (v6),1
+1252,A1252,Missile,,25,Spring-Loaded Missile,silver,2,,,,,,,,1993,Cobra Commander (v6),1
+1253,A1253,Standard Issue .9mm Pistol,,6,Weapon Pistol,bright green,,,,,,,,,1993,Colonel Courage (v1),1
+1254,A1254,Laser Pistol,,12,Weapon Blaster/ Laser,bright green,,,,,,,,,1993,Colonel Courage (v1),1
+1255,A1255,Rifle,,8,Weapon Rifle,bright green,,,,,,,,,1993,Colonel Courage (v1),1
+1256,A1256,Heavy Machine Gun with Scope,,10,Weapon Machine Gun,bright green,,,,,,,,,1993,Colonel Courage (v1),1
+1257,A1257,Knife,,14,Weapon Knife,bright green,,,,,,,,,1993,Colonel Courage (v1),1
+1258,A1258,Machete,,16,Weapon Machete,bright green,,,,,,,,,1993,Colonel Courage (v1),1
+1259,A1259,Armor Piercing Assault Gun,,24,Spring-Loaded Launcher,gold,,,,,,,,,1993,Colonel Courage (v1),1
+1260,A1260,Missile,,25,Spring-Loaded Missile,bright green,,,,,,,,,1993,Colonel Courage (v1),1
+1261,A1261,Pressure Regulated Space Helmet with Sun-Ray Face Shield ,,1,Helmet,red/silver,,,,,,,,,1993,Countdown (v2),1
+1262,A1262,Submachine Gun,,9,Weapon Submachine Gun,yellow,,,,,,,,,1993,Countdown (v2),1
+1263,A1263,SL-66 Blaster Gun ,,8,Weapon Rifle,yellow,,,,,,,,,1993,Countdown (v2),1
+1264,A1264,Missile Launching Fazer Gun,,24,Spring-Loaded Launcher,black,,,,,,,,,1993,Countdown (v2),1
+1265,A1265,Missile Launching Fazer Gun,,24,Spring-Loaded Launcher,brown,,,,,,,,,1993,Countdown (v2),1
+1266,A1266,Missile,,25,Spring-Loaded Missile,yellow,2,,,,,,,,1993,Countdown (v2),1
+1267,A1267,Pistol/Small Rifle,,6,Weapon Pistol,black,,,,,,,,,1993,Crimson Guard Commander (v1),1
+1268,A1268,Flamethrower,,11,Weapon Flamethrower,black,,,,,,,,,1993,Crimson Guard Commander (v1),1
+1269,A1269,Laser-Charged Missile Launcher (black tab),,24,Spring-Loaded Launcher,yellow,,,,,,,,,1993,Crimson Guard Commander (v1),1
+1270,A1270,Laser Guided Missile,,25,Spring-Loaded Missile,black,2,,,,,,,,1993,Crimson Guard Commander (v1),1
+1271,A1271,Backpack,,3,Backpack,orange,,,,,,,,,1993,Cross Country (v2),1
+1272,A1272,Knife,,14,Weapon Knife,black,,,,,,,,,1993,Cross Country (v2),7
+1273,A1273,"Cannon with Shoulder Padding, Infrared Targeting Sight",,24,Spring-Loaded Launcher,blue,,,,,,,,,1993,Cross Country (v2),3
+1274,A1274,Missile,,25,Spring-Loaded Missile,black,2,,,,,,,,1993,Cross Country (v2),11
+1275,A1275,"Rust-Proof, High Powered Assault Rifle",,9,Weapon Submachine Gun,black,,,,,,,,,1993,Cutter (v3),1
+1276,A1276,Armor Mold,,29,Armor/ Shield,green,,,,,,,,,1993,Cyber-Vipers (v1),1
+1277,A1277,Pistol/Small Rifle,,6,Weapon Pistol,gray,,,,,,,,,1993,Cyber-Vipers (v1),1
+1278,A1278,Submachine Gun,,9,Weapon Submachine Gun,gray,,,,,,,,,1993,Cyber-Vipers (v1),1
+1279,A1279,Rifle,,8,Weapon Rifle,gray,,,,,,,,,1993,Cyber-Vipers (v1),1
+1280,A1280,Flamethrower,,11,Weapon Flamethrower,gray,,,,,,,,,1993,Cyber-Vipers (v1),1
+1281,A1281,Forearm Firing Cyber-Gun Missile Launcher (yellow tab),,24,Spring-Loaded Launcher,yellow,,,,,,,,,1993,Cyber-Vipers (v1),1
+1282,A1282,Missile,,25,Spring-Loaded Launcher,gray,2,,,,,,,,1993,Cyber-Vipers (v1),1
+1283,A1283,Bio-Armor Putty,,48,Putty,red,,,,,,,,,1993,Cyber-Vipers (v1),1
+1284,A1284,Submachine Gun,,9,Weapon Submachine Gun,gold,,,,,,,,,1993,Dee-Jay (v2),5
+1285,A1285,Dive Helmet,,1,Helmet,yellow,,,,,,,,,1993,Deep Six (v4),1
+1286,A1286,Underwater AVB-40 Laser Gun,,12,Weapon Blaster/ Laser,gold,,,,,,,,,1993,Deep Six (v4),1
+1287,A1287,Space Helmet,,1,Helmet,clear,,,,,,,,,1993,Destro (v4),1
+1288,A1288,Laser Pistol,,6,Weapon Pistol,silver,,,,,,,,,1993,Destro (v4),1
+1289,A1289,Uzi Submachine Gun with Flash Supressor,,9,Weapon Submachine Gun,silver,,,,,,,,,1993,Destro (v4),1
+1290,A1290,Knife,,14,Weapon Knife,silver,,,,,,,,,1993,Destro (v4),1
+1291,A1291,Missile,,25,Spring-Loaded Missile,silver,2,,,,,,,,1993,Destro (v4),1
+1292,A1292,Bow,,19,Weapon Bow/ Crossbow,purple,,,,,,,,,1993,Dhalsim (v1),1
+1293,A1293,Sword,,17,Weapon Sword,purple,,,,,,,,,1993,Dhalsim (v1),1
+1294,A1294,Machete,,16,Weapon Machete,purple,,,,,,,,,1993,Dhalsim (v1),1
+1295,A1295,Sickle,,15,Weapon Blade,purple,,,,,,,,,1993,Dhalsim (v1),1
+1296,A1296,Knife,,14,Weapon Knife,purple,2,,,,,,,,1993,Dhalsim (v1),1
+1297,A1297,Large Laser Rifle,,12,Weapon Blaster/ Laser,yellow,,,,,,,,,1993,Dr. Mindbender (v2),1
+1298,A1298,Mind Scrambling Driller Gun ,,24,Spring-Loaded Launcher,purple,,,,,,,,,1993,Dr. Mindbender (v2),1
+1299,A1299,"High-Powered, Quick-Fire Missile Cannon",,24,Spring-Loaded Launcher,gold,,,,,,,,,1993,Duke (v4),3
+1300,A1300,Space Helmet,,1,Helmet,silver,,,,,,,,,1993,Duke (v5),1
+1301,A1301,Submachine Gun,,9,Weapon Submachine Gun,red,,,,,,,,,1993,Duke (v5),1
+1302,A1302,Large Rifle,,8,Weapon Rifle,red,,,,,,,,,1993,Duke (v5),1
+1303,A1303,Knife,,14,Weapon Knife,red,,,,,,,,,1993,Duke (v5),1
+1304,A1304,Missile,,25,Spring-Loaded Missile,red,2,,,,,,,,1993,Duke (v5),1
+1305,A1305,Mawashi,,40,Soft Goods,blue,,,,,,,,,1993,Edmond Honda (v1),1
+1306,A1306,Razor-Edged Katana Sword,,17,Weapon Sword,blue,,,,,,,,,1993,Edmond Honda (v1),1
+1307,A1307,Sword,,17,Weapon Sword,blue,,,,,,,,,1993,Edmond Honda (v1),1
+1308,A1308,Wide Butterfly Battle Knife,,14,Weapon Knife,blue,,,,,,,,,1993,Edmond Honda (v1),1
+1309,A1309,Two-Pronged Knife,,14,Weapon Knife,blue,2,,,,,,,,1993,Edmond Honda (v1),1
+1310,A1310,Sickle,,15,Weapon Blade,blue,,,,,,,,,1993,Edmond Honda (v1),1
+1311,A1311,Axe,,15,Weapon Blade,blue,,,,,,,,,1993,Edmond Honda (v1),1
+1312,A1312,Pistol/Small Rifle ,,6,Weapon Pistol,red,,,,,,,,,1993,Eel (v3),1
+1313,A1313,Submachine Gun,,9,Weapon Submachine Gun,red,,,,,,,,,1993,Eel (v3),1
+1314,A1314,Rifle,,8,Weapon Rifle,red,,,,,,,,,1993,Eel (v3),2
+1315,A1315,Flamethrower,,11,Weapon Flamethrower,red,,,,,,,,,1993,Eel (v3),1
+1316,A1316,Rapid Fire X9-Torpedo Launcher (red tab),,24,Spring-Loaded Launcher,yellow,,,,,,,,,1993,Eel (v3),1
+1317,A1317,Missile,,25,Spring-Loaded Launcher,red,2,,,,,,,,1993,Eel (v3),1
+1318,A1318,Swim Fin,,36,Swim/ Scuba Equipment,yellow,2,,,,,,,,1993,Eel (v3),1
+1319,A1319,Blade Launcher,,42,Launch System,black,,,,,,,,,1993,Firefly (v3),1
+1320,A1320,Long Barrel Laser Rifle with Mini-Machete Bayonet,,8,Weapon Rifle,orange,,,,,,,,,1993,Flak-Viper (v2),1
+1321,A1321,"Electronic-Firing, Dual Missile Launcher Backpack",,3,Backpack,green,,,,,,,,,1993,Flak-Viper (v2),1
+1322,A1322,High Altitude Tail-Biter Missile,,25,Spring-Loaded Missile,orange,2,,,,,,,,1993,Flak-Viper (v2),1
+1323,A1323,Frost-Free Face Mask,,1,Helmet,white,,,,,,,,,1993,Frostbite (v3),1
+1324,A1324,Rifle,,8,Weapon Rifle,white,,,,,,,,,1993,Frostbite (v3),1
+1325,A1325,X4-Machine Gun with Built-In Silencer,,9,Weapon Submachine Gun,white,,,,,,,,,1993,Frostbite (v3),1
+1326,A1326,Pump-Action Shotgun,,7,Weapon Shotgun,white,,,,,,,,,1993,Frostbite (v3),1
+1327,A1327,Machete,,16,Weapon Machete,white,,,,,,,,,1993,Frostbite (v3),1
+1328,A1328,Thermal Cannon with Heat Generated Blast Propulsion,,24,Spring-Loaded Launcher,orange,,,,,,,,,1993,Frostbite (v3),1
+1329,A1329,Missile,,25,Spring-Loaded Missile,white,2,,,,,,,,1993,Frostbite (v3),3
+1330,A1330,Helmet,,1,Helmet,yellow,,,,,,,,,1993,General Hawk (v3)/ (v5),1
+1331,A1331,Visor,,2,Helmet Accessory,yellow,,,,,,,,,1993,General Hawk (v3)/ (v5),1
+1332,A1332,Sonic Jet Pack Backpack,,3,Backpack,black,,,,,,,,,1993,General Hawk (v3)/ (v5),1
+1333,A1333,Machine Gun,,8,Weapon Rifle,bright green,,,,,,,,,1993,General Hawk (v3)/ (v5),1
+1334,A1334,Personalized Star Brigade Commander's Helmet,,1,Helmet,gold,,,,,,,,,1993,General Hawk (v4)/ (v6),1
+1335,A1335,Large Rifle,,8,Weapon Rifle,pink,,,,,,,,,1993,General Hawk (v4)/ (v6),1
+1336,A1336,Large Rifle,,8,Weapon Rifle,black,,,,,,,,,1993,General Hawk (v4)/ (v6),1
+1337,A1337,XL-14 Machine Gun with Infrared Sight,,8,Weapon Rifle,maroon,,,,,,,,,1993,Gristle (v1),1
+1338,A1338,Rifle,,8,Weapon Rifle,maroon,,,,,,,,,1993,Gristle (v1),1
+1339,A1339,Knife,,14,Weapon Knife,maroon,,,,,,,,,1993,Gristle (v1),1
+1340,A1340,Missile Blasting Tracker Gun,,24,Spring-Loaded Launcher,yellow,,,,,,,,,1993,Gristle (v1),1
+1341,A1341,Missile,,25,Spring-Loaded Missile,maroon,2,,,,,,,,1993,Gristle (v1),1
+1342,A1342,Laser Rifle,,8,Weapon Rifle,black,,,,,,,,,1993,Guile (v1),1
+1343,A1343,Sonic Boom Bazooka,,24,Spring-Loaded Launcher,orange,,,,,,,,,1993,Guile (v1),1
+1344,A1344,Shield attachment to Bazooka,,22,Weapon Accessory,black,,,,,,,,,1993,Guile (v1),1
+1345,A1345,Missile,,25,Spring-Loaded Missile,black,2,,,,,,,,1993,Guile (v1),1
+1346,A1346,Grappling Hook,,25,Spring-Loaded Missile,yellow,,,,,,,,,1993,Guile (v1),1
+1347,A1347,Helmet with Intercom System for Mega-Marine Communications,,1,Helmet,orange,,,,,,,,,1993,Gung-Ho (v5),1
+1348,A1348,Armor Mold,,29,Armor/ Shield,yellow,,,,,,,,,1993,Gung-Ho (v5),1
+1349,A1349,Machete,,16,Weapon Machete,black,,,,,,,,,1993,Gung-Ho (v5),1
+1350,A1350,Xeno-Blaster Laser Canon with Infrared Sights,,24,Spring-Loaded Launcher,orange,,,,,,,,,1993,Gung-Ho (v5),1
+1351,A1351,Bio-Armor Putty,,48,Putty,red,,,,,,,,,1993,Gung-Ho (v5),1
+1352,A1352,Laser Pistol,,6,Weapon Pistol,bright green,,,,,,,,,1993,H.E.A.T. Viper (v2),1
+1353,A1353,Submachine Gun,,9,Weapon Submachine Gun,bright green,,,,,,,,,1993,H.E.A.T. Viper (v2),1
+1354,A1354,Rifle,,8,Weapon Rifle,bright green,,,,,,,,,1993,H.E.A.T. Viper (v2),1
+1355,A1355,"""Fang"" II Anti-Tank High-Impact Weapon",,24,Spring-Loaded Launcher,black,,,,,,,,,1993,H.E.A.T. Viper (v2),1
+1356,A1356,Missile,,25,Spring-Loaded Missile,bright green,,,,,,,,,1993,H.E.A.T. Viper (v2),1
+1357,A1357,"Long Range, Pinpoint Accurate Rocket Launcher",,24,Spring-Loaded Launcher,purple,,,,,,,,,1993,Headhunters (v2),1
+1358,A1358,Helmet,,1,Helmet,bright green,,,,,,,,,1993,Heavy Duty (v2),1
+1359,A1359,Knife,,14,Weapon Knife,white,,,,,,,,,1993,Iceberg (v2),1
+1360,A1360,"Missile Launcher with Fur-Lined, Anti-Crack Muzzle",,24,Spring-Loaded Launcher,green,,,,,,,,,1993,Iceberg (v2),1
+1361,A1361,Missile,,25,Spring-Loaded Missile,white,2,,,,,,,,1993,Iceberg (v2),1
+1362,A1362,Jet-Powered Snowboard with Tracking Systems (left-to-right lettering),,34,Ski/ Snow Equipment,white,,,,,,,,,1993,Iceberg (v2),1
+1363,A1363,Jet-Powered Snowboard with Tracking Systems (right-to-left lettering),,34,Ski/ Snow Equipment,white,,,,,,,,,1993,Iceberg (v2),1
+1364,A1364,Cape,,40,Soft Goods,red,,,,,,,,,1993,Jinx (v2),1
+1365,A1365,"Anti-Aircraft, Heat Seeking Missile Launcher",,24,Spring-Loaded Launcher,brown,,,,,,,,,1993,Keel-Haul (v2),1
+1366,A1366,Bow,,19,Weapon Bow/ Crossbow,black,,,,,,,,,1993,Ken Masters (v1),1
+1367,A1367,Sword,,17,Weapon Sword,black,,,,,,,,,1993,Ken Masters (v1),1
+1368,A1368,Sickle,,15,Weapon Blade,black,,,,,,,,,1993,Ken Masters (v1),1
+1369,A1369,Knife,,14,Weapon Knife,black,2,,,,,,,,1993,Ken Masters (v1),1
+1370,A1370,Rifle,,8,Weapon Rifle,yellow,,,,,,,,,1993,Law (v3),1
+1371,A1371,Laser Rifle ,,12,Weapon Blaster/ Laser,yellow,,,,,,,,,1993,Law (v3),1
+1372,A1372,Knife,,14,Weapon Knife,yellow,,,,,,,,,1993,Law (v3),1
+1373,A1373,Missile Firing Enforcer Gun,,24,Spring-Loaded Launcher,blue,,,,,,,,,1993,Law (v3),1
+1374,A1374,Shield attachment to Rocket Launcher,,22,Weapon Accessory,yellow,,,,,,,,,1993,Law (v3),1
+1375,A1375,Missile,,25,Spring-Loaded Missile,yellow,2,,,,,,,,1993,Law (v3),1
+1376,A1376,Smith & Wesson Combat Revolver,,6,Weapon Pistol,black,,,,,,,,,1993,Leatherback (v3),2
+1377,A1377,Standard Issue Machine Gun ,,8,Weapon Rifle,black,,,,,,,,,1993,Leatherback (v3),2
+1378,A1378,Night Targeting Machine Gun with Infrared Scope,,8,Weapon Rifle,black,,,,,,,,,1993,Leatherback (v3),2
+1379,A1379,SS-24 Marine Corps Grenade Launcher,,13,Weapon Bazooka/ Launcher,black,,,,,,,,,1993,Leatherback (v3),2
+1380,A1380,XC 5150-Ripple Rocket,,24,Spring-Loaded Launcher,orange,,,,,,,,,1993,Leatherback (v3),1
+1381,A1381,Missile,,25,Spring-Loaded Missile,black,,,,,,,,,1993,Leatherback (v3),1
+1382,A1382,"Folding, Climate Controlled Enclosure Helmet with Shatter-Proof Face Shield",,1,Helmet,orange,,,,,,,,,1993,Long Arm (v1),1
+1383,A1383,Laser Rifle,,12,Weapon Blaster/ Laser,red,,,,,,,,,1993,Long Arm (v1),1
+1384,A1384,Rifle,,8,Weapon Rifle,red,,,,,,,,,1993,Long Arm (v1),1
+1385,A1385,Knife,,14,Weapon Knife,red,,,,,,,,,1993,Long Arm (v1),1
+1386,A1386,Missile Launching Mega-Blaster,,24,Spring-Loaded Launcher,black,,,,,,,,,1993,Long Arm (v1),1
+1387,A1387,Shield attachment to Rocket Launcher,,22,Weapon Accessory,red,,,,,,,,,1993,Long Arm (v1),1
+1388,A1388,Missile,,25,Spring-Loaded Missile,red,2,,,,,,,,1993,Long Arm (v1),1
+1389,A1389,Shoulder-Pad Harness,,29,Armor/ Shield,silver,,,,,,,,,1993,M. Bison (v1),1
+1390,A1390,Laser Pistol,,6,Weapon Pistol,black,,,,,,,,,1993,M. Bison (v1),1
+1391,A1391,Flaming Torpedo Launcher ,,24,Spring-Loaded Launcher,green,,,,,,,,,1993,M. Bison (v1),1
+1392,A1392,Missile,,25,Spring-Loaded Missile,black,2,,,,,,,,1993,M. Bison (v1),1
+1393,A1393,Grappling Hook,,25,Spring-Loaded Missile,orange,,,,,,,,,1993,M. Bison (v1),1
+1394,A1394,Bullet Deflecting Assault Helmet ,,1,Helmet,yellow,,,,,,,,,1993,Mace (v1),1
+1395,A1395,Pistol,,6,Weapon Pistol,yellow,,,,,,,,,1993,Mace (v1),1
+1396,A1396,"Automatic ""Street Sweep"" Assault Rifle",,8,Weapon Rifle,yellow,,,,,,,,,1993,Mace (v1),1
+1397,A1397,"Rapid-Fire, Steel Plated Short Rifle ",,8,Weapon Rifle,yellow,,,,,,,,,1993,Mace (v1),1
+1398,A1398,Knife,,14,Weapon Knife,yellow,,,,,,,,,1993,Mace (v1),1
+1399,A1399,Missile Firing Stealth Gun with Built-In Silencer ,,24,Spring-Loaded Launcher,black,,,,,,,,,1993,Mace (v1),1
+1400,A1400,Missile,,25,Spring-Loaded Missile,yellow,2,,,,,,,,1993,Mace (v1),1
+1401,A1401,Helmet,,1,Helmet,orange,,,,,,,,,1993,Major Altitude (v2),1
+1402,A1402,Submachine Gun,,9,Weapon Submachine Gun,silver,,,,,,,,,1993,Major Altitude (v2),1
+1403,A1403,Armor Mold,,29,Armor/ Shield,black,,,,,,,,,1993,Mega-Vipers (v1),1
+1404,A1404,Pistol/ Small Rifle,,6,Weapon Pistol,bright yellow,,,,,,,,,1993,Mega-Vipers (v1),1
+1405,A1405,Submachine Gun,,9,Weapon Submachine Gun,bright yellow,,,,,,,,,1993,Mega-Vipers (v1),1
+1406,A1406,Rifle,,8,Weapon Pistol,bright yellow,,,,,,,,,1993,Mega-Vipers (v1),1
+1407,A1407,Flamethrower,,11,Weapon Flamethrower,bright yellow,,,,,,,,,1993,Mega-Vipers (v1),1
+1408,A1408,"Arm-Mounted, Missile Launching Mega-Blaster",,24,Spring-Loaded Launcher,pink,,,,,,,,,1993,Mega-Vipers (v1),1
+1409,A1409,Missile,,25,Spring-Loaded Missile,bright yellow,2,,,,,,,,1993,Mega-Vipers (v1),1
+1410,A1410,Body-Armor Putty,,48,Putty,purple,,,,,,,,,1993,Mega-Vipers (v1),1
+1411,A1411,Armor Mold,,29,Armor/ Shield,blue,,,,,,,,,1993,Mirage (v1),1
+1412,A1412,Submachine Gun,,9,Weapon Submachine Gun,olive green,,,,,,,,,1993,Mirage (v1),1
+1413,A1413,Large Rifle,,8,Weapon Rifle,olive green,,,,,,,,,1993,Mirage (v1),1
+1414,A1414,Knife,,14,Weapon Knife,olive green,,,,,,,,,1993,Mirage (v1),1
+1415,A1415,"Shoulder-Mounted, Rocket Launching Bio-Bazooka",,24,Spring-Loaded Launcher,blue,,,,,,,,,1993,Mirage (v1),1
+1416,A1416,Missile,,25,Spring-Loaded Missile,olive green,2,,,,,,,,1993,Mirage (v1),1
+1417,A1417,Body-Armor Putty,,48,Putty,green,,,,,,,,,1993,Mirage (v1),1
+1418,A1418,Rifle,,8,Weapon Rifle,gold,,,,,,,,,1993,Monstro-Vipers (v1),1
+1419,A1419,Morning-Star Flail,,21,Weapon Specialized,gold,,,,,,,,,1993,Monstro-Vipers (v1),1
+1420,A1420,Body-Armor Putty,,48,Putty,orange,,,,,,,,,1993,Monstro-Vipers (v1),1
+1421,A1421,Sight-Guided Missile Launcher Helmet,,1,Helmet,green,,,,,,,,,1993,Muskrat (v3),1
+1422,A1422,Pistol,,6,Weapon Pistol,dark blue,,,,,,,,,1993,Muskrat (v3),1
+1423,A1423,XM-15 Rifle,,8,Weapon Rifle,dark blue,,,,,,,,,1993,Muskrat (v3),1
+1424,A1424,Rifle,,8,Weapon Rifle,dark blue,,,,,,,,,1993,Muskrat (v3),1
+1425,A1425,Knife,,14,Weapon Knife,dark blue,,,,,,,,,1993,Muskrat (v3),1
+1426,A1426,Missile Launching Helmet Gun,,24,Spring-Loaded Launcher,orange,,,,,,,,,1993,Muskrat (v3),1
+1427,A1427,Missile,,25,Spring-Loaded Missile,dark blue,2,,,,,,,,1993,Muskrat (v3),1
+1428,A1428,XL-66 Hyper-Powered Rocket Launcher,,24,Spring-Loaded Launcher,red,,,,,,,,,1993,Mutt & Junkyard (v4),1
+1429,A1429,Bow,,19,Weapon Bow/ Crossbow,light blue,,,,,,,,,1993,Night Creeper (v2),1
+1430,A1430,Sword,,17,Weapon Sword,light blue,,,,,,,,,1993,Night Creeper (v2),1
+1431,A1431,Machete,,16,Weapon Machete,light blue,,,,,,,,,1993,Night Creeper (v2),1
+1432,A1432,Sickle,,15,Weapon Blade,light blue,,,,,,,,,1993,Night Creeper (v2),1
+1433,A1433,Knife,,14,Weapon Knife,light blue,2,,,,,,,,1993,Night Creeper (v2),1
+1434,A1434,Forearm Shield,,29,Armor/ Shield,orange,,,,,,,,,1993,Night Creeper Leader (v1),1
+1435,A1435,Wrist-Mounted Crossbow,,19,Weapon Bow/ Crossbow,orange,,,,,,,,,1993,Night Creeper Leader (v1),1
+1436,A1436,Crossbow,,19,Weapon Bow/ Crossbow,orange,,,,,,,,,1993,Night Creeper Leader (v1),1
+1437,A1437,Knife,,14,Weapon Knife,orange,,,,,,,,,1993,Night Creeper Leader (v1),1
+1438,A1438,Ninja Clan Katana,,17,Weapon Sword,orange,2,,,,,,,,1993,Night Creeper Leader (v1),1
+1439,A1439,"Computer Locking ""Shock"" Gun",,24,Spring-Loaded Launcher,black,,,,,,,,,1993,Night Creeper Leader (v1),1
+1440,A1440,Missile,,25,Spring-Loaded Missile,orange,,,,,,,,,1993,Night Creeper Leader (v1),1
+1441,A1441,Standard Issue Machine Gun ,,10,Weapon Machine Gun,red,,,,,,,,,1993,Outback (v3),2
+1442,A1442,Rifle,,8,Weapon Rifle,red,,,,,,,,,1993,Outback (v3),2
+1443,A1443,Machine Gun,,10,Weapon Machine Gun,red,,,,,,,,,1993,Outback (v3),2
+1444,A1444,Missile Firing Pummel Gun,,24,Spring-Loaded Launcher,blue,,,,,,,,,1993,Outback (v3),2
+1445,A1445,Missile,,25,Spring-Loaded Missile,red,2,,,,,,,,1993,Outback (v3),2
+1446,A1446,Pressure Resistant Helmet with Face Shield,,1,Helmet,red/blue,,,,,,,,,1993,Ozone (v2),1
+1447,A1447,Missile Launching Solar Shooter Gun,,24,Spring-Loaded Launcher,orange,,,,,,,,,1993,Ozone (v2),1
+1448,A1448,Pistol,,6,Weapon Pistol,red,,,,,,,,,1993,Payload (v3),1
+1449,A1449,XM-15 Rifle,,8,Weapon Rifle,red,,,,,,,,,1993,Payload (v3),1
+1450,A1450,Standard Issue Laser Short Rifle,,12,Weapon Blaster/ Laser,red,,,,,,,,,1993,Payload (v3),1
+1451,A1451,Star Brigade Battle Knife,,14,Weapon Knife,red,,,,,,,,,1993,Payload (v3),1
+1452,A1452,Missile Launching Quasar Gun,,24,Spring-Loaded Launcher,gold,,,,,,,,,1993,Payload (v3),1
+1453,A1453,Missile,,25,Spring-Loaded Missile,red,2,,,,,,,,1993,Payload (v3),1
+1454,A1454,Razor-Edged Battle Ax,,15,Weapon Blade,red,,,,,,,,,1993,Red Ninjas (v1),1
+1455,A1455,Specialized Helmet,,1,Helmet,blue,,,,,,,,,1993,Roadblock (v6),1
+1456,A1456,Visor,,2,Helmet Accessory,red,,,,,,,,,1993,Roadblock (v6),1
+1457,A1457,Rapid-Fire Laser Short Rifle,,8,Weapon Rifle,gold,,,,,,,,,1993,Roadblock (v6),3
+1458,A1458,Pump-Action Shotgun,,7,Weapon Shotgun,gold,,,,,,,,,1993,Roadblock (v6),3
+1459,A1459,Machete,,16,Weapon Machete,gold,,,,,,,,,1993,Roadblock (v6),3
+1460,A1460,Missile Launching Star Blaster,,24,Spring-Loaded Launcher,dark blue,,,,,,,,,1993,Roadblock (v6),1
+1461,A1461,Missile,,25,Spring-Loaded Missile,gold,2,,,,,,,,1993,Roadblock (v6),3
+1462,A1462,Helmet,,1,Helmet,black,,,,,,,,,1993,Robo-J.O.E. (v1),1
+1463,A1463,Synchro-Tech Launcher,,24,Spring-Loaded Launcher,orange,,,,,,,,,1993,Robo-J.O.E. (v1),1
+1464,A1464,Helmet,,1,Helmet,silver/purple,,,,,,,,,1993,Rock 'N Roll (v4),1
+1465,A1465,Submachine Gun,,9,Weapon Submachine Gun,yellow,,,,,,,,,1993,Rock 'N Roll (v4),1
+1466,A1466,Submachine Gun,,9,Weapon Submachine Gun,purple,,,,,,,,,1993,Rock 'N Roll (v4),1
+1467,A1467,Shotgun,,7,Weapon Shotgun,yellow,,,,,,,,,1993,Rock 'N Roll (v4),1
+1468,A1468,Shotgun,,7,Weapon Shotgun,purple,,,,,,,,,1993,Rock 'N Roll (v4),1
+1469,A1469,Rifle,,8,Weapon Rifle,purple,,,,,,,,,1993,Rock 'N Roll (v4),1
+1470,A1470,Machete,,16,Weapon Machete,yellow,,,,,,,,,1993,Rock 'N Roll (v4),1
+1471,A1471,Machete,,16,Weapon Machete,purple,,,,,,,,,1993,Rock 'N Roll (v4),1
+1472,A1472,Robotizer Cannon,,24,Spring-Loaded Launcher,silver,,,,,,,,,1993,Rock 'N Roll (v4),1
+1473,A1473,Missile,,25,Spring-Loaded Missile,yellow,2,,,,,,,,1993,Rock 'N Roll (v4),1
+1474,A1474,Missile,,25,Spring-Loaded Missile,purple,2,,,,,,,,1993,Rock 'N Roll (v4),1
+1475,A1475,Razor-Edged Katana Sword,,17,Weapon Sword,blue,,,,,,,,,1993,Ryu (v1),1
+1476,A1476,Sword,,17,Weapon Sword,blue,,,,,,,,,1993,Ryu (v1),1
+1477,A1477,Wide Butterfly Battle Knife,,14,Weapon Knife,blue,,,,,,,,,1993,Ryu (v1),1
+1478,A1478,Two-Pronged Knife,,14,Weapon Knife,blue,2,,,,,,,,1993,Ryu (v1),1
+1479,A1479,Sickle,,15,Weapon Blade,blue,,,,,,,,,1993,Ryu (v1),1
+1480,A1480,Axe,,15,Weapon Blade,blue,,,,,,,,,1993,Ryu (v1),1
+1481,A1481,Sword (thin blade),,17,Weapon Sword,purple,,,,,,,,,1993,Sagat (v1),1
+1482,A1482,Sword (thick blade),,17,Weapon Sword,purple,,,,,,,,,1993,Sagat (v1),1
+1483,A1483,Sword (curved blade),,17,Weapon Sword,purple,,,,,,,,,1993,Sagat (v1),1
+1484,A1484,Knife,,14,Weapon Knife,purple,,,,,,,,,1993,Sagat (v1),1
+1485,A1485,Nunchuks,,18,Weapon Melee,purple,,,,,,,,,1993,Sagat (v1),1
+1486,A1486,Claw,,15,Weapon Blade,purple,2,,,,,,,,1993,Sagat (v1),1
+1487,A1487,Sword (thin blade),,17,Weapon Sword,yellow,,,,,,,,,1993,Scarlett (v2),1
+1488,A1488,Sword (thick blade),,17,Weapon Sword,yellow,,,,,,,,,1993,Scarlett (v2),1
+1489,A1489,Sword (curved blade),,17,Weapon Sword,yellow,,,,,,,,,1993,Scarlett (v2),1
+1490,A1490,Knife,,14,Weapon Knife,yellow,,,,,,,,,1993,Scarlett (v2),1
+1491,A1491,Nunchuks,,18,Weapon Melee,yellow,,,,,,,,,1993,Scarlett (v2),1
+1492,A1492,Claw,,15,Weapon Blade,yellow,2,,,,,,,,1993,Scarlett (v2),1
+1493,A1493,Standard Issue Starfighter Commander's Helmet,,1,Helmet,white/blue,,,,,,,,,1993,Sci-Fi (v3),1
+1494,A1494,Double-Sided Knife,,14,Weapon Knife,black,2,,,,,,,,1993,Slice (v2),1
+1495,A1495,Axe,,15,Weapon Blade,black,,,,,,,,,1993,Slice (v2),1
+1496,A1496,Jab Hook Heavy Sword,,17,Weapon Sword,black,,,,,,,,,1993,Slice (v2),1
+1497,A1497,Double Bladed Bo Staff,,18,Weapon Melee,black,,,,,,,,,1993,Slice (v2),1
+1498,A1498,Sword (thin blade),,17,Weapon Sword,blue,,,,,,,,,1993,Snake Eyes (v5),1
+1499,A1499,Sword (thick blade),,17,Weapon Sword,blue,,,,,,,,,1993,Snake Eyes (v5),1
+1500,A1500,Sword (curved blade),,17,Weapon Sword,blue,,,,,,,,,1993,Snake Eyes (v5),1
+1501,A1501,Knife,,14,Weapon Knife,blue,,,,,,,,,1993,Snake Eyes (v5),1
+1502,A1502,Nunchuks,,18,Weapon Melee,blue,,,,,,,,,1993,Snake Eyes (v5),1
+1503,A1503,Claw,,15,Weapon Blade,blue,2,,,,,,,,1993,Snake Eyes (v5),1
+1504,A1504,Pistol,,6,Weapon Pistol,white,,,,,,,,,1993,Snow Storm (v1),1
+1505,A1505,Assault Rifle,,8,Weapon Rifle,white,,,,,,,,,1993,Snow Storm (v1),1
+1506,A1506,Rifle,,8,Weapon Rifle,white,,,,,,,,,1993,Snow Storm (v1),1
+1507,A1507,"Missile Firing ""Glacier"" Gun ",,24,Spring-Loaded Launcher,orange,2,,,,,,,,1993,Snow Storm (v1),1
+1508,A1508,Face Shield,,1,Helmet,purple,,,,,,,,,1993,T.A.R.G.A.T. (v2),1
+1509,A1509,Pistol,,6,Weapon Pistol,pink,,,,,,,,,1993,T.A.R.G.A.T. (v2),1
+1510,A1510,Submachine Gun,,9,Weapon Submachine Gun,pink,,,,,,,,,1993,T.A.R.G.A.T. (v2),1
+1511,A1511,Rifle,,8,Weapon Rifle,pink,,,,,,,,,1993,T.A.R.G.A.T. (v2),1
+1512,A1512,Missile Launching Lunar Gun,,24,Spring-Loaded Launcher,red,,,,,,,,,1993,T.A.R.G.A.T. (v2),1
+1513,A1513,Missile,,25,Spring-Loaded Missile,pink,2,,,,,,,,1993,T.A.R.G.A.T. (v2),1
+1514,A1514,Razor-Sharp Steel Katana Sword,,17,Weapon Sword,black,,,,,,,,,1993,T'Gin-Zu (v1),1
+1515,A1515,Razor-Edged Katana Sword,,17,Weapon Sword,gold,,,,,,,,,1993,Vega (v1),1
+1516,A1516,Sword,,17,Weapon Sword,gold,,,,,,,,,1993,Vega (v1),1
+1517,A1517,Wide Butterfly Battle Knife,,14,Weapon Knife,gold,,,,,,,,,1993,Vega (v1),1
+1518,A1518,Two-Pronged Knife,,14,Weapon Knife,gold,2,,,,,,,,1993,Vega (v1),1
+1519,A1519,Sickle,,15,Weapon Blade,gold,,,,,,,,,1993,Vega (v1),1
+1520,A1520,Axe,,15,Weapon Blade,gold,,,,,,,,,1993,Vega (v1),1
+1521,A1521,Air-Tight Underwater Helmet with 360-Degree Radar,,1,Helmet,orange,,,,,,,,,1993,Wet-Suit (v4),1
+1522,A1522,"Hydro-Charged, Undersea Spear Rifle",,20,Weapon Harpoon/ Javelin/ Spear,orange,,,,,,,,,1993,Wet-Suit (v4),1
+1523,A1523,"Snug Fit, Deep Water Flipper",,36,Swim/ Scuba Equipment,orange,2,,,,,,,,1993,Wet-Suit (v4),1
+1524,A1524,Low Drag Nautical Jet Sled with Heads-Up Display,,24,Spring-Loaded Launcher,black/orange,,,,,,,,,1993,Wet-Suit (v4),1
+1525,A1525,Assault Rifle,,8,Weapon Rifle,orange,,,,,,,,,1993,Zangief (v1),1
+1526,A1526,Rifle,,8,Weapon Rifle,orange,,,,,,,,,1993,Zangief (v1),1
+1527,A1527,Machine Gun,,10,Weapon Machine Gun,orange,,,,,,,,,1993,Zangief (v1),1
+1528,A1528,Pile Driver,,24,Spring-Loaded Launcher,orange,,,,,,,,,1993,Zangief (v1),1
+1529,A1529,Missile,,25,Spring-Loaded Missile,orange,2,,,,,,,,1993,Zangief (v1),1
+1530,A1530,Grappling Hook,,25,Spring-Loaded Missile,orange,,,,,,,,,1993,Zangief (v1),1
+1531,A1531,Bow,,19,Weapon Bow/ Crossbow,orange,,,,,,,,,1993,Zartan (v2),1
+1532,A1532,Sword,,17,Weapon Sword,orange,,,,,,,,,1993,Zartan (v2),1
+1533,A1533,Machete,,16,Weapon Machete,orange,,,,,,,,,1993,Zartan (v2),1
+1534,A1534,Sickle,,15,Weapon Blade,orange,,,,,,,,,1993,Zartan (v2),1
+1535,A1535,Knife,,14,Weapon Knife,orange,2,,,,,,,,1993,Zartan (v2),1
+1536,A1536,Backpack,,3,Backpack,green,,,,,,,,,1994,Action Marine (v1),1
+1537,A1537,Rifle,,8,Weapon Rifle,black,,,,,,,,,1994,Action Marine (v1),1
+1538,A1538,Missile Launcher,,24,Spring-Loaded Launcher,green,,,,,,,,,1994,Action Marine (v1),2
+1539,A1539,Missile,,25,Spring-Loaded Missile,black,,,,,,,,,1994,Action Marine (v1),1
+1540,A1540,Raft Top,,44,Transportation,black,,,,,,,,,1994,Action Marine (v1),1
+1541,A1541,Raft Bottom,,44,Transportation,black,,,,,,,,,1994,Action Marine (v1),1
+1542,A1542,Raft Rifle Post,,44,Transportation,black,,,,,,,,,1994,Action Marine (v1),1
+1543,A1543,Oar,,44,Transportation,black,,,,,,,,,1994,Action Marine (v1),1
+1544,A1544,"Accessory Tree ""Raft""",,50,Accessory Tree,black,,,,,,,,,1994,Action Marine (v1),1
+1545,A1545,Helmet,,1,Helmet,white/red,,,,,,,,,1994,Action Pilot (v1),2
+1546,A1546,Airmask,,2,Helmet Accessory,black,,,,,,,,,1994,Action Pilot (v1),2
+1547,A1547,Backpack,,3,Backpack,green,,,,,,,,,1994,Action Pilot (v1),2
+1548,A1548,Parachute,,38,Parachute Case/ Parachute,white,,,,,,,,,1994,Action Pilot (v1),2
+1549,A1549,Strap,,41,Cord/ Pull/ Strap,black,,,,,,,,,1994,Action Pilot (v1),2
+1550,A1550,Pistol,,6,Weapon Pistol,green,,,,,,,,,1994,Action Pilot (v1),2
+1551,A1551,Rifle,,8,Weapon Rifle,green,,,,,,,,,1994,Action Pilot (v1),2
+1552,A1552,"Accessory Tree ""Parachute""",,50,Accessory Tree,green,,,,,,,,,1994,Action Pilot (v1),2
+1553,A1553,Helmet,,1,Helmet,white,,,,,,,,,1994,Action Pilot Astronaut (v1),1
+1554,A1554,Visor,,2,Helmet Accessory,clear,,,,,,,,,1994,Action Pilot Astronaut (v1),1
+1555,A1555,Hose,,47,Specialized Hose,black,,,,,,,,,1994,Action Sailor (v1) ,2
+1556,A1556,Scuba Tank,,3,Backpack,blue,,,,,,,,,1994,Action Sailor (v1) ,1
+1557,A1557,Spear Gun,,20,Weapon Harpoon/ Javelin/ Spear,blue,,,,,,,,,1994,Action Sailor (v1) ,1
+1558,A1558,Missile Launcher,,24,Spring-Loaded Launcher,blue,,,,,,,,,1994,Action Sailor (v1) ,1
+1559,A1559,Missile,,25,Spring-Loaded Missile,blue,,,,,,,,,1994,Action Sailor (v1) ,1
+1560,A1560,Flashlight,,37,Tactical Gear,blue,,,,,,,,,1994,Action Sailor (v1) ,1
+1561,A1561,Flipper,,36,Swim/ Scuba Equipment,black,2,,,,,,,,1994,Action Sailor (v1) ,2
+1562,A1562,Sea Sled,,44,Transportation,blue,,,,,,,,,1994,Action Sailor (v1) ,1
+1563,A1563,"Accessory Tree ""Sea Sled Top""",,50,Accessory Tree,blue,,,,,,,,,1994,Action Sailor (v1) ,1
+1564,A1564,"Accessory Tree ""Sea Sled Bottom""",,50,Accessory Tree,blue,,,,,,,,,1994,Action Sailor (v1) ,1
+1565,A1565,Scuba Tank,,3,Backpack,black,,,,,,,,,1994,Action Sailor (v2),1
+1566,A1566,Spear Gun,,20,Weapon Harpoon/ Javelin/ Spear,black,,,,,,,,,1994,Action Sailor (v2),1
+1567,A1567,Missile Launcher,,24,Spring-Loaded Launcher,black,,,,,,,,,1994,Action Sailor (v2),1
+1568,A1568,Missile,,25,Spring-Loaded Missile,black,,,,,,,,,1994,Action Sailor (v2),1
+1569,A1569,Flashlight,,37,Tactical Gear,black,,,,,,,,,1994,Action Sailor (v2),1
+1570,A1570,Sea Sled,,36,Swim/ Scuba Equipment,black,,,,,,,,,1994,Action Sailor (v2),1
+1571,A1571,"Accessory Tree ""Sea Sled Top""",,50,Accessory Tree,black,,,,,,,,,1994,Action Sailor (v2),1
+1572,A1572,"Accessory Tree ""Sea Sled Bottom""",,50,Accessory Tree,black,,,,,,,,,1994,Action Sailor (v2),1
+1573,A1573,Backpack,,3,Backpack,green,,,,,,,,,1994,Action Solider (v1),1
+1574,A1574,Pistol,,6,Weapon Pistol,brown,,,,,,,,,1994,Action Solider (v1),1
+1575,A1575,Rifle,,8,Weapon Rifle,brown,,,,,,,,,1994,Action Solider (v1),1
+1576,A1576,Missile,,24,Spring-Loaded Missile,brown,,,,,,,,,1994,Action Solider (v1),1
+1577,A1577,Front Bunker Wall,,43,Playset Feature,brown,,,,,,,,,1994,Action Solider (v1),1
+1578,A1578,Side Bunker Wall,,43,Playset Feature,brown,,,,,,,,,1994,Action Solider (v1),1
+1579,A1579,Side Bunker Wall,,43,Playset Feature,brown,,,,,,,,,1994,Action Solider (v1),1
+1580,A1580,Gun Post Mount,,43,Playset Feature,brown,,,,,,,,,1994,Action Solider (v1),1
+1581,A1581,Sandbags,,43,Playset Feature,brown,,,,,,,,,1994,Action Solider (v1),1
+1582,A1582,Figure Stand,,51,Stand/ Base,brown,,,,,,,,,1994,Action Solider (v1),1
+1583,A1583,"Accessory Tree ""Bunker One Piece""",,50,Accessory Tree,brown,,,,,,,,,1994,Action Solider (v1),1
+1584,A1584,"Accessory Tree ""Bunker Two Pieces""",,50,Accessory Tree,brown,,,,,,,,,1994,Action Solider (v1),1
+1585,A1585,Pistol,,6,Weapon Pistol,black,,,,,,,,,1994,Action Solider (v1),1
+1586,A1586,Rifle,,8,Weapon Rifle,black,,,,,,,,,1994,Action Solider (v1),1
+1587,A1587,Missile,,25,Spring-Loaded Missile,black,,,,,,,,,1994,Action Solider (v1),1
+1588,A1588,Front Bunker Wall,,43,Playset Feature,black,,,,,,,,,1994,Action Solider (v1),1
+1589,A1589,Side Bunker Wall,,43,Playset Feature,black,,,,,,,,,1994,Action Solider (v1),1
+1590,A1590,Side Bunker Wall,,43,Playset Feature,black,,,,,,,,,1994,Action Solider (v1),1
+1591,A1591,Gun Post Mount,,43,Playset Feature,black,,,,,,,,,1994,Action Solider (v1),1
+1592,A1592,Sandbags,,43,Playset Feature,black,,,,,,,,,1994,Action Solider (v1),1
+1593,A1593,Figure Stand,,51,Stand/ Base,black,,,,,,,,,1994,Action Solider (v1),1
+1594,A1594,"Accessory Tree ""Bunker One Piece""",,50,Accessory Tree,black,,,,,,,,,1994,Action Solider (v1),1
+1595,A1595,"Accessory Tree ""Bunker Two Pieces""",,50,Accessory Tree,black,,,,,,,,,1994,Action Solider (v1),1
+1596,A1596,Special Blast-Proof Trooper Helmet with Adjustable Visor,,1,Helmet,orange,,,,,,,,,1994,Alley Viper (v3),1
+1597,A1597,Submachine Gun,,9,Weapon Submachine Gun,orange,,,,,,,,,1994,Alley Viper (v3),1
+1598,A1598,Submachine Gun,,9,Weapon Submachine Gun,orange,,,,,,,,,1994,Alley Viper (v3),1
+1599,A1599,Computerized Missile Launcher with Urban-Assault Gun,,24,Spring-Loaded Launcher,blue,,,,,,,,,1994,Alley Viper (v3),1
+1600,A1600,Missile,,25,Spring-Loaded Missile,orange,2,,,,,,,,1994,Alley Viper (v3),1
+1601,A1601,Cobra Laser-Proof Shield,,29,Armor/ Shield,orange,,,,,,,,,1994,Alley Viper (v3),1
+1602,A1602,Pistol,,6,Weapon Pistol,black,,,,,,,,,1994,Blackstar (v1),1
+1603,A1603,Backpack,,3,Backpack,green,,,,,,,,,1994,Blackstar (v1),1
+1604,A1604,Missile Firing Blackstar Blaster,,24,Spring-Loaded Launcher,green,,,,,,,,,1994,Blackstar (v1),1
+1605,A1605,Razor-Edged Katana Sword,,17,Weapon Sword,translucent blue,,,,,,,,,1994,Bushido (v2),2
+1606,A1606,Sword,,17,Weapon Sword,translucent blue,,,,,,,,,1994,Bushido (v2),2
+1607,A1607,Wide Butterfly Battle Knife,,14,Weapon Knife,translucent blue,,,,,,,,,1994,Bushido (v2),1
+1608,A1608,Two-Pronged Knife,,14,Weapon Knife,translucent blue,2,,,,,,,,1994,Bushido (v2),1
+1609,A1609,Sickle,,15,Weapon Blade,translucent blue,,,,,,,,,1994,Bushido (v2),2
+1610,A1610,Axe,,15,Weapon Blade,translucent blue,,,,,,,,,1994,Bushido (v2),1
+1611,A1611,Pistol,,6,Weapon Pistol,green,,,,,,,,,1994,Carcass (v1),1
+1612,A1612,Rifle,,8,Weapon Rifle,green,,,,,,,,,1994,Carcass (v1),1
+1613,A1613,Machine Gun with Scope,,10,Weapon Machine Gun,green,,,,,,,,,1994,Carcass (v1),1
+1614,A1614,Grenade Launcher,,13,Weapon Bazooka/ Launcher,green,,,,,,,,,1994,Carcass (v1),1
+1615,A1615,Knife,,14,Weapon Knife,green,,,,,,,,,1994,Carcass (v1),1
+1616,A1616,Helmet,,1,Helmet,black/yellow,,,,,,,,,1994,Cobra Commander (v7),1
+1617,A1617,Pistol,,6,Weapon Pistol,yellow,,,,,,,,,1994,Cobra Commander (v7),1
+1618,A1618,Space Crawler Backpack,,3,Backpack,black,,,,,,,,,1994,Cobra Commander (v7),1
+1619,A1619,Space Crawler Harness,,5,Backpack Accessory,yellow,,,,,,,,,1994,Cobra Commander (v7),1
+1620,A1620,Space Crawler Suction Cup Wheel,,5,Backpack Accessory,black/yellow,,,,,,,,,1994,Cobra Commander (v7),1
+1621,A1621,Pressure Regulated Space Helmet with Sun-Ray Face Shield,,1,Helmet,green/blue,,,,,,,,,1994,Countdown (v3),1
+1622,A1622,Missile Launching Fazer Gun,,24,Spring-Loaded Launcher,blue,,,,,,,,,1994,Countdown (v3),1
+1623,A1623,Armor-Plated Helmet with Voice Activated Microphone,,1,Helmet,blue/yellow,,,,,,,,,1994,Dial-Tone (v4),1
+1624,A1624,Pistol,,6,Weapon Pistol,yellow,,,,,,,,,1994,Dial-Tone (v4),1
+1625,A1625,Submachine Gun,,9,Weapon Submachine Gun,yellow,,,,,,,,,1994,Dial-Tone (v4),1
+1626,A1626,Fully Automatic Laser Machine Gun,,10,Weapon Machine Gun,yellow,,,,,,,,,1994,Dial-Tone (v4),1
+1627,A1627,Knife,,14,Weapon Knife,yellow,,,,,,,,,1994,Dial-Tone (v4),2
+1628,A1628,Sonic Launcher with Night Scope,,24,Spring-Loaded Launcher,silver,,,,,,,,,1994,Dial-Tone (v4),1
+1629,A1629,Missile,,25,Spring-Loaded Missile,yellow,2,,,,,,,,1994,Dial-Tone (v4),1
+1630,A1630,Helmet,,1,Helmet,black/clear,,,,,,,,,1994,Duke (v6),1
+1631,A1631,Backpack,,3,Backpack,red,,,,,,,,,1994,Duke (v6),1
+1632,A1632,Back Blaster Rocket Launcher ,,24,Spring-Loaded Launcher,red,,,,,,,,,1994,Duke (v6),1
+1633,A1633,Helmet,,1,Helmet,purple/black,,,,,,,,,1994,Effects (v1),1
+1634,A1634,Rifle,,8,Weapon Rifle,bright green,,,,,,,,,1994,Effects (v1),1
+1635,A1635,Catapult Incendiary Grenade Launcher,,13,Weapon Bazooka/ Launcher,black,,,,,,,,,1994,Effects (v1),1
+1636,A1636,Catapult Arm,,42,Launch System,black,,,,,,,,,1994,Effects (v1),1
+1637,A1637,Catapult Lever,,42,Launch System,black,,,,,,,,,1994,Effects (v1),1
+1638,A1638,Flame Canister ,,31,Explosive Ordnance Disposal (EOD),orange,2,,,,,,,,1994,Effects (v1),1
+1639,A1639,Helmet,,1,Helmet,black/silver,,,,,,,,,1994,Fighter Pilot (v1),1
+1640,A1640,Airmask,,2,Helmet Accessory,silver,,,,,,,,,1994,Fighter Pilot (v1),1
+1641,A1641,Parachute,,38,Parachute Case/ Parachute,black/white,,,,,,,,,1994,Fighter Pilot (v1),1
+1642,A1642,Parachute,,38,Parachute Case/ Parachute,blue/white,,,,,,,,,1994,Fighter Pilot (v1),1
+1643,A1643,Parachute Case,,38,Parachute Case/ Parachute,black,,,,,,,,,1994,Fighter Pilot (v1),1
+1644,A1644,Helmet with Shatterproof Paratrooper Goggles,,1,Helmet,tan/black,,,,,,,,,1994,Flint (v4),1
+1645,A1645,Sand Blaster Rocket Launcher,,24,Spring-Loaded Launcher,orange,,,,,,,,,1994,Flint (v4),1
+1646,A1646,Helmet,,1,Helmet,silver/green,,,,,,,,,1994,Gears (v1),1
+1647,A1647,Standard Issue 9mm Pistol,,6,Weapon Pistol,gray,,,,,,,,,1994,Ice Cream Soldier (v1),1
+1648,A1648,Submachine Gun,,10,Weapon Submachine Gun,gray,,,,,,,,,1994,Ice Cream Soldier (v1),1
+1649,A1649,Flamethrower,,11,Weapon Flamethrower,gray,,,,,,,,,1994,Ice Cream Soldier (v1),1
+1650,A1650,Machete,,16,Weapon Machete,gray,,,,,,,,,1994,Ice Cream Soldier (v1),1
+1651,A1651,Rocket Launcher with Flamethrower Attachment,,24,Spring-Loaded Launcher,black,,,,,,,,,1994,Ice Cream Soldier (v1),1
+1652,A1652,Missile,,25,Spring-Loaded Missile,gray,2,,,,,,,,1994,Ice Cream Soldier (v1),1
+1653,A1653,Microphone,,2,Helmet Accessory,gray,,,,,,,,,1994,Lifeline (v4),1
+1654,A1654,Flare Launcher,,37,Tactical Gear,yellow,,,,,,,,,1994,Lifeline (v4),1
+1655,A1655,Knife,,14,Weapon Knife,yellow,,,,,,,,,1994,Lifeline (v4),1
+1656,A1656,Flashlight,,37,Tactical Gear,yellow,,,,,,,,,1994,Lifeline (v4),1
+1657,A1657,Antibiotics and Medicine Storage,,33,Medical Equipment,yellow,,,,,,,,,1994,Lifeline (v4),1
+1658,A1658,Super-Charged Grappling Hook Launcher,,24,Spring-Loaded Launcher,black,,,,,,,,,1994,Lifeline (v4),1
+1659,A1659,Grappling Hook,,25,Spring-Loaded Missile,yellow,,,,,,,,,1994,Lifeline (v4),1
+1660,A1660,XL-14 Machine Gun w/Infrared Sight,,10,Weapon Machine Gun,red,,,,,,,,,1994,Major Bludd (v3),1
+1661,A1661,Knife,,14,Weapon Knife,red,,,,,,,,,1994,Major Bludd (v3),1
+1662,A1662,"Rapid-Fire ""Bludd"" Launcher",,24,Spring-Loaded Launcher,black,,,,,,,,,1994,Major Bludd (v3),1
+1663,A1663,Missile,,25,Spring-Loaded Missile,red,2,,,,,,,,1994,Major Bludd (v3),1
+1664,A1664,Pistol,,6,Weapon Pistol,purple,,,,,,,,,1994,Metal-Head (v2),1
+1665,A1665,Submachine Gun,,10,Weapon Submachine Gun,purple,,,,,,,,,1994,Metal-Head (v2),1
+1666,A1666,Rifle,,8,Weapon Rifle,purple,,,,,,,,,1994,Metal-Head (v2),1
+1667,A1667,"Tank Blaster Anti-Tank, Computer Linked Rocket Launcher",,24,Spring-Loaded Launcher,red,,,,,,,,,1994,Metal-Head (v2),1
+1668,A1668,Missile,,25,Spring-Loaded Missile,purple,2,,,,,,,,1994,Metal-Head (v2),1
+1669,A1669,Bow,,19,Weapon Bow/ Crossbow,translucent blue,,,,,,,,,1994,Night Creeper (v3),1
+1670,A1670,Sword,,17,Weapon Sword,translucent blue,,,,,,,,,1994,Night Creeper (v3),1
+1671,A1671,Machete,,16,Weapon Machete,translucent blue,,,,,,,,,1994,Night Creeper (v3),1
+1672,A1672,Sickle,,15,Weapon Blade,translucent blue,,,,,,,,,1994,Night Creeper (v3),1
+1673,A1673,Knife,,14,Weapon Knife,translucent blue,2,,,,,,,,1994,Night Creeper (v3),1
+1674,A1674,Forearm Shield,,29,Armor/ Shield,gold,,,,,,,,,1994,Night Creeper Leader (v2),1
+1675,A1675,Wrist-Mounted Crossbow,,19,Weapon Bow/ Crossbow,gold,,,,,,,,,1994,Night Creeper Leader (v2),1
+1676,A1676,Crossbow,,19,Weapon Bow/ Crossbow,gold,,,,,,,,,1994,Night Creeper Leader (v2),1
+1677,A1677,Knife,,14,Weapon Knife,gold,,,,,,,,,1994,Night Creeper Leader (v2),1
+1678,A1678,Ninja Clan Katana,,17,Weapon Sword,gold,2,,,,,,,,1994,Night Creeper Leader (v2),1
+1679,A1679,"Computer Locking ""Shock"" Gun",,24,Spring-Loaded Launcher,gold,,,,,,,,,1994,Night Creeper Leader (v2),1
+1680,A1680,Bow,,19,Weapon Bow/ Crossbow,translucent pink,,,,,,,,,1994,Nunchuk (v2),1
+1681,A1681,Sword,,17,Weapon Sword,translucent pink,,,,,,,,,1994,Nunchuk (v2),1
+1682,A1682,Machete,,16,Weapon Machete,translucent pink,,,,,,,,,1994,Nunchuk (v2),1
+1683,A1683,Sickle,,15,Weapon Blade,translucent pink,,,,,,,,,1994,Nunchuk (v2),1
+1684,A1684,Knife,,14,Weapon Knife,translucent pink,2,,,,,,,,1994,Nunchuk (v2),1
+1685,A1685,Helmet,,1,Helmet,maroon/gold,,,,,,,,,1994,Ozone (v4),1
+1686,A1686,Shotgun,,7,Weapon Shotgun,silver,,,,,,,,,1994,Ozone (v4),1
+1687,A1687,Submachine Gun,,9,Weapon Submachine Gun,silver,,,,,,,,,1994,Ozone (v4),1
+1688,A1688,Rifle,,8,Weapon Rifle,silver,,,,,,,,,1994,Ozone (v4),1
+1689,A1689,Machete,,16,Weapon Machete,silver,,,,,,,,,1994,Ozone (v4),1
+1690,A1690,Missile Launching Solar Shooter Gun,,24,Spring-Loaded Launcher,orange,,,,,,,,,1994,Ozone (v4),1
+1691,A1691,Missile,,25,Spring-Loaded Missile,silver,2,,,,,,,,1994,Ozone (v4),1
+1692,A1692,Pistol,,6,Weapon Pistol,gray,,,,,,,,,1994,Payload (v4),2
+1693,A1693,Pistol,,6,Weapon Pistol,orange,,,,,,,,,1994,Payload (v4),1
+1694,A1694,XM-15 Rifle,,8,Weapon Rifle,gray,,,,,,,,,1994,Payload (v4),2
+1695,A1695,XM-15 Rifle,,8,Weapon Rifle,orange,,,,,,,,,1994,Payload (v4),1
+1696,A1696,Laser Rifle,,12,Weapon Blaster/ Laser,gray,,,,,,,,,1994,Payload (v4),2
+1697,A1697,Laser Rifle,,12,Weapon Blaster/ Laser,orange,,,,,,,,,1994,Payload (v4),1
+1698,A1698,Knife,,14,Weapon Knife,gray,,,,,,,,,1994,Payload (v4),2
+1699,A1699,Knife,,14,Weapon Knife,orange,,,,,,,,,1994,Payload (v4),1
+1700,A1700,Missile,,24,Spring-Loaded Missile,gray,2,,,,,,,,1994,Payload (v4),1
+1701,A1701,Missile,,24,Spring-Loaded Launcher,orange,2,,,,,,,,1994,Payload (v4),1
+1702,A1702,Helmet,,1,Helmet,black,,,,,,,,,1994,Roadblock (v7),1
+1703,A1703,Visor,,2,Helmet Accessory,red,,,,,,,,,1994,Roadblock (v7),1
+1704,A1704,Missile Launcher,,24,Spring-Loaded Launcher,silver,,,,,,,,,1994,Roadblock (v7),1
+1705,A1705,Helmet,,1,Helmet,silver/red,,,,,,,,,1994,Sci-Fi (v4),1
+1706,A1706,Backpack,,3,Backpack,red,,,,,,,,,1994,Sci-Fi (v4),1
+1707,A1707,Laser Attachment,,5,Backpack Accessory,black,,,,,,,,,1994,Sci-Fi (v4),1
+1708,A1708,Missile Launcher Attachment,,5,Backpack Accessory,black,,,,,,,,,1994,Sci-Fi (v4),1
+1709,A1709,Pistol,,6,Weapon Pistol,black,,,,,,,,,1994,Sci-Fi (v4),1
+1710,A1710,Climbing Hook,,32,Grappling Hook,black,2,,,,,,,,1994,Sci-Fi (v4),1
+1711,A1711,Airmask,,46,Specialized Hose,black,,,,,,,,,1994,Shipwreck (v2),1
+1712,A1712,Missile Launcher,,24,Spring-Loaded Launcher,black,,,,,,,,,1994,Shipwreck (v2),1
+1713,A1713,Swim Fins,,36,Swim/ Scuba Equipment,black,2,,,,,,,,1994,Shipwreck (v2),1
+1714,A1714,Axe,,15,Weapon Blade,translucent blue,,,,,,,,,1994,Slice (v3),1
+1715,A1715,Wide Butterfly Battle Knife,,14,Weapon Knife,translucent blue,,,,,,,,,1994,Slice (v3),1
+1716,A1716,Jab Hook Heavy Sword,,17,Weapon Sword,translucent blue,,,,,,,,,1994,Slice (v3),1
+1717,A1717,Double-Sided Knife,,14,Weapon Knife,translucent blue,2,,,,,,,,1994,Slice (v3),1
+1718,A1718,Double Bladed Bo Staff,,18,Weapon Melee,translucent blue,,,,,,,,,1994,Slice (v3),1
+1719,A1719,Sword (thin blade),,17,Weapon Sword,translucent gray,,,,,,,,,1994,Snake Eyes (v6),1
+1720,A1720,Sword (thick blade),,17,Weapon Sword,translucent gray,,,,,,,,,1994,Snake Eyes (v6),1
+1721,A1721,Sword (curved blade),,17,Weapon Sword,translucent gray,,,,,,,,,1994,Snake Eyes (v6),1
+1722,A1722,Knife,,14,Weapon Knife,translucent gray,,,,,,,,,1994,Snake Eyes (v6),1
+1723,A1723,Nunchuks,,18,Weapon Melee,translucent gray,,,,,,,,,1994,Snake Eyes (v6),1
+1724,A1724,Claw,,15,Weapon Blade,translucent gray,2,,,,,,,,1994,Snake Eyes (v6),1
+1725,A1725,Pistol,,6,Weapon Pistol,cream,,,,,,,,,1994,Snow Storm (v3),1
+1726,A1726,Submachine Gun,,9,Weapon Submachine Gun,cream,,,,,,,,,1994,Snow Storm (v3),1
+1727,A1727,Rifle,,8,Weapon Rifle,cream,,,,,,,,,1994,Snow Storm (v3),1
+1728,A1728,Machete,,16,Weapon Machete,cream,,,,,,,,,1994,Snow Storm (v3),1
+1729,A1729,"Missile Firing ""Glacier"" Gun",,24,Spring-Loaded Launcher,orange,,,,,,,,,1994,Snow Storm (v3),1
+1730,A1730,Missile,,25,Spring-Loaded Missile,cream,2,,,,,,,,1994,Snow Storm (v3),1
+1731,A1731,Helmet,,1,Helmet,white,,,,,,,,,1994,Space Shot (v1),1
+1732,A1732,Cosmic Climbing Backpack,,3,Backpack,blue,,,,,,,,,1994,Space Shot (v1),1
+1733,A1733,LX-1 Laser Pistol,,6,Weapon Pistol,black,,,,,,,,,1994,Space Shot (v1),1
+1734,A1734,Heat Seeking Missile Launcher,,24,Spring-Loaded Launcher,black,,,,,,,,,1994,Stalker (v5),1
+1735,A1735,Sword (thin blade),,17,Weapon Sword,translucent blue,,,,,,,,,1994,Storm Shadow (v4),1
+1736,A1736,Sword (thick blade),,17,Weapon Sword,translucent blue,,,,,,,,,1994,Storm Shadow (v4),1
+1737,A1737,Sword (curved blade),,17,Weapon Sword,translucent blue,,,,,,,,,1994,Storm Shadow (v4),1
+1738,A1738,Knife,,14,Weapon Knife,translucent blue,,,,,,,,,1994,Storm Shadow (v4),1
+1739,A1739,Nunchuks,,18,Weapon Melee,translucent blue,,,,,,,,,1994,Storm Shadow (v4),1
+1740,A1740,Claw,,15,Weapon Blade,translucent blue,2,,,,,,,,1994,Storm Shadow (v4),1
+1741,A1741,Pistol,,6,Weapon Pistol,red,,,,,,,,,1994,Viper (v4),1
+1742,A1742,Long Pistol,,6,Weapon Pistol,red,,,,,,,,,1994,Viper (v4),1
+1743,A1743,Harpoon Gun,,20,Weapon Harpoon/ Javelin/ Spear,red,,,,,,,,,1994,Viper (v4),1
+1744,A1744,Knife,,14,Weapon Knife,red,,,,,,,,,1994,Viper (v4),1
+1745,A1745,Missile,,23,Missile,red,2,,,,,,,,1994,Viper (v4),1
+1800,A1800,Action Figure Battle Stand,,51,Stand/ Base,black,,,,,,,,,,,
+1801,A1801,Action Figure Battle Stand,,51,Stand/ Base,blue,,,,,,,,,,,
+1802,A1802,Action Figure Battle Stand,,51,Stand/ Base,bright green,,,,,,,,,,,
+1803,A1803,Action Figure Battle Stand,,51,Stand/ Base,cream,,,,,,,,,,,
+1804,A1804,Action Figure Battle Stand,,51,Stand/ Base,dark blue,,,,,,,,,,,
+1805,A1805,Action Figure Battle Stand,,51,Stand/ Base,dark gray,,,,,,,,,,,
+1806,A1806,Action Figure Battle Stand,,51,Stand/ Base,gold,,,,,,,,,,,
+1807,A1807,Action Figure Battle Stand,,51,Stand/ Base,gray,,,,,,,,,,,
+1808,A1808,Action Figure Battle Stand,,51,Stand/ Base,green,,,,,,,,,,,
+1809,A1809,Action Figure Battle Stand,,51,Stand/ Base,light blue,,,,,,,,,,,
+1810,A1810,Action Figure Battle Stand,,51,Stand/ Base,maroon,,,,,,,,,,,
+1811,A1811,Action Figure Battle Stand,,51,Stand/ Base,olive green,,,,,,,,,,,
+1812,A1812,Action Figure Battle Stand,,51,Stand/ Base,orange,,,,,,,,,,,
+1813,A1813,Action Figure Battle Stand,,51,Stand/ Base,pink,,,,,,,,,,,
+1814,A1814,Action Figure Battle Stand,,51,Stand/ Base,purple,,,,,,,,,,,
+1815,A1815,Action Figure Battle Stand,,51,Stand/ Base,red,,,,,,,,,,,
+1816,A1816,Action Figure Battle Stand,,51,Stand/ Base,silver,,,,,,,,,,,
+1817,A1817,Action Figure Battle Stand,,51,Stand/ Base,translucent blue,,,,,,,,,,,
+1818,A1818,Action Figure Battle Stand,,51,Stand/ Base,translucent gray,,,,,,,,,,,
+1819,A1819,Action Figure Battle Stand,,51,Stand/ Base,translucent green,,,,,,,,,,,
+1820,A1820,Action Figure Battle Stand,,51,Stand/ Base,translucent pink,,,,,,,,,,,
+1821,A1821,Action Figure Battle Stand,,51,Stand/ Base,white,,,,,,,,,,,
+1822,A1822,Action Figure Battle Stand,,51,Stand/ Base,yellow,,,,,,,,,,,
+1850,A1850,Accessory Tree,,50,Accessory Tree,black,,,,,,,,,,,
+1851,A1851,Accessory Tree,,50,Accessory Tree,blue,,,,,,,,,,,
+1852,A1852,Accessory Tree,,50,Accessory Tree,bright green,,,,,,,,,,,
+1853,A1853,Accessory Tree,,50,Accessory Tree,cream,,,,,,,,,,,
+1854,A1854,Accessory Tree,,50,Accessory Tree,dark blue,,,,,,,,,,,
+1855,A1855,Accessory Tree,,50,Accessory Tree,gold,,,,,,,,,,,
+1856,A1856,Accessory Tree,,50,Accessory Tree,gray,,,,,,,,,,,
+1857,A1857,Accessory Tree,,50,Accessory Tree,green,,,,,,,,,,,
+1858,A1858,Accessory Tree,,50,Accessory Tree,light blue,,,,,,,,,,,
+1859,A1859,Accessory Tree,,50,Accessory Tree,maroon,,,,,,,,,,,
+1860,A1860,Accessory Tree,,50,Accessory Tree,olive green,,,,,,,,,,,
+1861,A1861,Accessory Tree,,50,Accessory Tree,orange,,,,,,,,,,,
+1862,A1862,Accessory Tree,,50,Accessory Tree,pink,,,,,,,,,,,
+1863,A1863,Accessory Tree,,50,Accessory Tree,purple,,,,,,,,,,,
+1864,A1864,Accessory Tree,,50,Accessory Tree,red,,,,,,,,,,,
+1865,A1865,Accessory Tree,,50,Accessory Tree,silver,,,,,,,,,,,
+1866,A1866,Accessory Tree,,50,Accessory Tree,translucent blue,,,,,,,,,,,
+1867,A1867,Accessory Tree,,50,Accessory Tree,translucent gray,,,,,,,,,,,
+1868,A1868,Accessory Tree,,50,Accessory Tree,translucent green,,,,,,,,,,,
+1869,A1869,Accessory Tree,,50,Accessory Tree,translucent pink,,,,,,,,,,,
+1870,A1870,Accessory Tree,,50,Accessory Tree,white,,,,,,,,,,,
+1871,A1871,Accessory Tree,,50,Accessory Tree,yellow,,,,,,,,,,,
+1900,A1900,"Hose 1 1/2"" Long (short)",,45,Standard Hose,black,,,,,,,,,,,
+1901,A1901,"Hose 3"" Long (medium)",,45,Standard Hose,black,,,,,,,,,,,
+1902,A1902,"Hose 6"" Long (long)",,45,Standard Hose,black,,,,,,,,,,,
+1903,A1903,Hose (hold) Long,,45,Standard Hose,black,,,,,,,,,,,
+1904,A1904,Hose (hold) Long,,45,Standard Hose,black,,,,,,,,,,,
+1905,A1905,String,,49,Accessory,black,,,,,,,,,,,
+1906,A1906,Rubber Band,,49,Accessory,tan,,,,,,,,,,,4
+1925,A1925,Patch - A,,40,Soft Goods,,,,,,,,,,,Steel Brigade,
+1926,A1926,Patch - B,,40,Soft Goods,,,,,,,,,,,Steel Brigade,
+1927,A1927,Patch - C,,40,Soft Goods,,,,,,,,,,,Steel Brigade,
+1928,A1928,Patch - D,,40,Soft Goods,,,,,,,,,,,Steel Brigade,
+1929,A1929,Patch - E,,40,Soft Goods,,,,,,,,,,,Steel Brigade,
+1930,A1930,Patch - F (Gold Head),,40,Soft Goods,,,,,,,,,,,Steel Brigade,

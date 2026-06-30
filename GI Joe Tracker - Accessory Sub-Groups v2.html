@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GI Joe Tracker — Accessory Sub-Groups v2 (Option C, qty-aware)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #f3eee2;
+    --ink: #211f1a;
+    --ink-soft: #56503f;
+    --line-soft: rgba(33,31,26,.22);
+    --accent: #b8402f;
+    --olive: #5f6b39;
+    --ok: #5d7d4d;
+    --warn: #b8802f;
+    --card: #e9e2d2;
+    --font-display: 'Oswald', sans-serif;
+    --font-mono: 'Space Mono', monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-display); }
+
+  /* ---- figure-card shell -------------------------------------------- */
+  .sgw-card { width: 348px; background: var(--paper); border: 1.5px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+  .sgw-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+    padding: 11px 13px; border-bottom: 1.5px solid var(--ink); background: var(--card); }
+  .sgw-head__l { display: flex; flex-direction: column; gap: 4px; }
+  .sgw-head__top { display: flex; align-items: baseline; gap: 9px; }
+  .sgw-fac { font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: 1px;
+    padding: 2px 6px; color: #fff; }
+  .sgw-fac--cobra { background: var(--accent); }
+  .sgw-fac--joe { background: var(--olive); }
+  .sgw-head__name { font-weight: 700; font-size: 19px; letter-spacing: .4px; }
+  .sgw-head__role { font-size: 11px; color: var(--ink-soft); font-style: italic; max-width: 200px; }
+  .sgw-head__alt { font-family: var(--font-mono); font-size: 8.5px; font-weight: 700; letter-spacing: .5px; color: var(--ink-soft); margin-top: 2px; }
+  .sgw-ver { font-family: var(--font-mono); font-size: 9px; color: var(--ink-soft); letter-spacing: .5px;
+    text-align: right; line-height: 1.5; white-space: nowrap; }
+
+  .sgw-list { padding: 6px 0; }
+
+  /* ---- single-unit rows --------------------------------------------- */
+  .sgw-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 8px 13px; }
+  .sgw-row + .sgw-row { border-top: 1px solid var(--line-soft); }
+  .acc-sw { box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
+  .sgw-row__name { font-weight: 600; font-size: 13px; }
+  .sgw-box { width: 22px; height: 22px; border: 1.5px solid var(--ink); background: var(--paper);
+    display: grid; place-items: center; cursor: pointer; line-height: 1;
+    font-family: var(--font-mono); font-weight: 700; font-size: 12px; color: transparent; padding: 0; }
+  .sgw-box.is-on { background: var(--ok); color: #fff; }
+  .sgw-box:hover { border-color: var(--accent); }
+
+  /* ---- matched-set block -------------------------------------------- */
+  .sgw-pillset { margin: 7px 11px 4px; border: 1.5px solid var(--ink); background: rgba(255,255,255,.28); }
+  /* header row: a label on the left, colour column headers on the right.
+     Columns are fixed-width so the tick boxes below line up under them. */
+  .sgw-pillhead { display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 7px 11px; border-bottom: 1px dashed var(--line-soft); }
+  .sgw-pillhead__lbl { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: 1px; color: var(--ink-soft); }
+  .sgw-cols { display: flex; gap: 6px; flex-shrink: 0; }
+  .sgw-colh { width: 58px; display: flex; align-items: center; justify-content: flex-end; gap: 5px;
+    font-family: var(--font-mono); font-size: 9.5px; font-weight: 700; letter-spacing: .3px; color: var(--ink-soft); }
+  .sgw-colh.is-matched { color: var(--ok); }
+
+  /* one slot row: name on the left, the version columns on the right */
+  .sgw-pillrow2 { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 7px 11px; min-height: 36px; }
+  .sgw-pillrow2 + .sgw-pillrow2 { border-top: 1px solid var(--line-soft); }
+  .sgw-pillrow2__name { font-weight: 600; font-size: 13px; display: flex; align-items: baseline; gap: 6px; }
+  .sgw-qty { font-family: var(--font-mono); font-style: normal; font-weight: 700; font-size: 10px;
+    color: var(--accent); border: 1px solid var(--accent); padding: 0 3px; line-height: 1.35; }
+
+  .sgw-pills2 { display: flex; gap: 6px; flex-shrink: 0; }
+  /* a version column = its tick boxes, right-aligned under the header */
+  .vpill { width: 58px; display: flex; align-items: center; justify-content: flex-end; gap: 3px; }
+  .vtick { width: 18px; height: 18px; border: 1.5px solid var(--ink); background: var(--paper);
+    display: grid; place-items: center; cursor: pointer; padding: 0; line-height: 1;
+    font-family: var(--font-mono); font-weight: 700; font-size: 11px; color: #fff; }
+  .vtick:hover { outline: 2px solid var(--ink); outline-offset: -1px; }
+
+  /* ---- either/or + assembly group blocks ---------------------------- */
+  .sgw-gstat { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .5px; color: var(--ink-soft); white-space: nowrap; }
+  .sgw-gstat.is-ok { color: var(--ok); }
+  .sgw-optname { font-weight: 600; font-size: 13px; padding: 8px 11px 0; }
+  .sgw-optrow { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; padding: 9px 11px; }
+  .sgw-opt { display: flex; align-items: center; gap: 7px; cursor: pointer;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .3px; color: var(--ink);
+    padding: 6px 9px; border: 1.5px solid var(--ink); background: var(--paper); }
+  .sgw-opt__box { width: 15px; height: 15px; border: 1.5px solid var(--ink); background: var(--paper);
+    display: grid; place-items: center; line-height: 1; font-size: 10px; color: #fff; flex: 0 0 auto; }
+  .sgw-opt.is-on { background: rgba(93,125,77,.14); border-color: var(--ok); }
+  .sgw-opt.is-on .sgw-opt__box { background: var(--ok); border-color: var(--ok); }
+  .sgw-or { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-soft); }
+  .sgw-blocknote { font-family: var(--font-mono); font-size: 9px; line-height: 1.5; color: var(--ink-soft);
+    padding: 7px 11px; border-top: 1px dashed var(--line-soft); }
+
+  /* ---- centered variant box (group_id) ------------------------------ */
+  /* Label + status stacked and centered; option buttons centered. No
+     "own either" instruction copy, and tick fills stay a single neutral
+     colour (set below) rather than echoing each accessory's swatch. */
+  .sgw-vhead { display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 9px 11px; border-bottom: 1px dashed var(--line-soft); }
+  .sgw-vhead__lbl { font-weight: 600; font-size: 13px; text-align: center; }
+  .sgw-vstat { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .5px; color: var(--ink-soft); }
+  .sgw-vstat.is-ok { color: var(--ok); }
+  .sgw-voptrow { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 9px; padding: 11px; }
+
+  /* ---- footer status ------------------------------------------------- */
+  .sgw-foot { padding: 9px 13px; border-top: 1.5px solid var(--ink); background: var(--card);
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: .4px; color: var(--ink-soft); }
+  .sgw-foot.is-ok { background: var(--ok); color: #fff; }
+
+  /* ---- annotation note ---------------------------------------------- */
+  .sgw-note { font-family: var(--font-mono); font-size: 11px; line-height: 1.55; color: var(--ink-soft); width: 300px; }
+  .sgw-note b { color: var(--ink); }
+  .sgw-note .k { color: var(--accent); font-weight: 700; }
+  .sgw-note code { background: rgba(33,31,26,.08); padding: 0 3px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="acc-colors.jsx"></script>
+<script type="text/babel" src="subgroup-wire-v2.jsx"></script>
+<script type="text/babel">
+const { createRoot } = ReactDOM;
+function Note({ children }) { return <div className="sgw-note">{children}</div>; }
+
+function App() {
+  // FIREFLY: matched light-green pair → COMPLETE
+  const ffSeed = [{ a: 1, b: 0 }, { a: 1, b: 0 }];
+  // ROCK: matched purple set incl. BOTH missiles purple (2/2) → COMPLETE
+  const rrSeed = [{ a: 0, b: 1 }, { a: 0, b: 1 }, { a: 0, b: 1 }, { a: 0, b: 2 }];
+  // ROCK partial: gun+shotgun+machete yellow, but only 1 of 2 missiles → INCOMPLETE
+  const rrPartial = [{ a: 1, b: 0 }, { a: 1, b: 0 }, { a: 1, b: 0 }, { a: 1, b: 0 }];
+
+  return (
+    <DesignCanvas>
+      <DCSection id="c2" title="OPTION C · redesigned — quantity-aware"
+                 subtitle="Kept the one-row-per-slot density you liked. New: each slot carries a required quantity, and every colour pill shows that many tick boxes on the same line. A version only tallies 'matched' when every slot — both missiles included — is filled in that one shade.">
+        <DCArtboard id="brief" label="What changed" width={300} height={520}>
+          <Note>
+            <p><b>From your notes</b></p>
+            <p>· <b>A</b> dropped — hid the other shade while toggling.<br/>
+            · <b>B</b> dropped — ledger ran too tall.<br/>
+            · <b>C</b> kept, now does quantity.</p>
+            <p style={{marginTop:12}}><b>The tick boxes</b><br/>
+            Each colour pill carries one <code>[x]</code> per required unit. Tap fills left→right; tap a filled box to drop back. qty-1 slots read exactly like the old single pill.</p>
+            <p style={{marginTop:12}}><b>Matched-set rule</b><br/>
+            Complete = base singles + one version where <i>every</i> slot hits its qty. A <span className="k">yellow</span> gun beside a <span className="k">purple</span> machete still won't tally — and a lone missile leaves the set <b>1 short</b>.</p>
+            <p style={{marginTop:14, paddingTop:10, borderTop:'1px solid var(--line-soft)'}}>qty comes straight from the blueprint: <code>["Missile", 2]</code>. Nothing hardcoded.</p>
+          </Note>
+        </DCArtboard>
+
+        <DCArtboard id="rr-c" label="ROCK 'N ROLL v4 · Missile ×2 (matched purple)" width={372} height={480}>
+          <OptionPills2 fig={ROCK} seed={rrSeed} />
+        </DCArtboard>
+
+        <DCArtboard id="rr-partial" label="ROCK 'N ROLL · 1 of 2 missiles → still incomplete" width={372} height={480}>
+          <OptionPills2 fig={ROCK} seed={rrPartial} />
+        </DCArtboard>
+
+        <DCArtboard id="ff-c" label="FIREFLY v1 · all qty-1 (matched light green)" width={372} height={356}>
+          <OptionPills2 fig={FIREFLY} seed={ffSeed} />
+        </DCArtboard>
+
+        <DCArtboard id="read" label="How to read the Missile row" width={300} height={480}>
+          <Note>
+            <p><b>MISSILE <span className="k">×2</span></b></p>
+            <p>Two pills, two ticks each:</p>
+            <p style={{marginTop:8}}>
+            <span className="k">Yellow</span> <code>[ ][ ]</code> — own 0<br/>
+            <span className="k">Purple</span> <code>[✓][✓]</code> — own 2</p>
+            <p style={{marginTop:12}}>With both purple ticks filled (and the other three slots purple too), the <b>Purple</b> header turns green and the card reads <b>Complete</b>.</p>
+            <p style={{marginTop:12}}>Drop one purple missile to <code>[✓][ ]</code> and the footer falls back to <b>Incomplete</b>. The middle card shows that state.</p>
+            <p style={{marginTop:14, paddingTop:10, borderTop:'1px solid var(--line-soft)'}}>Hold a spare in the <i>other</i> shade? Fill a yellow tick too — both stay visible, so nothing hides as you log spares (the thing A got wrong).</p>
+          </Note>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="edge" title="EDGE CASES · variant groups (group_id) + release_context"
+                 subtitle="Faithful to the live DB: a figure carries a FLAT accessory list. A shared group_id draws an 'own any one' box; release_context (convention / bonus / mail-in / exclusive) pulls pieces into a context box that is tracked but excluded from completion. Scrap-Iron's Missile System stays plain rows; A.V.A.C.'s whole kit is one group_id; Cobra shows a retail item beside a convention box. Alt-names ride in the header.">
+        <DCArtboard id="edge-brief" label="The rule" width={300} height={560}>
+          <Note>
+            <p><b>group_id = the box.</b> Two or more accessories that share a <code>group_id</code> are interchangeable variants: own <i>any one</i> and the group is satisfied. That’s the boxed “own either” structure, and it’s the <i>only</i> thing that boxes.</p>
+            <p style={{marginTop:12}}><b>No group_id → a plain row.</b> Ungrouped accessories are individual, qty-aware rows — a checkbox at qty&nbsp;1, tick boxes at qty&nbsp;2 (Legs <code>[✓][✓]</code>, Missiles <code>[✓][✓]</code>). Scrap-Iron’s Missile System pieces sit here: separate accessories, not a variant group.</p>
+            <p style={{marginTop:12}}><b>Generalises.</b> Any set of accessories inside one group_id renders this same box — nothing is special-cased to Scrap-Iron or A.V.A.C. Drop more ids into a group and they just add <code>or</code> options.</p>
+            <p style={{marginTop:12}}><b>ALT-NAMES.</b> “Scrap-Iron” / “Scrap Iron” both find the figure via the <code>alt_name</code> list, shown as the <b>A.K.A.</b> line.</p>
+            <p style={{marginTop:14, paddingTop:10, borderTop:'1px solid var(--line-soft)'}}><b>On the gray prose:</b> it’s removed from the cards. Those sentences were handoff annotation, not product UI — they live out here on the canvas. The final render is just label · status · the variant buttons.</p>
+          </Note>
+        </DCArtboard>
+
+        <DCArtboard id="scrap-c" label="SCRAP-IRON v1 · 6 flat rows + group_id 8401 (1 missile short)" width={372} height={560}>
+          <GroupCard fig={SCRAP} seed={{ A0105: 1, A0106: 1, A0107: 1, A0108: 1, A0109: 2, A0110: 1, A0111: 1 }} />
+        </DCArtboard>
+
+        <DCArtboard id="avac-c" label="A.V.A.C. v1 · whole kit is one group_id 8601 (soft owned)" width={372} height={260}>
+          <GroupCard fig={AVAC} seed={{ A0225: 1 }} />
+        </DCArtboard>
+
+        <DCArtboard id="cobra-c" label="COBRA v1 · retail rifle + convention context box (complete despite missing extras)" width={372} height={400}>
+          <GroupCard fig={COBRA_TROOPER} seed={{ A0004: 1, A0013: 1, A0028: 1 }} />
+        </DCArtboard>
+
+        <DCArtboard id="ctx-read" label="release_context" width={300} height={400}>
+          <Note>
+            <p><b>A second, independent axis.</b> <code>group_id</code> says “these are interchangeable.” <code>release_context</code> says “where this piece came from” — <code>retail</code> (the default, counts) vs <code>convention</code> · <code>bonus</code> · <code>mail-in</code> · <code>exclusive</code> (tracked, but never required for a complete figure).</p>
+            <p style={{marginTop:12}}>Cobra’s only retail accessory is the <span className="k">Dragunov rifle</span> — own it and the figure reads <b>Complete</b>. The four convention pieces drop into their own <b>Convention</b> box; you can tick what you have, but leaving them blank never blocks completion. Here two are owned, two aren’t, and the card is still green.</p>
+            <p style={{marginTop:14, paddingTop:10, borderTop:'1px solid var(--line-soft)'}}>The two axes are orthogonal: a context box could itself hold a <code>group_id</code> variant pair (the thin/thick Bazooka would qualify) once that data lands.</p>
+          </Note>
+        </DCArtboard>
+
+        <DCArtboard id="edge-read" label="Why these matter" width={300} height={560}>
+          <Note>
+            <p><b>Scrap-Iron</b> proves the split on one card: <span className="k">RAR Pistol</span> and the six Missile-System pieces are plain rows (Legs and Missiles at qty&nbsp;2), while only the <span className="k">Remote Activator</span> pair boxes — because only it carries <code>group_id 8401</code>. Seeded <b>1 of 2 missiles</b>, so the card reads <b>Incomplete</b> even with a handle ticked.</p>
+            <p style={{marginTop:12}}>The thin handle is ticked; the thick is a spare you don’t need — owning the first option in the group satisfies it.</p>
+            <p style={{marginTop:12}}><b>A.V.A.C.</b> answers your question directly: his entire kit is one <code>group_id 8601</code>, so the card is just that single box — soft <code>or</code> hard, pick what you have, done. No scaffolding around it.</p>
+            <p style={{marginTop:14, paddingTop:10, borderTop:'1px solid var(--line-soft)'}}>Open Q: should owning <b>both</b> variants in a group flag a “variant spare,” or stay silent? Right now it’s silent.</p>
+          </Note>
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

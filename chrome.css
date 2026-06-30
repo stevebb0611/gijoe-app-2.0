@@ -1,0 +1,82 @@
+/* ============================================================
+   chrome.css — the canonical app header (the "Figures" header).
+   Shared verbatim across Figures, Vehicles, and Parts Bin so the
+   three peer destinations carry one identical chrome.
+
+   Scope is deliberately HEADER-ONLY. Every selector here is unique
+   to the header (invp-top / inv-brand / inv-nav / inv-search /
+   inv-addfig / inv-kpis …) so it can be linked into pages that have
+   their own body CSS (e.g. Parts Bin uses .chip / .seg in its body)
+   WITHOUT colliding. Body/list/gallery styling stays per-page.
+   ============================================================ */
+
+/* shared tokens (pages may override --accent etc. after this loads) */
+:root {
+  --paper: #f3eee2;
+  --card: #e9e2d2;
+  --ink: #211f1a;
+  --ink-soft: #56503f;
+  --line: rgba(33,31,26,.55);
+  --line-soft: rgba(33,31,26,.22);
+  --accent: #b8402f;
+  --ok: #5d7d4d;
+  --olive: #5f6b39;
+  --crimson: #a23a2c;
+  --font-display: 'Oswald', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+  --shadow: 3px 3px 0 var(--ink);
+}
+
+/* sticky chrome wrapper */
+.invp-chrome { position: sticky; top: 0; z-index: 40; }
+
+/* ===== the header bar ===== */
+.invp-top { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 22px; padding: 12px 26px; background: var(--ink); color: var(--paper); }
+
+/* left cluster — brand mark + name + peer nav */
+.inv-brand { display: flex; align-items: center; gap: 14px; }
+.inv-brand__mk { display: inline-flex; align-items: center; }
+.inv-brand__name { font-family: var(--font-display); font-weight: 700; font-size: 19px; letter-spacing: .5px; line-height: 1; }
+.inv-brand__sub { font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px; opacity: .6; }
+
+.inv-nav { display: flex; gap: 10px; align-items: center; align-self: center; }
+.inv-nav a { font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .2px; color: rgba(255,255,255,.55); text-decoration: none; padding: 5px 12px; border: 1.5px solid transparent; white-space: nowrap; }
+.inv-nav a:hover { color: var(--paper); }
+.inv-nav a.is-active { color: #fff; border-color: rgba(255,255,255,.35); background: rgba(255,255,255,.08); }
+.inv-nav a em { font-style: normal; font-family: var(--font-mono); font-size: 10px; opacity: .7; margin-left: 4px; }
+/* "In Dev" tab — striped/dashed to read as not-finished, but now clickable */
+.inv-nav__soon { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .2px; color: rgba(255,255,255,.5); text-decoration: none; padding: 5px 12px; border: 1.5px dashed rgba(255,255,255,.32); background-image: repeating-linear-gradient(45deg, transparent 0 6px, rgba(255,255,255,.06) 6px 7px); cursor: pointer; white-space: nowrap; }
+.inv-nav__soon:hover { color: var(--paper); border-color: rgba(255,255,255,.5); }
+.inv-nav__soon.is-active { color: #fff; border-style: solid; border-color: rgba(255,255,255,.45); background-color: rgba(255,255,255,.08); }
+.inv-nav__tag { font-style: normal; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .5px; color: rgba(255,255,255,.62); border: 1px solid rgba(255,255,255,.3); padding: 1px 5px; }
+
+/* mid cluster — centered search + the styled Add button */
+.invp-mid { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.inv-search { background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.3); padding: 7px 12px; display: flex; gap: 8px; align-items: center; color: rgba(255,255,255,.55); font-family: var(--font-display); font-weight: 500; font-size: 13px; letter-spacing: .2px; }
+.invp-search { flex: 0 1 440px; max-width: 440px; }
+.invp-search input { flex: 1; background: transparent; border: none; outline: none; color: var(--paper); font: inherit; }
+.invp-search input::placeholder { color: rgba(255,255,255,.45); }
+.invp-search__x { background: transparent; border: none; color: rgba(255,255,255,.6); cursor: pointer; font-size: 12px; }
+
+.inv-addfig { display: inline-flex; align-items: center; white-space: nowrap; text-decoration: none; flex: none; cursor: pointer;
+  font-family: var(--font-display); font-weight: 700; font-size: 13px; letter-spacing: .2px;
+  color: #fff !important; background: var(--olive); border: 1.5px solid var(--olive); padding: 8px 14px;
+  box-shadow: 2px 2px 0 rgba(0,0,0,.35); }
+.inv-addfig:hover { background: #717f3f; border-color: #717f3f; }
+.inv-addfig__mk { font-size: 15px; margin-right: 4px; }
+
+/* right cluster — contextual KPI stat boxes (3, optionally 4) */
+.inv-kpis { display: flex; gap: 8px; }
+.invk { border: 1.5px solid rgba(255,255,255,.3); padding: 5px 12px; display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 84px; }
+.invk__v { font-family: var(--font-display); font-weight: 700; font-size: 20px; line-height: 1; }
+.invk__v small { font-family: var(--font-mono); font-size: 11px; opacity: .55; font-weight: 400; }
+.invk__k { font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: .2px; opacity: .6; margin-top: 3px; }
+/* accent KPI variant — clickable rebalance */
+.invk--rebal { border-color: var(--accent); background: rgba(184,64,47,.18); cursor: pointer; font: inherit; color: var(--paper); text-align: center; }
+.invk--rebal:hover { background: rgba(184,64,47,.3); }
+.invk--rebal .invk__k { opacity: .9; }
+
+@media (max-width: 900px) {
+  .invp-top { grid-template-columns: 1fr; gap: 10px; }
+  .inv-kpis { flex-wrap: wrap; }
+}

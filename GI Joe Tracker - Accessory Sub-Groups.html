@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GI Joe Tracker — Accessory Sub-Groups (Wireframe)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #f3eee2;
+    --ink: #211f1a;
+    --ink-soft: #56503f;
+    --line-soft: rgba(33,31,26,.22);
+    --accent: #b8402f;
+    --olive: #5f6b39;
+    --ok: #5d7d4d;
+    --warn: #b8802f;
+    --card: #e9e2d2;
+    --font-display: 'Oswald', sans-serif;
+    --font-mono: 'Space Mono', monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-display); }
+
+  /* ---- figure-card shell -------------------------------------------- */
+  .sgw-card { width: 340px; background: var(--paper); border: 1.5px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+  .sgw-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+    padding: 11px 13px; border-bottom: 1.5px solid var(--ink); background: var(--card); }
+  .sgw-head__l { display: flex; flex-direction: column; gap: 4px; }
+  .sgw-head__top { display: flex; align-items: baseline; gap: 9px; }
+  .sgw-fac { font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: 1px;
+    padding: 2px 6px; color: #fff; }
+  .sgw-fac--cobra { background: var(--accent); }
+  .sgw-fac--joe { background: var(--olive); }
+  .sgw-head__name { font-weight: 700; font-size: 19px; letter-spacing: .4px; }
+  .sgw-head__role { font-size: 11px; color: var(--ink-soft); font-style: italic; max-width: 200px; }
+  .sgw-ver { font-family: var(--font-mono); font-size: 9px; color: var(--ink-soft); letter-spacing: .5px;
+    text-align: right; line-height: 1.5; white-space: nowrap; }
+
+  .sgw-list { padding: 6px 0; }
+
+  /* ---- single-unit rows --------------------------------------------- */
+  .sgw-row, .sgw-vrow { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 8px 13px; }
+  .sgw-row + .sgw-row { border-top: 1px solid var(--line-soft); }
+  .acc-sw { box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
+  .sgw-row__name { font-weight: 600; font-size: 13px; }
+  .sgw-box { width: 22px; height: 22px; border: 1.5px solid var(--ink); background: var(--paper);
+    display: grid; place-items: center; cursor: pointer; line-height: 1;
+    font-family: var(--font-mono); font-weight: 700; font-size: 12px; color: transparent; padding: 0; }
+  .sgw-box.is-on { background: var(--ok); color: #fff; }
+  .sgw-box:hover { border-color: var(--accent); }
+
+  /* ---- A · matched set with version segment ------------------------- */
+  .sgw-set { margin: 7px 11px 4px; border: 1.5px solid var(--ink); background: rgba(255,255,255,.28); }
+  .sgw-set__cap { padding: 8px 11px; border-bottom: 1px dashed var(--line-soft); }
+  .sgw-set__cap > span { display: block; font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; color: var(--ink-soft); margin-bottom: 7px; }
+  .sgw-seg { display: flex; gap: 0; border: 1.5px solid var(--ink); width: max-content; }
+  .sgw-seg__b { display: flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+    padding: 4px 9px; background: var(--paper); border: none; cursor: pointer; color: var(--ink-soft); }
+  .sgw-seg__b + .sgw-seg__b { border-left: 1.5px solid var(--ink); }
+  .sgw-seg__b.is-on { background: var(--ink); color: var(--paper); }
+  .sgw-seg__dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid rgba(0,0,0,.3); }
+  .sgw-set .sgw-row + .sgw-row { border-top: 1px solid var(--line-soft); }
+
+  /* ---- B · ownership ledger ----------------------------------------- */
+  .sgw-bracket { margin: 7px 11px 4px; border-left: 3px solid var(--ink); padding-left: 0; background: rgba(255,255,255,.28); border-top: 1px solid var(--line-soft); border-right: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); }
+  .sgw-bracket__cap { font-family: var(--font-mono); font-size: 9px; letter-spacing: .8px; color: var(--ink-soft);
+    padding: 8px 11px 6px; }
+  .sgw-bracket__body { padding-bottom: 2px; }
+  .sgw-slotlbl { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--ink); padding: 6px 11px 2px; }
+  .sgw-vrow { padding: 5px 11px 5px 18px; }
+  .sgw-vrow .sgw-row__name { font-size: 12px; font-weight: 500; }
+  .sgw-setstat { display: flex; align-items: center; gap: 7px; margin: 6px 0 0; padding: 7px 11px;
+    border-top: 1px dashed var(--line-soft); font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--ink-soft); }
+  .sgw-setstat__ic { font-size: 12px; }
+  .sgw-setstat.is-ok { color: var(--ok); }
+  .sgw-setstat.is-warn { color: var(--accent); background: rgba(184,64,47,.07); }
+
+  /* ---- C · slot + variant pills ------------------------------------- */
+  .sgw-pillset { margin: 7px 11px 4px; border: 1.5px solid var(--ink); background: rgba(255,255,255,.28); }
+  .sgw-pillset__cap { display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    padding: 7px 11px; border-bottom: 1px dashed var(--line-soft);
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; color: var(--ink-soft); }
+  .sgw-tag { font-size: 9px; font-weight: 700; padding: 2px 6px; border: 1px solid var(--line-soft); color: var(--ink-soft); }
+  .sgw-tag.is-ok { color: #fff; background: var(--ok); border-color: var(--ok); }
+  .sgw-tag.is-warn { color: #fff; background: var(--accent); border-color: var(--accent); }
+  .sgw-pillrow { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 11px; }
+  .sgw-pillrow + .sgw-pillrow { border-top: 1px solid var(--line-soft); }
+  .sgw-pillrow__name { font-weight: 600; font-size: 13px; }
+  .sgw-pills { display: flex; gap: 6px; }
+  .sgw-pill { display: flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+    padding: 4px 8px; background: var(--paper); border: 1.5px solid var(--ink); cursor: pointer; color: var(--ink); }
+  .sgw-pill.is-on { color: #fff; }
+  .sgw-pill__dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid rgba(0,0,0,.35); }
+  .sgw-pill.is-on .sgw-pill__dot { border-color: rgba(255,255,255,.6); }
+
+  /* ---- footer status ------------------------------------------------- */
+  .sgw-foot { padding: 9px 13px; border-top: 1.5px solid var(--ink); background: var(--card);
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: var(--ink-soft); }
+  .sgw-foot.is-ok { background: var(--ok); color: #fff; }
+
+  /* ---- annotation note ---------------------------------------------- */
+  .sgw-note { font-family: var(--font-mono); font-size: 11px; line-height: 1.55; color: var(--ink-soft); width: 300px; }
+  .sgw-note b { color: var(--ink); }
+  .sgw-note .k { color: var(--accent); font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="acc-colors.jsx"></script>
+<script type="text/babel" src="subgroup-wire.jsx"></script>
+<script type="text/babel">
+const { createRoot } = ReactDOM;
+
+function Note({ children }) { return <div className="sgw-note">{children}</div>; }
+
+function App() {
+  // demo seed states (own[slot] = {a,b}) so each card shows a telling case
+  const ffLock = [{a:true,b:false},{a:false,b:false}];                 // gun green only → partial
+  const ffLedger = [{a:true,b:false},{a:false,b:true}];                // green gun + dull radio → MISMATCH
+  const ffPills = [{a:true,b:false},{a:true,b:false}];                 // matched light green → complete
+  const rrLock = [{a:true,b:false},{a:false,b:false},{a:false,b:false},{a:false,b:false}];      // 1 yellow → partial
+  const rrLedger = [{a:true,b:false},{a:true,b:false},{a:false,b:true},{a:true,b:false}];        // machete purple → MISMATCH
+  const rrPills = [{a:false,b:true},{a:false,b:true},{a:false,b:true},{a:false,b:true}];         // matched purple → complete
+  return (
+    <DesignCanvas>
+      <DCSection id="firefly" title="FIREFLY v1 · light green / dull green"
+                 subtitle="Gun + radio each ship in two greens; a complete copy needs a colour-MATCHED pair. Swatches resolved straight from the CSV. Boxes are live — try a mismatch.">
+        <DCArtboard id="ff-brief" label="The rule" width={300} height={520}>
+          <Note>
+            <p><b>FIREFLY v1 accessories (CSV order)</b></p>
+            <p>1 · Demolition Backpack <span style={{opacity:.6}}>(gray)</span><br/>
+            2 · Backpack Cover <span style={{opacity:.6}}>(gray)</span><br/>
+            3 · Submachine Gun <span className="k">light green</span> | <span className="k">dull green</span><br/>
+            4 · Walkie-Talkie <span className="k">light green</span> | <span className="k">dull green</span></p>
+            <p>The gun and radio belong to one <b>sub_group</b>. Complete = backpack + cover + <b>one matched pair</b>.</p>
+            <p><b>A light-green gun + a dull-green radio does NOT tally complete</b> — colours must pair.</p>
+            <p style={{marginTop:14, paddingTop:10, borderTop:'1px solid var(--line-soft)'}}>Three ways to model it →. Same rule, different data-entry philosophy. This is also the contract the import wizard has to satisfy.</p>
+          </Note>
+        </DCArtboard>
+        <DCArtboard id="ff-a" label="A · Version lock" width={364} height={420}>
+          <OptionVersionLock fig={FIREFLY} seed={ffLock} />
+        </DCArtboard>
+        <DCArtboard id="ff-b" label="B · Ownership ledger" width={364} height={560}>
+          <OptionLedger fig={FIREFLY} seed={ffLedger} />
+        </DCArtboard>
+        <DCArtboard id="ff-c" label="C · Slot + variant pills" width={364} height={380}>
+          <OptionPills fig={FIREFLY} seed={ffPills} />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="rocknroll" title="ROCK 'N ROLL v4 · yellow / purple"
+                 subtitle="Same matched-set rule, different palette — and FOUR variant slots (gun, shotgun, machete, missile). Proves the colour scheme is data-driven, not hardcoded to green.">
+        <DCArtboard id="rr-brief" label="The rule" width={300} height={560}>
+          <Note>
+            <p><b>ROCK 'N ROLL v4 accessories (CSV order)</b></p>
+            <p>1 · Helmet <span style={{opacity:.6}}>(silver/purple)</span><br/>
+            2 · Robotizer Cannon <span style={{opacity:.6}}>(silver)</span><br/>
+            3 · Rifle <span style={{opacity:.6}}>(purple)</span></p>
+            <p>Matched-set slots — each in <span className="k">yellow</span> | <span className="k">purple</span>:<br/>
+            · Submachine Gun · Shotgun<br/>· Machete · Missile</p>
+            <p>Complete = the three singles + <b>all four set slots in ONE shared version</b>. A yellow gun beside a purple machete is a <b>mismatch</b>.</p>
+            <p style={{marginTop:14, paddingTop:10, borderTop:'1px solid var(--line-soft)'}}>Note the two-tone <b>silver/purple</b> helmet swatch — the resolver renders split chips for <code>x/y</code> CSV values too.</p>
+          </Note>
+        </DCArtboard>
+        <DCArtboard id="rr-a" label="A · Version lock" width={364} height={470}>
+          <OptionVersionLock fig={ROCK} seed={rrLock} />
+        </DCArtboard>
+        <DCArtboard id="rr-b" label="B · Ownership ledger" width={364} height={760}>
+          <OptionLedger fig={ROCK} seed={rrLedger} />
+        </DCArtboard>
+        <DCArtboard id="rr-c" label="C · Slot + variant pills" width={364} height={470}>
+          <OptionPills fig={ROCK} seed={rrPills} />
+        </DCArtboard>
+        <DCArtboard id="compare" label="Trade-offs" width={320} height={560}>
+          <Note>
+            <p><b>A · Version lock</b><br/>Card commits to one shade; off-version dimmed. Cleanest read, fewest taps. Hides the fact that you might own the <i>other</i> colour as a spare.</p>
+            <p style={{marginTop:12}}><b>B · Ownership ledger</b><br/>Log every variant you physically hold. Most honest — surfaces mismatches and spares — but the slot list gets tall (8 rows for Rock 'N Roll).</p>
+            <p style={{marginTop:12}}><b>C · Slot + variant pills</b><br/>One row per slot, colour pills mark what you hold. Densest. Matched-set badge resolves the set. Scales best to 4 slots.</p>
+            <p style={{marginTop:14, paddingTop:10, borderTop:'1px solid var(--line-soft)'}}>My lean: <b>C</b> for the card, with <b>B</b>'s ledger as the expanded / import-wizard view.</p>
+          </Note>
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

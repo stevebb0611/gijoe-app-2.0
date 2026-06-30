@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>G.I. Joe Tracker — Handoff Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #f3eee2; --card: #e9e2d2; --ink: #211f1a; --ink-soft: #56503f;
+    --line: rgba(33,31,26,.55); --line-soft: rgba(33,31,26,.22);
+    --accent: #6b6f39; --ok: #5d7d4d; --olive: #5f6b39; --crimson: #a23a2c;
+    --font-display: 'Oswald', sans-serif; --font-mono: 'Space Mono', monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-mono); }
+  a { color: inherit; }
+
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 26px 80px; }
+
+  /* masthead */
+  .mast { background: var(--ink); color: var(--paper); margin: 0 -26px 0; padding: 30px 26px 26px; }
+  .mast__inner { max-width: 1040px; margin: 0 auto; }
+  .mast__kick { font-family: var(--font-mono); font-size: 10px; letter-spacing: 3px; color: rgba(255,255,255,.55); }
+  .mast__h { font-family: var(--font-display); font-weight: 700; font-size: 38px; letter-spacing: 2px; line-height: 1; margin: 8px 0 0; }
+  .mast__h em { font-style: normal; color: var(--accent); }
+  .mast__sub { font-size: 12px; color: rgba(255,255,255,.7); margin-top: 12px; max-width: 660px; line-height: 1.6; }
+  .mast__tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .tag { font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: 1px; padding: 3px 8px; border: 1.5px solid rgba(255,255,255,.4); color: rgba(255,255,255,.85); }
+  .tag--ok { border-color: var(--ok); color: #cfe0c4; }
+
+  /* run box */
+  .run { border: 2px solid var(--ink); background: var(--card); box-shadow: 6px 6px 0 rgba(33,31,26,.5); margin: 28px 0 36px; }
+  .run__hd { background: var(--accent); color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: 2px; padding: 10px 16px; display: flex; align-items: center; gap: 10px; }
+  .run__hd span { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; font-weight: 700; background: rgba(0,0,0,.25); padding: 2px 7px; }
+  .run__body { padding: 18px 16px 20px; }
+  .run__lead { font-size: 12px; line-height: 1.6; color: var(--ink-soft); margin: 0 0 16px; }
+  .run__lead b { color: var(--ink); }
+  .steps { counter-reset: s; display: flex; flex-direction: column; gap: 12px; }
+  .step { display: grid; grid-template-columns: 26px 1fr; gap: 12px; align-items: start; }
+  .step__n { counter-increment: s; width: 26px; height: 26px; border: 1.5px solid var(--ink); background: var(--ink); color: var(--paper); font-family: var(--font-mono); font-weight: 700; font-size: 12px; display: grid; place-items: center; }
+  .step__n::before { content: counter(s); }
+  .step__b { font-size: 12px; line-height: 1.55; padding-top: 3px; }
+  .step__b b { font-family: var(--font-display); font-weight: 600; letter-spacing: .3px; }
+  code { font-family: var(--font-mono); font-size: 11.5px; background: var(--paper); border: 1.5px solid var(--line-soft); padding: 2px 7px; white-space: nowrap; }
+  .codeblock { display: block; background: var(--ink); color: #e6e1d4; border: none; padding: 12px 14px; margin: 8px 0 0; font-size: 12px; line-height: 1.7; white-space: pre; overflow-x: auto; }
+  .codeblock .c { color: #8a8470; }
+  .codeblock .g { color: #a9c08f; }
+  .alt { font-size: 11px; color: var(--ink-soft); margin: 14px 0 0; line-height: 1.6; border-top: 1px dashed var(--line-soft); padding-top: 12px; }
+  .alt b { color: var(--ink); }
+
+  /* section label */
+  .seclab { font-family: var(--font-display); font-weight: 700; font-size: 13px; letter-spacing: 2px; color: var(--ink); display: flex; align-items: center; gap: 12px; margin: 0 0 16px; }
+  .seclab::after { content: ""; flex: 1; height: 1.5px; background: var(--line-soft); }
+  .seclab-note { font-size: 11px; color: var(--ink-soft); line-height: 1.5; margin: -8px 0 16px; max-width: 720px; }
+
+  /* launch banner */
+  .launch { display: flex; align-items: center; gap: 20px; justify-content: space-between; text-decoration: none; border: 2px solid var(--ink); background: var(--ink); color: var(--paper); box-shadow: 6px 6px 0 rgba(33,31,26,.5); padding: 22px 24px; margin: 28px 0 40px; transition: transform .1s, box-shadow .1s; }
+  .launch:hover { transform: translate(-2px,-2px); box-shadow: 8px 8px 0 rgba(33,31,26,.5); }
+  .launch__kick { font-family: var(--font-mono); font-weight: 700; font-size: 10px; letter-spacing: 2px; color: var(--accent); }
+  .launch__h { font-family: var(--font-display); font-weight: 700; font-size: 30px; letter-spacing: 2px; line-height: 1; margin: 8px 0 0; }
+  .launch__d { font-size: 12px; color: rgba(255,255,255,.72); line-height: 1.6; margin-top: 10px; max-width: 620px; }
+  .launch__go { font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: 1px; background: var(--accent); color: #fff; padding: 14px 20px; white-space: nowrap; flex: none; }
+
+  /* screen grid */
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .scr { display: flex; flex-direction: column; border: 2px solid var(--ink); background: var(--card); box-shadow: 3px 3px 0 var(--ink); text-decoration: none; transition: transform .1s, box-shadow .1s; }
+  .scr:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 var(--ink); }
+  .scr__top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 12px 14px 0; }
+  .scr__no { font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--accent); }
+  .scr__badge { font-family: var(--font-mono); font-size: 8px; font-weight: 700; letter-spacing: 1px; padding: 2px 6px; border: 1.5px solid var(--ink); }
+  .scr__badge--primary { background: var(--ink); color: var(--paper); }
+  .scr__badge--util { background: var(--paper); color: var(--ink-soft); }
+  .scr__h { font-family: var(--font-display); font-weight: 700; font-size: 21px; letter-spacing: .5px; padding: 4px 14px 0; line-height: 1.05; }
+  .scr__d { font-size: 11px; color: var(--ink-soft); line-height: 1.5; padding: 8px 14px 14px; flex: 1; }
+  .scr__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 14px; border-top: 1.5px solid var(--line-soft); background: var(--paper); }
+  .scr__files { font-family: var(--font-mono); font-size: 9.5px; color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .scr__go { font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: 1px; color: var(--ink); white-space: nowrap; }
+
+  /* docs list */
+  .docs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .doc { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: baseline; text-decoration: none; border: 1.5px solid var(--line); background: var(--card); padding: 10px 13px; transition: border-color .1s; }
+  .doc:hover { border-color: var(--ink); }
+  .doc__f { font-family: var(--font-mono); font-weight: 700; font-size: 11px; color: var(--accent); white-space: nowrap; }
+  .doc__d { font-size: 10.5px; color: var(--ink-soft); line-height: 1.4; }
+  .doc--star { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+  .foot { margin-top: 40px; border-top: 2px solid var(--ink); padding-top: 16px; font-size: 10px; color: var(--ink-soft); line-height: 1.6; letter-spacing: .3px; }
+
+  @media (max-width: 720px) {
+    .grid, .docs { grid-template-columns: 1fr; }
+    .mast__h { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+<div class="mast">
+  <div class="mast__inner">
+    <div class="mast__kick">DESIGN HANDOFF · LOCAL DEV BUNDLE</div>
+    <h1 class="mast__h">G.I. JOE COLLECTION <em>//</em> TRACKER</h1>
+    <p class="mast__sub">A personal inventory &amp; condition tracker for a 700&ndash;800 figure vintage G.I. Joe collection. This bundle is the <b>design source of truth</b>: high-fidelity <b>reference mockups</b> for screen-by-screen review, plus the <b>spec docs</b> that define the data model, decisions, and standards. Serve it locally (below), open any screen, then hand it to Claude Code to build from.</p>
+    <div class="mast__tags">
+      <span class="tag tag--ok">REFERENCE MOCKUPS + SPEC DOCS</span>
+      <span class="tag">VINTAGE FIELD-MANUAL UI</span>
+      <span class="tag">SOURCE OF TRUTH FOR BUILD</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="run">
+    <div class="run__hd">RUN IT LOCALLY <span>~60 SECONDS</span></div>
+    <div class="run__body">
+      <p class="run__lead">The prototypes compile JSX in the browser, so they must be served over <b>http://localhost</b> — opening the files directly (<code>file://</code>) will leave the screens blank. Any static server works; here's the zero-install path.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step__n"></div>
+          <div class="step__b"><b>Open the folder in VS Code.</b> File → Open Folder → choose this <code>design_handoff_inventory</code> folder. Open the built-in terminal (<code>Ctrl</code>/<code>Cmd</code> + <code>`</code>).</div>
+        </div>
+        <div class="step">
+          <div class="step__n"></div>
+          <div class="step__b"><b>Start a static server</b> from the terminal (requires Node, which ships with VS Code workflows):
+            <code class="codeblock"><span class="c"># zero-install, recommended</span>
+npx serve .
+
+<span class="c"># …or with the package.json in this folder</span>
+npm start</code>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__n"></div>
+          <div class="step__b"><b>Open the printed URL</b> (usually <code>http://localhost:3000</code>) in your browser. This index page loads first — open any reference screen below (start with <span class="g">Inventory</span>, the design of record).</div>
+        </div>
+        <div class="step">
+          <div class="step__n"></div>
+          <div class="step__b"><b>Hand it to Claude Code.</b> Run <code>claude</code> in this same folder and start with: <span class="g">"Read CLAUDE.md, then the README and spec docs."</span> It now has the full design context plus a live preview to compare against.</div>
+        </div>
+      </div>
+      <p class="alt"><b>No Node?</b> Use <code>python3 -m http.server 3000</code> instead, or install the <b>Live Server</b> VS Code extension and click "Go Live". <b>Heads-up:</b> screens pull React, Babel &amp; fonts from CDNs, so keep an internet connection for the first load.</p>
+    </div>
+  </div>
+
+  <a class="launch" href="GI Joe Tracker - Inventory.html">
+    <div class="launch__l">
+      <div class="launch__kick">▶ START HERE · THE DESIGN OF RECORD</div>
+      <div class="launch__h">INVENTORY</div>
+      <div class="launch__d">The home screen and the canonical reference for the whole app: the full collection grouped by release year, search + filter chips, List/Gallery modes, inline instance accordions, the detail modal, and the live theme panel. Every other screen hangs off this one.</div>
+    </div>
+    <div class="launch__go">OPEN ›</div>
+  </a>
+
+  <a class="launch" href="GI Joe Tracker - Collection App.html">
+    <div class="launch__l">
+      <div class="launch__kick">▶ TEST-DRIVE · BUILD A REAL COLLECTION · SAVES LOCALLY</div>
+      <div class="launch__h">COLLECTION APP</div>
+      <div class="launch__d">The working, test-drivable app — not a mockup. Starts <b>empty</b>, searches the full ~520-figure catalog, and <b>saves everything you add to this browser</b> (localStorage). Add figures, pick the production variant, log condition on the damage map, tick accessories. Export / import a JSON backup from the panel. A single-browser prototype — real multi-device persistence is the backend work in <code>BACKEND_AND_SCALE.md</code>.</div>
+    </div>
+    <div class="launch__go">OPEN ›</div>
+  </a>
+
+  <h2 class="seclab">REFERENCE MOCKUPS · STATIC, PRELOADED SAMPLE DATA</h2>
+  <p class="seclab-note">These are the original design prototypes — fixed sample figures, not connected to the working app. Use them to review look &amp; behavior screen-by-screen.</p>
+  <div class="grid">
+
+    <a class="scr" href="GI Joe Tracker - Inventory.html">
+      <div class="scr__top"><span class="scr__no">SCR-01</span><span class="scr__badge scr__badge--primary">HOME · DESIGN OF RECORD</span></div>
+      <div class="scr__h">Inventory ("All")</div>
+      <div class="scr__d">The landing screen: full collection grouped by release year, with search, filter chips, List/Gallery modes, inline instance accordions, the detail modal, and the live theme panel.</div>
+      <div class="scr__foot"><span class="scr__files">inventory-app.jsx · wf-data.jsx · tweaks-panel.jsx</span><span class="scr__go">OPEN ▸</span></div>
+    </a>
+
+    <a class="scr" href="GI Joe Tracker - Instance Detail.html">
+      <div class="scr__top"><span class="scr__no">SCR-02</span><span class="scr__badge scr__badge--primary">CORE FLOW</span></div>
+      <div class="scr__h">Instance Detail</div>
+      <div class="scr__d">A single owned copy: the damage-map condition system, the derived grade engine, accessory checklist, and the VARIANT IDENTITY panel for correcting a copy's production variant.</div>
+      <div class="scr__foot"><span class="scr__files">instance-detail.jsx</span><span class="scr__go">OPEN ▸</span></div>
+    </a>
+
+    <a class="scr" href="GI Joe Tracker - Add Figure.html">
+      <div class="scr__top"><span class="scr__no">SCR-03</span><span class="scr__badge scr__badge--primary">CORE FLOW</span></div>
+      <div class="scr__h">Add Figure</div>
+      <div class="scr__d">The three-step intake wizard (Find → Details → Condition), including the production-variant picker (a variant is required for multi-variant figures — VARIANTS §3) and the Parts-Bin pull.</div>
+      <div class="scr__foot"><span class="scr__files">add-figure.jsx · damage-map.jsx</span><span class="scr__go">OPEN ▸</span></div>
+    </a>
+
+    <a class="scr" href="GI Joe Tracker - Add Missing Figure.html">
+      <div class="scr__top"><span class="scr__no">SCR-03B</span><span class="scr__badge scr__badge--util">RARE · CATALOG ADMIN</span></div>
+      <div class="scr__h">Add a Missing Figure</div>
+      <div class="scr__d">The branch behind Add Figure's "can't find it?" link (VARIANTS §7.6): a single owner-as-admin form to <b>append a real figure missing from the catalog</b> — a genuine mail-away / convention / exclusive not in <b>figures_2.0</b> yet. Real F-code allocated into the 700-block, blueprint, variant count. Hands off to Details → Condition. <i>Custom/homemade figures were dropped — they don't fit a completionist collection.</i></div>
+      <div class="scr__foot"><span class="scr__files">add-missing-figure.jsx · add-missing-figure.css</span><span class="scr__go">OPEN ▸</span></div>
+    </a>
+
+      <div class="scr__top"><span class="scr__no">SCR-04</span><span class="scr__badge scr__badge--primary">CORE FLOW</span></div>
+      <div class="scr__h">Add Instance</div>
+      <div class="scr__d">Adding another copy of a figure already in the collection: condition capture via the shared damage map, then accessory allocation against the blueprint.</div>
+      <div class="scr__foot"><span class="scr__files">add-instance.jsx · damage-map.jsx</span><span class="scr__go">OPEN ▸</span></div>
+    </a>
+
+    <a class="scr" href="GI Joe Tracker - Parts Bin.html">
+      <div class="scr__top"><span class="scr__no">SCR-05</span><span class="scr__badge scr__badge--primary">CORE FLOW</span></div>
+      <div class="scr__h">Parts Bin</div>
+      <div class="scr__d">Loose-accessory inventory: compatibility &amp; reverse-lookup ("what does this fit?"), the two-way figure↔bin flow, and the ⚖ REBALANCE recommender header.</div>
+      <div class="scr__foot"><span class="scr__files">parts-bin.jsx · parts-catalog.js · wf-data.jsx</span><span class="scr__go">OPEN ▸</span></div>
+    </a>
+
+    <a class="scr" href="GI Joe Tracker - Inventory (Scale States).html">
+      <div class="scr__top"><span class="scr__no">SCR-06</span><span class="scr__badge scr__badge--util">REFERENCE · SCALE TEST</span></div>
+      <div class="scr__h">Inventory — Scale States</div>
+      <div class="scr__d">A standalone stress test showing the home screen populated toward the real 700–800 figure target, for density and performance reference. Self-contained (no JSX deps).</div>
+      <div class="scr__foot"><span class="scr__files">self-contained</span><span class="scr__go">OPEN ▸</span></div>
+    </a>
+
+    <a class="scr" href="GI Joe Tracker - Site Map.html">
+      <div class="scr__top"><span class="scr__no">SCR-07</span><span class="scr__badge scr__badge--util">REFERENCE · IA MAP</span></div>
+      <div class="scr__h">Site Map</div>
+      <div class="scr__d">The navigation &amp; information architecture at a glance: every screen, its type (page / modal / future), how you move between them, and the two-way figure↔Parts-Bin link — plus a key to the core vocabulary (Figure vs. Instance).</div>
+      <div class="scr__foot"><span class="scr__files">self-contained</span><span class="scr__go">OPEN ▸</span></div>
+    </a>
+
+  <h2 class="seclab" style="margin-top:40px;">SPEC DOCS · READ THESE</h2>
+  <div class="docs">
+    <a class="doc doc--star" href="README.md"><span class="doc__f">README.md</span><span class="doc__d">Start here — overview, design language, screen-by-screen spec, tokens, data model.</span></a>
+    <a class="doc doc--star" href="OPEN_QUESTIONS.md"><span class="doc__f">OPEN_QUESTIONS.md</span><span class="doc__d">Decisions to resolve before/early in implementation. Read second.</span></a>
+    <a class="doc" href="FRONTEND_STANDARDS.md"><span class="doc__f">FRONTEND_STANDARDS.md</span><span class="doc__d">Architecture, accessibility, performance, and code standards.</span></a>
+    <a class="doc" href="INSTANCE_MODEL.md"><span class="doc__f">INSTANCE_MODEL.md</span><span class="doc__d">Instance schema, the damage map, and the derived-grade engine.</span></a>
+    <a class="doc" href="VARIANTS.md"><span class="doc__f">VARIANTS.md</span><span class="doc__d">Character→figure→variant→instance hierarchy; variant required at Add.</span></a>
+    <a class="doc" href="PARTS_BIN.md"><span class="doc__f">PARTS_BIN.md</span><span class="doc__d">Loose-accessory inventory and the two-way figure↔bin flow.</span></a>
+    <a class="doc" href="TAXONOMY.md"><span class="doc__f">TAXONOMY.md</span><span class="doc__d">Naming &amp; categorization of figures, factions, and accessories.</span></a>
+    <a class="doc" href="NAVIGATION.md"><span class="doc__f">NAVIGATION.md</span><span class="doc__d">How the screens connect and how each detail view is reached.</span></a>
+    <a class="doc" href="BACKEND_AND_SCALE.md"><span class="doc__f">BACKEND_AND_SCALE.md</span><span class="doc__d">Data layer, persistence, and the 700–800 figure scale plan.</span></a>
+    <a class="doc" href="CLAUDE.md"><span class="doc__f">CLAUDE.md</span><span class="doc__d">Primer for Claude Code — what this bundle is and how to work in it.</span></a>
+  </div>
+
+  <div class="foot">
+    BUNDLE CONTENTS · 7 reference screens (fixed sample data, incl. the IA site map) · 1 working app (Collection App — saves locally) · 10 markdown spec docs · package.json · this index. <br />
+    Rebuild for production using the README + spec docs as the source of truth. The bundled Collection App is a localStorage prototype (single browser); real multi-device persistence is the backend work in BACKEND_AND_SCALE.md.
+  </div>
+
+</div>
+</body>
+</html>

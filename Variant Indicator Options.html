@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Variant Indicator — Workshop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #f3eee2; --card: #e9e2d2; --ink: #211f1a; --ink-soft: #56503f;
+    --line: rgba(33,31,26,.55); --line-soft: rgba(33,31,26,.22);
+    --accent: #6b6f39; --ok: #5d7d4d; --olive: #5f6b39; --crimson: #a23a2c;
+    --font-display: 'Oswald', sans-serif; --font-mono: 'Space Mono', monospace;
+    --shadow: 3px 3px 0 var(--ink);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); min-height: 100vh; }
+  body { padding: 40px 32px 80px; display: flex; flex-direction: column; align-items: center; }
+  .wrap { width: 100%; max-width: 1000px; }
+
+  /* ---------- page head ---------- */
+  .hd { border-bottom: 2px solid var(--ink); padding-bottom: 16px; margin-bottom: 6px; }
+  .hd__k { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; }
+  .hd__h { font-family: var(--font-display); font-weight: 700; font-size: 30px; line-height: 1.05; margin: 6px 0 8px; }
+  .hd__d { font-family: var(--font-display); font-weight: 400; font-size: 14px; color: var(--ink-soft); max-width: 70ch; line-height: 1.45; }
+  .hd__d b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- option block ---------- */
+  .opt { margin-top: 30px; }
+  .opt__cap { display: flex; align-items: baseline; gap: 12px; margin-bottom: 9px; flex-wrap: wrap; }
+  .opt__no { font-family: var(--font-mono); font-weight: 700; font-size: 11px; color: #fff; background: var(--ink); padding: 2px 8px; letter-spacing: 1px; }
+  .opt__nm { font-family: var(--font-display); font-weight: 700; font-size: 17px; }
+  .opt__why { font-family: var(--font-display); font-weight: 400; font-size: 12.5px; color: var(--ink-soft); flex: 1; min-width: 220px; line-height: 1.35; }
+  .opt__scale { font-family: var(--font-mono); font-size: 9px; letter-spacing: .4px; padding: 2px 7px; border: 1px solid var(--line-soft); color: var(--ink-soft); white-space: nowrap; }
+  .opt__scale.is-good { color: var(--ok); border-color: var(--ok); }
+  .opt__scale.is-warn { color: var(--crimson); border-color: var(--crimson); }
+
+  /* ---------- mock inventory row ---------- */
+  .wrow { display: grid; grid-template-columns: 42px 1fr 96px 44px 150px 96px 22px; gap: 12px; align-items: center;
+    background: var(--card); border: 1.5px solid var(--ink); padding: 8px 12px; box-shadow: var(--shadow); margin-bottom: 7px; }
+  .wthumb { width: 42px; height: 42px; border: 1.5px solid var(--ink); background-color: var(--paper);
+    background-image: repeating-linear-gradient(45deg, transparent 0 6px, var(--line-soft) 6px 7px); }
+  .nm { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+  .nm b { font-family: var(--font-display); font-weight: 700; font-size: 16px; line-height: 1; display: inline-flex; align-items: center; flex-wrap: wrap; }
+  .nm i { font-style: normal; font-size: 10px; color: var(--ink-soft); line-height: 1.2; margin-top: 4px; }
+
+  .fac { font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .5px; padding: 1px 5px; border: 1.5px solid var(--ink);
+    color: #fff; background: var(--olive); text-align: center; min-width: 84px; }
+  .fac--cobra { background: var(--crimson); }
+  .own { font-family: var(--font-display); font-weight: 700; font-size: 16px; }
+  .bar { height: 9px; width: 86px; border: 1.5px solid var(--ink); background: var(--paper); }
+  .bar__f { height: 100%; background: var(--ink-soft); background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.18) 0 4px, transparent 4px 8px); }
+  .bar__f.is-done { background: var(--ok); background-image: none; }
+  .miss { font-family: var(--font-mono); font-weight: 700; font-size: 11px; text-align: center; border: 1.5px solid var(--ink); padding: 4px 6px; background: var(--paper); }
+  .miss.is-zero { background: var(--ok); color: #fff; }
+  .go { font-size: 15px; color: var(--ink-soft); text-align: center; }
+
+  /* version chip (shared baseline) */
+  .ver { font-style: normal; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .3px; color: var(--ink-soft);
+    border: 1px solid var(--line-soft); padding: 0 4px; margin-left: 8px; }
+
+  /* ====== indicator treatments ====== */
+
+  /* 0 — baseline flag */
+  .i-flag { font-style: normal; font-family: var(--font-mono); font-weight: 700; font-size: 9px; color: var(--accent); margin-left: 7px; }
+
+  /* 1 — explicit text pill */
+  .i-pill { font-style: normal; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .2px; color: var(--accent);
+    border: 1px solid var(--accent); padding: 0 5px; margin-left: 8px; }
+
+  /* 2 — version + count fused into one chip */
+  .i-fuse { display: inline-flex; align-items: stretch; margin-left: 8px; border: 1px solid var(--line); font-family: var(--font-mono); font-weight: 700; font-size: 9px; }
+  .i-fuse span { padding: 1px 5px; color: var(--ink-soft); }
+  .i-fuse i { font-style: normal; padding: 1px 5px; background: var(--accent); color: #fff; }
+
+  /* 3 — diamond pips */
+  .i-pips { display: inline-flex; align-items: center; gap: 3px; margin-left: 9px; vertical-align: 2px; }
+  .i-pips s { width: 7px; height: 7px; background: var(--accent); transform: rotate(45deg); display: block; text-decoration: none; }
+  .i-pips s.hollow { background: transparent; border: 1.5px solid var(--accent); }
+  .i-pips em { font-style: normal; font-family: var(--font-mono); font-weight: 700; font-size: 9px; color: var(--accent); margin-left: 3px; }
+
+  /* 4 — stacked-layers glyph + count */
+  .i-stack { display: inline-flex; align-items: center; gap: 5px; margin-left: 9px; vertical-align: 1px; font-family: var(--font-mono); font-weight: 700; font-size: 10px; color: var(--accent); }
+  .i-stack .stk { position: relative; width: 11px; height: 11px; }
+  .i-stack .stk::before, .i-stack .stk::after, .i-stack .stk b { position: absolute; left: 0; width: 9px; height: 9px; border: 1.4px solid var(--accent); background: var(--card); }
+  .i-stack .stk::before { content: ""; top: 0; left: 2px; }
+  .i-stack .stk::after { content: ""; top: 2px; left: 0; }
+
+  /* 5 — moved to the meta sub-line */
+  .i-meta { color: var(--accent); }
+
+  /* 6 — superscript on the version chip */
+  .ver sup { font-size: 7px; font-weight: 700; margin-left: 1px; }
+
+  /* ====== combos (04 + a written label) ====== */
+  .lyr { width: 13px; height: 12px; position: relative; display: inline-block; flex: none; }
+  .lyr b, .lyr::before, .lyr::after { content: ""; position: absolute; width: 8px; height: 8px; border: 1.4px solid currentColor; background: var(--lyrbg, transparent); box-sizing: border-box; }
+  .lyr b { top: 0; left: 4px; }
+  .lyr::before { top: 2px; left: 2px; }
+  .lyr::after { top: 4px; left: 0; }
+  /* A: layers + fused version chip */
+  .i-cfuse { display: inline-flex; align-items: stretch; margin-left: 8px; border: 1px solid var(--line); font-family: var(--font-mono); font-weight: 700; font-size: 9px; vertical-align: 1px; }
+  .i-cfuse .v { padding: 2px 5px; color: var(--ink-soft); display: inline-flex; align-items: center; }
+  .i-cfuse .c { padding: 2px 6px 2px 5px; background: var(--accent); color: #fff; display: inline-flex; align-items: center; gap: 5px; --lyrbg: var(--accent); }
+  /* B: layers + text pill */
+  .i-cpill { display: inline-flex; align-items: center; gap: 5px; margin-left: 8px; font-family: var(--font-mono); font-weight: 700; font-size: 9px; color: var(--accent); border: 1px solid var(--accent); padding: 1px 6px; vertical-align: 1px; --lyrbg: var(--card); }
+
+  .note { margin-top: 44px; border-top: 2px solid var(--ink); padding-top: 16px; font-family: var(--font-display); font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+  .note b { color: var(--ink); font-weight: 600; }
+  .note .tag { font-family: var(--font-mono); font-size: 11px; color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hd">
+    <div class="hd__k">Workshop · Inventory list row</div>
+    <div class="hd__h">Production-variant count indicator</div>
+    <div class="hd__d">The badge that tells you a figure has more than one <b>production variant</b> (mold / paint "tells"). Today it's a flag glyph + number (<b>⚑3</b>) sitting after the version chip. Below: the same BLOWTORCH row drawn seven ways, each with a high-count stress row (×6) since later-year figures can carry many variants. The <b>v1</b> version chip stays unless an option folds it in.</div>
+  </div>
+
+  <!-- 0 — BASELINE -->
+  <div class="opt">
+    <div class="opt__cap">
+      <span class="opt__no">NOW</span><span class="opt__nm">Baseline — flag glyph</span>
+      <span class="opt__why">What's there today. The flag reads as "flagged for something" rather than "count of variants," and the glyph is cryptic out of context.</span>
+      <span class="opt__scale is-warn">ambiguous</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>BLOWTORCH<em class="ver">v1</em><em class="i-flag">⚑3</em></b><i>Infantry Special Weapons</i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×1</span>
+      <span class="bar"><span class="bar__f" style="width:55%"></span></span>
+      <span class="miss">Missing 1</span><span class="go">▸</span>
+    </div>
+  </div>
+
+  <!-- 1 — TEXT PILL -->
+  <div class="opt">
+    <div class="opt__cap">
+      <span class="opt__no">01</span><span class="opt__nm">Explicit text pill</span>
+      <span class="opt__why">Spell it out: "3 variants." Zero ambiguity, matches the bordered version-chip family. Costs the most horizontal space.</span>
+      <span class="opt__scale is-good">scales: text</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>BLOWTORCH<em class="ver">v1</em><em class="i-pill">3 variants</em></b><i>Infantry Special Weapons</i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×1</span>
+      <span class="bar"><span class="bar__f" style="width:55%"></span></span>
+      <span class="miss">Missing 1</span><span class="go">▸</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>ROADBLOCK<em class="ver">v2</em><em class="i-pill">6 variants</em></b><i>Infantry Heavy Weapons</i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×3</span>
+      <span class="bar"><span class="bar__f is-done" style="width:100%"></span></span>
+      <span class="miss is-zero">✓ Complete</span><span class="go">▸</span>
+    </div>
+  </div>
+
+  <!-- 2 — FUSED CHIP -->
+  <div class="opt">
+    <div class="opt__cap">
+      <span class="opt__no">02</span><span class="opt__nm">Version + count, one chip</span>
+      <span class="opt__why">Folds the count into the version chip — "v1 · 3 variants" as a single token. Removes the separate badge, keeps the name line tight.</span>
+      <span class="opt__scale is-good">scales: text</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>BLOWTORCH<em class="i-fuse"><span>v1</span><i>3 variants</i></em></b><i>Infantry Special Weapons</i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×1</span>
+      <span class="bar"><span class="bar__f" style="width:55%"></span></span>
+      <span class="miss">Missing 1</span><span class="go">▸</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>ROADBLOCK<em class="i-fuse"><span>v2</span><i>6 variants</i></em></b><i>Infantry Heavy Weapons</i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×3</span>
+      <span class="bar"><span class="bar__f is-done" style="width:100%"></span></span>
+      <span class="miss is-zero">✓ Complete</span><span class="go">▸</span>
+    </div>
+  </div>
+
+  <!-- 3 — PIPS -->
+  <div class="opt">
+    <div class="opt__cap">
+      <span class="opt__no">03</span><span class="opt__nm">Diamond pips</span>
+      <span class="opt__why">One diamond per variant — scannable at a glance, on-brand with the field-manual marks. Great for low counts; needs a "+N" cap past ~5 or it sprawls.</span>
+      <span class="opt__scale is-warn">scales: cap at 5</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>BLOWTORCH<em class="ver">v1</em><span class="i-pips"><s></s><s></s><s></s></span></b><i>Infantry Special Weapons</i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×1</span>
+      <span class="bar"><span class="bar__f" style="width:55%"></span></span>
+      <span class="miss">Missing 1</span><span class="go">▸</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>ROADBLOCK<em class="ver">v2</em><span class="i-pips"><s></s><s></s><s></s><s></s><s></s><em>+1</em></span></b><i>Infantry Heavy Weapons</i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×3</span>
+      <span class="bar"><span class="bar__f is-done" style="width:100%"></span></span>
+      <span class="miss is-zero">✓ Complete</span><span class="go">▸</span>
+    </div>
+  </div>
+
+  <!-- 4 — STACK GLYPH -->
+  <div class="opt">
+    <div class="opt__cap">
+      <span class="opt__no">04</span><span class="opt__nm">Stacked-layers mark + count</span>
+      <span class="opt__why">A "stacked molds" icon + number. The metaphor (multiple physical versions of one figure) is more legible than a flag. Swaps to a real Lucide "layers" icon in production.</span>
+      <span class="opt__scale is-good">scales: number</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>BLOWTORCH<em class="ver">v1</em><span class="i-stack"><span class="stk"><b></b></span>3</span></b><i>Infantry Special Weapons</i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×1</span>
+      <span class="bar"><span class="bar__f" style="width:55%"></span></span>
+      <span class="miss">Missing 1</span><span class="go">▸</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>ROADBLOCK<em class="ver">v2</em><span class="i-stack"><span class="stk"><b></b></span>6</span></b><i>Infantry Heavy Weapons</i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×3</span>
+      <span class="bar"><span class="bar__f is-done" style="width:100%"></span></span>
+      <span class="miss is-zero">✓ Complete</span><span class="go">▸</span>
+    </div>
+  </div>
+
+  <!-- ★ COMBOS — your pick: 04 + a written label -->
+  <div class="opt" style="border-top:2px dashed var(--accent); padding-top:22px; margin-top:34px;">
+    <div class="opt__cap">
+      <span class="opt__no" style="background:var(--accent)">PICK</span>
+      <span class="opt__nm">Combos — the layers mark, now with the word</span>
+      <span class="opt__why">04 read well but the bare number was a mystery. These two keep the stacked-molds mark and add "variants" so it explains itself.</span>
+    </div>
+  </div>
+
+  <!-- A: 04 + 02 -->
+  <div class="opt">
+    <div class="opt__cap">
+      <span class="opt__no">04 + 02</span><span class="opt__nm">Layers mark + fused chip</span>
+      <span class="opt__why">Icon, count and the word all fold into the version chip — one token says "v1 · ▤ 3 variants." Most compact way to keep the label.</span>
+      <span class="opt__scale is-good">scales: text</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>BLOWTORCH<em class="i-cfuse"><span class="v">v1</span><span class="c"><span class="lyr"><b></b></span>3 variants</span></em></b><i>Infantry Special Weapons</i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×1</span>
+      <span class="bar"><span class="bar__f" style="width:55%"></span></span>
+      <span class="miss">Missing 1</span><span class="go">▸</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>ROADBLOCK<em class="i-cfuse"><span class="v">v2</span><span class="c"><span class="lyr"><b></b></span>6 variants</span></em></b><i>Infantry Heavy Weapons</i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×3</span>
+      <span class="bar"><span class="bar__f is-done" style="width:100%"></span></span>
+      <span class="miss is-zero">✓ Complete</span><span class="go">▸</span>
+    </div>
+  </div>
+
+  <!-- B: 04 + 01 -->
+  <div class="opt">
+    <div class="opt__cap">
+      <span class="opt__no">04 + 01</span><span class="opt__nm">Layers mark + text pill</span>
+      <span class="opt__why">Version chip stays separate; the variant badge is its own bordered pill — icon + "3 variants." Most explicit, reads even at a glance.</span>
+      <span class="opt__scale is-good">scales: text</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>BLOWTORCH<em class="ver">v1</em><span class="i-cpill"><span class="lyr"><b></b></span>3 variants</span></b><i>Infantry Special Weapons</i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×1</span>
+      <span class="bar"><span class="bar__f" style="width:55%"></span></span>
+      <span class="miss">Missing 1</span><span class="go">▸</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>ROADBLOCK<em class="ver">v2</em><span class="i-cpill"><span class="lyr"><b></b></span>6 variants</span></b><i>Infantry Heavy Weapons</i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×3</span>
+      <span class="bar"><span class="bar__f is-done" style="width:100%"></span></span>
+      <span class="miss is-zero">✓ Complete</span><span class="go">▸</span>
+    </div>
+  </div>
+
+  <!-- 5 — META LINE -->
+  <div class="opt">
+    <div class="opt__cap">
+      <span class="opt__no">05</span><span class="opt__nm">Move it to the meta line</span>
+      <span class="opt__why">Take it off the headline entirely — append to the specialty sub-line. Cleanest name row; the count reads as descriptive data, not a badge demanding attention.</span>
+      <span class="opt__scale is-good">scales: text</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>BLOWTORCH<em class="ver">v1</em></b><i>Infantry Special Weapons&nbsp;&nbsp;·&nbsp;&nbsp;<span class="i-meta">3 variants</span></i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×1</span>
+      <span class="bar"><span class="bar__f" style="width:55%"></span></span>
+      <span class="miss">Missing 1</span><span class="go">▸</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>ROADBLOCK<em class="ver">v2</em></b><i>Infantry Heavy Weapons&nbsp;&nbsp;·&nbsp;&nbsp;<span class="i-meta">6 variants</span></i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×3</span>
+      <span class="bar"><span class="bar__f is-done" style="width:100%"></span></span>
+      <span class="miss is-zero">✓ Complete</span><span class="go">▸</span>
+    </div>
+  </div>
+
+  <!-- 6 — SUPERSCRIPT -->
+  <div class="opt">
+    <div class="opt__cap">
+      <span class="opt__no">06</span><span class="opt__nm">Superscript on the version</span>
+      <span class="opt__why">Ultra-compact: the count rides the version chip as a superscript ("v1³"). Tiny footprint, stays put at any count — but the smallest, easiest-to-miss option.</span>
+      <span class="opt__scale is-good">scales: number</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>BLOWTORCH<em class="ver">v1<sup>3</sup></em></b><i>Infantry Special Weapons</i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×1</span>
+      <span class="bar"><span class="bar__f" style="width:55%"></span></span>
+      <span class="miss">Missing 1</span><span class="go">▸</span>
+    </div>
+    <div class="wrow">
+      <span class="wthumb"></span>
+      <span class="nm"><b>ROADBLOCK<em class="ver">v2<sup>6</sup></em></b><i>Infantry Heavy Weapons</i></span>
+      <span class="fac">G.I. Joe</span><span class="own">×3</span>
+      <span class="bar"><span class="bar__f is-done" style="width:100%"></span></span>
+      <span class="miss is-zero">✓ Complete</span><span class="go">▸</span>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>My read:</b> for the dense list, <b>02 (fused chip)</b> or <b>05 (meta line)</b> keep the headline calmest while staying unambiguous — and both scale to any count without sprawl. <b>03 (pips)</b> is the most charming and on-brand if counts stay low, but the "+N" cap is a tell that it's fighting later years. <b>04 (layers mark)</b> is the best middle ground if you want an *icon* that actually means something, once it's a real Lucide glyph. <span class="tag">Pick one (or a combo — e.g. fused chip in the list, full "3 production variants on file" in the modal) and I'll wire it into the live Inventory.</span>
+  </div>
+
+</div>
+</body>
+</html>
