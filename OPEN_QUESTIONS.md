@@ -173,7 +173,7 @@ Beyond sub-team as a *filter / grouping axis* (#6), an early prototype explored 
 
 Four gaps identified at the Claude Code handoff that must be resolved before the app can be used for real collection data. Ordered by dependency.
 
-### 17a. Backend — app is disconnected from the database
+### 17a. Backend — app is disconnected from the database ⬅ NEXT
 The running app reads `catalog-data.js` (a static generated file) and writes to `localStorage`. The SQLite database (`gijoe_collection.db`) is edited independently via TablePlus and has **no connection to the app**. Changes in TablePlus are invisible to the browser; changes via the app are invisible to the DB. A local backend (small Express/Fastify server or Next.js API routes) is required to bridge them. Until this exists, the DB and the app are two separate systems drifting apart.
 - **Blocking:** every other item below depends on this.
 - **Decision needed:** confirm the local stack — Next.js App Router + Turso/libSQL (as `BACKEND_AND_SCALE.md` specifies) or a simpler local-only Express + better-sqlite3 first.
@@ -182,9 +182,8 @@ The running app reads `catalog-data.js` (a static generated file) and writes to 
 The JSX files (`app-inventory.jsx`, `app-add-figure.jsx`, `damage-map.jsx`, etc.) are compiled at runtime by Babel loaded from CDN. There is no real build. `PORT_VERBATIM.md` specifies the mechanical steps: scaffold a Vite React project, swap `Object.assign(window, …)` exports for real `import`/`export`, extract `<style>` blocks to `.css` files, mount root in `main.jsx`. The visual output must be pixel-identical to the prototype — this is a compilation change, not a redesign.
 - **Blocking:** a real build is required before the backend can be wired in, and before the app can be deployed anywhere.
 
-### 17c. Per-instance data model — real collection data could be stranded
-`figState()` in `wf-data.jsx` synthesizes per-copy accessory allocations from aggregate counts. There is no real `Instance` entity. If you begin adding figures to the collection now (via localStorage) and the schema is later changed to a proper per-instance model, that data will not migrate cleanly. The instance schema is already specified in `INSTANCE_MODEL.md`; the question is sequencing — lock and implement it **before** accumulating real collection data, not after.
-- **Blocking:** do not populate the real collection until this is resolved. See also #1 and #13.
+### 17c. Per-instance data model — ✅ RESOLVED (June 2026)
+Schema updated and migration applied to `gijoe_collection.db`. `figures` is now pure catalog (read-only reference). `instances` (one row per physical copy), `instance_accessories` (one row per accessory per copy), and `variant_lookup` (owner-authored production variant tells) are live. `quantity_owned`, `condition_id`, `year_acquired`, and `is_moc` removed from `figures`; `quantity_owned` and `condition_id` removed from `figure_accessories`. Migration script: `migrations/001_per_instance_model.sql`. Schema source of truth: `gijoe_collection.sql`.
 
 ### 17d. catalog-data.js → DB sync — edits in TablePlus don't reach the app
 `catalog-data.js` was generated once from the CSVs and is now a static snapshot. If figures or accessories are edited in TablePlus (corrections, additions), those changes don't appear in the app until `catalog-data.js` is manually regenerated. Once the backend (17a) is wired up, the app should query the DB directly and this file becomes obsolete. Until then, treat `catalog-data.js` as read-only and do not edit it while real collection data depends on it — a regeneration with changed IDs or code names will orphan owned figures stored in localStorage.
