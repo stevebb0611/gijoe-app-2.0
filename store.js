@@ -1,36 +1,57 @@
 // store.js — REAL data layer for the working app. Plain JS (loads before Babel).
-// Owned inventory lives here, persisted to localStorage. The catalog
-// (catalog-data.js → window.JOE_CATALOG) is reference data and is never mutated.
+// Backed by the local Express/SQLite API (server/) instead of localStorage or the
+// static catalog-data.js (17a). Deliberately uses SYNCHRONOUS XHR: this is a
+// personal, single-user, localhost-only tool, so a same-machine round trip is
+// effectively instant, and keeping every JoeStore call synchronous means
+// app-inventory.jsx / app-add-figure.jsx / app-detail.jsx need zero changes —
+// they still just call window.JoeStore.* and read the result immediately.
 //
-// Instance shape (one owned physical copy):
+// Instance shape (one owned physical copy) — unchanged from before:
 //   { id, catalogId, variant, moc, acc:{[name]:units}, phys, paint,
-//     marks:{physMarks,paintMarks,body,side}, filecard:{onFile,printing}, loc, notes, addedAt }
+//     marks:{gender,condition,paint}, filecard:{onFile,printing}, loc, notes, addedAt }
 //   variant: '' (single-variant figure) | 'A'|'B'… (a production variant)
 //   moc: true = Mint-on-Card (sealed) — counts 100% complete regardless of acc
-//   phys/paint: grade string ('Mint'…'Poor') or null when ungraded
+//   phys/paint: grade string ('Mint'…'Poor') or null when ungraded — derived live
+//   from `marks` (not stored), same as the DB's own damage JSON design.
 (function () {
-  const KEY = 'gi_joe_collection_v1';
+  function api(method, url, body) {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url, false); // synchronous — see file header
+    if (body !== undefined) xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(body !== undefined ? JSON.stringify(body) : null);
+    if (xhr.status >= 200 && xhr.status < 300) {
+      return xhr.responseText ? JSON.parse(xhr.responseText) : null;
+    }
+    console.error('API error', method, url, xhr.status, xhr.responseText);
+    return null;
+  }
 
-  // ---- catalog index (built once) ----
-  const CAT = window.JOE_CATALOG || [];
+  // ---- catalog (was catalog-data.js) ----
+  const CAT = api('GET', '/api/catalog') || [];
+  window.JOE_CATALOG = CAT;
   const CAT_BY_ID = new Map(CAT.map(f => [f.id, f]));
 
-  // ---- completeness math (real model) ----
+  // ---- completeness math (unchanged) ----
   function bpReq(bp) { return (bp || []).reduce((s, a) => s + a[1], 0); }
   function instOwn(bp, acc) { return (bp || []).reduce((s, [n, q]) => s + Math.min(acc[n] || 0, q), 0); }
   function instPct(bp, acc) { const r = bpReq(bp); return r ? Math.round(instOwn(bp, acc) / r * 100) : 100; }
   function instWhole(bp, acc) { return (bp || []).every(([n, q]) => (acc[n] || 0) >= q); }
 
-  // ---- persistence ----
-  function load() {
-    try { const o = JSON.parse(localStorage.getItem(KEY)); if (o && Array.isArray(o.instances)) { if (!Array.isArray(o.bin)) o.bin = []; return o; } } catch (e) {}
-    return { instances: [], bin: [] };
-  }
-  let state = load();
+  // ---- live state, loaded from the db ----
+  let state = api('GET', '/api/state') || { instances: [], bin: [] };
   const subs = new Set();
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
-  function emit() { save(); subs.forEach(fn => { try { fn(state); } catch (e) { console.error(e); } }); }
-  const uid = () => 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  function refresh() { state = api('GET', '/api/state') || state; }
+  function emit() { subs.forEach(fn => { try { fn(state); } catch (e) { console.error(e); } }); }
+
+  // Grades are derived from `marks` at read time (damage-map.jsx loads after this
+  // file, but this only runs later, well after mount — see window.physicalGrade).
+  function gradeOf(inst) {
+    if (inst.moc) return { phys: null, paint: null };
+    const p = window.physicalGrade(inst.marks);
+    const t = window.paintGrade(inst.marks);
+    const ungraded = (p.zones + t.zones) === 0;
+    return { phys: ungraded ? null : p.grade, paint: ungraded ? null : t.grade };
+  }
 
   // ---- derived views ----
   function instancesOf(catalogId) { return state.instances.filter(i => i.catalogId === catalogId); }
@@ -47,9 +68,10 @@
       // The file card does NOT gate completeness — it's a separate notation.
       // (A sealed/MOC copy carries its card on the backer, so it reads as on file.)
       const card = moc || !!(i.filecard && i.filecard.onFile);
+      const { phys, paint } = gradeOf(i);
       return {
         id: i.id, variant: i.variant, loc: i.loc, notes: i.notes, moc,
-        phys: i.phys, paint: i.paint, acc, cardOnFile: card,
+        phys, paint, acc, cardOnFile: card,
         own: moc ? req : instOwn(bp, acc), req,
         pct: moc ? 100 : instPct(bp, acc), whole: moc ? true : instWhole(bp, acc),
         missing: moc ? [] : bp.filter(([n, q]) => (acc[n] || 0) < q).map(([n, q]) => q > 1 ? `${n} ${acc[n] || 0}/${q}` : n),
@@ -72,56 +94,64 @@
     get: () => state,
     subscribe(fn) { subs.add(fn); return () => subs.delete(fn); },
     addInstance(inst) {
-      state.instances.push(Object.assign({ id: uid(), addedAt: Date.now(), acc: {}, variant: '' }, inst));
-      emit();
+      api('POST', '/api/instances', inst);
+      refresh(); emit();
     },
-    updateInstance(id, patch) { const i = state.instances.find(x => x.id === id); if (i) Object.assign(i, patch); emit(); },
+    updateInstance(id, patch) {
+      api('PATCH', '/api/instances/' + id, patch);
+      refresh(); emit();
+    },
     setAcc(id, name, units) {
-      const i = state.instances.find(x => x.id === id); if (!i) return;
-      i.acc = Object.assign({}, i.acc, { [name]: units }); emit();
+      api('PATCH', '/api/instances/' + id + '/accessory', { name, units });
+      refresh(); emit();
     },
-    removeInstance(id) { state.instances = state.instances.filter(x => x.id !== id); emit(); },
+    removeInstance(id) {
+      api('DELETE', '/api/instances/' + id);
+      refresh(); emit();
+    },
 
-    // ---- Parts Bin: loose accessories, each scoped to a catalog figure ----
+    // ---- Parts Bin: loose accessories (global stock — see server/instances.js) ----
     // entry: { id, catalogId, accessory, qty, notes, addedAt }
     binEntries() { return state.bin; },
     addPart({ catalogId, accessory, qty = 1, notes = '' }) {
-      const e = state.bin.find(x => x.catalogId === catalogId && x.accessory === accessory);
-      if (e) { e.qty += qty; if (notes) e.notes = notes; }
-      else state.bin.push({ id: uid(), catalogId, accessory, qty, notes, addedAt: Date.now() });
-      emit();
+      api('POST', '/api/parts-bin', { catalogId, accessory, qty, notes });
+      refresh(); emit();
     },
     adjustPart(id, delta) {
-      const e = state.bin.find(x => x.id === id); if (!e) return;
-      e.qty += delta; if (e.qty <= 0) state.bin = state.bin.filter(x => x.id !== id);
-      emit();
+      api('PATCH', '/api/parts-bin/' + id, { delta });
+      refresh(); emit();
     },
-    removePart(id) { state.bin = state.bin.filter(x => x.id !== id); emit(); },
+    removePart(id) {
+      api('DELETE', '/api/parts-bin/' + id);
+      refresh(); emit();
+    },
     // pull one loose unit onto an owned instance's accessory checklist (two-way A)
     pullPart(partId, instanceId, accessory) {
-      const e = state.bin.find(x => x.id === partId);
-      const inst = state.instances.find(x => x.id === instanceId);
-      if (!e || !inst) return;
-      const fig = CAT_BY_ID.get(inst.catalogId); const bp = fig && fig.blueprint || [];
-      const req = (bp.find(a => a[0] === accessory) || [])[1] || 1;
-      const cur = (inst.acc && inst.acc[accessory]) || 0;
-      if (cur >= req) return;
-      inst.acc = Object.assign({}, inst.acc, { [accessory]: cur + 1 });
-      e.qty -= 1; if (e.qty <= 0) state.bin = state.bin.filter(x => x.id !== partId);
-      emit();
+      api('POST', '/api/parts-bin/' + partId + '/pull', { instanceId, accessory });
+      refresh(); emit();
     },
     // deposit accessories into the bin (two-way B — kept parts from a removed copy)
     depositParts(catalogId, parts) { // parts: [{accessory, qty}]
-      parts.forEach(({ accessory, qty }) => {
-        if (!qty) return;
-        const e = state.bin.find(x => x.catalogId === catalogId && x.accessory === accessory);
-        if (e) e.qty += qty; else state.bin.push({ id: uid(), catalogId, accessory, qty, notes: '', addedAt: Date.now() });
-      });
-      emit();
+      api('POST', '/api/parts-bin/deposit', { catalogId, parts });
+      refresh(); emit();
     },
-    clearAll() { state = { instances: [], bin: [] }; emit(); },
+    clearAll() {
+      api('POST', '/api/clear');
+      refresh(); emit();
+    },
     exportJSON() { return JSON.stringify(state, null, 2); },
-    importJSON(text) { try { const o = JSON.parse(text); if (o && Array.isArray(o.instances)) { if (!Array.isArray(o.bin)) o.bin = []; state = o; emit(); return true; } } catch (e) {} return false; },
+    importJSON(text) {
+      try {
+        const o = JSON.parse(text);
+        if (o && Array.isArray(o.instances)) {
+          if (!Array.isArray(o.bin)) o.bin = [];
+          api('POST', '/api/import', o);
+          refresh(); emit();
+          return true;
+        }
+      } catch (e) {}
+      return false;
+    },
   };
   window.JoeData = { CAT, CAT_BY_ID, bpReq, instOwn, instPct, instWhole, instancesOf, ownedCount, figureSummary, totals };
 })();

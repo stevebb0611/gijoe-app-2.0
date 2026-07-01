@@ -180,6 +180,8 @@ CREATE TABLE IF NOT EXISTS instances (
     damage      TEXT,   -- JSON (see shape above); NULL = no damage logged
     location    TEXT,   -- free-text bin/box label, e.g. "BIN C-04 · long-box"
     notes       TEXT,
+    filecard_on_file  BOOLEAN DEFAULT 0,  -- this copy's file card is on hand (a notation, not a completeness gate)
+    filecard_printing TEXT,               -- which printing, e.g. 'A' first print / 'B' reissue / 'C' mail-away
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -191,13 +193,15 @@ CREATE TABLE IF NOT EXISTS instances (
 -- (from the figure's blueprint in figure_accessories). The app manages
 -- this table; TablePlus is read-only / admin override.
 --
--- have = 1  → this copy has this accessory
--- have = 0  → this copy is missing this accessory
+-- units_owned is a count, not a boolean — some blueprint lines require more
+-- than one unit of an accessory (e.g. a figure needing two of the same
+-- weapon). A line is satisfied when units_owned >= figure_accessories.quantity_required.
+-- units_owned = 0 → this copy is missing this accessory entirely.
 
 CREATE TABLE IF NOT EXISTS instance_accessories (
     instance_id  INTEGER NOT NULL REFERENCES instances(id) ON DELETE CASCADE,
     accessory_id INTEGER NOT NULL REFERENCES accessories(id) ON DELETE RESTRICT,
-    have         BOOLEAN NOT NULL DEFAULT 0,
+    units_owned  INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (instance_id, accessory_id)
 );
 
@@ -206,7 +210,7 @@ CREATE TABLE IF NOT EXISTS instance_accessories (
 -- ─────────────────────────────────────────────
 
 -- Named accessory slots (interchangeable variant groups).
--- The slot is satisfied if SUM(have) >= quantity_required across the group
+-- The slot is satisfied if SUM(units_owned) >= quantity_required across the group
 -- for a given instance.
 CREATE TABLE IF NOT EXISTS accessory_groups (
     group_id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -234,7 +238,7 @@ CREATE TABLE IF NOT EXISTS figure_accessories (
 --  PARTS BIN — loose accessory inventory
 -- ─────────────────────────────────────────────
 -- Global loose-accessory stock. Unassigned surplus = quantity_owned
--- minus the sum of instance_accessories.have across all instances
+-- minus the sum of instance_accessories.units_owned across all instances
 -- that require this accessory. Useful for accessories without a figure home.
 
 CREATE TABLE IF NOT EXISTS accessory_inventory (
@@ -420,7 +424,8 @@ GROUP BY f.id;
 
 
 -- Per-instance completeness summary.
--- A copy is "whole" when every required retail accessory has have = 1.
+-- A copy is "whole" when every required retail accessory line has
+-- units_owned >= quantity_required.
 -- The app's rebalance engine uses the raw instance_accessories rows, not this view.
 CREATE VIEW IF NOT EXISTS v_figure_completeness AS
 SELECT
@@ -436,12 +441,11 @@ SELECT
             SELECT 1 FROM figure_accessories fa
             WHERE fa.figure_id       = f.id
               AND fa.release_context = 'retail'
-              AND NOT EXISTS (
-                SELECT 1 FROM instance_accessories ia
+              AND fa.quantity_required > COALESCE((
+                SELECT ia.units_owned FROM instance_accessories ia
                 WHERE ia.instance_id  = i.id
                   AND ia.accessory_id = fa.accessory_id
-                  AND ia.have         = 1
-              )
+              ), 0)
         ) THEN 1
         ELSE 0
     END)                                                            AS is_complete_now
@@ -450,7 +454,7 @@ LEFT JOIN instances i ON i.figure_id = f.id
 GROUP BY f.id;
 
 
--- Per-instance view of missing retail accessories.
+-- Per-instance view of missing/partial retail accessories.
 -- Useful for the needs list and the rebalance engine input.
 CREATE VIEW IF NOT EXISTS v_instance_missing_accessories AS
 SELECT
@@ -462,6 +466,7 @@ SELECT
     a.name          AS accessory,
     ac.name         AS category,
     fa.quantity_required,
+    COALESCE(ia.units_owned, 0) AS units_owned,
     fa.release_context,
     fa.group_id
 FROM instances i
@@ -473,7 +478,7 @@ LEFT JOIN instance_accessories ia ON ia.instance_id  = i.id
                                  AND ia.accessory_id = fa.accessory_id
 WHERE fa.release_context = 'retail'
   AND i.is_moc           = 0          -- MOC copies have no missing accessories
-  AND (ia.have IS NULL OR ia.have = 0)
+  AND COALESCE(ia.units_owned, 0) < fa.quantity_required
 ORDER BY f.code_name, i.id, a.name;
 
 
