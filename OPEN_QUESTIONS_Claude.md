@@ -187,3 +187,26 @@ Schema updated and migration applied to `gijoe_collection.db`. `figures` is now 
 
 ### 17d. catalog-data.js → DB sync — edits in TablePlus don't reach the app
 `catalog-data.js` was generated once from the CSVs and is now a static snapshot. If figures or accessories are edited in TablePlus (corrections, additions), those changes don't appear in the app until `catalog-data.js` is manually regenerated. Once the backend (17a) is wired up, the app should query the DB directly and this file becomes obsolete. Until then, treat `catalog-data.js` as read-only and do not edit it while real collection data depends on it — a regeneration with changed IDs or code names will orphan owned figures stored in localStorage.
+
+---
+
+## 18. CSV data quality — `full_name` field review (flagged July 2026)
+
+An audit of `gijoe_db_figures_2.0.csv` for code names shared by multiple `full_name` values found **4 genuine distinct-character cases** (resolved via `character_key` in migration 002) and **the following unresolved inconsistencies** that need owner verification before being corrected. Most are likely data-entry typos; a few may reflect real file-card variation across printings.
+
+> **Do not bulk-correct these without verifying against physical file cards or a trusted reference (YoJoe, HissTank).** Some differences may be intentional (e.g. Storm Shadow's name being "Classified" on early cards and revealed later).
+
+| Code name | Figures | Variants found | Likely correct | Notes |
+|---|---|---|---|---|
+| Flint | F125, F248, F389, F597, F701 | Faireborn / Faireborne / Fairborne | Faireborn | Three spellings; F701 has no name at all |
+| General Flagg | F434, F508 | "James Longstreet" vs "James L." | James Longstreet | Middle name abbreviated on one card |
+| Gung-Ho | F067, F203, F436, F514, F515, F702 | La Fitte / LaFitte; Etienne / Ettiene | LaFitte, Etienne R. | Spacing + spelling vary; F702 has no name |
+| Heavy Duty | F392, F519 | Lamont vs Lemont | Lamont | One-letter typo |
+| Lightfoot | F258, F307 | Cory vs Corey | Cory | Spelling variation |
+| Low-Light | F161, F309, F396, F531 | "Cooper G." vs "Cooper" | Cooper G. | Missing middle initial on one row |
+| Lt. Falcon | F259, F397 | Falcone vs Falcon | Falcon | One-letter difference |
+| Mutt | F098, F311 | Stanley R. vs Stanley G. | Stanley R. | Wrong middle initial on one row |
+| Ozone | F402, F549, F550, F610 | David P. vs David F. | David P. | Wrong middle initial on one row |
+| Sci-Fi | F168, F408, F563, F616 | Fine vs Pine | Pine | Likely OCR/scan error on F168 |
+| Snake-Eyes | F565, F620 | "Classified" vs "Top Secret" | Both intentional | Name obfuscation varies by card; same character |
+| Storm Shadow | F107, F280, F456, F457, F625 | "Classified" → "Arashikage, Thomas S." | Both intentional | Name revealed mid-line; same character |

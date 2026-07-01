@@ -69,6 +69,8 @@ CREATE TABLE IF NOT EXISTS figures (
     id                INTEGER PRIMARY KEY AUTOINCREMENT,
     figure_id         TEXT    UNIQUE,
     code_name         TEXT    NOT NULL,
+    character_key     TEXT,               -- disambiguates reused code names (e.g. AIRBORNE_1 vs AIRBORNE_2);
+                                          -- NULL for the vast majority of figures where code_name is unique
     alt_name          TEXT,
     version           TEXT,
     variant           TEXT,
