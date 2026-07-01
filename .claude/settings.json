@@ -12,7 +12,11 @@
       "Bash(git rm *)",
       "Bash(git commit -m ' *)",
       "Bash(which gh *)",
-      "Read(//usr/local/bin/**)"
+      "Read(//usr/local/bin/**)",
+      "Bash(git -C /Users/steveblumrick/gijoe-app-2.0 add gijoe_collection.sql OPEN_QUESTIONS.md)",
+      "Bash(git -C /Users/steveblumrick/gijoe-app-2.0 commit -m ' *)",
+      "Bash(git -C /Users/steveblumrick/gijoe-app-2.0 push)",
+      "Bash(git -C /Users/steveblumrick/gijoe-app-2.0 add OPEN_QUESTIONS.md)"
     ]
   }
 }
