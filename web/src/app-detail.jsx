@@ -4,6 +4,7 @@
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
 import { physicalGrade, paintGrade, dmEmpty, DamageMap, GradeBadge } from './damage-map.jsx';
+import { VariantGroup, ContextGroup, clusterContexts } from './accessory-groups.jsx';
 
 const INV_CAT = JoeData.CAT || [];
 const INV_ERAS = {}; // was window.JOE_ERAS from the retired catalog-data.js — always {}
@@ -252,6 +253,8 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const filecard = raw.filecard || { onFile: false, printing: 'A' };
   const marks = (raw.marks && raw.marks.condition) ? raw.marks : dmEmpty(fig.body || 'male');
   const bp = fig.blueprint;
+  const clusterBp = JoeData.clusterBlueprint(bp);
+  const ctxGroups = clusterContexts(bp);
 
   const setUnit = (name, n) => JoeStore.setAcc(cur.id, name, n);
   const setMoc = (v) => JoeStore.updateInstance(cur.id, { moc: v });
@@ -307,7 +310,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                   <p className="inv-modal__blurb">Adding it creates your first owned copy and a blank accessory checklist from the blueprint below ({bp.length} piece{bp.length !== 1 ? "s" : ""} to track).</p>
                   <div className="inv-bprint">BLUEPRINT</div>
                   <div className="acc-list">
-                    <div className="acc-list__cap"><span>ACCESSORY · CHECK PER UNIT</span><span><b>0</b>/{bp.reduce((s, a) => s + a[1], 0)}</span></div>
+                    <div className="acc-list__cap"><span>ACCESSORIES</span><span><b>0</b>/{bp.reduce((s, a) => s + a[1], 0)}</span></div>
                     {bp.map((a, i) => <AccItem key={i} name={a[0]} req={a[1]} checked={Array.from({ length: a[1] }, () => false)} />)}
                   </div>
                 </React.Fragment>}
@@ -390,28 +393,37 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                   </div>
                 ) : (
                   <div className="acc-list">
-                    <div className="acc-list__cap"><span>ACCESSORY · CHECK PER UNIT</span><span><b>{liveOwn}</b>/{cur.req}</span></div>
-                    {bp.map((a, i) => (
+                    <div className="acc-list__cap"><span>ACCESSORIES</span><span><b>{liveOwn}</b>/{cur.req}</span></div>
+                    {clusterBp.solo.map((a, i) => (
                       <AccItem key={i} name={a[0]} req={a[1]}
                                checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
                                onSet={(n) => setUnit(a[0], n)} />
+                    ))}
+                    {clusterBp.groups.map((items, i) => (
+                      <VariantGroup key={i} items={items} acc={raw.acc || {}} live onSet={setUnit} />
+                    ))}
+                    {ctxGroups.map((cg) => (
+                      <ContextGroup key={cg.context} context={cg.context} items={cg.items}
+                                    renderRow={(a) => (
+                                      <AccItem key={a[0]} name={a[0]} req={a[1]}
+                                               checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
+                                               onSet={(n) => setUnit(a[0], n)} />
+                                    )} />
                     ))}
                   </div>
                 )}
 
                 <div className="acc-list fc-list">
-                  <div className="acc-list__cap"><span>FILE CARD · THIS COPY</span><span>{filecard.onFile ? <b>ON FILE</b> : "NOT ON FILE"}</span></div>
+                  <div className="acc-list__cap"><span>FILE CARD</span><span>{filecard.onFile && <b>ON FILE</b>}</span></div>
                   <div className="acc fc-row">
                     <span className="acc__name">Card on file</span>
-                    {filecard.onFile
-                      ? <span className="fc-selwrap"><select className="fc-sel" value={filecard.printing} onChange={e => setCard({ printing: e.target.value })}>{FILECARDS.map(c => <option key={c.letter} value={c.letter}>{c.letter} · {c.name}</option>)}</select><span className="fc-caret">▾</span></span>
-                      : <span className="fc-hint">noted on this copy · not required for complete</span>}
+                    {filecard.onFile &&
+                      <span className="fc-selwrap"><select className="fc-sel" value={filecard.printing} onChange={e => setCard({ printing: e.target.value })}>{FILECARDS.map(c => <option key={c.letter} value={c.letter}>{c.letter} · {c.name}</option>)}</select><span className="fc-caret">▾</span></span>}
                     <button className={"acc__box fc-box" + (filecard.onFile ? " is-on" : "")} onClick={() => setCard({ onFile: !filecard.onFile })} title={filecard.onFile ? "Mark card not on file" : "Mark file card on file"}>{filecard.onFile ? "✓" : ""}</button>
                   </div>
                 </div>
 
                 <div className="inv-copymeta">
-                  <div className="inv-copymeta__cap">THIS COPY</div>
                   <div className="inv-notes">
                     <div className="inv-notes__cap">NOTES</div>
                     <textarea className="inv-notes__in" rows={2} defaultValue={raw.notes || ""} placeholder="Notes on this copy…"

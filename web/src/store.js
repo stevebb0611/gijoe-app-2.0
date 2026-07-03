@@ -31,11 +31,75 @@ function api(method, url, body) {
 const CAT = api('GET', '/api/catalog') || [];
 const CAT_BY_ID = new Map(CAT.map(f => [f.id, f]));
 
-// ---- completeness math (unchanged) ----
-function bpReq(bp) { return (bp || []).reduce((s, a) => s + a[1], 0); }
-function instOwn(bp, acc) { return (bp || []).reduce((s, [n, q]) => s + Math.min(acc[n] || 0, q), 0); }
+// ---- accessory catalog (Parts Bin: category + shared-vs-single-use + home figure) ----
+const ACC = api('GET', '/api/accessories') || [];
+const ACC_BY_ID = new Map(ACC.map(a => [a.id, a]));
+
+// ---- completeness math ----
+// Blueprint items are [name, quantity_required, accessory_id, group_id, release_context, match_key].
+// Three axes restructure the flat list (see PARTS_BIN.md "Accessory completeness model" + match_key.md):
+//   group_id    — interchangeable variants ("own any one" satisfies the slot)
+//   match_key   — when 2+ group_id slots have members sharing a match_key, those
+//                 slots must resolve to the SAME key together (e.g. Firefly's
+//                 light-green gun only counts alongside the light-green radio)
+//   release_context — only 'retail' counts toward completion; convention/mail_in/
+//                      bonus items are tracked but never block Complete
+function clusterBlueprint(bp) {
+  const retail = (bp || []).filter((a) => !a[4] || a[4] === 'retail');
+  const groupMap = new Map(); // group_id -> items[]
+  const solo = [];
+  for (const a of retail) {
+    if (a[3] != null) {
+      if (!groupMap.has(a[3])) groupMap.set(a[3], []);
+      groupMap.get(a[3]).push(a);
+    } else solo.push(a);
+  }
+  const groups = [...groupMap.values()];
+  const matched = groups.filter((members) => members.some((m) => m[5] != null));
+  const plain = groups.filter((members) => !members.some((m) => m[5] != null));
+  return { solo, groups, matched, plain };
+}
+// Is there one match_key value K such that every matched slot's K-tagged member is owned?
+function matchedSetSatisfied(matched, acc) {
+  if (matched.length === 0) return true;
+  const keys = new Set();
+  matched.forEach((members) => members.forEach((m) => { if (m[5] != null) keys.add(m[5]); }));
+  for (const k of keys) {
+    if (matched.every((members) => members.some((m) => m[5] === k && (acc[m[0]] || 0) > 0))) return true;
+  }
+  return false;
+}
+function bpReq(bp) {
+  const { solo, plain, matched } = clusterBlueprint(bp);
+  return solo.reduce((s, a) => s + a[1], 0) + plain.length + (matched.length > 0 ? 1 : 0);
+}
+function instOwn(bp, acc) {
+  const { solo, plain, matched } = clusterBlueprint(bp);
+  const soloOwn = solo.reduce((s, [n, q]) => s + Math.min(acc[n] || 0, q), 0);
+  const plainOwn = plain.reduce((s, members) => s + (members.some(([n]) => (acc[n] || 0) > 0) ? 1 : 0), 0);
+  return soloOwn + plainOwn + (matched.length > 0 && matchedSetSatisfied(matched, acc) ? 1 : 0);
+}
 function instPct(bp, acc) { const r = bpReq(bp); return r ? Math.round(instOwn(bp, acc) / r * 100) : 100; }
-function instWhole(bp, acc) { return (bp || []).every(([n, q]) => (acc[n] || 0) >= q); }
+function instWhole(bp, acc) {
+  const { solo, plain, matched } = clusterBlueprint(bp);
+  return solo.every(([n, q]) => (acc[n] || 0) >= q)
+    && plain.every((members) => members.some(([n]) => (acc[n] || 0) > 0))
+    && matchedSetSatisfied(matched, acc);
+}
+// Shared label rule (matches the locked reference subgroup-wire-v2.jsx):
+// text before the first "(" is the slot label, text inside "(...)" is the option label.
+function groupLabel(items) { const m = items[0][0].match(/^(.*?)\s*\(/); return m ? m[1].trim() : items[0][0]; }
+function optLabel(name) { const m = name.match(/\(([^)]+)\)/); return m ? m[1] : name; }
+function missingList(bp, acc) {
+  const { solo, plain, matched } = clusterBlueprint(bp);
+  const soloMissing = solo.filter(([n, q]) => (acc[n] || 0) < q).map(([n, q]) => q > 1 ? `${n} ${acc[n] || 0}/${q}` : n);
+  const plainMissing = plain.filter((members) => !members.some(([n]) => (acc[n] || 0) > 0))
+    .map((members) => members.map((m) => optLabel(m[0])).join(' or '));
+  const matchedMissing = (matched.length > 0 && !matchedSetSatisfied(matched, acc))
+    ? [matched.map((members) => groupLabel(members)).join(' & ') + ' (matching color)']
+    : [];
+  return [...soloMissing, ...plainMissing, ...matchedMissing];
+}
 
 // ---- live state, loaded from the db ----
 let state = api('GET', '/api/state') || { instances: [], bin: [] };
@@ -43,12 +107,14 @@ const subs = new Set();
 function refresh() { state = api('GET', '/api/state') || state; }
 function emit() { subs.forEach(fn => { try { fn(state); } catch (e) { console.error(e); } }); }
 
-// Grades are derived from `marks` at read time.
+// Grades are derived from `marks` at read time. Zero zones reads as "ungraded"
+// (not yet mapped) unless the copy carries an explicit marks.clean confirmation.
 function gradeOf(inst) {
   if (inst.moc) return { phys: null, paint: null };
   const p = physicalGrade(inst.marks);
   const t = paintGrade(inst.marks);
-  const ungraded = (p.zones + t.zones) === 0;
+  const clean = !!(inst.marks && inst.marks.clean);
+  const ungraded = (p.zones + t.zones) === 0 && !clean;
   return { phys: ungraded ? null : p.grade, paint: ungraded ? null : t.grade };
 }
 
@@ -73,7 +139,7 @@ function figureSummary(catalogId) {
       phys, paint, acc, cardOnFile: card,
       own: moc ? req : instOwn(bp, acc), req,
       pct: moc ? 100 : instPct(bp, acc), whole: moc ? true : instWhole(bp, acc),
-      missing: moc ? [] : bp.filter(([n, q]) => (acc[n] || 0) < q).map(([n, q]) => q > 1 ? `${n} ${acc[n] || 0}/${q}` : n),
+      missing: moc ? [] : missingList(bp, acc),
     };
   });
   // best copy first
@@ -152,4 +218,4 @@ export const JoeStore = {
       return false;
     },
   };
-export const JoeData = { CAT, CAT_BY_ID, bpReq, instOwn, instPct, instWhole, instancesOf, ownedCount, figureSummary, totals };
+export const JoeData = { CAT, CAT_BY_ID, ACC, ACC_BY_ID, bpReq, instOwn, instPct, instWhole, clusterBlueprint, groupLabel, optLabel, instancesOf, ownedCount, figureSummary, totals };

@@ -2,6 +2,7 @@
 // used to hand the app (window.JOE_CATALOG), computed live from the figures/
 // accessories/variant_lookup/figure_accessories tables instead of a static file (17d).
 import db from './db.js';
+import { disambiguateNames } from './blueprint-names.js';
 
 const FACTION_CODE = {
   'G.I. Joe': 'JOE',
@@ -25,10 +26,10 @@ const variantsStmt = db.prepare(`
 `);
 
 const blueprintStmt = db.prepare(`
-  SELECT fa.figure_id, a.name, fa.quantity_required
+  SELECT fa.figure_id, a.name, a.color, fa.quantity_required, a.id AS accessory_id,
+         fa.group_id, fa.release_context, fa.match_key
   FROM figure_accessories fa
   JOIN accessories a ON a.id = fa.accessory_id
-  WHERE fa.release_context = 'retail'
   ORDER BY fa.figure_id, fa.rowid
 `);
 
@@ -39,10 +40,15 @@ export function buildCatalog() {
     variantsByFigure.get(v.figure_id).push({ letter: v.letter, tell: v.tell });
   }
 
-  const blueprintByFigure = new Map();
+  const blueprintRowsByFigure = new Map();
   for (const b of blueprintStmt.all()) {
-    if (!blueprintByFigure.has(b.figure_id)) blueprintByFigure.set(b.figure_id, []);
-    blueprintByFigure.get(b.figure_id).push([b.name, b.quantity_required]);
+    if (!blueprintRowsByFigure.has(b.figure_id)) blueprintRowsByFigure.set(b.figure_id, []);
+    blueprintRowsByFigure.get(b.figure_id).push(b);
+  }
+  const blueprintByFigure = new Map();
+  for (const [figureId, rows] of blueprintRowsByFigure) {
+    blueprintByFigure.set(figureId, disambiguateNames(rows)
+      .map((b) => [b.name, b.quantity_required, b.accessory_id, b.group_id, b.release_context, b.match_key]));
   }
 
   return figuresStmt.all().map((f) => ({

@@ -4,17 +4,25 @@
 // nothing downstream of store.js (app-inventory.jsx, app-add-figure.jsx,
 // app-detail.jsx) has to change.
 import db from './db.js';
+import { disambiguateNames } from './blueprint-names.js';
 
-// name -> accessory_id, scoped to one figure's blueprint (accessories.name isn't
-// globally unique, but it is unique within a single figure's required list).
-function blueprintNameMap(figureId) {
+// Disambiguated (name, accessory_id) pairs for one figure's blueprint. Raw
+// accessories.name isn't always unique within a figure (e.g. Firefly's two
+// "Submachine Gun" entries, one per colour) — disambiguateNames() must match
+// catalog.js's blueprint exactly, both directions: name -> id when the
+// frontend PATCHes a toggle, and id -> name when getState() reads ownership
+// back out, or the two colours collapse onto one tracked row.
+function blueprintRows(figureId) {
   const rows = db.prepare(`
-    SELECT a.id, a.name FROM figure_accessories fa
+    SELECT a.id, a.name, a.color FROM figure_accessories fa
     JOIN accessories a ON a.id = fa.accessory_id
     WHERE fa.figure_id = ?
+    ORDER BY fa.rowid
   `).all(figureId);
-  return new Map(rows.map((r) => [r.name, r.id]));
+  return disambiguateNames(rows);
 }
+function blueprintNameMap(figureId) { return new Map(blueprintRows(figureId).map((r) => [r.name, r.id])); }
+function blueprintIdNameMap(figureId) { return new Map(blueprintRows(figureId).map((r) => [r.id, r.name])); }
 
 function accessoryIdForName(figureId, name) {
   const id = blueprintNameMap(figureId).get(name);
@@ -35,9 +43,9 @@ const instanceRowsStmt = db.prepare(`
 `);
 
 const instanceAccStmt = db.prepare(`
-  SELECT ia.instance_id, a.name, ia.units_owned
+  SELECT ia.instance_id, i.figure_id, ia.accessory_id, ia.units_owned
   FROM instance_accessories ia
-  JOIN accessories a ON a.id = ia.accessory_id
+  JOIN instances i ON i.id = ia.instance_id
   WHERE ia.units_owned > 0
 `);
 
@@ -70,9 +78,13 @@ function shapeBinEntry(row) {
 
 export function getState() {
   const accByInstance = new Map();
+  const idNameByFigure = new Map(); // figure_id -> Map(accessory_id -> disambiguated name)
   for (const r of instanceAccStmt.all()) {
+    if (!idNameByFigure.has(r.figure_id)) idNameByFigure.set(r.figure_id, blueprintIdNameMap(r.figure_id));
+    const name = idNameByFigure.get(r.figure_id).get(r.accessory_id);
+    if (!name) continue; // accessory no longer on this figure's blueprint
     if (!accByInstance.has(r.instance_id)) accByInstance.set(r.instance_id, {});
-    accByInstance.get(r.instance_id)[r.name] = r.units_owned;
+    accByInstance.get(r.instance_id)[name] = r.units_owned;
   }
   return {
     instances: instanceRowsStmt.all().map((r) => shapeInstance(r, accByInstance)),

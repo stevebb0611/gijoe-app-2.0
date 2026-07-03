@@ -186,15 +186,26 @@ console.log(`accessories: ${accessoryRows.length} rows`);
 // 3. figure_accessories (blueprint), from gijoe_db_figures_accessories_group_id.csv
 //    Columns (raw, header has duplicate figure_id/accessory_id names):
 //    0 year_released, 1 code_name, 2 figure_id(text), 3 figure_id(numeric-legacy),
-//    4 accessory_id(text), 5 accessory_id(numeric-legacy), 6 group_id(external, unused —
-//    no slot_name available to build accessory_groups from it), 7 release_context,
+//    4 accessory_id(text), 5 accessory_id(numeric-legacy), 6 group_id, 7 release_context,
 //    8 is_original, 9 is_shared, 10 quantity_required, 11-12 legacy owned/condition, 13 notes
+//
+//    group_id (col 6) is NOT imported here even though it's populated in the CSV:
+//    of the 19 distinct external ids, only 8 are genuine "own any one" variant
+//    pairs (matched item names, e.g. Helmet / Helmet (with holes)) — the other
+//    11 pair unrelated item types (e.g. Firefly's Submachine Gun + Walkie-Talkie)
+//    and are NOT interchangeable, per owner confirmation. That curated 8-group
+//    import is a separate, hand-verified, additive-only script — see
+//    server/migrate-accessory-groups.mjs — safe to re-run against the live DB,
+//    unlike this file (which rebuilds figures/accessories from scratch).
+//    release_context (col 7) is currently blank for every row in the source
+//    CSV — real classification happens live via server/set-accessory-context.mjs
+//    as the owner works through the collection figure-by-figure.
 // ---------------------------------------------------------------------------
 const blueprintRows = readCsv('gijoe_db_figures_accessories_group_id.csv', { raw: true }).slice(1);
 const insertBlueprint = db.prepare(`
   INSERT OR IGNORE INTO figure_accessories (
-    figure_id, accessory_id, quantity_required, notes
-  ) VALUES (?, ?, ?, ?)
+    figure_id, accessory_id, quantity_required, release_context, notes
+  ) VALUES (?, ?, ?, ?, ?)
 `);
 let blueprintInserted = 0, blueprintSkippedUnresolved = 0;
 const insertBlueprintTxn = db.transaction(() => {
@@ -202,7 +213,8 @@ const insertBlueprintTxn = db.transaction(() => {
     const fig = csvFigureIdToDb.get(row[2]);
     const accId = accessoryCodeToDb.get(row[4]);
     if (!fig || !accId) { blueprintSkippedUnresolved++; continue; }
-    const info = insertBlueprint.run(fig.dbId, accId, asInt(row[10]) ?? 1, asText(row[13]));
+    const releaseContext = normalizeReleaseContext(row[7]).bucket;
+    const info = insertBlueprint.run(fig.dbId, accId, asInt(row[10]) ?? 1, releaseContext, asText(row[13]));
     if (info.changes) blueprintInserted++;
   }
 });

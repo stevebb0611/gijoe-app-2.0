@@ -4,6 +4,7 @@
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
 import { DamageMap, GradeBadge, physicalGrade, paintGrade, dmEmpty } from './damage-map.jsx';
+import { VariantGroup, ContextGroup, clusterContexts } from './accessory-groups.jsx';
 const AF_CATALOG = JoeData.CAT || [];
 const AF_FILECARDS = [{ letter: 'A', name: 'First print' }, { letter: 'B', name: "Reissue '85" }, { letter: 'C', name: 'Mail-away' }];
 const AF_YEARS = [...new Set(AF_CATALOG.map(f => f.year))].sort((a, b) => a - b);
@@ -38,7 +39,8 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const [owned, setOwnedAcc] = React.useState({});   // accName -> units owned
   const [moc, setMoc] = React.useState(false);       // Mint on Card (sealed) — counts 100% complete
   const [filecard, setFilecard] = React.useState({ onFile: false, printing: 'A' });
-  // condition — single zone-map value
+  // condition — single zone-map value; dmg.clean is the explicit "no damage found"
+  // confirmation (vs. not yet mapped), and travels with marks into the stored instance
   const [dmg, setDmg] = React.useState(() => dmEmpty('male'));
   const [done, setDone] = React.useState(false);
 
@@ -67,22 +69,42 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const results = !hasFilter ? [] : yearF ? allResults : allResults.slice(0, 60);
 
   const blueprint = fig ? fig.blueprint : [];
+  const clusterBp = JoeData.clusterBlueprint(blueprint);
+  const ctxGroups = clusterContexts(blueprint);
   const unitsOf = (n) => owned[n] || 0;
-  const lineDone = ([n, qr]) => unitsOf(n) >= qr;
-  const fullDone = blueprint.filter(lineDone).length;
+  const bpReq = JoeData.bpReq(blueprint);
+  const fullDone = JoeData.instOwn(blueprint, owned);
 
   const goto = (i) => { setStep(i); setMax(m => Math.max(m, i)); };
   const next = () => goto(Math.min(step + 1, AF_STEPS.length - 1));
   const back = () => goto(Math.max(step - 1, 0));
 
   const setUnit = (n, idx) => setOwnedAcc(o => { const cur = o[n] || 0; return { ...o, [n]: cur > idx ? idx : idx + 1 }; });
+  const setUnitTo = (n, val) => setOwnedAcc(o => ({ ...o, [n]: val }));
+  const afAccRow = ([n, qreq]) => {
+    const u = unitsOf(n); const isDone = u >= qreq;
+    return (
+      <div key={n} className={"af-acc__row" + (isDone ? " is-done" : "")}>
+        <div className="af-acc__left"><span className="af-acc__n">{n}</span></div>
+        <div className="af-acc__right">
+          <div className="af-acc__boxes">
+            {Array.from({ length: qreq }).map((_, i) => (
+              <button key={i} className={"af-unit" + (i < u ? " is-on" : "")} title={`unit ${i + 1} of ${qreq}`} onClick={() => setUnit(n, i)}>✓</button>
+            ))}
+          </div>
+          <span className={"af-acc__count" + (isDone ? " is-done" : "")}>{u}/{qreq}</span>
+        </div>
+      </div>
+    );
+  };
   const markAllAcc = () => setOwnedAcc(() => { const o = {}; blueprint.forEach(([n, qr]) => o[n] = qr); return o; });
 
   // condition handlers
   const phys = physicalGrade(dmg);
   const paint = paintGrade(dmg);
   const marksCount = phys.zones + paint.zones;
-  const ungraded = marksCount === 0;
+  const clean = !!dmg.clean;
+  const ungraded = marksCount === 0 && !clean;
   const canNext = step === 0 ? (!!fig && (single || selVar !== null)) : true;
 
   const commit = () => {
@@ -108,13 +130,12 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   return (
     <div className="af-scrim" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
     <div className="af af--overlay">
-      <header className="af-top">
-        <button className="af-back" onClick={onClose}>‹ INVENTORY</button>
-        <div className="af-title">{preset ? "ADD COPY" : "ADD FIGURE"}</div>
-        <button className="af-x" onClick={onClose}>✕</button>
-      </header>
-
       <div className="af-card">
+        <header className="af-top">
+          <div className="af-title">{preset ? "ADD COPY" : "ADD FIGURE"}</div>
+          <button className="af-x" onClick={onClose} aria-label="Close">✕</button>
+        </header>
+
         <AfStepper step={step} setStep={goto} maxReached={maxReached} lockFirst={preset} />
 
         <div className="af-body">
@@ -151,7 +172,6 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                   </button>
                   {f.id === selId && !isSingle(f) && (
                     <div className="af-varpick">
-                      <div className="af-varpick__hd">WHICH VARIANT? · match the physical tell</div>
                       {f.variants.map(v => (
                         <button key={v.letter} className={"af-var" + (selVar === v.letter ? " is-sel" : "")} onClick={() => setSelVar(v.letter)}>
                           <span className="af-var__radio"></span>
@@ -192,40 +212,30 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                 </label>
 
                 {moc ? (
-                  <p className="af-seclab"><b>Accessories</b> · sealed on card — all {blueprint.length} assumed present</p>
+                  <p className="af-seclab"><b>Accessories</b> · sealed on card — all {bpReq} assumed present</p>
                 ) : (
                   <React.Fragment>
-                    <p className="af-seclab"><b>Accessories</b> · {fullDone}/{blueprint.length} complete{blueprint.length ? "" : " — no blueprint on file for this figure"}</p>
+                    <p className="af-seclab"><b>Accessories</b> · {fullDone}/{bpReq} complete{blueprint.length ? "" : " — no blueprint on file for this figure"}</p>
                     {blueprint.length > 0 && (
                       <div className="af-acc">
-                        {blueprint.map(([n, qreq]) => {
-                          const u = unitsOf(n); const isDone = u >= qreq;
-                          return (
-                            <div key={n} className={"af-acc__row" + (isDone ? " is-done" : "")}>
-                              <div className="af-acc__left"><span className="af-acc__n">{n}</span></div>
-                              <div className="af-acc__right">
-                                <div className="af-acc__boxes">
-                                  {Array.from({ length: qreq }).map((_, i) => (
-                                    <button key={i} className={"af-unit" + (i < u ? " is-on" : "")} title={`unit ${i + 1} of ${qreq}`} onClick={() => setUnit(n, i)}>✓</button>
-                                  ))}
-                                </div>
-                                <span className={"af-acc__count" + (isDone ? " is-done" : "")}>{u}/{qreq}</span>
-                              </div>
-                            </div>
-                          );
-                        })}
+                        {clusterBp.solo.map(afAccRow)}
+                        {clusterBp.groups.map((items, i) => (
+                          <VariantGroup key={i} items={items} acc={owned} live onSet={setUnitTo} />
+                        ))}
+                        {ctxGroups.map((cg) => (
+                          <ContextGroup key={cg.context} context={cg.context} items={cg.items} renderRow={afAccRow} />
+                        ))}
                       </div>
                     )}
                   </React.Fragment>
                 )}
 
                 <div className="acc-list fc-list" style={{ marginTop: 18 }}>
-                  <div className="acc-list__cap"><span>FILE CARD · THIS COPY</span><span>{filecard.onFile ? <b>ON FILE</b> : "NOT ON FILE"}</span></div>
+                  <div className="acc-list__cap"><span>FILE CARD</span><span>{filecard.onFile && <b>ON FILE</b>}</span></div>
                   <div className="acc fc-row">
                     <span className="acc__name">Card on file</span>
-                    {filecard.onFile
-                      ? <span className="fc-selwrap"><select className="fc-sel" value={filecard.printing} onChange={e => setFilecard(s => ({ ...s, printing: e.target.value }))}>{AF_FILECARDS.map(c => <option key={c.letter} value={c.letter}>{c.letter} · {c.name}</option>)}</select><span className="fc-caret">▾</span></span>
-                      : <span className="fc-hint">noted on this copy · not required for complete</span>}
+                    {filecard.onFile &&
+                      <span className="fc-selwrap"><select className="fc-sel" value={filecard.printing} onChange={e => setFilecard(s => ({ ...s, printing: e.target.value }))}>{AF_FILECARDS.map(c => <option key={c.letter} value={c.letter}>{c.letter} · {c.name}</option>)}</select><span className="fc-caret">▾</span></span>}
                     <button type="button" className={"acc__box fc-box" + (filecard.onFile ? " is-on" : "")} onClick={() => setFilecard(s => ({ ...s, onFile: !s.onFile }))} title={filecard.onFile ? "Mark card not on file" : "Mark file card on file"}>{filecard.onFile ? "✓" : ""}</button>
                   </div>
                 </div>
@@ -251,19 +261,27 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
               </div>
               <div className="af-cond__side">
                 <section className="panel">
-                  <div className="panel__hd">CONDITION <em>· {moc ? "mint on card" : (ungraded ? "ungraded" : "from " + marksCount + " mark" + (marksCount !== 1 ? "s" : ""))}</em></div>
+                  <div className="panel__hd">CONDITION <em>· {moc ? "mint on card" : (ungraded ? "ungraded" : marksCount === 0 ? "clean · confirmed" : "from " + marksCount + " mark" + (marksCount !== 1 ? "s" : ""))}</em></div>
                   {moc ? (
                     <div className="id-mocgrade">
                       <span className="id-mocgrade__badge">MOC</span>
                       <span className="id-mocgrade__txt"><b>Factory mint · sealed</b><i>Grade derives from the card &amp; bubble, not the figure — record specifics in notes.</i></span>
                     </div>
                   ) : ungraded ? (
-                    <div className="panel__note">Tag the diagram to record this copy's condition — grades derive live. Or leave it <b>ungraded</b> and map it later.</div>
-                  ) : (
-                    <div className="grades">
-                      <GradeBadge kind="PHYSICAL" result={phys} />
-                      <GradeBadge kind="PAINT" result={paint} />
+                    <div className="panel__note">
+                      <div>Tag the diagram to record condition, or mark it clean.</div>
+                      <button className="af-markall" onClick={() => setDmg(d => ({ ...d, clean: true }))}>✓ MARK CLEAN — NO DAMAGE</button>
                     </div>
+                  ) : (
+                    <React.Fragment>
+                      <div className="grades">
+                        <GradeBadge kind="PHYSICAL" result={phys} />
+                        <GradeBadge kind="PAINT" result={paint} />
+                      </div>
+                      {clean && marksCount === 0 && (
+                        <div className="panel__note">Confirmed clean — no damage mapped. <button className="af-clear" onClick={() => setDmg(d => ({ ...d, clean: false }))}>undo</button></div>
+                      )}
+                    </React.Fragment>
                   )}
                 </section>
                 <section className="panel">
@@ -282,8 +300,8 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                 <div className="af-sum__row"><span>Figure</span><b>{fig.name} · {multi ? varLabel : (fig.role || varLabel)} · {fig.year}</b></div>
                 {multi && <div className="af-sum__row"><span>Variant</span><b>{varTell}</b></div>}
                 <div className="af-sum__row"><span>Copy</span><b>#{instNo}{isNew ? " · first of this variant" : ""}</b></div>
-                <div className="af-sum__row"><span>Accessories</span><b>{moc ? "sealed on card · 100% (assumed present)" : (blueprint.length ? `${fullDone}/${blueprint.length} complete` : "none on file")}</b></div>
-                <div className="af-sum__row"><span>Condition</span><b>{moc ? "Mint on Card · factory mint (sealed)" : (ungraded ? "ungraded — map later" : `${phys.grade} physical / ${paint.grade} paint · ${marksCount} mark${marksCount !== 1 ? "s" : ""}`)}</b></div>
+                <div className="af-sum__row"><span>Accessories</span><b>{moc ? "sealed on card · 100% (assumed present)" : (blueprint.length ? `${fullDone}/${bpReq} complete` : "none on file")}</b></div>
+                <div className="af-sum__row"><span>Condition</span><b>{moc ? "Mint on Card · factory mint (sealed)" : (ungraded ? "ungraded — map later" : marksCount === 0 ? `${phys.grade} physical / ${paint.grade} paint · confirmed clean` : `${phys.grade} physical / ${paint.grade} paint · ${marksCount} mark${marksCount !== 1 ? "s" : ""}`)}</b></div>
                 <div className="af-sum__row"><span>Location</span><b>{loc || "—"}</b></div>
                 {notes && <div className="af-sum__row"><span>Notes</span><b>{notes}</b></div>}
               </div>
@@ -299,7 +317,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
               <div className="af-ok__sub">
                 {moc ? "Mint on Card · 100% complete (sealed) · factory mint" : (
                   <React.Fragment>
-                    {blueprint.length ? (fullDone > 0 ? `${fullDone}/${blueprint.length} accessories complete` : "no accessories yet") : "no blueprint"} ·{" "}
+                    {blueprint.length ? (fullDone > 0 ? `${fullDone}/${bpReq} accessories complete` : "no accessories yet") : "no blueprint"} ·{" "}
                     {ungraded ? "condition still to map" : `${phys.grade} / ${paint.grade}`}{loc ? ` · ${loc}` : ""}
                   </React.Fragment>
                 )}
