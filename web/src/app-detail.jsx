@@ -147,11 +147,27 @@ function applyRebalance(catalogId, mode) {
   });
 }
 
+// Roster counts by PRODUCTION VARIANT, not by catalog figure — a true complete
+// year means owning every variant, not just one copy of each code name (e.g.
+// 1982's 16 code names carry 43 variants between them). Every figure carries
+// >=1 variants[] entry (single-variant figures get one with letter '' — see
+// server/catalog.js), so this generalizes cleanly to figures with no variant
+// data authored yet (they just count as a single slot, same as before).
 function yearParts(yearNum) {
   const roster = INV_CAT.filter(f => f.year === yearNum);
-  const figs = roster.length;
-  let owned = 0, completeNow = 0;
-  roster.forEach(cf => { const s = JoeData.figureSummary(cf.id); if (s && s.owned > 0) { owned++; if (s.whole > 0) completeNow++; } });
+  let figs = 0, owned = 0, completeNow = 0;
+  roster.forEach(cf => {
+    const s = JoeData.figureSummary(cf.id);
+    const slots = (cf.variants && cf.variants.length) ? cf.variants : [{ letter: '' }];
+    figs += slots.length;
+    slots.forEach(({ letter }) => {
+      const copiesOfVariant = s ? s.copies.filter(c => (c.variant || '') === (letter || '')) : [];
+      if (copiesOfVariant.length > 0) {
+        owned++;
+        if (copiesOfVariant.some(c => c.whole)) completeNow++;
+      }
+    });
+  });
   return { figs, owned, completeNow, coverage: figs ? Math.round(owned / figs * 100) : 0, completion: owned ? Math.round(completeNow / owned * 100) : 0 };
 }
 function invTotals() {
@@ -165,11 +181,13 @@ function invTotals() {
 function FactionTag({ faction, mini }) {
   return <span className={"wf-fac wf-fac--" + faction.toLowerCase() + (mini ? " wf-fac--mini" : "")}>{faction}</span>;
 }
-function CompRing({ pct, size = 46, neutral }) {
+function CompRing({ pct, size = 46, neutral, damagedPct = 0 }) {
   const done = pct === 100;
   const col = done ? "var(--ok)" : (neutral ? "var(--ink-soft)" : "var(--accent)");
+  const dmgEnd = pct * 3.6 * Math.min(Math.max(damagedPct, 0), 1);
   return (
     <div className="wf-ring" style={{ width: size, height: size, background: `conic-gradient(${col} ${pct * 3.6}deg, var(--ring-track) 0)` }}>
+      {dmgEnd > 0 && <div className="wf-ring__dmg" style={{ "--dmg-end": dmgEnd + "deg" }} title="Some owned accessories are marked damaged"></div>}
       <div className="wf-ring__hole"><span className="wf-ring__pct">{pct}<small>%</small></span></div>
     </div>
   );
@@ -192,23 +210,24 @@ function boxLayout(req) {
   const cols = rows === 1 ? req : Math.ceil(req / 2);
   return { rows, cols, empty: cols * rows - req };
 }
-function AccItem({ name, req, checked, onSet }) {
+function AccItem({ name, req, checked, onSet, tone }) {
   const { rows, cols, empty } = boxLayout(req);
   const own = checked.reduce((s, c) => s + (c ? 1 : 0), 0);
   const done = own >= req;
   const live = typeof onSet === 'function';
+  const dmg = tone === 'damage';
   const cells = [];
   for (let i = 0; i < empty; i++) cells.push(<span key={"sp" + i} className="acc__box is-spacer" aria-hidden="true"></span>);
   for (let i = 0; i < req; i++) {
     const on = i < own;
     cells.push(
       <button key={i} type="button" className={"acc__box" + (on ? " is-on" : "")} disabled={!live}
-              title={req > 1 ? name + " · unit " + (i + 1) + " of " + req : name}
+              title={dmg ? name + " · unit " + (i + 1) + (on ? " · damaged" : " · not damaged") : (req > 1 ? name + " · unit " + (i + 1) + " of " + req : name)}
               onClick={live ? () => onSet(i + 1 === own ? i : i + 1) : undefined}>✓</button>
     );
   }
   return (
-    <div className={"acc" + (rows === 2 ? " is-stack" : "") + (done ? " is-done" : "")}>
+    <div className={"acc" + (rows === 2 ? " is-stack" : "") + (done ? " is-done" : "") + (dmg ? " is-damage-tone" : "")}>
       <span className="acc__name">{name}</span>
       <div className="acc__boxes" style={{ gridTemplateColumns: "repeat(" + cols + ", 22px)" }}>{cells}</div>
       <span className="acc__count">{own}/{req}</span>
@@ -230,6 +249,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const [curId, setCurId] = React.useState(instId || (copies[0] && copies[0].id));
   const cur = copies.find(c => c.id === curId) || copies[0] || null;
   const [flipped, setFlipped] = React.useState(false);
+  const [damageMode, setDamageMode] = React.useState(false);
   // binder tabs retract while the card flips, then spring back once it lands
   const [tucked, setTucked] = React.useState(false);
   const tuckTimer = React.useRef(null);
@@ -255,8 +275,14 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const bp = fig.blueprint;
   const clusterBp = JoeData.clusterBlueprint(bp);
   const ctxGroups = clusterContexts(bp);
+  const accDamage = raw.accDamage || {};
+  const ownedAcc = bp.filter(([n]) => ((raw.acc && raw.acc[n]) || 0) > 0);
+  const dmgOwned = ownedAcc.reduce((s, [n]) => s + ((raw.acc && raw.acc[n]) || 0), 0);
+  const dmgDamaged = ownedAcc.reduce((s, [n]) => s + (accDamage[n] || 0), 0);
+  const dmgShare = moc ? 0 : JoeData.accDamagePct(bp, raw.acc || {}, accDamage);
 
   const setUnit = (name, n) => JoeStore.setAcc(cur.id, name, n);
+  const setDamage = (name, n) => JoeStore.setAccDamage(cur.id, name, n);
   const setMoc = (v) => JoeStore.updateInstance(cur.id, { moc: v });
   const setCard = (patch) => JoeStore.updateInstance(cur.id, { filecard: { ...filecard, ...patch } });
   const setNotes = (v) => JoeStore.updateInstance(cur.id, { notes: v });
@@ -365,7 +391,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                   <div className="inv-modal__var">{fig.specialty} · {fig.year}{cur.variant ? " · var " + cur.variant : ""}</div>
                   {fig.variants > 1 ? <div className="inv-modal__variants"><span className="lyr"><b></b></span>{fig.variants} variants</div> : null}
                 </div>
-                <CompRing pct={ringPct} size={84} neutral />
+                <CompRing pct={ringPct} size={84} neutral damagedPct={dmgShare} />
                 {!moc && !liveWhole && <div className="inv-modal__ringlab">COMPLETENESS</div>}
                 {moc && <div className="inv-modal__ringlab">MINT ON CARD</div>}
               </div>
@@ -393,7 +419,10 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                   </div>
                 ) : (
                   <div className="acc-list">
-                    <div className="acc-list__cap"><span>ACCESSORIES</span><span><b>{liveOwn}</b>/{cur.req}</span></div>
+                    <div className="acc-list__cap">
+                      <span>ACCESSORIES{dmgDamaged > 0 && <span className="acc-list__dmgflag">⚠ {dmgDamaged} damaged</span>}</span>
+                      <span><b>{liveOwn}</b>/{cur.req}</span>
+                    </div>
                     {clusterBp.solo.map((a, i) => (
                       <AccItem key={i} name={a[0]} req={a[1]}
                                checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
@@ -410,6 +439,22 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                                                onSet={(n) => setUnit(a[0], n)} />
                                     )} />
                     ))}
+                    <button type="button" className={"acc-dmgtoggle" + (damageMode ? " is-on" : "") + (dmgDamaged > 0 ? " has-damage" : "")}
+                            onClick={() => setDamageMode(v => !v)}>
+                      {damageMode ? "✕ done marking damage" : "⚠ mark as damaged"}
+                    </button>
+                    {damageMode && (
+                      <div className="acc-list acc-list--dmg">
+                        <div className="acc-list__cap"><span>DAMAGED ACCESSORIES</span><span><b>{dmgDamaged}</b>/{dmgOwned}</span></div>
+                        {ownedAcc.length === 0
+                          ? <div className="acc acc--note">No accessories owned yet on this copy.</div>
+                          : ownedAcc.map(([n]) => (
+                              <AccItem key={n} name={n} req={(raw.acc && raw.acc[n]) || 0} tone="damage"
+                                       checked={Array.from({ length: (raw.acc && raw.acc[n]) || 0 }, (_, k) => k < (accDamage[n] || 0))}
+                                       onSet={(k) => setDamage(n, k)} />
+                            ))}
+                      </div>
+                    )}
                   </div>
                 )}
 

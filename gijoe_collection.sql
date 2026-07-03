@@ -197,11 +197,15 @@ CREATE TABLE IF NOT EXISTS instances (
 -- than one unit of an accessory (e.g. a figure needing two of the same
 -- weapon). A line is satisfied when units_owned >= figure_accessories.quantity_required.
 -- units_owned = 0 → this copy is missing this accessory entirely.
+-- units_damaged (migration 004) is a subset of units_owned — a condition
+-- notation, not a completeness input. Clamped to <= units_owned at the app
+-- layer (SQLite ALTER TABLE can't add cross-column CHECK constraints).
 
 CREATE TABLE IF NOT EXISTS instance_accessories (
-    instance_id  INTEGER NOT NULL REFERENCES instances(id) ON DELETE CASCADE,
-    accessory_id INTEGER NOT NULL REFERENCES accessories(id) ON DELETE RESTRICT,
-    units_owned  INTEGER NOT NULL DEFAULT 0,
+    instance_id    INTEGER NOT NULL REFERENCES instances(id) ON DELETE CASCADE,
+    accessory_id   INTEGER NOT NULL REFERENCES accessories(id) ON DELETE RESTRICT,
+    units_owned    INTEGER NOT NULL DEFAULT 0,
+    units_damaged  INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (instance_id, accessory_id)
 );
 

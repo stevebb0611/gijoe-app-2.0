@@ -7,8 +7,11 @@
 // they still just call JoeStore.* and read the result immediately.
 //
 // Instance shape (one owned physical copy) — unchanged from before:
-//   { id, catalogId, variant, moc, acc:{[name]:units}, phys, paint,
-//     marks:{gender,condition,paint}, filecard:{onFile,printing}, loc, notes, addedAt }
+//   { id, catalogId, variant, moc, acc:{[name]:units}, accDamage:{[name]:units},
+//     phys, paint, marks:{gender,condition,paint}, filecard:{onFile,printing},
+//     loc, notes, addedAt }
+//   accDamage: how many of acc[name]'s owned units are damaged (<= acc[name]).
+//   A condition notation, not a completeness input — see accDamagePct().
 //   variant: '' (single-variant figure) | 'A'|'B'… (a production variant)
 //   moc: true = Mint-on-Card (sealed) — counts 100% complete regardless of acc
 //   phys/paint: grade string ('Mint'…'Poor') or null when ungraded — derived live
@@ -90,6 +93,14 @@ function instWhole(bp, acc) {
 // text before the first "(" is the slot label, text inside "(...)" is the option label.
 function groupLabel(items) { const m = items[0][0].match(/^(.*?)\s*\(/); return m ? m[1].trim() : items[0][0]; }
 function optLabel(name) { const m = name.match(/\(([^)]+)\)/); return m ? m[1] : name; }
+// Damaged share across the FULL blueprint (retail + group + non-retail alike) —
+// condition is orthogonal to what counts toward Complete, so it isn't run
+// through clusterBlueprint. 0 when nothing's owned yet.
+function accDamagePct(bp, acc, accDamage) {
+  let owned = 0, damaged = 0;
+  (bp || []).forEach(([n]) => { owned += acc[n] || 0; damaged += (accDamage && accDamage[n]) || 0; });
+  return owned ? damaged / owned : 0;
+}
 function missingList(bp, acc) {
   const { solo, plain, matched } = clusterBlueprint(bp);
   const soloMissing = solo.filter(([n, q]) => (acc[n] || 0) < q).map(([n, q]) => q > 1 ? `${n} ${acc[n] || 0}/${q}` : n);
@@ -170,6 +181,10 @@ export const JoeStore = {
       api('PATCH', '/api/instances/' + id + '/accessory', { name, units });
       refresh(); emit();
     },
+    setAccDamage(id, name, units) {
+      api('PATCH', '/api/instances/' + id + '/accessory-damage', { name, units });
+      refresh(); emit();
+    },
     removeInstance(id) {
       api('DELETE', '/api/instances/' + id);
       refresh(); emit();
@@ -218,4 +233,4 @@ export const JoeStore = {
       return false;
     },
   };
-export const JoeData = { CAT, CAT_BY_ID, ACC, ACC_BY_ID, bpReq, instOwn, instPct, instWhole, clusterBlueprint, groupLabel, optLabel, instancesOf, ownedCount, figureSummary, totals };
+export const JoeData = { CAT, CAT_BY_ID, ACC, ACC_BY_ID, bpReq, instOwn, instPct, instWhole, accDamagePct, clusterBlueprint, groupLabel, optLabel, instancesOf, ownedCount, figureSummary, totals };

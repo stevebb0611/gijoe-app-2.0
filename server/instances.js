@@ -43,19 +43,20 @@ const instanceRowsStmt = db.prepare(`
 `);
 
 const instanceAccStmt = db.prepare(`
-  SELECT ia.instance_id, i.figure_id, ia.accessory_id, ia.units_owned
+  SELECT ia.instance_id, i.figure_id, ia.accessory_id, ia.units_owned, ia.units_damaged
   FROM instance_accessories ia
   JOIN instances i ON i.id = ia.instance_id
   WHERE ia.units_owned > 0
 `);
 
-function shapeInstance(row, accByInstance) {
+function shapeInstance(row, accByInstance, damageByInstance) {
   return {
     id: row.id,
     catalogId: row.catalogId,
     variant: row.variant || '',
     moc: !!row.moc,
     acc: accByInstance.get(row.id) || {},
+    accDamage: damageByInstance.get(row.id) || {},
     marks: row.marks ? JSON.parse(row.marks) : null,
     loc: row.loc || '',
     notes: row.notes || '',
@@ -78,6 +79,7 @@ function shapeBinEntry(row) {
 
 export function getState() {
   const accByInstance = new Map();
+  const damageByInstance = new Map();
   const idNameByFigure = new Map(); // figure_id -> Map(accessory_id -> disambiguated name)
   for (const r of instanceAccStmt.all()) {
     if (!idNameByFigure.has(r.figure_id)) idNameByFigure.set(r.figure_id, blueprintIdNameMap(r.figure_id));
@@ -85,9 +87,13 @@ export function getState() {
     if (!name) continue; // accessory no longer on this figure's blueprint
     if (!accByInstance.has(r.instance_id)) accByInstance.set(r.instance_id, {});
     accByInstance.get(r.instance_id)[name] = r.units_owned;
+    if (r.units_damaged > 0) {
+      if (!damageByInstance.has(r.instance_id)) damageByInstance.set(r.instance_id, {});
+      damageByInstance.get(r.instance_id)[name] = r.units_damaged;
+    }
   }
   return {
-    instances: instanceRowsStmt.all().map((r) => shapeInstance(r, accByInstance)),
+    instances: instanceRowsStmt.all().map((r) => shapeInstance(r, accByInstance, damageByInstance)),
     bin: binRowsStmt.all().map(shapeBinEntry),
   };
 }
@@ -163,6 +169,25 @@ export function setInstanceAccessory(instanceId, name, units) {
   const accId = accessoryIdForName(row.figure_id, name);
   if (!accId) return false;
   upsertInstanceAcc.run(instanceId, accId, units);
+  return true;
+}
+
+const setInstanceAccDamage = db.prepare(`
+  UPDATE instance_accessories SET units_damaged = ? WHERE instance_id = ? AND accessory_id = ?
+`);
+
+// units_damaged is a condition notation on units the copy already owns — never
+// creates a row (upsertInstanceAcc already did that when units_owned was set)
+// and is clamped to [0, units_owned] since you can't damage a part you don't have.
+export function setInstanceAccessoryDamage(instanceId, name, units) {
+  const row = getInstanceFigure.get(instanceId);
+  if (!row) return false;
+  const accId = accessoryIdForName(row.figure_id, name);
+  if (!accId) return false;
+  const cur = db.prepare('SELECT units_owned FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(instanceId, accId);
+  const owned = cur ? cur.units_owned : 0;
+  if (!owned) return false;
+  setInstanceAccDamage.run(Math.max(0, Math.min(units, owned)), instanceId, accId);
   return true;
 }
 

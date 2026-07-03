@@ -7,6 +7,7 @@
     --line-soft: rgba(33,31,26,.22);
     --accent: #b8402f;
     --ok: #5d7d4d;
+    --damage: #8f2f24;
     --olive: #5f6b39;
     --crimson: #a23a2c;
     --oktober: oklch(0.5 0.085 245);
@@ -45,10 +46,15 @@
     background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.25) 0 4px, transparent 4px 8px); }
   .wf-bar__fill.is-done { background: var(--ok); }
 
-  .wf-ring { border-radius: 50%; display: grid; place-items: center; border: 1.5px solid var(--ink); flex: none; }
-  .wf-ring__hole { background: var(--paper); border-radius: 50%; width: 68%; height: 68%; display: grid; place-items: center; }
+  .wf-ring { position: relative; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid var(--ink); flex: none; }
+  .wf-ring__hole { position: relative; z-index: 1; background: var(--paper); border-radius: 50%; width: 68%; height: 68%; display: grid; place-items: center; }
   .wf-ring__pct { font-family: var(--font-display); font-weight: 700; font-size: 16px; line-height: 1; }
   .wf-ring__pct small { font-size: 8px; font-family: var(--font-mono); }
+  /* hashed pie-slice overlay showing the damaged share of the completed arc */
+  .wf-ring__dmg { position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+    background: repeating-conic-gradient(var(--damage) 0deg 8deg, transparent 8deg 16deg);
+    -webkit-mask: conic-gradient(#000 var(--dmg-end), transparent 0);
+            mask: conic-gradient(#000 var(--dmg-end), transparent 0); }
 
   /* ===== page shell ===== */
   .invp { color: var(--ink); font-family: var(--font-mono); font-size: 13px; min-height: 100vh; }
@@ -417,6 +423,20 @@
   .acc__box.is-spacer { border: none; background: none; visibility: hidden; cursor: default; }
   .acc__count { font-family: var(--font-mono); font-weight: 700; font-size: 12px; text-align: right; white-space: nowrap; min-width: 34px; color: var(--ink-soft); }
   .acc.is-done .acc__count { color: var(--ok); }
+
+  /* ===== damage notation — per-unit condition flag on owned accessories ===== */
+  .acc-list__dmgflag { margin-left: 8px; color: var(--damage); font-weight: 700; }
+  .acc.is-damage-tone .acc__box.is-on { background: var(--damage);
+    background-image: repeating-linear-gradient(45deg, rgba(0,0,0,.3) 0 4px, transparent 4px 8px); color: #fff; }
+  .acc.is-damage-tone.is-done .acc__count { color: var(--damage); }
+  .acc-dmgtoggle { display: block; width: 100%; margin-top: 2px; padding: 9px 12px; border: none; border-top: 1px solid var(--line-soft);
+    background: var(--card); color: var(--ink-soft); font-family: var(--font-mono); font-weight: 700; font-size: 10px; letter-spacing: .6px;
+    text-align: left; cursor: pointer; }
+  .acc-dmgtoggle:hover { color: var(--damage); }
+  .acc-dmgtoggle.is-on { background: var(--ink); color: var(--paper); }
+  .acc-dmgtoggle.has-damage:not(.is-on) { color: var(--damage); }
+  .acc-list--dmg { border: 1.5px solid var(--damage); margin-top: -1.5px; margin-bottom: 16px; }
+  .acc-list--dmg .acc-list__cap { border-bottom-color: var(--damage); }
 
   /* ===== accessory groups — variant slots (group_id) + non-retail context
      boxes, ported from "GI Joe Tracker - Accessory Sub-Groups v2.html" ===== */

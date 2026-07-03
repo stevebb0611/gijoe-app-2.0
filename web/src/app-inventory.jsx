@@ -19,6 +19,11 @@ function useStore() {
   return JoeStore.get();
 }
 
+// Catalog code names are stored ALL CAPS (vintage file-card style, kept as the
+// design-of-record look elsewhere in the app); this is for spots that need
+// sentence/Title case per FRONTEND_STANDARDS.md's "no ALL CAPS" rule.
+function titleCase(s) { return (s || '').toLowerCase().replace(/(^|[\s\-'.])\S/g, (c) => c.toUpperCase()); }
+
 // ---------------------------------------------------------------------------
 // Roster row (list) + its inline instance accordion
 // ---------------------------------------------------------------------------
@@ -82,7 +87,7 @@ function Row({ fig, selId, openIds, onToggle, onOpen }) {
           {copies.map((c) => (
             <button key={c.id} className={"inv-inst" + (active && selId === fig.id ? "" : "")} onClick={() => onOpen(fig.id, c.id)}>
               <span className="inv-inst__tab">↳</span>
-              <span className="inv-inst__id"><span>No. {c.no}</span><i>{c.loc || (c.phys ? c.phys + " / " + c.paint : "ungraded")}</i></span>
+              <span className="inv-inst__id"><span>{titleCase(fig.name)} No. {c.no}</span><i>{c.loc || (c.phys ? c.phys + " / " + c.paint : "ungraded")}</i></span>
               <span className="inv-stock"><StockBar pct={c.pct} />{c.cardOnFile && <span className="inv-fc" title="File card on file">+ File card</span>}</span>
               <span className={"inv-need" + (c.pct === 100 ? " is-zero" : "")}>{c.pct === 100 ? "✓ Complete" : "Missing " + (c.req - c.own)}</span>
               <span className="inv-go">▸</span>
@@ -184,6 +189,15 @@ const RELEASE_OPTS = ['Retail', 'Mail-away', 'Convention', 'Store exclusive'];
 const ALL_YEARS = [...new Set(INV_CAT.map(y => y.year))].sort((a, b) => a - b);
 const YR_MIN = ALL_YEARS[0], YR_MAX = ALL_YEARS[ALL_YEARS.length - 1];
 
+// distinct production variants actually owned (>=1 copy of that letter)
+function ownedVariantCount(fig) {
+  return fig._sum ? new Set(fig._sum.copies.map(c => c.variant || '')).size : 0;
+}
+// a "gap" is now variant-aware: never owned at all, OR owned but missing one
+// or more of its production variants — a true complete collection needs every
+// variant, not just one copy of the code name (see #9's yearParts()).
+function isGap(fig) { return fig.owned === 0 || ownedVariantCount(fig) < fig.variants; }
+
 // completeness band for one figure (only meaningful when owned > 0)
 function compBand(fig) {
   if (fig.owned === 0) return null;
@@ -262,7 +276,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
 
   const matchQ = (fig) => !q || [fig.name, fig.variant, fig.specialty, fig.version, fig.faction, String(fig.year)].some(s => s && s.toLowerCase().includes(q)) || fig.acc.some(a => a[0].toLowerCase().includes(q));
   const passStatus = (fig) => {
-    if (status === 'gaps') return fig.owned === 0;
+    if (status === 'gaps') return isGap(fig);
     if (status === 'dupes') return fig.owned > 1;
     if (fig.owned === 0) return status === 'all' && !!q; // gaps surface via search only
     const st = figState(fig);

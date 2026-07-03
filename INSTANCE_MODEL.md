@@ -25,10 +25,17 @@ Instance
   isPrimary: boolean       // optional manual pin; if unset, No. 1 (most complete) is the de-facto primary shown in list/gallery summaries
   bodyType: 'male'|'female'// which diagram template the damage map uses
 
-  accessories: [{ name, have: boolean }]   // per-instance checklist, seeded from the
-                                            // figure's required accessory blueprint.
+  accessories: [{ name, have: boolean, damaged: boolean }]   // per-instance checklist, seeded
+                                            // from the figure's required accessory blueprint.
                                             // "have" = the ORIGINAL part is present.
                                             // complete = every required accessory.have === true
+                                            // "damaged" (July 2026) is a condition notation on a
+                                            // HAD unit — never affects complete. Real schema:
+                                            // instance_accessories.units_damaged, clamped <=
+                                            // units_owned (migration 004). Surfaced as a
+                                            // "mark as damaged" toggle in the accessories panel
+                                            // and a hashed wedge on the completeness ring sized
+                                            // to the damaged share of owned accessories.
 
   damage: {
     physical: [{ id, side:'front'|'back', point, type, severity }]

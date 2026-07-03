@@ -165,8 +165,16 @@ Completeness math (figParts / figState / yearParts / totals) — PER-INSTANCE (s
   complete-now = ≥ 1 copy is whole as parts are currently assigned   // the real "complete"
   figState(fig): per-instance allocation + currentWhole / optimalWhole /
                  completeNow / completable / surplus / rebalance moves
-  year.coverage   = ownedFigures / rosterFigures      // "how much of the year"
-  year.completion = completeNowFigures / ownedFigures  // "how many are whole"
+  year.coverage   = ownedVariantSlots / rosterVariantSlots   // "how much of the year"
+  year.completion = completeNowSlots / ownedVariantSlots      // "how many are whole"
+  // (July 2026) roster/owned are counted per PRODUCTION VARIANT, not per catalog
+  // figure — a true complete year means owning every variant, not one copy of
+  // each code name (1982's 16 code names carry 43 variants between them; see
+  // OPEN_QUESTIONS_ISSUES_FOUND.md #9/#11). A figure contributes >=1 slots (its
+  // variants[] array, always >=1 — see VARIANTS.md); "owned" only credits
+  // variant letters you actually hold a copy of, not raw copy count. This is
+  // the roster/coverage axis only — the accessory blueprint itself still keys
+  // on figureId with no per-variant override (OPEN_QUESTIONS.md §7.5).
   totals: figs, instances(=Σowned), inInventory(owned≥1), complete(=complete-now), missing(req−own)
 ```
 

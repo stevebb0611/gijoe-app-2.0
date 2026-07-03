@@ -51,7 +51,6 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const variantKey = single ? '' : (selVar || '');
   const ownedHere = fig ? JoeData.ownedCount(fig.id, variantKey) : 0;
   const isNew = !!fig && ownedHere === 0;
-  const instNo = ownedHere + 1;
   const varLabel = multi ? (chosen ? "v" + fig.ver + " · " + chosen.letter : "") : (single ? "v" + fig.ver : null);
   const varTell = chosen ? chosen.tell : null;
 
@@ -299,7 +298,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
               <div className="af-sum">
                 <div className="af-sum__row"><span>Figure</span><b>{fig.name} · {multi ? varLabel : (fig.role || varLabel)} · {fig.year}</b></div>
                 {multi && <div className="af-sum__row"><span>Variant</span><b>{varTell}</b></div>}
-                <div className="af-sum__row"><span>Copy</span><b>#{instNo}{isNew ? " · first of this variant" : ""}</b></div>
+                <div className="af-sum__row"><span>Copy</span><b>{isNew ? "first of this variant" : "additional copy"}</b></div>
                 <div className="af-sum__row"><span>Accessories</span><b>{moc ? "sealed on card · 100% (assumed present)" : (blueprint.length ? `${fullDone}/${bpReq} complete` : "none on file")}</b></div>
                 <div className="af-sum__row"><span>Condition</span><b>{moc ? "Mint on Card · factory mint (sealed)" : (ungraded ? "ungraded — map later" : marksCount === 0 ? `${phys.grade} physical / ${paint.grade} paint · confirmed clean` : `${phys.grade} physical / ${paint.grade} paint · ${marksCount} mark${marksCount !== 1 ? "s" : ""}`)}</b></div>
                 <div className="af-sum__row"><span>Location</span><b>{loc || "—"}</b></div>
@@ -313,7 +312,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
           {step === 3 && done && (
             <div className="af-okwrap">
               <div className="af-ok">✓</div>
-              <div className="af-ok__h">{fig.name}{multi ? " " + varLabel : ""} · copy #{instNo} added</div>
+              <div className="af-ok__h">{fig.name}{multi ? " " + varLabel : ""} added</div>
               <div className="af-ok__sub">
                 {moc ? "Mint on Card · 100% complete (sealed) · factory mint" : (
                   <React.Fragment>

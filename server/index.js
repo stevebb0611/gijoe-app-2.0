@@ -48,6 +48,12 @@ app.patch('/api/instances/:id/accessory', (req, res) => {
   res.json({ ok: true });
 });
 
+app.patch('/api/instances/:id/accessory-damage', (req, res) => {
+  const ok = store.setInstanceAccessoryDamage(+req.params.id, req.body.name, req.body.units);
+  if (!ok) return res.status(400).json({ error: 'accessory not owned on this copy' });
+  res.json({ ok: true });
+});
+
 app.delete('/api/instances/:id', (req, res) => {
   store.removeInstance(+req.params.id);
   res.status(204).end();
