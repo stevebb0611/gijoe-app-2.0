@@ -66,6 +66,14 @@ const __TWEAKS_STYLE = `
     border:.5px solid rgba(255,255,255,.6);border-radius:14px;
     box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.18);
     font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+  .twk-trigger{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:40px;height:40px;
+    border-radius:50%;border:.5px solid rgba(255,255,255,.6);padding:0;
+    background:rgba(250,249,247,.78);color:rgba(41,38,27,.7);
+    -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
+    box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 8px 24px rgba(0,0,0,.18);
+    font-size:17px;line-height:1;cursor:pointer;display:grid;place-items:center}
+  .twk-trigger:hover{color:#29261b;
+    box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 10px 28px rgba(0,0,0,.22)}
   .twk-hd{display:flex;align-items:center;justify-content:space-between;
     padding:10px 8px 10px 14px;cursor:move;user-select:none}
   .twk-hd b{font-size:12px;font-weight:600;letter-spacing:.01em}
@@ -91,6 +99,14 @@ const __TWEAKS_STYLE = `
   .twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
     color:rgba(41,38,27,.45);padding:10px 0 0}
   .twk-sect:first-child{padding-top:0}
+
+  .twk-note{display:flex;flex-direction:column;gap:6px;font-size:11px;line-height:1.45;
+    color:rgba(41,38,27,.78)}
+  .twk-note b{font-size:11.5px;color:#29261b}
+  .twk-note p{margin:0}
+  .twk-note code{display:block;background:rgba(0,0,0,.06);border:.5px solid rgba(0,0,0,.08);
+    border-radius:6px;padding:6px 8px;font:10.5px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;
+    color:#29261b;overflow-wrap:break-word;user-select:text}
 
   .twk-field{appearance:none;box-sizing:border-box;width:100%;min-width:0;height:26px;padding:0 8px;
     border:.5px solid rgba(0,0,0,.1);border-radius:7px;
@@ -264,7 +280,15 @@ function TweaksPanel({ title = 'Tweaks', children }) {
     window.addEventListener('mouseup', up);
   };
 
-  if (!open) return null;
+  if (!open) {
+    return (
+      <>
+        <style>{__TWEAKS_STYLE}</style>
+        <button type="button" className="twk-trigger" onClick={() => setOpen(true)}
+                aria-label={"Open " + title} title={title}>⚙</button>
+      </>
+    );
+  }
   return (
     <>
       <style>{__TWEAKS_STYLE}</style>

@@ -306,7 +306,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                   <p className="inv-modal__blurb">Adding it creates your first owned copy and a blank accessory checklist from the blueprint below ({bp.length} piece{bp.length !== 1 ? "s" : ""} to track).</p>
                   <div className="inv-bprint">BLUEPRINT</div>
                   <div className="acc-list">
-                    <div className="acc-list__cap"><span>ACCESSORY · CHECK PER UNIT</span><span><b>0</b>/{bp.reduce((s, a) => s + a[1], 0)}</span></div>
+                    <div className="acc-list__cap"><span>ACCESSORIES</span><span><b>0</b>/{bp.reduce((s, a) => s + a[1], 0)}</span></div>
                     {bp.map((a, i) => <AccItem key={i} name={a[0]} req={a[1]} checked={Array.from({ length: a[1] }, () => false)} />)}
                   </div>
                 </React.Fragment>}
@@ -389,7 +389,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                   </div>
                 ) : (
                   <div className="acc-list">
-                    <div className="acc-list__cap"><span>ACCESSORY · CHECK PER UNIT</span><span><b>{liveOwn}</b>/{cur.req}</span></div>
+                    <div className="acc-list__cap"><span>ACCESSORIES</span><span><b>{liveOwn}</b>/{cur.req}</span></div>
                     {bp.map((a, i) => (
                       <AccItem key={i} name={a[0]} req={a[1]}
                                checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}

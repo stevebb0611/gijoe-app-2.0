@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { useTweaks, TweaksPanel, TweakSection, TweakRadio, TweakToggle, TweakColor, TweakButton } from './tweaks-panel.jsx';
 import { InventoryView } from './app-inventory.jsx';
 import { AddFigureOverlay } from './app-add-figure.jsx';
+import { PartsBin } from './parts-bin.jsx';
 import { JoeStore } from './store.js';
 import './app.css';
 
@@ -15,6 +16,7 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 
 function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [page, setPage] = React.useState('figures'); // 'figures' | 'parts-bin'
   const [overlay, setOverlay] = React.useState(null); // null | { presetId, presetVariant }
   const fileRef = React.useRef(null);
 
@@ -45,18 +47,36 @@ function App() {
 
   return (
     <React.Fragment>
-      <InventoryView onAddFigure={openAdd} onAddInstance={addInstance} />
+      {page === 'parts-bin'
+        ? <PartsBin onNavigate={setPage} />
+        : <InventoryView onAddFigure={openAdd} onAddInstance={addInstance} onNavigate={setPage} />}
       {overlay && <AddFigureOverlay onClose={() => setOverlay(null)} presetCatalogId={overlay.presetId} presetVariant={overlay.presetVariant} />}
       <input ref={fileRef} type="file" accept="application/json" style={{ display: 'none' }} onChange={doImport} />
-      <TweaksPanel>
+      <TweaksPanel title="Tweaks & Admin">
         <TweakSection label="Paper & ink" />
         <TweakRadio label="Paper" value={t.paper} options={['kraft', 'white']} onChange={(v) => setTweak('paper', v)} />
         <TweakColor label="Accent" value={t.accent} options={['#6b6f39', '#b8402f', '#c9772f', '#3f6f86']} onChange={(v) => setTweak('accent', v)} />
         <TweakToggle label="Faction colors" value={t.factionColors} onChange={(v) => setTweak('factionColors', v)} />
-        <TweakSection label="Your data (saved on this machine)" />
+        <TweakSection label="Collection data" />
         <TweakButton label="⬇ Export backup (.json)" onClick={doExport} />
         <TweakButton label="⬆ Import backup" secondary onClick={() => fileRef.current && fileRef.current.click()} />
         <TweakButton label="✕ Clear collection" secondary onClick={doClear} />
+        <TweakSection label="Admin" />
+        <div className="twk-note">
+          <b>Figure missing from the catalog?</b>
+          <p>Run from the project root, then reload this tab — the catalog loads once at page load, not live:</p>
+          <code>{'node server/add-figure.mjs --name "NAME" --faction Cobra --year 1993 --series "Series 12"'}</code>
+          <p>Look up ids first if you need them:</p>
+          <code>node server/add-figure.mjs --search-series 1993</code>
+          <code>{'node server/add-figure.mjs --search-accessories "helmet"'}</code>
+        </div>
+        <div className="twk-note">
+          <b>Condition-map zone data</b>
+          <p>Hand-authored body-zone grids, one per gender/view, tied 1:1 to the line art. Hand-edit these if a zone needs adjusting — there's no in-app editor:</p>
+          <code>web/src/assets/figure-masks.js</code>
+          <code>web/src/assets/figure-zones.js</code>
+          <code>web/public/assets/fig/*.png</code>
+        </div>
       </TweaksPanel>
     </React.Fragment>
   );

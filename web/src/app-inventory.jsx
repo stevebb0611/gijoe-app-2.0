@@ -59,9 +59,7 @@ function Row({ fig, selId, openIds, onToggle, onOpen }) {
               : <React.Fragment>
                   <StockBar pct={single.pct} />
                   <span className="inv-stock__n">{single.own}/{single.req}</span>
-                  {single.pct === 100
-                    ? <span className="inv-stock__done">✓ whole</span>
-                    : <span className="inv-stock__miss" title={single.missing.join(', ')}>{single.missing.join(', ') || "—"}</span>}
+                  {single.pct !== 100 && <span className="inv-stock__miss" title={single.missing.join(', ')}>{single.missing.join(', ') || "—"}</span>}
                   {single.cardOnFile && <span className="inv-fc" title="File card on file">+ File card</span>}
                 </React.Fragment>}
         </span>
@@ -222,7 +220,7 @@ function FacetRow({ label, sub, options, selected, onToggle, facColors, off, not
 // ---------------------------------------------------------------------------
 // Root
 // ---------------------------------------------------------------------------
-function InventoryView({ onAddFigure, onAddInstance }) {
+function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
   useStore();
   const t = invTotals();
   const [view, setView] = React.useState('list');
@@ -322,9 +320,9 @@ function InventoryView({ onAddFigure, onAddInstance }) {
             </span>
             <span className="inv-brand__name">G.I. JOE<br/>COLLECTION</span>
             <nav className="inv-nav">
-              <a className="is-active">Figures</a>
+              <button type="button" className="is-active">Figures</button>
               <a className="inv-nav__soon" href="GI Joe Tracker - Vehicles.html" title="Vehicles & Playsets — in development">Vehicles<em className="inv-nav__tag">In Dev</em></a>
-              <a href="GI Joe Tracker - Parts Bin.html">Parts Bin</a>
+              <button type="button" onClick={() => onNavigate('parts-bin')}>Parts Bin</button>
             </nav>
           </div>
           <div className="invp-mid">

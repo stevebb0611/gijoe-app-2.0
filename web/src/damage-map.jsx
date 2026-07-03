@@ -110,7 +110,7 @@ function dmZoneGrade(marks, useCap) {
 function physicalGrade(value) { return dmZoneGrade(value && value.condition, true); }
 function paintGrade(value) { return dmZoneGrade(value && value.paint, false); }
 
-const dmEmpty = (gender) => ({ gender: gender || 'male', condition: { front: {}, rear: {} }, paint: { front: {}, rear: {} } });
+const dmEmpty = (gender) => ({ gender: gender || 'male', condition: { front: {}, rear: {} }, paint: { front: {}, rear: {} }, clean: false });
 
 // ---------- one-time CSS inject ----------
 function dmInjectCss() {

@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { buildCatalog } from './catalog.js';
+import { buildAccessoryCatalog } from './accessories.js';
 import * as store from './instances.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -21,6 +22,10 @@ app.use((req, res, next) => (BLOCKED_EXT.test(req.path) ? res.status(404).end() 
 
 app.get('/api/catalog', (req, res) => {
   res.json(buildCatalog());
+});
+
+app.get('/api/accessories', (req, res) => {
+  res.json(buildAccessoryCatalog());
 });
 
 app.get('/api/state', (req, res) => {
