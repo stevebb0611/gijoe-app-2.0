@@ -4,7 +4,8 @@
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
 import { physicalGrade, paintGrade, dmEmpty, DamageMap, GradeBadge } from './damage-map.jsx';
-import { VariantGroup, ContextGroup, clusterContexts } from './accessory-groups.jsx';
+import { VariantGroup, MatchedGroup, ContextGroup, clusterContexts } from './accessory-groups.jsx';
+import { AccSwatch } from './acc-colors.jsx';
 
 const INV_CAT = JoeData.CAT || [];
 const INV_ERAS = {}; // was window.JOE_ERAS from the retired catalog-data.js — always {}
@@ -34,7 +35,7 @@ function fvm(cf) {
     id: cf.id, name: cf.name, year: cf.year, faction: cf.faction,
     version: cf.ver ? 'v' + cf.ver : '',
     variants: (cf.variants || []).length,
-    specialty: cf.role || '', variant: cf.role || '',
+    specialty: cf.role || '', variant: cf.role || '', vehicle: cf.vehicle || null,
     owned, acc, blueprint: bp,
     _cf: cf, _sum: sum,
   };
@@ -155,9 +156,10 @@ function applyRebalance(catalogId, mode) {
 // data authored yet (they just count as a single slot, same as before).
 function yearParts(yearNum) {
   const roster = INV_CAT.filter(f => f.year === yearNum);
-  let figs = 0, owned = 0, completeNow = 0;
+  let figs = 0, owned = 0, completeNow = 0, ownedInstances = 0;
   roster.forEach(cf => {
     const s = JoeData.figureSummary(cf.id);
+    ownedInstances += s ? s.owned : 0; // raw physical-copy count, duplicates included
     const slots = (cf.variants && cf.variants.length) ? cf.variants : [{ letter: '' }];
     figs += slots.length;
     slots.forEach(({ letter }) => {
@@ -168,7 +170,13 @@ function yearParts(yearNum) {
       }
     });
   });
-  return { figs, owned, completeNow, coverage: figs ? Math.round(owned / figs * 100) : 0, completion: owned ? Math.round(completeNow / owned * 100) : 0 };
+  // Both meters are anchored to the SAME denominator (the full series roster,
+  // e.g. 43 for 1982) per owner request — "Figures" is how much of the whole
+  // series you own, "Complete" is how much of the whole series is whole, not
+  // how much of what you've collected so far is whole. ownedInstances is a
+  // separate, third metric — how many physical copies you actually have from
+  // this year (duplicates count), independent of roster coverage.
+  return { figs, owned, completeNow, ownedInstances, coverage: figs ? Math.round(owned / figs * 100) : 0, completion: figs ? Math.round(completeNow / figs * 100) : 0 };
 }
 function invTotals() {
   const t = JoeData.totals();
@@ -210,7 +218,10 @@ function boxLayout(req) {
   const cols = rows === 1 ? req : Math.ceil(req / 2);
   return { rows, cols, empty: cols * rows - req };
 }
-function AccItem({ name, req, checked, onSet, tone }) {
+// color (added 2026-07-03, see acc-colors.jsx) renders as an AccSwatch beside
+// the name — decoration only, never gates the checkbox fill (see rule #5 in
+// acc-colors.jsx's header).
+function AccItem({ name, req, checked, onSet, tone, color }) {
   const { rows, cols, empty } = boxLayout(req);
   const own = checked.reduce((s, c) => s + (c ? 1 : 0), 0);
   const done = own >= req;
@@ -228,7 +239,7 @@ function AccItem({ name, req, checked, onSet, tone }) {
   }
   return (
     <div className={"acc" + (rows === 2 ? " is-stack" : "") + (done ? " is-done" : "") + (dmg ? " is-damage-tone" : "")}>
-      <span className="acc__name">{name}</span>
+      <span className="acc__namewrap">{color && <AccSwatch color={color} />}<span className="acc__name">{name}</span></span>
       <div className="acc__boxes" style={{ gridTemplateColumns: "repeat(" + cols + ", 22px)" }}>{cells}</div>
       <span className="acc__count">{own}/{req}</span>
     </div>
@@ -250,6 +261,8 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const cur = copies.find(c => c.id === curId) || copies[0] || null;
   const [flipped, setFlipped] = React.useState(false);
   const [damageMode, setDamageMode] = React.useState(false);
+  const [varEdit, setVarEdit] = React.useState(false);
+  React.useEffect(() => setVarEdit(false), [curId]);
   // binder tabs retract while the card flips, then spring back once it lands
   const [tucked, setTucked] = React.useState(false);
   const tuckTimer = React.useRef(null);
@@ -287,6 +300,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const setCard = (patch) => JoeStore.updateInstance(cur.id, { filecard: { ...filecard, ...patch } });
   const setNotes = (v) => JoeStore.updateInstance(cur.id, { notes: v });
   const setLoc = (v) => JoeStore.updateInstance(cur.id, { loc: v });
+  const setVariant = (letter) => { JoeStore.updateInstance(cur.id, { variant: letter }); setVarEdit(false); };
   const setMarks = (val) => {
     const pg = physicalGrade(val), pt = paintGrade(val);
     JoeStore.updateInstance(cur.id, { marks: val, phys: pg.zones ? pg.grade : null, paint: pt.zones ? pt.grade : null });
@@ -325,6 +339,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
               <div className="inv-modal__name">{fig.name}{fig.version ? <em className="idver idver--lg">{fig.version}</em> : null}</div>
               <div className="inv-modal__var">{fig.specialty} · {fig.year}</div>
               {fig.variants > 1 ? <div className="inv-modal__variants"><span className="lyr"><b></b></span>{fig.variants} variants</div> : null}
+              {fig.vehicle && <span className="idveh idveh--modal" title={"Vehicle driver — packaged with the " + fig.vehicle}><b>VEHICLE</b> {fig.vehicle}</span>}
             </div>
             <div className="inv-modal__notin">NOT IN<br/>INVENTORY</div>
           </div>
@@ -389,7 +404,24 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                 <div className="inv-modal__id">
                   <div className="inv-modal__name">{fig.name}{fig.version ? <em className="idver idver--lg">{fig.version}</em> : null}</div>
                   <div className="inv-modal__var">{fig.specialty} · {fig.year}{cur.variant ? " · var " + cur.variant : ""}</div>
-                  {fig.variants > 1 ? <div className="inv-modal__variants"><span className="lyr"><b></b></span>{fig.variants} variants</div> : null}
+                  {fig.variants > 1 ? (
+                    <button type="button" className="inv-modal__variants inv-modal__variants--btn" title="Change production variant"
+                            aria-expanded={varEdit} onClick={() => setVarEdit(v => !v)}>
+                      <span className="lyr"><b></b></span>{fig.variants} variants
+                    </button>
+                  ) : null}
+                  {varEdit && (
+                    <div className="inv-varpick">
+                      {cf.variants.map(v => (
+                        <button key={v.letter} type="button" className={"inv-var" + (cur.variant === v.letter ? " is-sel" : "")} onClick={() => setVariant(v.letter)}>
+                          <span className="inv-var__radio"></span>
+                          <span className="inv-var__lab">{v.letter || "—"}</span>
+                          <span className="inv-var__tell">{v.tell || "no distinguishing notes"}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {fig.vehicle && <span className="idveh idveh--modal" title={"Vehicle driver — packaged with the " + fig.vehicle}><b>VEHICLE</b> {fig.vehicle}</span>}
                 </div>
                 <CompRing pct={ringPct} size={84} neutral damagedPct={dmgShare} />
                 {!moc && !liveWhole && <div className="inv-modal__ringlab">COMPLETENESS</div>}
@@ -424,17 +456,20 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                       <span><b>{liveOwn}</b>/{cur.req}</span>
                     </div>
                     {clusterBp.solo.map((a, i) => (
-                      <AccItem key={i} name={a[0]} req={a[1]}
+                      <AccItem key={i} name={a[0]} req={a[1]} color={a[6]}
                                checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
                                onSet={(n) => setUnit(a[0], n)} />
                     ))}
-                    {clusterBp.groups.map((items, i) => (
+                    {clusterBp.plain.map((items, i) => (
                       <VariantGroup key={i} items={items} acc={raw.acc || {}} live onSet={setUnit} />
                     ))}
+                    {clusterBp.matched.length > 0 && (
+                      <MatchedGroup groups={clusterBp.matched} acc={raw.acc || {}} live onSet={setUnit} />
+                    )}
                     {ctxGroups.map((cg) => (
                       <ContextGroup key={cg.context} context={cg.context} items={cg.items}
                                     renderRow={(a) => (
-                                      <AccItem key={a[0]} name={a[0]} req={a[1]}
+                                      <AccItem key={a[0]} name={a[0]} req={a[1]} color={a[6]}
                                                checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
                                                onSet={(n) => setUnit(a[0], n)} />
                                     )} />
@@ -448,10 +483,10 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                         <div className="acc-list__cap"><span>DAMAGED ACCESSORIES</span><span><b>{dmgDamaged}</b>/{dmgOwned}</span></div>
                         {ownedAcc.length === 0
                           ? <div className="acc acc--note">No accessories owned yet on this copy.</div>
-                          : ownedAcc.map(([n]) => (
-                              <AccItem key={n} name={n} req={(raw.acc && raw.acc[n]) || 0} tone="damage"
-                                       checked={Array.from({ length: (raw.acc && raw.acc[n]) || 0 }, (_, k) => k < (accDamage[n] || 0))}
-                                       onSet={(k) => setDamage(n, k)} />
+                          : ownedAcc.map((a) => (
+                              <AccItem key={a[0]} name={a[0]} req={(raw.acc && raw.acc[a[0]]) || 0} tone="damage" color={a[6]}
+                                       checked={Array.from({ length: (raw.acc && raw.acc[a[0]]) || 0 }, (_, k) => k < (accDamage[a[0]] || 0))}
+                                       onSet={(k) => setDamage(a[0], k)} />
                             ))}
                       </div>
                     )}

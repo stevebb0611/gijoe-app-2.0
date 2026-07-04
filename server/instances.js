@@ -143,11 +143,17 @@ const patchFieldsStmt = {
 };
 const getInstanceFigure = db.prepare('SELECT figure_id FROM instances WHERE id = ?');
 
+const setInstanceVariant = db.prepare('UPDATE instances SET variant_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
+
 export const updateInstance = db.transaction((id, patch) => {
   if ('loc' in patch) patchFieldsStmt.loc.run((patch.loc || '').trim() || null, id);
   if ('notes' in patch) patchFieldsStmt.notes.run((patch.notes || '').trim() || null, id);
   if ('moc' in patch) patchFieldsStmt.moc.run(patch.moc ? 1 : 0, id);
   if ('marks' in patch) patchFieldsStmt.marks.run(patch.marks ? JSON.stringify(patch.marks) : null, id);
+  if ('variant' in patch) {
+    const row = getInstanceFigure.get(id);
+    if (row) setInstanceVariant.run(resolveVariantId(row.figure_id, patch.variant), id);
+  }
   if ('filecard' in patch) {
     db.prepare('UPDATE instances SET filecard_on_file = ?, filecard_printing = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
       .run(patch.filecard.onFile ? 1 : 0, patch.filecard.printing || 'A', id);

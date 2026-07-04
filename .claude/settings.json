@@ -111,7 +111,26 @@
       "Bash(sqlite3 gijoe_collection.db \"select fa.figure_id, f.code_name from figure_accessories fa join figures f on f.id=fa.figure_id where fa.accessory_id=34;\")",
       "Bash(grep -v '^$\\\\|+\\\\|is-\\\\|on-')",
       "Bash(curl -sf http://localhost:3000/api/accessories)",
-      "Bash(mkdir -p /private/tmp/claude-501/-Users-steveblumrick-gijoe-app-2-0/a1bc086f-6f3c-4865-9acc-016f7b030712/scratchpad/pbtest)"
+      "Bash(mkdir -p /private/tmp/claude-501/-Users-steveblumrick-gijoe-app-2-0/a1bc086f-6f3c-4865-9acc-016f7b030712/scratchpad/pbtest)",
+      "Bash(git push *)",
+      "Bash(NODE_PATH=/Users/steveblumrick/.npm/_npx/5e2e484947874241/node_modules node verify-damage.mjs)",
+      "Bash(git check-ignore *)",
+      "Bash(curl -sf http://localhost:3000/api/state)",
+      "Bash(node verify-instlabel.mjs)",
+      "Bash(sqlite3 gijoe_collection.db \"SELECT f.series_id, count\\(*\\) as fig_count FROM figures f WHERE f.id IN \\(SELECT id FROM figures\\) GROUP BY f.series_id LIMIT 5;\")",
+      "Bash(sqlite3 gijoe_collection.db \"PRAGMA table_info\\(figures\\);\")",
+      "Bash(sqlite3 gijoe_collection.db \"PRAGMA table_info\\(variant_lookup\\);\")",
+      "Bash(sqlite3 gijoe_collection.db \"SELECT year_released, count\\(*\\) FROM figures WHERE year_released=1982 GROUP BY year_released;\")",
+      "Bash(sqlite3 gijoe_collection.db \"SELECT * FROM series LIMIT 20;\")",
+      "Bash(sqlite3 gijoe_collection.db \"SELECT year_released, count\\(*\\) FROM figures GROUP BY year_released ORDER BY year_released LIMIT 10;\")",
+      "Bash(node verify-yearparts.mjs)",
+      "Bash(NODE_PATH='' node -e ' *)",
+      "Bash(sips -c 700 1400 --out 11-gaps-top.png 11-gaps-filter.png)",
+      "Bash(node verify-gaps2.mjs)",
+      "Bash(node verify-addfigure.mjs)",
+      "Bash(node debug-af.mjs)",
+      "Bash(sqlite3 gijoe_collection.db \"SELECT count\\(*\\) FROM instances WHERE figure_id=26;\")",
+      "Bash(sqlite3 gijoe_collection.db \"SELECT count\\(*\\) FROM instances;\")"
     ]
   }
 }

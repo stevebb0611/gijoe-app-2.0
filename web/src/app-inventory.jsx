@@ -30,7 +30,8 @@ function titleCase(s) { return (s || '').toLowerCase().replace(/(^|[\s\-'.])\S/g
 function Row({ fig, selId, openIds, onToggle, onOpen }) {
   const p = figParts(fig);
   const ghost = fig.owned === 0;
-  const multi = fig.owned > 1;
+  const multi = fig.owned > 1;       // aggregate vs per-copy stock-summary rendering
+  const expandable = fig.owned > 0;  // any owned figure (single or multi) gets the accordion
   const isOpen = openIds.has(fig.id);
   const st = ghost ? null : figState(fig);
   const whole = st ? st.currentWhole : 0;
@@ -40,15 +41,20 @@ function Row({ fig, selId, openIds, onToggle, onOpen }) {
   const single = copies[0];
   const cardCount = copies.filter(c => c.cardOnFile).length;
   const need = single ? single.req - single.own : (p.req - p.own);
+  // production variants this figure has that no owned copy carries — the gap
+  // the "Show Collection Gaps" filter (isGap()) is actually flagging
+  const ownedLetters = new Set(copies.map(c => c.variant).filter(Boolean));
+  const missingVariants = (fig._cf && fig._cf.variants || []).filter(v => v.letter && !ownedLetters.has(v.letter));
 
   return (
     <React.Fragment>
-      <button className={"inv-row" + (ghost ? " is-ghost" : "") + (active && !multi ? " is-active" : "") + (multi && isOpen ? " is-open" : "")}
-              onClick={() => ghost ? onOpen(fig.id, null) : multi ? onToggle(fig.id) : onOpen(fig.id, single.id)}>
+      <button className={"inv-row" + (ghost ? " is-ghost" : "") + (active && !expandable ? " is-active" : "") + (expandable && isOpen ? " is-open" : "")}
+              onClick={() => ghost ? onOpen(fig.id, null) : onToggle(fig.id)}>
         <span className="inv-thumb" data-tag={ghost ? "—" : ""}></span>
         <span className="inv-name">
           <b>{fig.name}{fig.version ? <em className="idver">{fig.version}</em> : null}{fig.variants > 1 ? <span className="idvar" title={fig.variants + " production variants"}><span className="lyr"><b></b></span>{fig.variants} variants</span> : null}</b>
           <i>{fig.specialty || fig.variant}</i>
+          {fig.vehicle && <span className="idveh" title={"Vehicle driver — packaged with the " + fig.vehicle}><b>VEHICLE</b> {fig.vehicle}</span>}
         </span>
         <FactionTag faction={fig.faction} mini />
         <span className="inv-owned">{ghost ? "—" : "×" + fig.owned}</span>
@@ -71,10 +77,10 @@ function Row({ fig, selId, openIds, onToggle, onOpen }) {
         <span className={"inv-need" + ((multi ? whole > 0 : need === 0) ? " is-zero" : "") + (ghost ? " is-ghost" : "") + (!ghost && !multi && canRebalance ? " is-rebal" : "")}>
           {ghost ? "＋ Add" : multi ? (whole === fig.owned ? "✓ Complete" : whole + "/" + fig.owned) : need === 0 ? "✓ Complete" : "Missing " + need}
         </span>
-        <span className="inv-go">{multi ? (isOpen ? "▾" : "▸") : "▸"}</span>
+        <span className="inv-go">{expandable ? (isOpen ? "▾" : "▸") : "▸"}</span>
       </button>
 
-      {multi && isOpen && (
+      {expandable && isOpen && (
         <div className="inv-insts">
           {canRebalance && (
             <div className="inv-rebalbox">
@@ -87,12 +93,17 @@ function Row({ fig, selId, openIds, onToggle, onOpen }) {
           {copies.map((c) => (
             <button key={c.id} className={"inv-inst" + (active && selId === fig.id ? "" : "")} onClick={() => onOpen(fig.id, c.id)}>
               <span className="inv-inst__tab">↳</span>
-              <span className="inv-inst__id"><span>{titleCase(fig.name)} No. {c.no}</span><i>{c.loc || (c.phys ? c.phys + " / " + c.paint : "ungraded")}</i></span>
+              <span className="inv-inst__id"><span>{titleCase(fig.name)} No. {c.no}{c.variant ? " · " + c.variant : ""}</span><i>{c.loc || (c.phys ? c.phys + " / " + c.paint : "ungraded")}</i></span>
               <span className="inv-stock"><StockBar pct={c.pct} />{c.cardOnFile && <span className="inv-fc" title="File card on file">+ File card</span>}</span>
               <span className={"inv-need" + (c.pct === 100 ? " is-zero" : "")}>{c.pct === 100 ? "✓ Complete" : "Missing " + (c.req - c.own)}</span>
               <span className="inv-go">▸</span>
             </button>
           ))}
+          {missingVariants.length > 0 && (
+            <div className="inv-gapbox">
+              <span className="inv-gapbox__hd">⚠ Missing variant{missingVariants.length > 1 ? "s" : ""}: {missingVariants.map(v => v.letter).join(", ")} — not yet in your collection</span>
+            </div>
+          )}
         </div>
       )}
     </React.Fragment>
@@ -125,7 +136,8 @@ function GalleryCard({ fig, onOpen }) {
 }
 
 // ---------------------------------------------------------------------------
-// Collapsible year section (two meters: Coverage + Complete)
+// Collapsible year section (two meters: Figures + Complete, both denominated
+// against the full series roster — see yearParts() in app-detail.jsx)
 // ---------------------------------------------------------------------------
 function YearSection({ year, figs, view, open, onToggleYear, rowProps }) {
   const yp = yearParts(year);
@@ -134,18 +146,18 @@ function YearSection({ year, figs, view, open, onToggleYear, rowProps }) {
       <button className="ysec__hd" onClick={() => onToggleYear(year)}>
         <span className="ysec__yr">{year}</span>
         <span className="ysec__title">
-          <span className="ysec__meta">{yp.owned}/{yp.figs} owned · {yp.completeNow} complete</span>
+          <span className="ysec__meta">{yp.ownedInstances} owned</span>
         </span>
         <span className="ysec__meters">
           <span className="ysec__meter">
-            <span className="ysec__meterlab">Coverage</span>
+            <span className="ysec__meterlab">Figures</span>
             <span className="ysec__bar"><CompBar pct={yp.coverage} height={8} /></span>
             <span className="ysec__metern">{yp.owned}/{yp.figs}</span>
           </span>
           <span className="ysec__meter">
             <span className="ysec__meterlab">Complete</span>
             <span className="ysec__bar"><CompBar pct={yp.completion} height={8} /></span>
-            <span className="ysec__metern">{yp.completeNow}/{yp.owned}</span>
+            <span className="ysec__metern">{yp.completeNow}/{yp.figs}</span>
           </span>
         </span>
         <span className="ysec__pct">{yp.completion}%</span>

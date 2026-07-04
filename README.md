@@ -66,9 +66,9 @@ The collection is grouped into one `<section>` per release year, rendered in sor
 
 **2a. Year header** (`.ysec__hd`) — sticky at `top: var(--chrome-h)`, grid `92px 1fr 232px 50px 26px`, gap 18px, padding `12px`, background `--paper`, dashed bottom border. **Expanded state inverts to `--ink` background / `--paper` text.** Columns:
 - Year number — a **black boxed tab** (Oswald 700 ~23px, `--ink` fill, `--paper` text, hard `2px 2px 0` offset shadow); inverts to paper-on-ink when the section is expanded
-- Title block: meta "`X/Y owned · Z whole`" (10px, `--ink-soft`). *(The series flavor label — "THE ORIGINAL 13", "RED SHADOWS RISING", etc. — was removed per owner request; the year number alone heads each section.)*
-- **Two meters**: COVERAGE (owned/roster) and COMPLETE (complete-now/owned), thin striped bars; COMPLETE goes green at 100%
-- Percent (Oswald 700, 16px) — the COMPLETE meter's value
+- Title block: meta "`N owned`" — total *physical copies* owned from that year, duplicates included (10px, `--ink-soft`), e.g. "18 owned" for 1982. A third, independent metric from the two meters: the meters count *distinct variants* covered against the roster total; this counts raw instances, so a figure with 2 duplicate copies of the same variant adds 2 here but only 1 to the "Figures" meter. *(Briefly showed the roster total itself ("43 figures") — July 2026 — before the owner clarified they wanted an owned-count here instead. Before that it carried a redundant "`X/Y owned · Z whole`" line duplicating the meters. The series flavor label — "THE ORIGINAL 13", "RED SHADOWS RISING", etc. — was removed earlier per owner request; the year number alone heads each section otherwise.)*
+- **Two meters**, same denominator (the full series roster, e.g. 43 for 1982): **Figures** (owned/roster) and **Complete** (complete-now/roster), thin striped bars; COMPLETE goes green at 100%
+- Percent (Oswald 700, 16px) — the Complete meter's value
 - Chevron ▸/▾
 
 **2b. Section body** — padding `12px 4px 18px`. Renders either the **List** or the **Gallery** for that year's filtered+sorted figures (sorted A–Z within the year).
@@ -83,14 +83,14 @@ A column header row (`.inv-cols`, Space Mono 9px labels: CODE NAME / FACTION / O
 - **Owned**: `×N` (Oswald 700, 16px), or `—` if not owned
 - **Stock**: depends on state (see below)
 - **Need chip**: `NEED n` / `✓ FULL` (green) / `＋ ADD` (accent dashed, for catalog gaps) / for multi-copy: `M/N` (whole/owned) or `✓ ALL`
-- **Go** ▸ (or ▾ when a multi-instance row is expanded)
+- **Go** ▸ (or ▾ when the row's accordion is expanded)
 
 **Stock cell variants:**
-- *Single owned figure*: a short 78px striped bar (neutral `--ink-soft`, green when whole) + fraction `own/req` + either "✓ whole" (green) or the **names of the missing accessories** (muted, fraction-tagged like "Skis 1/2" when req>1, truncated with ellipsis).
-- *Multi-instance figure* (`owned > 1`): no bar — a summary "`N copies · M whole`" (M = complete-now copies). When the figure is *completable but not complete-now*, a **`⚖ REBALANCE`** hint appears (the recommender — see `INSTANCE_MODEL.md`). The row becomes an **accordion** (see 3a).
-- *Catalog gap* (`owned == 0`): dashed muted row, "not yet owned".
+- *Single owned figure*: a short 78px striped bar (neutral `--ink-soft`, green when whole) + fraction `own/req` + either "✓ whole" (green) or the **names of the missing accessories** (muted, fraction-tagged like "Skis 1/2" when req>1, truncated with ellipsis). The row still expands into the accordion (see 3a) — one copy, but variant-gap accountability applies just the same.
+- *Multi-instance figure* (`owned > 1`): no bar — a summary "`N copies · M whole`" (M = complete-now copies). When the figure is *completable but not complete-now*, a **`⚖ REBALANCE`** hint appears (the recommender — see `INSTANCE_MODEL.md`).
+- *Catalog gap* (`owned == 0`): dashed muted row, "not yet owned". Does not expand — clicking opens the acquire modal directly.
 
-**3a. Inline instance accordion** (List only). Clicking a multi-instance row expands indented sub-rows — one per owned copy — beneath it, connected by a dashed left guide (`.inv-insts` / `.inv-inst`). Each sub-row shows: `↳ No. n` + a condition note, its **own** short bar + fraction + missing-parts/whole text, and its own NEED chip. Copies are **sorted most-complete-first and numbered contiguously** (No. 1 = most complete; removing a copy renumbers the rest — no gaps). When the figure is *completable but not complete-now*, a **`⚖ REBALANCE`** box heads the accordion with the move list. Multiple figures may be expanded at once. Clicking a sub-row opens the modal focused on that copy.
+**3a. Inline instance accordion** (List only). Clicking **any owned row** — single-copy or multi — expands indented sub-rows beneath it, connected by a dashed left guide (`.inv-insts` / `.inv-inst`); *(July 2026: previously multi-copy only — single-copy rows opened straight into the modal, which hid variant-gap info for the common "own 1 of N variants" case.)* Each sub-row shows: `↳ {Figure Name} No. n · {variant letter}` (title-cased) + a condition note, its **own** short bar + fraction + missing-parts/whole text, and its own NEED chip. Copies are **sorted most-complete-first and numbered contiguously** (No. 1 = most complete; removing a copy renumbers the rest — no gaps). When the figure is *completable but not complete-now*, a **`⚖ REBALANCE`** box heads the accordion with the move list. When the catalog lists a production variant no owned copy carries, a **`⚠ Missing variant(s)`** callout (`.inv-gapbox`, dashed rust border) closes out the *bottom* of the accordion, below the copy rows. Multiple figures may be expanded at once. Clicking a sub-row opens the modal focused on that copy.
 > ⚠️ Per-instance completeness is **synthesized** in the prototype (`figState()` in `wf-data.jsx`) — the sample data stores only aggregate accessory counts, so a deterministic per-copy allocation (scattered "as-stored" + greedy "optimal") is derived to demo complete-now vs. completable and the rebalance recommender. Real per-instance data must replace this — see `OPEN_QUESTIONS.md`.
 
 ### 4. Gallery view — cardback cards
@@ -104,7 +104,7 @@ Cards sit on a **straight grid** (no wobble) and open the modal on click. There 
 ### 5. Detail modal (overlay)
 Centered fixed overlay (`.inv-modal`, 720px wide, grid `230px 1fr`) over a scrim. Closes on scrim-click, ✕, or `Esc`. Two layouts:
 
-**5a. Owned figure** — Left: photo, faction tag, name, `variant · year`, an 84px completeness ring. Right: **copy tabs** (`No. 1…N`, the whole ones flagged ✓, + a `＋` to add), an optional `⚖ REBALANCE` callout with move list + APPLY MOVES, an accessories summary line + note, a 2-column **accessory checklist** (each chip: ✓ have / ＋ missing, name, `owned/required`), and actions: `＋ ADD INSTANCE`, `EDIT NOTES`, `REMOVE`.
+**5a. Owned figure** — Left: photo, faction tag, name, `variant · year`, an 84px completeness ring. Right: **copy tabs** (`No. 1…N`, the whole ones flagged ✓, + a `＋` to add), an optional `⚖ REBALANCE` callout with move list + APPLY MOVES, an accessories summary line + note, a 2-column **accessory checklist** (each chip: ✓ have / ＋ missing, name, `owned/required`), and actions: `＋ ADD INSTANCE`, `EDIT NOTES`, `REMOVE`. *(Built July 2026, see `OPEN_QUESTIONS_ISSUES_FOUND.md` #5: for multi-variant figures the "N variants" badge is itself the hotlink — click it to open an inline A/B/C picker, pre-selected to the copy's current letter, to correct a mis-identified variant. Matches the `change ›` correction affordance already specced in `VARIANTS.md` §"Instance Detail" — no separate "identify later" state, a plain overwrite of `variantId`.)*
 
 **5b. Catalog gap (not owned)** — Left: photo, faction, name, a "NOT IN INVENTORY" plate instead of a ring. Right: a "CATALOG ENTRY" blurb explaining that adding creates the first instance + a blank checklist from the **blueprint**, the blueprint accessory grid, and a single `＋ ADD TO INVENTORY` action.
 
@@ -112,11 +112,11 @@ Centered fixed overlay (`.inv-modal`, 720px wide, grid `230px 1fr`) over a scrim
 
 ## Interactions & Behavior
 - **Expand/collapse year**: click header toggles; `EXPAND ALL`/`COLLAPSE ALL` in toolbar. While filtering/searching, matching years are force-open and the toggle is hidden.
-- **Filter chips**: single-select across both bracketed groups; click active to clear. Semantics: `complete` = owned & **complete-now** (≥1 whole copy); `incomplete` = owned & not complete-now; `dupes` = owned > 1; `gaps` = owned == 0; default ("all") shows owned-only **unless** a search query is present (search reveals gaps too).
+- **Filter chips**: single-select across both bracketed groups; click active to clear. Semantics: `complete` = owned & **complete-now** (≥1 whole copy); `incomplete` = owned & not complete-now; `dupes` = owned > 1; `gaps` = owned == 0 **or** owned but missing one or more production variants (`isGap()` — July 2026, see `OPEN_QUESTIONS_ISSUES_FOUND.md` #11); default ("all") shows owned-only **unless** a search query is present (search reveals gaps too).
 - **Search**: live, case-insensitive, matches code name / variant / faction / year / accessory name. Auto-expands matching years; updates the count to "N of M".
 - **Sort**: year (asc/desc toggle), A–Z within each year. (Currently the only sort; more are an open question.)
 - **List/Gallery toggle**: swaps the body renderer per year; preserves filters/search/expansion.
-- **Row click**: multi-instance → toggle inline accordion; single/owned → open modal; catalog gap → open acquire modal.
+- **Row click**: any owned figure (single-copy or multi) → toggle inline accordion; catalog gap → open acquire modal.
 - **Instance sub-row click**: open modal at that instance index.
 - **Gallery card click**: open modal.
 - **Modal**: copy tabs (`No. 1…N`) switch the per-copy view (derived by `figState`); an optional `⚖ REBALANCE` callout lists moves; `Esc`/scrim/✕ close.
@@ -165,16 +165,19 @@ Completeness math (figParts / figState / yearParts / totals) — PER-INSTANCE (s
   complete-now = ≥ 1 copy is whole as parts are currently assigned   // the real "complete"
   figState(fig): per-instance allocation + currentWhole / optimalWhole /
                  completeNow / completable / surplus / rebalance moves
-  year.coverage   = ownedVariantSlots / rosterVariantSlots   // "how much of the year"
-  year.completion = completeNowSlots / ownedVariantSlots      // "how many are whole"
-  // (July 2026) roster/owned are counted per PRODUCTION VARIANT, not per catalog
-  // figure — a true complete year means owning every variant, not one copy of
-  // each code name (1982's 16 code names carry 43 variants between them; see
-  // OPEN_QUESTIONS_ISSUES_FOUND.md #9/#11). A figure contributes >=1 slots (its
-  // variants[] array, always >=1 — see VARIANTS.md); "owned" only credits
-  // variant letters you actually hold a copy of, not raw copy count. This is
-  // the roster/coverage axis only — the accessory blueprint itself still keys
-  // on figureId with no per-variant override (OPEN_QUESTIONS.md §7.5).
+  year."Figures"  = ownedVariantSlots / rosterVariantSlots     // "how much of the series you own"
+  year."Complete" = completeNowSlots / rosterVariantSlots      // "how much of the series is whole"
+  // (July 2026) roster/owned/complete are all counted per PRODUCTION VARIANT,
+  // not per catalog figure — a true complete year means owning every variant,
+  // not one copy of each code name (1982's 16 code names carry 43 variants
+  // between them; see OPEN_QUESTIONS_ISSUES_FOUND.md #9/#11/#13). A figure
+  // contributes >=1 slots (its variants[] array, always >=1 — see
+  // VARIANTS.md); "owned"/"complete" only credit variant letters you actually
+  // hold a copy of, not raw copy count. Both meters share the SAME
+  // denominator (the full series roster) so "Figures" and "Complete" read as
+  // two cuts of the one true total, not complete-of-owned. This is the
+  // roster/coverage axis only — the accessory blueprint itself still keys on
+  // figureId with no per-variant override (OPEN_QUESTIONS.md §7.5).
   totals: figs, instances(=Σowned), inInventory(owned≥1), complete(=complete-now), missing(req−own)
 ```
 

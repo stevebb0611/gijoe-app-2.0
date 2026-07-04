@@ -13,6 +13,7 @@ const FACTION_CODE = {
 
 const figuresStmt = db.prepare(`
   SELECT f.id, f.code_name, f.version, f.specialty, f.variant_lookup AS single_tell,
+         f.is_vehicle_driver, f.vehicle,
          fac.name AS faction_name,
          COALESCE(s.year, f.year_released) AS year
   FROM figures f
@@ -47,8 +48,11 @@ export function buildCatalog() {
   }
   const blueprintByFigure = new Map();
   for (const [figureId, rows] of blueprintRowsByFigure) {
+    // color (index 6, added 2026-07-03) was already selected by blueprintStmt
+    // above but dropped here before this fix — the frontend's AccSwatch
+    // (web/src/acc-colors.jsx) had nothing to render off of until now.
     blueprintByFigure.set(figureId, disambiguateNames(rows)
-      .map((b) => [b.name, b.quantity_required, b.accessory_id, b.group_id, b.release_context, b.match_key]));
+      .map((b) => [b.name, b.quantity_required, b.accessory_id, b.group_id, b.release_context, b.match_key, b.color]));
   }
 
   return figuresStmt.all().map((f) => ({
@@ -58,6 +62,7 @@ export function buildCatalog() {
     year: f.year,
     faction: FACTION_CODE[f.faction_name] || f.faction_name,
     role: f.specialty,
+    vehicle: f.is_vehicle_driver && f.vehicle ? f.vehicle : null,
     // Every figure has at least one variants[] entry — single-variant figures
     // (or the handful with no usable variant letter, see server/seed.mjs) get a
     // synthesized blank-letter entry so the frontend's isSingle() check holds.

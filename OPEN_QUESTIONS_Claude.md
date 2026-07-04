@@ -210,3 +210,16 @@ An audit of `gijoe_db_figures_2.0.csv` for code names shared by multiple `full_n
 | Sci-Fi | F168, F408, F563, F616 | Fine vs Pine | Pine | Likely OCR/scan error on F168 |
 | Snake-Eyes | F565, F620 | "Classified" vs "Top Secret" | Both intentional | Name obfuscation varies by card; same character |
 | Storm Shadow | F107, F280, F456, F457, F625 | "Classified" → "Arashikage, Thomas S." | Both intentional | Name revealed mid-line; same character |
+
+---
+
+## 19. CSV data quality — `is_vehicle_driver` / `vehicle` review (flagged July 2026)
+
+The vehicle-driver tag (`is_vehicle_driver` + `vehicle`, 139 figures — see `TAXONOMY.md`) was wired into the app for the first time this session (`server/catalog.js` + a "VEHICLE {name}" badge — see `OPEN_QUESTIONS_ISSUES_FOUND.md` #1). Surfacing it live turned up one inconsistency worth a data check:
+
+| Code name | Figures | `is_vehicle_driver` | Notes |
+|---|---|---|---|
+| Grunt | F019 (v1), F065 (v1.5), F066 (v2), F391 (v3) | v1 = 0, **v1.5 = 0**, v2 = 1 (`Falcon`), v3 = 0 | Same code name, same 1983 series as Grand Slam (below), which *does* carry vehicle data on both its 1983 rows — worth confirming whether Grunt v1.5 should too, or whether it genuinely shipped standalone. |
+| Grand Slam | F016 (v1, `HAL`), F063 (v1.5, `HAL`), F064 (v2, `JUMP`) | all three = 1 | No inconsistency — flagged here only as the contrasting case that made Grunt's gap noticeable. |
+
+> **Do not bulk-edit without verifying against physical file cards or a trusted reference (YoJoe, HissTank)** — same caution as #18. Not verified independently; flagged from the data pattern alone.

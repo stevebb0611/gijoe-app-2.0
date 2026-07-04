@@ -39,6 +39,14 @@ const GROUPS = [
   // together for completion.
   { extGroupId: null, figure: 'Firefly', accessories: ['A0078', 'A0079'] }, // Submachine Gun light/dull green
   { extGroupId: null, figure: 'Firefly', accessories: ['A0080', 'A0081'] }, // Walkie-Talkie light/dull green
+  // Duke (1983, v1, F057-F061 -> catalog id 27): 'Duke' also matches 5 later
+  // versions by code_name, but the lowest id (27, v1) is the one with these
+  // accessories, so the unqualified code_name lookup below resolves correctly.
+  // Not a plain interchangeable-variant slot: two Helmet molds (with-holes,
+  // no-holes) share a colourway with the Submachine Gun, tied via match_key
+  // (set separately, see set-match-key.mjs) rather than by this grouping alone.
+  { extGroupId: null, figure: 'Duke', accessories: ['A0024', 'A0039', 'A0040'] }, // Helmet (with holes) light/bright green + Helmet (no holes) green
+  { extGroupId: null, figure: 'Duke', accessories: ['A0041', 'A0042'] }, // M-32 Submachine Gun green/bright green
 ];
 
 // Same label rule as the locked reference (subgroup-wire-v2.jsx groupLabel):

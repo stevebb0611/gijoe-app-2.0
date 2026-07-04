@@ -5,3 +5,4 @@ dist/
 .env
 .vite/
 *.db
+*.db.bak*

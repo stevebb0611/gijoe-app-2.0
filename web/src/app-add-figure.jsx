@@ -4,7 +4,8 @@
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
 import { DamageMap, GradeBadge, physicalGrade, paintGrade, dmEmpty } from './damage-map.jsx';
-import { VariantGroup, ContextGroup, clusterContexts } from './accessory-groups.jsx';
+import { VariantGroup, MatchedGroup, ContextGroup, clusterContexts } from './accessory-groups.jsx';
+import { AccSwatch } from './acc-colors.jsx';
 const AF_CATALOG = JoeData.CAT || [];
 const AF_FILECARDS = [{ letter: 'A', name: 'First print' }, { letter: 'B', name: "Reissue '85" }, { letter: 'C', name: 'Mail-away' }];
 const AF_YEARS = [...new Set(AF_CATALOG.map(f => f.year))].sort((a, b) => a - b);
@@ -80,11 +81,14 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
 
   const setUnit = (n, idx) => setOwnedAcc(o => { const cur = o[n] || 0; return { ...o, [n]: cur > idx ? idx : idx + 1 }; });
   const setUnitTo = (n, val) => setOwnedAcc(o => ({ ...o, [n]: val }));
-  const afAccRow = ([n, qreq]) => {
+  // color (blueprint tuple index 6, added 2026-07-03 — see acc-colors.jsx)
+  // renders as an AccSwatch beside the name, decoration only.
+  const afAccRow = (a) => {
+    const [n, qreq, , , , , color] = a;
     const u = unitsOf(n); const isDone = u >= qreq;
     return (
       <div key={n} className={"af-acc__row" + (isDone ? " is-done" : "")}>
-        <div className="af-acc__left"><span className="af-acc__n">{n}</span></div>
+        <div className="af-acc__left">{color && <AccSwatch color={color} />}<span className="af-acc__n">{n}</span></div>
         <div className="af-acc__right">
           <div className="af-acc__boxes">
             {Array.from({ length: qreq }).map((_, i) => (
@@ -159,12 +163,14 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
               <div className="af-results">
                 {results.map(f => {
                   const own = JoeData.ownedCount(f.id);
-                  const sub = isSingle(f) ? (f.role || ("v" + f.ver)) : f.variants.length + " variants";
+                  // always lead with the version — role/variant-count alone isn't enough to
+                  // tell apart same-name/same-year rows like Grunt v1.5 vs v2 (both "Infantry")
+                  const sub = "v" + f.ver + (isSingle(f) ? (f.role ? " · " + f.role : "") : " · " + f.variants.length + " variants");
                   return (
                   <React.Fragment key={f.id}>
                   <button className={"af-res" + (f.id === selId ? " is-sel" : "")} onClick={() => setSelId(f.id)}>
                     <span className="af-res__thumb"></span>
-                    <span className="af-res__name"><b>{f.name}</b><i>{sub} · {f.year}</i></span>
+                    <span className="af-res__name"><b>{f.name}</b><i>{sub} · {f.year}</i>{f.vehicle && <span className="idveh" title={"Vehicle driver — packaged with the " + f.vehicle}><b>VEHICLE</b> {f.vehicle}</span>}</span>
                     <span className={"wf-fac wf-fac--" + f.faction.toLowerCase() + " wf-fac--mini"}>{f.faction}</span>
                     <span className="af-res__own">{own === 0 ? "not owned" : "owned ×" + own}</span>
                     <span className="af-res__pick">{f.id === selId ? (isSingle(f) ? "● selected" : "▾ pick variant") : "select ›"}</span>
@@ -218,9 +224,12 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                     {blueprint.length > 0 && (
                       <div className="af-acc">
                         {clusterBp.solo.map(afAccRow)}
-                        {clusterBp.groups.map((items, i) => (
+                        {clusterBp.plain.map((items, i) => (
                           <VariantGroup key={i} items={items} acc={owned} live onSet={setUnitTo} />
                         ))}
+                        {clusterBp.matched.length > 0 && (
+                          <MatchedGroup groups={clusterBp.matched} acc={owned} live onSet={setUnitTo} />
+                        )}
                         {ctxGroups.map((cg) => (
                           <ContextGroup key={cg.context} context={cg.context} items={cg.items} renderRow={afAccRow} />
                         ))}

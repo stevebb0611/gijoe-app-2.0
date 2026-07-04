@@ -39,7 +39,7 @@ const ACC = api('GET', '/api/accessories') || [];
 const ACC_BY_ID = new Map(ACC.map(a => [a.id, a]));
 
 // ---- completeness math ----
-// Blueprint items are [name, quantity_required, accessory_id, group_id, release_context, match_key].
+// Blueprint items are [name, quantity_required, accessory_id, group_id, release_context, match_key, color].
 // Three axes restructure the flat list (see PARTS_BIN.md "Accessory completeness model" + match_key.md):
 //   group_id    — interchangeable variants ("own any one" satisfies the slot)
 //   match_key   — when 2+ group_id slots have members sharing a match_key, those
@@ -91,8 +91,15 @@ function instWhole(bp, acc) {
 }
 // Shared label rule (matches the locked reference subgroup-wire-v2.jsx):
 // text before the first "(" is the slot label, text inside "(...)" is the option label.
+// disambiguateNames (blueprint-names.js) can append a second "(color)" paren on
+// top of an existing one (e.g. "Helmet (with holes)" -> "Helmet (with holes)
+// (bright green)") — join every paren so two options never collapse onto the
+// same displayed label.
 function groupLabel(items) { const m = items[0][0].match(/^(.*?)\s*\(/); return m ? m[1].trim() : items[0][0]; }
-function optLabel(name) { const m = name.match(/\(([^)]+)\)/); return m ? m[1] : name; }
+function optLabel(name) {
+  const parts = [...name.matchAll(/\(([^)]+)\)/g)].map((m) => m[1]);
+  return parts.length ? parts.join(' · ') : name;
+}
 // Damaged share across the FULL blueprint (retail + group + non-retail alike) —
 // condition is orthogonal to what counts toward Complete, so it isn't run
 // through clusterBlueprint. 0 when nothing's owned yet.

@@ -74,6 +74,19 @@ orange Submachine Guns; Chun Li's three separate yellow Swords), not a matched-c
 Every figure below was confirmed individually by the owner before being added. Treat this
 list as owner-reviewed ground truth, not a pattern to extrapolate from.
 
+## Considered, not applicable
+
+Figures that look like match_key candidates (duplicate-colored accessories across two
+group_id slots) but were confirmed by the owner to be independent "or" choices instead —
+listed here so they aren't re-flagged by a future duplicate-color scan.
+
+- **Blowtorch (1984, v1, figure catalog id 50 — F086/F087/F088, variants A/B/C):** Helmet
+  (no holes / with holes, both yellow, group 1) and Flamethrower (light green / dark green,
+  group 2) are each independently "own any one" — no color/mold pairing ties a specific
+  helmet to a specific flamethrower. Existing plain group_id slots (imported pre-match_key,
+  ext groups 8401/8402) are correct as-is. Confirmed with owner and visually verified
+  in-app, 2026-07-03.
+
 ## Figures (chronological by year of release)
 
 ### 1984 — Firefly (v1, figure catalog id 56 — source F-codes F096 / F097)
@@ -81,4 +94,24 @@ list as owner-reviewed ground truth, not a pattern to extrapolate from.
 - **Variants:** F096 · A "Black eyes" / F097 · B "Brown eyes" — folded into one catalog row (id 56) with both letters in `variant_lookup`, per the standard variant-collapse rule (`VARIANTS.md`)
 - **Matched pieces:** Submachine Gun + Walkie-Talkie, light green (tag `A`) or dull green (tag `B`)
 - **Unaffected (plain, independently required):** Demolition Backpack, Demolition Backpack Cover
-- **Status:** ✅ implemented and verified via API round-trip (2026-07-03). Pending: visual confirmation in-app.
+- **Status:** ✅ implemented and verified via API round-trip and in-app (2026-07-03).
+
+### 1983 — Duke (v1, figure catalog id 27 — source F-codes F057–F061)
+
+- **Variants:** F057 A / F058 B / F059 C / F060 D / F061 E — folded into one catalog row
+  (id 27) per the standard variant-collapse rule (`VARIANTS.md`)
+- **Matched pieces:** Helmet + M-32 "Pulverizer" Submachine Gun, tagged `A` or `B`. Unlike
+  Firefly, the Helmet slot has three members, not two — a "green" tag can be satisfied by
+  *either* of two different helmet molds:
+  - Tag `A` ("green"): Helmet (with holes) light green (A0024, shared accessory — also used
+    by 5 other figures) **or** Helmet (no holes) green (A0039) + Submachine Gun green (A0041)
+  - Tag `B` ("bright green"): Helmet (with holes) bright green (A0040, Duke-exclusive) +
+    Submachine Gun bright green (A0042, Duke-exclusive)
+  - `matchedSetSatisfied` already supports multiple members per (slot, tag) — owning *any*
+    tag-`A` helmet alongside the tag-`A` gun satisfies the bucket; no code change was needed.
+- **Unaffected (plain, independently required):** Helicopter Assault Trooper Backpack,
+  Binocular
+- **Bonus (tracked, non-blocking):** American Flag (decal) — reclassified `retail` → `bonus`
+  via `set-accessory-context.mjs`, 2026-07-03
+- **Status:** ✅ implemented and verified (group_id + match_key set, API round-trip and
+  `matchedSetSatisfied` unit-checked, 2026-07-03). Pending: visual confirmation in-app.
