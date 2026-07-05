@@ -4,7 +4,7 @@
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
 import { DamageMap, GradeBadge, physicalGrade, paintGrade, dmEmpty } from './damage-map.jsx';
-import { VariantGroup, MatchedGroup, ContextGroup, clusterContexts } from './accessory-groups.jsx';
+import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
 const AF_CATALOG = JoeData.CAT || [];
 const AF_FILECARDS = [{ letter: 'A', name: 'First print' }, { letter: 'B', name: "Reissue '85" }, { letter: 'C', name: 'Mail-away' }];
@@ -27,7 +27,7 @@ function AfStepper({ step, setStep, maxReached, lockFirst }) {
 
 function isSingle(fig) { return fig && fig.variants.length === 1 && !fig.variants[0].letter; }
 
-function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = null }) {
+function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = null, presetAcc = null }) {
   const preset = presetCatalogId != null;            // launched from a figure's + (add a copy) — lock to that figure, skip FIND
   const [step, setStep] = React.useState(preset ? 1 : 0);
   const [maxReached, setMax] = React.useState(preset ? 1 : 0);
@@ -37,7 +37,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const [selVar, setSelVar] = React.useState(presetVariant); // letter | '' (single) | null
   const [loc, setLoc] = React.useState("");
   const [notes, setNotes] = React.useState("");
-  const [owned, setOwnedAcc] = React.useState({});   // accName -> units owned
+  const [owned, setOwnedAcc] = React.useState(() => presetAcc || {});   // accName -> units owned
   const [moc, setMoc] = React.useState(false);       // Mint on Card (sealed) — counts 100% complete
   const [filecard, setFilecard] = React.useState({ onFile: false, printing: 'A' });
   // condition — single zone-map value; dmg.clean is the explicit "no damage found"
@@ -59,7 +59,8 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   React.useEffect(() => {
     if (!fig) return;
     setSelVar(isSingle(fig) ? '' : (presetVariant && fig.id === presetCatalogId ? presetVariant : null));
-    setOwnedAcc({}); setMoc(false); setFilecard({ onFile: false, printing: 'A' }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male'));
+    setOwnedAcc(presetAcc && fig.id === presetCatalogId ? presetAcc : {});
+    setMoc(false); setFilecard({ onFile: false, printing: 'A' }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male'));
   }, [selId]);
 
   const q = query.trim().toLowerCase();
@@ -69,8 +70,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const results = !hasFilter ? [] : yearF ? allResults : allResults.slice(0, 60);
 
   const blueprint = fig ? fig.blueprint : [];
-  const clusterBp = JoeData.clusterBlueprint(blueprint);
-  const ctxGroups = clusterContexts(blueprint);
+  const ordered = orderedBlueprint(blueprint);
   const unitsOf = (n) => owned[n] || 0;
   const bpReq = JoeData.bpReq(blueprint);
   const fullDone = JoeData.instOwn(blueprint, owned);
@@ -80,15 +80,19 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const back = () => goto(Math.max(step - 1, 0));
 
   const setUnit = (n, idx) => setOwnedAcc(o => { const cur = o[n] || 0; return { ...o, [n]: cur > idx ? idx : idx + 1 }; });
-  const setUnitTo = (n, val) => setOwnedAcc(o => ({ ...o, [n]: val }));
   // color (blueprint tuple index 6, added 2026-07-03 — see acc-colors.jsx)
-  // renders as an AccSwatch beside the name, decoration only.
-  const afAccRow = (a) => {
-    const [n, qreq, , , , , color] = a;
+  // renders as an AccSwatch beside the name, decoration only. short=true is
+  // for variant-slot options: display the shortened option label (via
+  // JoeData.optLabel) plus its match_key tag badge, same row shape as a solo item.
+  const afAccRow = (a, short) => {
+    const [n, qreq, , , , tag, color] = a;
     const u = unitsOf(n); const isDone = u >= qreq;
     return (
       <div key={n} className={"af-acc__row" + (isDone ? " is-done" : "")}>
-        <div className="af-acc__left">{color && <AccSwatch color={color} />}<span className="af-acc__n">{n}</span></div>
+        <div className="af-acc__left">
+          {short && tag != null && <span className="af-acc__tag">{tag}</span>}
+          {color && <AccSwatch color={color} />}<span className="af-acc__n">{short ? JoeData.optLabel(n) : n}</span>
+        </div>
         <div className="af-acc__right">
           <div className="af-acc__boxes">
             {Array.from({ length: qreq }).map((_, i) => (
@@ -223,16 +227,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                     <p className="af-seclab"><b>Accessories</b> · {fullDone}/{bpReq} complete{blueprint.length ? "" : " — no blueprint on file for this figure"}</p>
                     {blueprint.length > 0 && (
                       <div className="af-acc">
-                        {clusterBp.solo.map(afAccRow)}
-                        {clusterBp.plain.map((items, i) => (
-                          <VariantGroup key={i} items={items} acc={owned} live onSet={setUnitTo} />
-                        ))}
-                        {clusterBp.matched.length > 0 && (
-                          <MatchedGroup groups={clusterBp.matched} acc={owned} live onSet={setUnitTo} />
-                        )}
-                        {ctxGroups.map((cg) => (
-                          <ContextGroup key={cg.context} context={cg.context} items={cg.items} renderRow={afAccRow} />
-                        ))}
+                        <AccessoryList ordered={ordered} renderSolo={(a) => afAccRow(a)} renderOption={(a) => afAccRow(a, true)} />
                       </div>
                     )}
                   </React.Fragment>
@@ -313,7 +308,6 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                 <div className="af-sum__row"><span>Location</span><b>{loc || "—"}</b></div>
                 {notes && <div className="af-sum__row"><span>Notes</span><b>{notes}</b></div>}
               </div>
-              <button className="af-add" onClick={commit}>＋ ADD TO INVENTORY</button>
             </div>
           )}
 
@@ -344,7 +338,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
             <span className="af-foot__mid">{fig ? `${fig.name} · step ${step + 1} of ${AF_STEPS.length}` : "select a figure to begin"}</span>
             {step < AF_STEPS.length - 1
               ? <button className="af-nav" onClick={next} disabled={!canNext}>NEXT ›</button>
-              : <button className="af-nav" onClick={commit}>＋ ADD</button>}
+              : <button className="af-nav" onClick={commit}>＋ ADD TO INVENTORY</button>}
           </div>
         )}
       </div>

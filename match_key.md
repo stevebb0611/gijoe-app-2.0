@@ -114,4 +114,8 @@ listed here so they aren't re-flagged by a future duplicate-color scan.
 - **Bonus (tracked, non-blocking):** American Flag (decal) — reclassified `retail` → `bonus`
   via `set-accessory-context.mjs`, 2026-07-03
 - **Status:** ✅ implemented and verified (group_id + match_key set, API round-trip and
-  `matchedSetSatisfied` unit-checked, 2026-07-03). Pending: visual confirmation in-app.
+  `matchedSetSatisfied` unit-checked, 2026-07-03). Visually confirmed in-app 2026-07-06 —
+  see `PARTS_BIN.md` §1: Helmet and Gun now render as two independent groups at their own
+  blueprint positions (not merged into one block), each option tagged with its A/B badge.
+  Toggling a tag-A option on each slot correctly resolved the bucket and pushed the copy
+  to 100%; net toggling left the real instance's owned accessories unchanged.

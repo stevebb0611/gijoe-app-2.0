@@ -28,8 +28,8 @@ function App() {
     document.body.classList.toggle('no-faction', !t.factionColors);
   }, [t]);
 
-  const openAdd = () => setOverlay({ presetId: null, presetVariant: null });
-  const addInstance = (catalogId, variant) => setOverlay({ presetId: catalogId, presetVariant: variant });
+  const openAdd = () => setOverlay({ presetId: null, presetVariant: null, presetAcc: null });
+  const addInstance = (catalogId, variant, presetAcc) => setOverlay({ presetId: catalogId, presetVariant: variant, presetAcc: presetAcc || null });
 
   const doExport = () => {
     const blob = new Blob([JoeStore.exportJSON()], { type: 'application/json' });
@@ -50,7 +50,7 @@ function App() {
       {page === 'parts-bin'
         ? <PartsBin onNavigate={setPage} />
         : <InventoryView onAddFigure={openAdd} onAddInstance={addInstance} onNavigate={setPage} />}
-      {overlay && <AddFigureOverlay onClose={() => setOverlay(null)} presetCatalogId={overlay.presetId} presetVariant={overlay.presetVariant} />}
+      {overlay && <AddFigureOverlay onClose={() => setOverlay(null)} presetCatalogId={overlay.presetId} presetVariant={overlay.presetVariant} presetAcc={overlay.presetAcc} />}
       <input ref={fileRef} type="file" accept="application/json" style={{ display: 'none' }} onChange={doImport} />
       <TweaksPanel title="Tweaks & Admin">
         <TweakSection label="Paper & ink" />

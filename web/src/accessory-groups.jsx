@@ -1,16 +1,14 @@
-// accessory-groups.jsx — shared "own any one" variant-slot box and non-retail
-// context box, ported verbatim from the locked reference subgroup-wire-v2.jsx
-// (GI Joe Tracker - Accessory Sub-Groups v2.html → GroupCard). Three mechanisms
-// restructure a figure's flat blueprint list (see PARTS_BIN.md "Accessory
-// completeness model" + match_key.md):
-//   group_id        — interchangeable variants; box with "or" between options,
-//                      owning any one satisfies the slot (store.js math)
+// accessory-groups.jsx — shared "own any one" variant-slot label and non-retail
+// context label, plus the blueprint-order walk that interleaves them with solo
+// items. Three mechanisms restructure a figure's flat blueprint list (see
+// PARTS_BIN.md "Accessory completeness model" + match_key.md):
+//   group_id        — interchangeable variants; owning any one satisfies the
+//                      slot (store.js math)
 //   match_key       — 2+ group_id slots that must resolve to the same tag
-//                      together (MatchedGroup below); one merged box per
-//                      bucket instead of one box per slot (2026-07-03, see
-//                      match_key.md "Considered, not applicable" for the
-//                      Blowtorch case this does NOT apply to)
-//   release_context — non-retail items; boxed by context, tracked but never
+//                      together. Each slot still renders on its own (see
+//                      2026-07-06 note below) — a small tag badge on every
+//                      option row is the only cross-slot hint.
+//   release_context — non-retail items; grouped by context, tracked but never
 //                      gates Complete (store.js math already excludes them)
 //
 // Row-label color swatches (AccSwatch) merged in 2026-07-03 from
@@ -18,109 +16,116 @@
 // dependency, now archived — see _archive/). Per that mockup's locked visual
 // rule #5: the swatch decorates the row label only; checkbox fill stays a
 // single neutral confirm color and never echoes the accessory's own color.
+//
+// Layout redesign (2026-07-05, "Option 2" from the accessory-group-options
+// mockup): the old boxed sgw-pillset card (bordered, centered header) took up
+// too much room and broke the row-to-row flow of the plain checklist. Groups
+// now render as a left-aligned micro-label followed by full-width option rows,
+// same rhythm as a solo AccItem row, no card. orderedBlueprint() replaces the
+// old bucket-then-concatenate rendering (all solo rows, then all groups, then
+// all context rows) — the owner keys the DB head-to-toe (helmet, backpack,
+// weapons, skis/fins…) and expects that order on screen, so groups/context
+// buckets are now emitted at the position of their first blueprint row
+// instead of being pulled to the end.
+//
+// 2026-07-06: matched slots (e.g. Duke's helmet + gun colorway) used to be
+// merged into one combined block, anchored to whichever slot's group_id came
+// first — but matched slots are often spread across the body (helmet vs.
+// gun), so merging them fought the head-to-toe layout instead of respecting
+// it. Each group_id — matched or not — now renders independently at its own
+// blueprint position; a matched slot's options just carry a tag badge
+// (A/B/…) so the owner can still tell which pieces pair up across slots.
+//
+// 2026-07-06 (2): wrapping option "pills" sized to their own text, so their
+// checkboxes landed at a different x per option instead of lining up with
+// every other row's checkbox column. Options are no longer a bespoke pill —
+// each renders through the same per-row renderer (renderOption) the caller
+// already uses for solo items (AccItem in app-detail.jsx, .af-acc__row in
+// app-add-figure.jsx), so the checkbox sits in the exact same right-hand
+// column as everywhere else in the list.
 import React from 'react';
 import { JoeData } from './store.js';
-import { AccSwatch } from './acc-colors.jsx';
 
 const CTX_LABEL = { convention: 'Convention', mail_in: 'Mail-in', bonus: 'Bonus', exclusive: 'Exclusive' };
 
 // Blueprint tuples: [name, quantity_required, accessory_id, group_id, release_context, match_key, color]
-export function VariantGroup({ items, acc, onSet, live }) {
+// renderOption(item): caller-supplied single-row renderer for one option —
+// same idea as ContextGroup's renderRow, so the row matches whichever screen
+// it's used from and lines up with that screen's own checkbox column.
+export function VariantGroup({ items, renderOption }) {
   const label = JoeData.groupLabel(items);
+  const matched = items.some((it) => it[5] != null);
   return (
-    <div className="sgw-pillset">
-      <div className="sgw-vhead"><span className="sgw-vhead__lbl">{label}</span></div>
-      <div className="sgw-voptrow">
-        {items.map((it, i) => {
-          const name = it[0];
-          const on = (acc[name] || 0) > 0;
-          return (
-            <React.Fragment key={name}>
-              {i > 0 && <span className="sgw-or">or</span>}
-              <button type="button" className={"sgw-opt" + (on ? " is-on" : "")} disabled={!live}
-                      onClick={live ? () => onSet(name, on ? 0 : 1) : undefined}>
-                <span className="sgw-opt__box">{on ? "✓" : ""}</span>
-                <AccSwatch color={it[6]} />{JoeData.optLabel(name)}
-              </button>
-            </React.Fragment>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// One box for an entire match_key bucket (see match_key.md), instead of one
-// box per group_id slot — the slots aren't independent choices, they're one
-// "own a matching colorway" requirement, so they shouldn't cost a header+
-// border each. Rows are grouped by match_key tag (the owner-chosen short
-// code, e.g. "A"/"B") with the slot name folded into each row instead of
-// repeated as a big centered header.
-// groups: array of group_id member-arrays that all carry a match_key (JoeData.clusterBlueprint's `matched`).
-// Row-level slot tag is just the last word of the full slot name (the header
-// above already spells the whole thing out) — keeps rows on one line even
-// when a slot name is as long as `M-32 "Pulverizer" Submachine Gun`.
-function shortSlot(slot) { const w = slot.trim().split(/\s+/); return w[w.length - 1]; }
-export function MatchedGroup({ groups, acc, onSet, live }) {
-  const label = groups.map((g) => shortSlot(JoeData.groupLabel(g))).join(' + ');
-  const tagOrder = [];
-  const byTag = new Map();
-  groups.forEach((g) => {
-    const slot = shortSlot(JoeData.groupLabel(g));
-    g.forEach((m) => {
-      const tag = m[5];
-      if (tag == null) return;
-      if (!byTag.has(tag)) { byTag.set(tag, []); tagOrder.push(tag); }
-      byTag.get(tag).push({ slot, member: m });
-    });
-  });
-  return (
-    <div className="sgw-pillset sgw-matched">
-      <div className="sgw-vhead"><span className="sgw-vhead__lbl">{label}</span></div>
-      <div className="sgw-mbody">
-        {tagOrder.map((tag) => (
-          <div className="sgw-mset" key={tag}>
-            <span className="sgw-mtag">{tag}</span>
-            <div className="sgw-mopts">
-              {byTag.get(tag).map(({ slot, member }) => {
-                const name = member[0];
-                const on = (acc[name] || 0) > 0;
-                return (
-                  <button type="button" key={name} className={"sgw-mopt" + (on ? " is-on" : "")} disabled={!live}
-                          onClick={live ? () => onSet(name, on ? 0 : 1) : undefined}>
-                    <span className="sgw-opt__box">{on ? "✓" : ""}</span>
-                    <AccSwatch color={member[6]} />
-                    <span className="sgw-mopt__slot">{slot}</span>{JoeData.optLabel(name)}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="sgw-group">
+      <div className="sgw-label"><span className="sgw-label__name">{label}</span> <em>{matched ? '· match a colorway' : '· pick one'}</em></div>
+      {items.map((it) => renderOption(it))}
     </div>
   );
 }
 
 // context: 'convention' | 'mail_in' | 'bonus' | 'exclusive'.
-// renderRow(item): caller-supplied single-row renderer, so the box matches
+// renderRow(item): caller-supplied single-row renderer, so the row matches
 // whichever screen it's used from (app-detail.jsx's AccItem vs. app-add-figure.jsx's row).
 export function ContextGroup({ context, items, renderRow }) {
   return (
-    <div className="sgw-pillset">
-      <div className="sgw-vhead"><span className="sgw-vhead__lbl">{CTX_LABEL[context] || context}</span></div>
+    <div className="sgw-group">
+      <div className="sgw-label sgw-label--cap">{CTX_LABEL[context] || context}</div>
       {items.map((it) => renderRow(it))}
     </div>
   );
 }
 
-// Buckets non-retail blueprint items by release_context, first-seen order.
-export function clusterContexts(bp) {
-  const extras = (bp || []).filter((a) => a[4] && a[4] !== 'retail');
-  const order = [], byCtx = new Map();
-  for (const a of extras) {
-    if (!byCtx.has(a[4])) { byCtx.set(a[4], []); order.push(a[4]); }
-    byCtx.get(a[4]).push(a);
-  }
-  return order.map((context) => ({ context, items: byCtx.get(context) }));
+// Walks a blueprint in its authored (head-to-toe) order and buckets each item
+// only at the position where its kind first appears — a group_id's members,
+// or a release_context's items, are each emitted once, as a unit, then
+// skipped on later occurrences. This is what keeps e.g. "Helmet, Backpack,
+// Gun, Binocular" in DB order instead of the old solo-then-groups-then-context
+// concatenation, and what keeps a matched colorway's slots (Helmet, Gun) each
+// at their own position instead of merged into one combined block.
+export function orderedBlueprint(bp) {
+  const list = bp || [];
+  const groupMembers = new Map();   // group_id -> retail members
+  const contextMembers = new Map(); // release_context -> non-retail members
+  list.forEach((a) => {
+    const ctx = a[4] && a[4] !== 'retail' ? a[4] : null;
+    if (ctx) { if (!contextMembers.has(ctx)) contextMembers.set(ctx, []); contextMembers.get(ctx).push(a); return; }
+    if (a[3] != null) { if (!groupMembers.has(a[3])) groupMembers.set(a[3], []); groupMembers.get(a[3]).push(a); }
+  });
+
+  const order = [];
+  const seenGroups = new Set();
+  const seenContexts = new Set();
+  list.forEach((a) => {
+    const ctx = a[4] && a[4] !== 'retail' ? a[4] : null;
+    if (ctx) {
+      if (seenContexts.has(ctx)) return;
+      seenContexts.add(ctx);
+      order.push({ type: 'context', context: ctx, items: contextMembers.get(ctx) });
+      return;
+    }
+    if (a[3] != null) {
+      if (seenGroups.has(a[3])) return;
+      seenGroups.add(a[3]);
+      order.push({ type: 'group', items: groupMembers.get(a[3]) });
+      return;
+    }
+    order.push({ type: 'solo', item: a });
+  });
+  return order;
+}
+
+// Renders an orderedBlueprint() list end to end.
+// renderSolo(item, key): draws one solo/context row using the item's full
+// name (e.g. "American Flag (decal)").
+// renderOption(item): draws one variant-slot option using its short label
+// (e.g. "no holes", via JoeData.optLabel) — its own shape (AccItem vs. the
+// Add Figure step's .af-acc__row) is the caller's call, same as
+// ContextGroup's renderRow always was.
+export function AccessoryList({ ordered, renderSolo, renderOption }) {
+  return ordered.map((u, i) => {
+    if (u.type === 'solo') return renderSolo(u.item, i);
+    if (u.type === 'group') return <VariantGroup key={'g' + i} items={u.items} renderOption={renderOption} />;
+    if (u.type === 'context') return <ContextGroup key={'c' + i} context={u.context} items={u.items} renderRow={(a) => renderSolo(a, u.context + '-' + a[0])} />;
+    return null;
+  });
 }

@@ -4,7 +4,7 @@
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
 import { physicalGrade, paintGrade, dmEmpty, DamageMap, GradeBadge } from './damage-map.jsx';
-import { VariantGroup, MatchedGroup, ContextGroup, clusterContexts } from './accessory-groups.jsx';
+import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
 
 const INV_CAT = JoeData.CAT || [];
@@ -221,7 +221,7 @@ function boxLayout(req) {
 // color (added 2026-07-03, see acc-colors.jsx) renders as an AccSwatch beside
 // the name — decoration only, never gates the checkbox fill (see rule #5 in
 // acc-colors.jsx's header).
-function AccItem({ name, req, checked, onSet, tone, color }) {
+function AccItem({ name, req, checked, onSet, tone, color, tag, damaged }) {
   const { rows, cols, empty } = boxLayout(req);
   const own = checked.reduce((s, c) => s + (c ? 1 : 0), 0);
   const done = own >= req;
@@ -239,7 +239,8 @@ function AccItem({ name, req, checked, onSet, tone, color }) {
   }
   return (
     <div className={"acc" + (rows === 2 ? " is-stack" : "") + (done ? " is-done" : "") + (dmg ? " is-damage-tone" : "")}>
-      <span className="acc__namewrap">{color && <AccSwatch color={color} />}<span className="acc__name">{name}</span></span>
+      <span className="acc__namewrap">{tag != null && <span className="acc__tag">{tag}</span>}{color && <AccSwatch color={color} />}<span className="acc__name">{name}</span></span>
+      <span className="acc__dmgflag" title={damaged ? name + " · has damaged units" : undefined} aria-hidden={!damaged}>{damaged ? "⚠" : ""}</span>
       <div className="acc__boxes" style={{ gridTemplateColumns: "repeat(" + cols + ", 22px)" }}>{cells}</div>
       <span className="acc__count">{own}/{req}</span>
     </div>
@@ -263,6 +264,10 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const [damageMode, setDamageMode] = React.useState(false);
   const [varEdit, setVarEdit] = React.useState(false);
   React.useEffect(() => setVarEdit(false), [curId]);
+  // ghost-only: accessories ticked before the figure is owned — carried into
+  // the Add Figure flow's DETAILS step as a starting point, not persisted here.
+  const [preAcc, setPreAcc] = React.useState({});
+  const setPreUnit = (name, n) => setPreAcc(o => ({ ...o, [name]: n }));
   // binder tabs retract while the card flips, then spring back once it lands
   const [tucked, setTucked] = React.useState(false);
   const tuckTimer = React.useRef(null);
@@ -286,8 +291,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const filecard = raw.filecard || { onFile: false, printing: 'A' };
   const marks = (raw.marks && raw.marks.condition) ? raw.marks : dmEmpty(fig.body || 'male');
   const bp = fig.blueprint;
-  const clusterBp = JoeData.clusterBlueprint(bp);
-  const ctxGroups = clusterContexts(bp);
+  const ordered = orderedBlueprint(bp);
   const accDamage = raw.accDamage || {};
   const ownedAcc = bp.filter(([n]) => ((raw.acc && raw.acc[n]) || 0) > 0);
   const dmgOwned = ownedAcc.reduce((s, [n]) => s + ((raw.acc && raw.acc[n]) || 0), 0);
@@ -344,18 +348,23 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
             <div className="inv-modal__notin">NOT IN<br/>INVENTORY</div>
           </div>
           <div className="inv-modal__r">
-            <div className="inv-modal__sec">CATALOG ENTRY · you don't own this yet</div>
             {bp.length === 0
               ? <p className="inv-modal__blurb">No accessory blueprint on file for this figure.</p>
-              : <React.Fragment>
-                  <p className="inv-modal__blurb">Adding it creates your first owned copy and a blank accessory checklist from the blueprint below ({bp.length} piece{bp.length !== 1 ? "s" : ""} to track).</p>
-                  <div className="inv-bprint">BLUEPRINT</div>
-                  <div className="acc-list">
-                    <div className="acc-list__cap"><span>ACCESSORIES</span><span><b>0</b>/{bp.reduce((s, a) => s + a[1], 0)}</span></div>
-                    {bp.map((a, i) => <AccItem key={i} name={a[0]} req={a[1]} checked={Array.from({ length: a[1] }, () => false)} />)}
-                  </div>
-                </React.Fragment>}
-            <div className="inv-modal__btns"><button className="invbtn invbtn--go" onClick={() => onAddInstance(fig.id, null)}>＋ ADD TO INVENTORY</button></div>
+              : <div className="acc-list">
+                  <div className="acc-list__cap"><span>ACCESSORIES</span><span><b>{JoeData.instOwn(bp, preAcc)}</b>/{JoeData.bpReq(bp)}</span></div>
+                  <AccessoryList ordered={ordered}
+                                 renderSolo={(a, key) => (
+                                   <AccItem key={key} name={a[0]} req={a[1]} color={a[6]}
+                                            checked={Array.from({ length: a[1] }, (_, k) => k < (preAcc[a[0]] || 0))}
+                                            onSet={(n) => setPreUnit(a[0], n)} />
+                                 )}
+                                 renderOption={(a) => (
+                                   <AccItem key={a[0]} name={JoeData.optLabel(a[0])} req={a[1]} color={a[6]} tag={a[5]}
+                                            checked={Array.from({ length: a[1] }, (_, k) => k < (preAcc[a[0]] || 0))}
+                                            onSet={(n) => setPreUnit(a[0], n)} />
+                                 )} />
+                </div>}
+            <div className="inv-modal__btns"><button className="invbtn invbtn--go" onClick={() => onAddInstance(fig.id, null, preAcc)}>＋ ADD TO INVENTORY</button></div>
           </div>
         </div>
       </React.Fragment>
@@ -455,25 +464,17 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                       <span>ACCESSORIES{dmgDamaged > 0 && <span className="acc-list__dmgflag">⚠ {dmgDamaged} damaged</span>}</span>
                       <span><b>{liveOwn}</b>/{cur.req}</span>
                     </div>
-                    {clusterBp.solo.map((a, i) => (
-                      <AccItem key={i} name={a[0]} req={a[1]} color={a[6]}
-                               checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
-                               onSet={(n) => setUnit(a[0], n)} />
-                    ))}
-                    {clusterBp.plain.map((items, i) => (
-                      <VariantGroup key={i} items={items} acc={raw.acc || {}} live onSet={setUnit} />
-                    ))}
-                    {clusterBp.matched.length > 0 && (
-                      <MatchedGroup groups={clusterBp.matched} acc={raw.acc || {}} live onSet={setUnit} />
-                    )}
-                    {ctxGroups.map((cg) => (
-                      <ContextGroup key={cg.context} context={cg.context} items={cg.items}
-                                    renderRow={(a) => (
-                                      <AccItem key={a[0]} name={a[0]} req={a[1]} color={a[6]}
-                                               checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
-                                               onSet={(n) => setUnit(a[0], n)} />
-                                    )} />
-                    ))}
+                    <AccessoryList ordered={ordered}
+                                   renderSolo={(a, key) => (
+                                     <AccItem key={key} name={a[0]} req={a[1]} color={a[6]} damaged={(accDamage[a[0]] || 0) > 0}
+                                              checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
+                                              onSet={(n) => setUnit(a[0], n)} />
+                                   )}
+                                   renderOption={(a) => (
+                                     <AccItem key={a[0]} name={JoeData.optLabel(a[0])} req={a[1]} color={a[6]} tag={a[5]} damaged={(accDamage[a[0]] || 0) > 0}
+                                              checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
+                                              onSet={(n) => setUnit(a[0], n)} />
+                                   )} />
                     <button type="button" className={"acc-dmgtoggle" + (damageMode ? " is-on" : "") + (dmgDamaged > 0 ? " has-damage" : "")}
                             onClick={() => setDamageMode(v => !v)}>
                       {damageMode ? "✕ done marking damage" : "⚠ mark as damaged"}

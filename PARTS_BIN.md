@@ -126,17 +126,19 @@ The compatibility question above is **answered by the real schema** (`route.js`)
 How a figure's accessory checklist is structured and what counts toward **Complete**. Locked reference: **`GI Joe Tracker - Accessory Sub-Groups v2.html`** + `subgroup-wire-v2.jsx`. A figure owns a **flat list** of `figures_accessories` rows — `accessory_id`, `quantity_required`, `group_id`, `release_context` — and exactly two fields restructure that flat list:
 
 ### 1. `group_id` → a variant group ("own any one")
-Two or more accessories that **share a `group_id`** are interchangeable variants: owning **any one** satisfies the group. They render as a single bordered **variant box** — centered label (the shared name), centered option buttons, an `or` between them. **No per-item "owned" status line and no "own either" instruction copy** inside the box (dropped in review); the selected button's filled checkbox is the only state shown.
+Two or more accessories that **share a `group_id`** are interchangeable variants: owning **any one** satisfies the group. **(Redesigned July 2026 — see below.)** They render as a left-aligned micro-label ("Helmet · pick one") followed by one full-width row per option, using the exact same row component (bold name, checkbox, `owned/required` count) as any plain accessory — no bordered card, no centered "or" pill row. The group's position in the checklist matches wherever its first blueprint row falls (owner keys the DB head-to-toe: helmet, backpack, weapons, skis/fins…), not pulled to the end.
 - Examples (group_ids supplied by the owner; the join's `group_id` column is otherwise blank in current exports): Scrap-Iron's **Remote Activator** thin/thick handles = **`8401`**; A.V.A.C.'s **Parachute pack** soft/hard plastic = **`8601`**.
-- Generalises: *any* set of accessories inside one `group_id` renders this same box — nothing is special-cased per figure.
+- Generalises: *any* set of accessories inside one `group_id` renders this same way — nothing is special-cased per figure.
+- **`match_key` slots (see `match_key.md`)** — when 2+ `group_id` slots must resolve to the same tag together (a matched colorway, e.g. Duke's Helmet + Gun), each slot still renders as its own independent group at its own position — they are **not** merged into one block, since matched slots are often spread across the body. Each option row carries a small tag badge (A/B/…) so the owner can tell which pieces pair up despite being visually apart. Completeness math (`matchedSetSatisfied`) is unaffected — this is a rendering decision, not a scoring one.
 
 ### 2. No `group_id` → a plain row (qty-aware)
 Every ungrouped accessory is its own row: a single checkbox at `quantity_required = 1`, or **N tick boxes** when `quantity_required > 1` (e.g. Scrap-Iron Missile System **Legs ×2**, **Missiles ×2**). **Multi-piece sets are NOT a special "assembly" construct** — the Missile System is just six individual accessory rows, because the data carries no grouping binding them. (Reverted in review — the assembly box was "too extra.")
 
 ### 3. `release_context` → an independent completion axis
-`release_context` is orthogonal to `group_id`. Values: **`retail`** (default — **counts** toward completion) vs **`convention` · `bonus` · `mail-in` · `exclusive`** (tracked, but **excluded** from completion). Non-retail accessories pull into their own per-context box (header = the context name, e.g. **Convention**) and **never block a Complete**.
-- Demo: **Cobra trooper (figure 7)** — retail **Dragunov rifle** (`A0004`) is the only thing required for Complete; the convention pieces (M-16 Heavy MG `A0013`, Bipod `A0014`, Bazooka thin/thick handles `A0028`/`A0029`) sit in a "Convention" box and stay optional.
-- The two axes compose: a context box could itself hold a `group_id` variant pair (the thin/thick Bazooka would qualify) once those ids are assigned.
+`release_context` is orthogonal to `group_id`. Values: **`retail`** (default — **counts** toward completion) vs **`convention` · `bonus` · `mail-in` · `exclusive`** (tracked, but **excluded** from completion). Non-retail accessories pull into their own per-context group (label = the context name, e.g. **Bonus**, same flush micro-label + row treatment as a `group_id` slot) and **never block a Complete**. Positioned at the point its first context row falls in the blueprint, same as `group_id`.
+- Demo: **Cobra trooper (figure 7)** — retail **Dragunov rifle** (`A0004`) is the only thing required for Complete; the convention pieces (M-16 Heavy MG `A0013`, Bipod `A0014`, Bazooka thin/thick handles `A0028`/`A0029`) sit in a "Convention" group and stay optional.
+- Real data (July 2026): every "Accessory Tree" accessory (bare + the Raft/Parachute/Sea Sled/Bunker-piece variants — 107 pairings, 100 figures) was reclassified `retail` → `bonus`, the first bulk use of this axis beyond the hand-picked Firefly/Duke examples below.
+- The two axes compose: a context group could itself hold a `group_id` variant pair (the thin/thick Bazooka would qualify) once those ids are assigned.
 
 ### 4. Completeness rule (LOCKED)
 A figure instance is **Complete** when **every retail accessory is owned at its `quantity_required`** *and* **every retail `group_id` has ≥1 member owned**. Non-retail contexts are ignored entirely. The card footer is **binary: `Complete` / `Incomplete`** — no detail/reason string, sentence case (per `FRONTEND_STANDARDS.md` → no ALL CAPS).
@@ -146,6 +148,6 @@ A figure instance is **Complete** when **every retail accessory is owned at its 
 - **Alt-names** ride in the card header as an **A.K.A.** line, from the `alt_name` list (e.g. "Scrap-Iron" / "Scrap Iron").
 
 ### Open / deferred
-- A better in-card **notation for `release_context`** — the explicit "not counted" tag was dropped June 2026; treatment TBD.
+- ~~A better in-card **notation for `release_context`**~~ — ✅ resolved (July 2026): non-retail items get their own labeled group (context name as a small muted caption), same as before, now flush with the rest of the checklist rather than a bordered box.
 - Whether owning **both** members of a `group_id` should flag a **"variant spare"** (currently silent).
 - `group_id` / `release_context` values are **not yet in the join export** — they live in the live DB; the mockup hard-codes the owner-supplied ids (`8401`, `8601`) and contexts for illustration.

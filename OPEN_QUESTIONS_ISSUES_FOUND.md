@@ -20,8 +20,11 @@ need a way to adjust variant figures.
 example: Breaker v1 A --> Breaker v1 B
 Built (July 2026): the "N variants" badge on the FIGURE face of the detail modal (`.inv-modal__variants` in `web/src/app-detail.jsx`) is now a button — click it to open an inline A/B/C picker (same style as Add Figure's variant step) with the copy's current variant pre-selected. Picking a different letter PATCHes that instance's `variant_id` (`server/instances.js`, `updateInstance`) and every derived view (modal header, inventory row label, "missing variants" callout, year coverage meters) updates live. Verified live against the real DB on Breaker v1 (owned copies were variant B): switched one copy to A, confirmed it persisted independently of the other copy, then switched it back to restore the original data.
 
-# 6 Accessories Groups and Release_Context (csv data)
+# 6 Accessories Groups and Release_Context (csv data) ✅
 currently not reading bonus items 
+Built (July 2026): two separate fixes.
+1. **Data** — all "Accessory Tree" accessories (bare + the qualified Raft/Parachute/Sea Sled Top-Bottom/Bunker One-Two-Piece variants — 107 `figure_accessories` pairings across 100 figures, plus the 32 matching rows in the base `accessories` table) were reclassified `retail` → `bonus`. The app was already reading `figure_accessories.release_context` correctly (`server/catalog.js`); the data itself just hadn't been marked. Verified: Rock 'N Roll '93's two Accessory Trees now render under a BONUS section and the required-accessory count dropped from 0/18 to 0/16.
+2. **Layout** — the accessory-group rendering went through several passes based on live feedback: the original boxed `sgw-pillset` card (bordered, centered header, `or`-separated pill buttons) was replaced with a flush micro-label + full-width option rows using the exact same `AccItem` row (bold name, checkbox, count) as every plain accessory — no more separate "pill" component. Groups (and non-retail context boxes) now render at the position their first blueprint row occupies instead of being pulled to the end, so a figure's DB entry order (head to toe: helmet, backpack, weapons…) matches what's on screen. Matched-colorway slots (`match_key`, e.g. Duke's Helmet + Gun) render as two independent groups at their own positions rather than one merged block, with a small tag badge (A/B) on each option so the owner can still tell which pieces pair up. New shared helper: `orderedBlueprint()` / `AccessoryList` in `web/src/accessory-groups.jsx`.
 
 # 7 Figure Expanded View ✅
 No. 1 adjust to Breaker No. 1 
@@ -40,6 +43,10 @@ damaged needs to be accounted for at time of import. not just as a callback edit
 
 # 8.c Damaged Accessories
 notations need to be callable in PartsBin
+
+# 8.d Damaged Accessories (follow-up) ✅
+the mark-as-damaged toggle box was the only place damage showed up — the main checklist only had an aggregate "⚠ N damaged" count in the mini header, no way to tell *which* row from a glance.
+Built (July 2026): each accessory row in the main checklist now carries a small ⚠ flag in a fixed-width column just before its checkbox, shown only when that specific accessory has a damaged unit on this copy. The column is always reserved (like the existing spacer-box pattern) so checkboxes never shift between damaged and undamaged rows. The mini header's aggregate "⚠ N damaged" count is unchanged.
 
 # 9 Dashboard Counts
 update [Complete Chip] 
@@ -67,6 +74,18 @@ Built (July 2026): expanding a figure's accordion now shows a "⚠ Missing varia
 Issue Found (July 2026): adding a 2nd Doc showed "DOC · copy #3 added" on the FINALIZE success screen despite only 2 Docs existing after the add. Root cause: `instNo` (`web/src/app-add-figure.jsx`) was derived live from `JoeData.ownedCount()` on every render, including the success screen shown *after* `commit()` already persisted the new instance — so it counted the just-added copy twice. The pre-commit FINALIZE summary row wasn't affected (rendered before commit), only the post-commit success message.
 Built: removed the "copy #" ordinal from both the success heading and the FINALIZE summary row (now just "first of this variant" / "additional copy") per owner request — this number never necessarily matched the real "No. N" badge shown later in Inventory anyway, since that's sorted most-complete-first, not by add order. Verified live: added a real 3rd Doc, confirmed the success screen now reads "DOC added" with no number, confirmed the DB count went 2→3, then deleted the test instance to restore the collection to its original 2 Docs.
 
-# 13 Figure Display 
-remove the boxing around version and variants. 
-move vehile in line with figure name. 
+# 13 Figure Display/ View 
+remove the boxing around version and variants. ✅
+Built (July 2026): dropped the `border` from `.idver` (the "v1" version tag) and `.idvar` (the "N variants" pill) in `web/src/app.css` — both now read as plain inline text/icon instead of bordered boxes.
+move vehile in line with figure name. — still open, `idveh` still renders on its own line below the name/specialty in `.inv-name`'s column layout.
+
+# 14 Figure 'mark for upgrade' 
+introduce an option for figures to be flagged for upgrade. 
+
+# 15 Catalog/Ghost Figure View ✅
+Issue Found (July 2026): clicking an unowned figure from search opened a modal with "CATALOG ENTRY · you don't own this yet" and an "Adding it creates your first owned copy…" blurb; its accessory checklist was a flat list with no color swatches, grouping, or selectability (unlike the same figure once owned); and figures with a long blueprint (e.g. Rock 'N Roll '93, 16 pieces) had no way to scroll to the rest of the list or reach the "＋ ADD TO INVENTORY" button.
+Built: removed the callout text; the checklist now uses the same clustered/colored rendering as an owned copy (`AccessoryList`) and its checkboxes are live — ticking one here seeds the starting accessory state carried into the Add Figure flow's DETAILS step (`presetAcc`, threaded through `main.jsx` → `AddFigureOverlay`). The modal (`.inv-modal` in `web/src/app.css`) now has a fixed `height: min(92vh, 620px)` with `grid-template-rows: minmax(0, 1fr)` (matching the owned flip-card's sizing) so the right-hand panel scrolls internally instead of the modal silently overflowing past the viewport.
+
+# 16 Add Figure — redundant buttons ✅
+Issue Found (July 2026): the FINALIZE step showed a green "＋ ADD TO INVENTORY" button in the summary body *and* a black "＋ ADD" button in the footer — both called the same `commit()`. The post-add success screen's "＋ ADD ANOTHER" / "DONE → INVENTORY" pair is not affected (those are two different actions).
+Built: removed the body-level `.af-add` button; the footer's action button (present on every step, same place `NEXT ›` sits) is now the single commit action, relabeled "＋ ADD TO INVENTORY" for clarity since it's the only one. Verified live: ran the full flow on Free Fall through to a real commit, confirmed the success screen and DB write were unaffected, then deleted the test instance.
