@@ -12,6 +12,7 @@ import {
   FactionTag, CompRing, CompBar, PhotoSlot, StockBar,
   InvDetailModal,
 } from './app-detail.jsx';
+import { VersionChip, VariantBadge, VehicleTag } from './fig-identity.jsx';
 
 function useStore() {
   const [, force] = React.useReducer(x => x + 1, 0);
@@ -52,9 +53,9 @@ function Row({ fig, selId, openIds, onToggle, onOpen }) {
               onClick={() => ghost ? onOpen(fig.id, null) : onToggle(fig.id)}>
         <span className="inv-thumb" data-tag={ghost ? "—" : ""}></span>
         <span className="inv-name">
-          <b>{fig.name}{fig.version ? <em className="idver">{fig.version}</em> : null}{fig.variants > 1 ? <span className="idvar" title={fig.variants + " production variants"}><span className="lyr"><b></b></span>{fig.variants} variants</span> : null}</b>
-          <i>{fig.specialty || fig.variant}</i>
-          {fig.vehicle && <span className="idveh" title={"Vehicle driver — packaged with the " + fig.vehicle}><b>VEHICLE</b> {fig.vehicle}</span>}
+          <b>{fig.name}<VersionChip version={fig.version} /><VariantBadge count={fig.variants} /></b>
+          <i>{fig.specialty}</i>
+          <VehicleTag vehicle={fig.vehicle} />
         </span>
         <FactionTag faction={fig.faction} mini />
         <span className="inv-owned">{ghost ? "—" : "×" + fig.owned}</span>
@@ -93,7 +94,7 @@ function Row({ fig, selId, openIds, onToggle, onOpen }) {
           {copies.map((c) => (
             <button key={c.id} className={"inv-inst" + (active && selId === fig.id ? "" : "")} onClick={() => onOpen(fig.id, c.id)}>
               <span className="inv-inst__tab">↳</span>
-              <span className="inv-inst__id"><span>{titleCase(fig.name)} No. {c.no}{c.variant ? " · " + c.variant : ""}</span><i>{c.loc || (c.phys ? c.phys + " / " + c.paint : "ungraded")}</i></span>
+              <span className="inv-inst__id"><span>{titleCase(fig.name)}<VariantBadge letter={c.variant} /> No. {c.no}</span><i>{c.loc || (c.phys ? c.phys + " / " + c.paint : "ungraded")}</i></span>
               <span className="inv-stock"><StockBar pct={c.pct} />{c.cardOnFile && <span className="inv-fc" title="File card on file">+ File card</span>}</span>
               <span className={"inv-need" + (c.pct === 100 ? " is-zero" : "")}>{c.pct === 100 ? "✓ Complete" : "Missing " + (c.req - c.own)}</span>
               <span className="inv-go">▸</span>
@@ -120,8 +121,8 @@ function GalleryCard({ fig, onOpen }) {
     <button className={"card inv-card" + (ghost ? " is-ghostcard" : "")} onClick={() => ghost ? onOpen(fig.id, null) : onOpen(fig.id, copies[0].id)}>
       <div className="card__corner"><FactionTag faction={fig.faction} mini /></div>
       <PhotoSlot className="card__photo" />
-      <div className="card__name">{fig.name}{fig.version ? <em className="idver">{fig.version}</em> : null}{fig.variants > 1 ? <span className="idvar" title={fig.variants + " production variants"}><span className="lyr"><b></b></span>{fig.variants} variants</span> : null}</div>
-      <div className="card__var">{fig.specialty || fig.variant}</div>
+      <div className="card__name">{fig.name}<VersionChip version={fig.version} /><VariantBadge count={fig.variants} /></div>
+      <div className="card__var">{fig.specialty}</div>
       {!ghost && multi && st.moves.length > 0 && <div className="card__rebal">Rebalance</div>}
       <div className="card__foot">
         <span className="card__own">{ghost ? "Not owned" : "Owned ×" + fig.owned}</span>

@@ -8,8 +8,10 @@
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
 import { figState, applyRebalance } from './app-detail.jsx';
+import { VersionChip } from './fig-identity.jsx';
+import { figIdentityText } from './fig-identity.js';
 
-const figLabel = (cf) => cf ? cf.name + (cf.ver ? " (v" + cf.ver + ")" : "") : "—";
+const figLabel = (cf) => cf ? figIdentityText({ name: cf.name, version: cf.ver ? 'v' + cf.ver : '' }) : "—";
 
 function useStore() {
   const [, force] = React.useReducer(x => x + 1, 0);
@@ -158,7 +160,7 @@ function AddPartModal({ onClose }) {
                   {results.length === 0 ? <div className="sugg__none">No figures match.</div>
                     : results.map(f => (
                       <button key={f.id} className="sugg__item" onClick={() => choose(f)}>
-                        <span>{f.name}{f.ver ? " · v" + f.ver : ""}</span><em>{f.year} · {f.role || f.faction}</em>
+                        <span>{f.name}<VersionChip version={f.ver ? "v" + f.ver : ""} /></span><em>{f.year} · {f.role || f.faction}</em>
                       </button>
                     ))}
                 </div>
@@ -169,7 +171,7 @@ function AddPartModal({ onClose }) {
               <div className="fld">
                 <label className="fld__lab">FIGURE</label>
                 <div className="pb-pickfig">
-                  <span><b>{fig.name}</b>{fig.ver ? " · v" + fig.ver : ""} <em>{fig.year} · {fig.role || fig.faction}</em></span>
+                  <span><b>{fig.name}</b><VersionChip version={fig.ver ? "v" + fig.ver : ""} /> <em>{fig.year} · {fig.role || fig.faction}</em></span>
                   <button className="pb-pickfig__x" onClick={() => { setFigId(null); setSel({}); }}>change</button>
                 </div>
               </div>
@@ -249,8 +251,8 @@ function RebalanceModal({ figs, onClose }) {
                 return (
                 <div key={r.id} className={"rebal-fig" + (partial ? " rebal-fig--partial" : "")}>
                   <div className="rebal-fig__hd">
-                    <span className="rebal-fig__name">{r.name}</span>
-                    <span className="rebal-fig__meta">{r.year} · {r.variant} · ×{r.st.owned}</span>
+                    <span className="rebal-fig__name">{r.name}<VersionChip version={r.version} /></span>
+                    <span className="rebal-fig__meta">{r.specialty ? r.specialty + " · " : ""}{r.year} · ×{r.st.owned}</span>
                     <span className={"rebal-fig__goal" + (partial ? " is-partial" : "")}>
                       {partial
                         ? "No. " + r.st.partial.targetNo + ": " + r.st.partial.from + "→" + r.st.partial.to + "/" + r.st.partial.reqCount
@@ -343,7 +345,7 @@ function PartsBin({ onNavigate }) {
       const whole = !!(st.moves && st.moves.length);
       const partial = !whole && !!(st.partial && st.partial.moves.length);
       if (!whole && !partial) return null;
-      return { id, name: cf.name, variant: cf.role || ("v" + cf.ver), year: cf.year, st, mode: whole ? 'whole' : 'partial' };
+      return { id, name: cf.name, specialty: cf.role || null, version: 'v' + cf.ver, year: cf.year, st, mode: whole ? 'whole' : 'partial' };
     }).filter(Boolean);
   }, [store]);
 

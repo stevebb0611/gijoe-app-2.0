@@ -3,8 +3,8 @@ Questions Generated while waiting on Claude to reset
 # 1 Figure misData 
 ✅ *Airborne* F045 and F046 pulling from F339
 Issue Found: Airborne and Airborne [2] were breaking the logic. 
-*Grunt v1.5* and * Grunt v2* not showing pilot details 
-*Grand Slam v1.5* and *Grand Slam v2* 
+✅ *Grunt v1.5* and * Grunt v2* not showing pilot details 
+✅ *Grand Slam v1.5* and *Grand Slam v2* 
 
 # 2 Grading Conditions ✅
 review condition "ungraded" - if no grading is slected figure is considered as ungraded. dev toggle 'clean figure' 
@@ -48,18 +48,19 @@ notations need to be callable in PartsBin
 the mark-as-damaged toggle box was the only place damage showed up — the main checklist only had an aggregate "⚠ N damaged" count in the mini header, no way to tell *which* row from a glance.
 Built (July 2026): each accessory row in the main checklist now carries a small ⚠ flag in a fixed-width column just before its checkbox, shown only when that specific accessory has a damaged unit on this copy. The column is always reserved (like the existing spacer-box pattern) so checkboxes never shift between damaged and undamaged rows. The mini header's aggregate "⚠ N damaged" count is unchanged.
 
-# 9 Dashboard Counts
+# 9 Dashboard Counts ✅
 update [Complete Chip] 
-update to include variants, 1982 = 43, not "16" ✅
+update to include variants, 1982 = 43, not "16" 
 Built (July 2026): year-header COVERAGE/COMPLETE meters (`yearParts()` in `web/src/app-detail.jsx`) now count roster + owned at the (figure, production variant) level instead of per catalog figure — a figure with 3 variants contributes 3 roster slots, and "owned" only credits the distinct variants you actually have a copy of (not raw copy count). 1982 now reads 12/43. Single-variant figures still count as one slot (catalog always carries >=1 `variants[]` entry, per `server/catalog.js`), so this degrades gracefully where variant data isn't authored yet. Scoped to the year meters only — the top KPI header and per-figure accessory-completeness % are a different axis and untouched. [Complete Chip] item still needs clarification — unclear what specifically was meant.
 Follow-ups (July 2026):
 1. Renamed "Coverage" → "Figures", and changed the "Complete" meter's denominator from owned-so-far to the full series roster — both meters now share the same total, e.g. "Figures 12/43" / "Complete 8/43" instead of "Complete 8/12".
 2. Dropped the redundant "12/43 owned · 8 complete" text line that sat to the left of the meters (same two numbers, third rendering counting the % badge) and replaced it with a plain "43 figures" total — gives the meters a reference point instead of repeating them.
 3. Owner clarified that left-side total should be an **owned count**, not the roster size — changed to "N owned" = total physical copies owned that year, duplicates included (`yearParts().ownedInstances`). Distinct from the "Figures" meter, which counts unique variants covered, not raw copies. 1982 now reads "18 owned" (verified: 18 = count of `instances` rows joined to 1982-series figures in the DB).
 
-# 10 Refined Delete Sequence
+# 10 Refined Delete Sequence ✅
 [Remove Figure Only] (Accessories drop into PartsBin)
 [Remove Figure and Accessories]
+Built (July 2026): the trash icon now opens an in-card confirm step instead of the old two-step `window.confirm` sequence — "Remove Figure Only" (every on-file accessory moves to the Parts Bin) vs. "Remove Figure and All Accessories" (everything discarded) vs. Cancel. Also trying a 4-button variant (`DELETE_DIALOG_BUTTONS` in `web/src/app-detail.jsx`, currently `4`) that inserts a third "Remove Figure and Selected Accessories" option, opening a per-accessory keep/discard checklist; flip the constant to `3` to fall back to the simpler two-button-plus-picker version (picker framed as "which to keep" instead of "which to discard") if the extra button doesn't earn its place. Both variants share the same checklist component and `finishRemove`/`depositParts` plumbing — not yet decided which the owner prefers.
 
 # 11 Show Collection Gaps ✅
 needs to account for variants. 
@@ -74,8 +75,8 @@ Built (July 2026): expanding a figure's accordion now shows a "⚠ Missing varia
 Issue Found (July 2026): adding a 2nd Doc showed "DOC · copy #3 added" on the FINALIZE success screen despite only 2 Docs existing after the add. Root cause: `instNo` (`web/src/app-add-figure.jsx`) was derived live from `JoeData.ownedCount()` on every render, including the success screen shown *after* `commit()` already persisted the new instance — so it counted the just-added copy twice. The pre-commit FINALIZE summary row wasn't affected (rendered before commit), only the post-commit success message.
 Built: removed the "copy #" ordinal from both the success heading and the FINALIZE summary row (now just "first of this variant" / "additional copy") per owner request — this number never necessarily matched the real "No. N" badge shown later in Inventory anyway, since that's sorted most-complete-first, not by add order. Verified live: added a real 3rd Doc, confirmed the success screen now reads "DOC added" with no number, confirmed the DB count went 2→3, then deleted the test instance to restore the collection to its original 2 Docs.
 
-# 13 Figure Display/ View 
-remove the boxing around version and variants. ✅
+# 13 Figure Display/ View ✅
+remove the boxing around version and variants. 
 Built (July 2026): dropped the `border` from `.idver` (the "v1" version tag) and `.idvar` (the "N variants" pill) in `web/src/app.css` — both now read as plain inline text/icon instead of bordered boxes.
 move vehile in line with figure name. — still open, `idveh` still renders on its own line below the name/specialty in `.inv-name`'s column layout.
 
@@ -89,3 +90,19 @@ Built: removed the callout text; the checklist now uses the same clustered/color
 # 16 Add Figure — redundant buttons ✅
 Issue Found (July 2026): the FINALIZE step showed a green "＋ ADD TO INVENTORY" button in the summary body *and* a black "＋ ADD" button in the footer — both called the same `commit()`. The post-add success screen's "＋ ADD ANOTHER" / "DONE → INVENTORY" pair is not affected (those are two different actions).
 Built: removed the body-level `.af-add` button; the footer's action button (present on every step, same place `NEXT ›` sits) is now the single commit action, relabeled "＋ ADD TO INVENTORY" for clarity since it's the only one. Verified live: ran the full flow on Free Fall through to a real commit, confirmed the success screen and DB write were unaffected, then deleted the test instance.
+
+# 17 COO tagging ✅
+Country of Origin tagging China // Hong Kong // Indonesia
+Built (July 2026): found the owner's `gijoe_db_figures_coo.csv` (108 rows, never wired up) — for 54 figures it lists which two of the three countries that figure/version was produced in. Modeled like production variants: catalog-level `figure_coo` (figure_id, country — migration 005) plus an optional per-copy `instances.country_of_origin`, a notation like filecard printing, not a completeness input. `server/import-coo.mjs` loaded all 108 rows (54/54 resolved, including 3 name typos in the source CSV — "Sneak Peak"→"Sneak Peek", "Ice Crean Soldier"→"Ice Cream Soldier", and "Astro-Viper v2"→"Astro Viper" since the catalog itself drops the hyphen at v2). Surfaced in three places, all optional/skippable: the ghost (unowned) modal shows a plain "Known origins: China, Hong Kong" line; Add Figure's DETAILS step offers an optional origin picker only when the figure has known origins (doesn't gate NEXT); the owned Detail modal shows the current copy's origin. The other ~469 figures render with no COO section at all. Verified live: API confirms all 54 tagged figures serve `coo` correctly post-import; browser-checked the ghost modal (Crankcase), the DETAILS picker on both a tagged figure (shows China/Hong Kong buttons) and an untagged one (no picker rendered), and the owned modal on an owned copy of a tagged figure (Deep Six v2). Required restarting the long-running dev server (`node server/index.js`, no hot-reload) to pick up the schema/server changes.
+Follow-up (July 2026): the owned-modal indicator moved from a click-to-expand button near the name (top-left) down to below the NOTES / BIN-BOX LOCATION fields in the right-hand panel — now a small "COUNTRY OF ORIGIN" checklist (reusing the FILE CARD section's exact checkbox styling) listing only that figure's applicable countries, one checkbox each; checking one sets it and unchecks the other (single-select, since a copy has exactly one true origin), checking the active one again clears it back to unset. Ghost modal and Add Figure's DETAILS-step picker are unchanged (scoped to the owned Detail modal only, per owner direction). Second follow-up: laid out as a single row split into two equal columns (`.fc-coorow`, CSS grid) instead of two stacked rows — each country+checkbox pair left-justified at its own column start (China at the row's left edge, Hong Kong at the column break), not pushed to the row's far right edge. Third follow-up: shrank the section's text/controls (caption 9px→8px, country labels 13px→11px, checkbox 22px→16px) via a scoped `.coo-list` class so the reduction doesn't leak into the shared ACCESSORIES/FILE CARD styles those same base classes drive elsewhere.
+
+# 18 Percentage 'leakage' figure/ damage.map flip ✅
+when rotating between views, the % from tile-front is leaking to tile-back.
+Built (July 2026): root cause was Safari/WebKit not depth-sorting the two `preserve-3d` card faces (`.inv-face--front` / `.inv-face--back` in `web/src/app-detail.jsx`) by their actual 3D rotation — it fell back to DOM paint order, so the CONDITION (back) face painted over the FIGURE (front) face regardless of `backface-visibility: hidden`, showing a mirrored ghost of the completeness ring bleeding through onto the back face. Chromium didn't reproduce it at all, which is why it looked fine in normal dev testing. Fixed in `web/src/app.css` (`.inv-face`, `.inv-face--front`, `.inv-face--back`) by adding explicit `z-index` that swaps with `.inv-cardwrap.is-flipped`, forcing the correct paint order as a backstop to `backface-visibility`. Verified live: drove the running dev server with headless WebKit (Safari's engine) and screenshotted the flip before and after the fix — the mirrored "100%" ghost on the CONDITION face is gone, both faces clean through the full transition.
+
+# 19 Figure identity — inconsistent name/version/variant/year format ✅
+Issue Found (July 2026): the same figure identity (code name, version, production variant, year, faction, specialty, vehicle-driver, copy ordinal) was formatted differently on almost every screen — Inventory read "Pathfinder˅v1 / Jungle Assault Specialist" while Add Figure read "Pathfinder / v1 Jungle Assault Specialist 1990"; Parts Bin had two more formats in the same file (`"NAME (v1)"` vs `"NAME · v1"`); Add Figure's DETAILS step silently dropped the version number entirely. Root cause: no shared formatter existed — 15 render sites across 4 files each hand-rolled their own JSX.
+Built: a confirmed priority ranking for the 8 identifiers — name → version → variant (resolved letter, or a "N variants" count badge when unresolved) → year → faction (handled by the existing separate `FactionTag` chip) → specialty → vehicle-driver tag → copy ordinal — with name+version+variant always forming the non-negotiable "core identity," never dropped or reordered. Two new shared files carry this everywhere: `web/src/fig-identity.jsx` (`VersionChip`, `VariantBadge`, `VehicleTag` — presentational, reuse the existing `.idver`/`.idvar`+`.lyr`/`.idveh` CSS as-is, no new classes) and `web/src/fig-identity.js` (`figIdentityText()`, the plain-string form used by Parts Bin's `figLabel()`). Applied across `app-inventory.jsx` (list row, gallery card, per-copy accordion row), `app-detail.jsx` (ghost modal header, owned modal front panel), `app-add-figure.jsx` (FIND/DETAILS/FINALIZE/success — fixes the dropped-version bug), and `parts-bin.jsx` (search dropdown, selected-figure row, rebalance row — converges the two formats, and stops mislabeling a specialty/version fallback as `variant` in the rebalance data-prep). One intentional behavior change: the per-copy accordion row (issue #7.b's "Breaker No. 1 · B") now reads "Breaker B No. 1" — variant ahead of copy ordinal, per the confirmed priority order, superseding #7.b. Verified live against the real DB (Breaker, Clutch) across Inventory list/gallery/modal, Add Figure's FIND/DETAILS/FINALIZE, and Parts Bin's dropdown/pickfig/rebalance — read the flow through to FINALIZE without committing, since the dev server turned out to be a long-running process against the real collection DB, not a disposable copy.
+
+# 20 Save to MASTER/ Personal Collection
+possible design tool set Master or Primary Collection - everything outside would be available to sell off. 

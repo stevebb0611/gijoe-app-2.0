@@ -26,6 +26,10 @@ const variantsStmt = db.prepare(`
   SELECT figure_id, letter, tell FROM variant_lookup ORDER BY figure_id, letter
 `);
 
+const cooStmt = db.prepare(`
+  SELECT figure_id, country FROM figure_coo ORDER BY figure_id, country
+`);
+
 const blueprintStmt = db.prepare(`
   SELECT fa.figure_id, a.name, a.color, fa.quantity_required, a.id AS accessory_id,
          fa.group_id, fa.release_context, fa.match_key
@@ -39,6 +43,12 @@ export function buildCatalog() {
   for (const v of variantsStmt.all()) {
     if (!variantsByFigure.has(v.figure_id)) variantsByFigure.set(v.figure_id, []);
     variantsByFigure.get(v.figure_id).push({ letter: v.letter, tell: v.tell });
+  }
+
+  const cooByFigure = new Map();
+  for (const c of cooStmt.all()) {
+    if (!cooByFigure.has(c.figure_id)) cooByFigure.set(c.figure_id, []);
+    cooByFigure.get(c.figure_id).push(c.country);
   }
 
   const blueprintRowsByFigure = new Map();
@@ -67,6 +77,7 @@ export function buildCatalog() {
     // (or the handful with no usable variant letter, see server/seed.mjs) get a
     // synthesized blank-letter entry so the frontend's isSingle() check holds.
     variants: variantsByFigure.get(f.id) || [{ letter: '', tell: f.single_tell || null }],
+    coo: cooByFigure.get(f.id) || [],
     blueprint: blueprintByFigure.get(f.id) || [],
   }));
 }

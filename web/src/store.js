@@ -7,12 +7,14 @@
 // they still just call JoeStore.* and read the result immediately.
 //
 // Instance shape (one owned physical copy) — unchanged from before:
-//   { id, catalogId, variant, moc, acc:{[name]:units}, accDamage:{[name]:units},
+//   { id, catalogId, variant, coo, moc, acc:{[name]:units}, accDamage:{[name]:units},
 //     phys, paint, marks:{gender,condition,paint}, filecard:{onFile,printing},
 //     loc, notes, addedAt }
 //   accDamage: how many of acc[name]'s owned units are damaged (<= acc[name]).
 //   A condition notation, not a completeness input — see accDamagePct().
 //   variant: '' (single-variant figure) | 'A'|'B'… (a production variant)
+//   coo: '' (unset) | 'China'|'Hong Kong'|'Indonesia' — country of origin, a
+//   notation like filecard, not a completeness input (see catalog `coo[]`).
 //   moc: true = Mint-on-Card (sealed) — counts 100% complete regardless of acc
 //   phys/paint: grade string ('Mint'…'Poor') or null when ungraded — derived live
 //   from `marks` (not stored), same as the DB's own damage JSON design.
@@ -153,7 +155,7 @@ function figureSummary(catalogId) {
     const card = moc || !!(i.filecard && i.filecard.onFile);
     const { phys, paint } = gradeOf(i);
     return {
-      id: i.id, variant: i.variant, loc: i.loc, notes: i.notes, moc,
+      id: i.id, variant: i.variant, coo: i.coo, loc: i.loc, notes: i.notes, moc,
       phys, paint, acc, cardOnFile: card,
       own: moc ? req : instOwn(bp, acc), req,
       pct: moc ? 100 : instPct(bp, acc), whole: moc ? true : instWhole(bp, acc),

@@ -6,6 +6,7 @@ import { JoeStore, JoeData } from './store.js';
 import { physicalGrade, paintGrade, dmEmpty, DamageMap, GradeBadge } from './damage-map.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
+import { VersionChip, VariantBadge, VehicleTag } from './fig-identity.jsx';
 
 const INV_CAT = JoeData.CAT || [];
 const INV_ERAS = {}; // was window.JOE_ERAS from the retired catalog-data.js — always {}
@@ -18,6 +19,12 @@ const FILECARDS = [
   { letter: 'B', name: "Reissue '85" },
   { letter: 'C', name: 'Mail-away' },
 ];
+
+// Delete-copy dialog layout — trying a 4th button ("...Selected Accessories")
+// alongside the original 3. Flip to 3 to revert to [Remove Figure Only] /
+// [Remove Figure and All Accessories] / [Cancel] if the 4-button version
+// doesn't earn its place; every handler below already supports both.
+const DELETE_DIALOG_BUTTONS = 4; // 3 | 4
 
 // ---------------------------------------------------------------------------
 // View-model: merge a catalog entry with its current ownership.
@@ -35,6 +42,7 @@ function fvm(cf) {
     id: cf.id, name: cf.name, year: cf.year, faction: cf.faction,
     version: cf.ver ? 'v' + cf.ver : '',
     variants: (cf.variants || []).length,
+    coo: cf.coo || [],
     specialty: cf.role || '', variant: cf.role || '', vehicle: cf.vehicle || null,
     owned, acc, blueprint: bp,
     _cf: cf, _sum: sum,
@@ -305,23 +313,49 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const setNotes = (v) => JoeStore.updateInstance(cur.id, { notes: v });
   const setLoc = (v) => JoeStore.updateInstance(cur.id, { loc: v });
   const setVariant = (letter) => { JoeStore.updateInstance(cur.id, { variant: letter }); setVarEdit(false); };
+  const setCoo = (country) => JoeStore.updateInstance(cur.id, { coo: country });
   const setMarks = (val) => {
     const pg = physicalGrade(val), pt = paintGrade(val);
     JoeStore.updateInstance(cur.id, { marks: val, phys: pg.zones ? pg.grade : null, paint: pt.zones ? pt.grade : null });
   };
-  const removeCopy = () => {
-    if (!window.confirm(`Remove ${fig.name} · No. ${cur.no} from your collection?`)) return;
-    // two-way B: offer to keep this copy's accessories as loose parts in the Parts Bin
-    const kept = bp.map(([n, q]) => [n, Math.min((raw.acc && raw.acc[n]) || 0, q)]).filter(([, o]) => o > 0);
-    if (kept.length) {
-      const total = kept.reduce((s, [, o]) => s + o, 0);
-      const keep = window.confirm(`This copy has ${total} accessor${total !== 1 ? 'ies' : 'y'}. Keep them as loose parts in your Parts Bin?\n\nOK = keep in Parts Bin · Cancel = discard with the figure`);
-      if (keep) JoeStore.depositParts(catalogId, kept.map(([accessory, qty]) => ({ accessory, qty })));
-    }
+  // ---- delete sequence (see DELETE_DIALOG_BUTTONS) ----
+  // 3-button: [Remove Figure Only] [Remove Figure and All Accessories] [Cancel].
+  // "Remove Figure Only" opens a secondary checklist (only when the copy has
+  // accessories on file) so the owner can choose which pieces move to the
+  // Parts Bin vs. get discarded, instead of an all-or-nothing pick.
+  // 4-button: adds [Remove Figure and Selected Accessories] between them —
+  // "Remove Figure Only" becomes a one-click keep-everything action, and the
+  // checklist (same component, opposite default) moves to the new button,
+  // framed as picking which pieces to *discard* rather than which to *keep*.
+  const [delStep, setDelStep] = React.useState(null); // null | 'confirm' | 'pick'
+  const [keepSel, setKeepSel] = React.useState({}); // name -> keep-in-Parts-Bin (true) regardless of which button opened the picker
+  const [pickMode, setPickMode] = React.useState('keep'); // 'keep' | 'discard' — only affects the checklist's labels/checkbox polarity
+  const keepable = bp.map(([n, q]) => [n, Math.min((raw.acc && raw.acc[n]) || 0, q)]).filter(([, o]) => o > 0);
+
+  const finishRemove = (deposit) => {
+    if (deposit.length) JoeStore.depositParts(catalogId, deposit.map(([accessory, qty]) => ({ accessory, qty })));
     JoeStore.removeInstance(cur.id);
+    setDelStep(null);
     const rest = copies.filter(c => c.id !== cur.id);
     if (rest.length) setCurId(rest[0].id); else onClose();
   };
+  const openPicker = (mode) => {
+    setKeepSel(Object.fromEntries(keepable.map(([n]) => [n, true]))); // default: keep everything either way
+    setPickMode(mode);
+    setDelStep('pick');
+  };
+  const removeAll = () => finishRemove([]);
+  const removeKeepAll = () => finishRemove(keepable); // 4-button "Remove Figure Only" — no picker, keeps every piece
+  const removeOnly = () => { // 3-button "Remove Figure Only"
+    if (!keepable.length) { finishRemove([]); return; }
+    openPicker('keep');
+  };
+  const removeSelected = () => { // 4-button "Remove Figure and Selected Accessories"
+    if (!keepable.length) { finishRemove([]); return; }
+    openPicker('discard');
+  };
+  const confirmPick = () => finishRemove(keepable.filter(([n]) => keepSel[n]));
+  const toggleKeep = (n) => setKeepSel(s => ({ ...s, [n]: !s[n] }));
 
   const DMap = DamageMap, DGrade = GradeBadge;
   const dmgPhys = !ghost && !moc ? physicalGrade(marks) : null;
@@ -340,10 +374,11 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
             <PhotoSlot className="inv-modal__photo" />
             <FactionTag faction={fig.faction} />
             <div className="inv-modal__id">
-              <div className="inv-modal__name">{fig.name}{fig.version ? <em className="idver idver--lg">{fig.version}</em> : null}</div>
+              <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /></div>
               <div className="inv-modal__var">{fig.specialty} · {fig.year}</div>
               {fig.variants > 1 ? <div className="inv-modal__variants"><span className="lyr"><b></b></span>{fig.variants} variants</div> : null}
-              {fig.vehicle && <span className="idveh idveh--modal" title={"Vehicle driver — packaged with the " + fig.vehicle}><b>VEHICLE</b> {fig.vehicle}</span>}
+              <VehicleTag vehicle={fig.vehicle} modal />
+              {fig.coo.length > 0 && <div className="inv-modal__coo">Known origins: {fig.coo.join(', ')}</div>}
             </div>
             <div className="inv-modal__notin">NOT IN<br/>INVENTORY</div>
           </div>
@@ -411,8 +446,8 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                 <PhotoSlot className="inv-modal__photo" />
                 <FactionTag faction={fig.faction} />
                 <div className="inv-modal__id">
-                  <div className="inv-modal__name">{fig.name}{fig.version ? <em className="idver idver--lg">{fig.version}</em> : null}</div>
-                  <div className="inv-modal__var">{fig.specialty} · {fig.year}{cur.variant ? " · var " + cur.variant : ""}</div>
+                  <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /></div>
+                  <div className="inv-modal__var">{cur.variant ? <React.Fragment><VariantBadge letter={cur.variant} /> · </React.Fragment> : null}{fig.specialty} · {fig.year}</div>
                   {fig.variants > 1 ? (
                     <button type="button" className="inv-modal__variants inv-modal__variants--btn" title="Change production variant"
                             aria-expanded={varEdit} onClick={() => setVarEdit(v => !v)}>
@@ -517,8 +552,26 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                   </div>
                 </div>
 
+                {fig.coo.length > 0 && (
+                  <div className="acc-list fc-list coo-list">
+                    <div className="acc-list__cap"><span>COUNTRY OF ORIGIN</span><span>{cur.coo && <b>{cur.coo}</b>}</span></div>
+                    <div className="acc fc-coorow">
+                      {fig.coo.map(country => (
+                        <span key={country} className="fc-coo__opt">
+                          <span className="acc__name">{country}</span>
+                          <button type="button" className={"acc__box fc-box" + (cur.coo === country ? " is-on" : "")}
+                                  onClick={() => setCoo(cur.coo === country ? '' : country)}
+                                  title={cur.coo === country ? "Clear country of origin" : "Set as country of origin"}>
+                            {cur.coo === country ? "✓" : ""}
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="inv-modal__btns inv-modal__btns--foot">
-                  <button className="invbtn-trash" title="Remove this copy" aria-label="Remove this copy" onClick={removeCopy}>
+                  <button className="invbtn-trash" title="Remove this copy" aria-label="Remove this copy" onClick={() => setDelStep('confirm')}>
                     <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                       <path d="M2.5 4h11M6 4V2.6h4V4M3.9 4l.7 9.4h6.8l.7-9.4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"></path>
                       <path d="M6.6 6.4v5M9.4 6.4v5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"></path>
@@ -559,6 +612,76 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
           </div>
         </div>
       </div>
+
+      {delStep && (
+        <React.Fragment>
+          <div className="inv-scrim inv-scrim--top" onClick={() => setDelStep(null)}></div>
+          {delStep === 'confirm' ? (
+            <div className="inv-confirm">
+              <div className="inv-confirm__hd">Remove {fig.name} · No. {cur.no}?</div>
+              <div className="inv-confirm__sub">
+                {keepable.length
+                  ? `This copy has ${keepable.reduce((s, [, o]) => s + o, 0)} accessor${keepable.reduce((s, [, o]) => s + o, 0) !== 1 ? 'ies' : 'y'} on file.`
+                  : 'This copy has no accessories on file.'}
+              </div>
+              <div className="inv-confirm__btns">
+                {DELETE_DIALOG_BUTTONS === 4 ? (
+                  <React.Fragment>
+                    <button className="inv-confirm__btn" onClick={removeKeepAll}>
+                      REMOVE FIGURE ONLY
+                      {keepable.length ? <i>all accessories move to the Parts Bin</i> : null}
+                    </button>
+                    <button className="inv-confirm__btn inv-confirm__btn--warn" onClick={removeSelected}>
+                      REMOVE FIGURE AND SELECTED ACCESSORIES
+                      {keepable.length ? <i>choose which accessories to discard</i> : null}
+                    </button>
+                  </React.Fragment>
+                ) : (
+                  <button className="inv-confirm__btn" onClick={removeOnly}>
+                    REMOVE FIGURE ONLY
+                    {keepable.length ? <i>accessories move to the Parts Bin</i> : null}
+                  </button>
+                )}
+                <button className="inv-confirm__btn inv-confirm__btn--danger" onClick={removeAll}>
+                  REMOVE FIGURE AND ALL ACCESSORIES
+                  {keepable.length ? <i>everything is discarded</i> : null}
+                </button>
+                <button className="inv-confirm__btn inv-confirm__btn--cancel" onClick={() => setDelStep(null)}>CANCEL</button>
+              </div>
+            </div>
+          ) : (
+            <div className="inv-confirm">
+              <div className="inv-confirm__hd">{pickMode === 'discard' ? 'Discard which accessories?' : 'Keep which accessories?'}</div>
+              <div className="inv-confirm__sub">
+                {pickMode === 'discard'
+                  ? 'Checked pieces are discarded with the figure; unchecked pieces move to the Parts Bin as loose parts.'
+                  : 'Checked pieces move to the Parts Bin as loose parts; unchecked pieces are discarded with the figure.'}
+              </div>
+              <div className="inv-confirm__list">
+                {keepable.map(([name, qty]) => {
+                  const on = pickMode === 'discard' ? !keepSel[name] : keepSel[name];
+                  return (
+                    <div key={name} className="inv-confirm__row">
+                      <span className="acc__name">{name}{qty > 1 ? <i> ×{qty}</i> : null}</span>
+                      <button type="button" className={"acc__box" + (on ? " is-on" : "")}
+                              onClick={() => toggleKeep(name)}
+                              title={on
+                                ? (pickMode === 'discard' ? "Discard with figure" : "Keep in Parts Bin")
+                                : (pickMode === 'discard' ? "Keep in Parts Bin" : "Discard with figure")}>
+                        {on ? "✓" : ""}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="inv-confirm__foot">
+                <button className="inv-confirm__btn inv-confirm__btn--cancel" onClick={() => setDelStep('confirm')}>‹ BACK</button>
+                <button className="inv-confirm__btn inv-confirm__btn--danger" onClick={confirmPick}>REMOVE FIGURE</button>
+              </div>
+            </div>
+          )}
+        </React.Fragment>
+      )}
     </React.Fragment>
   );
 }

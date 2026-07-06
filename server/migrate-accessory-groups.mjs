@@ -30,6 +30,7 @@ const GROUPS = [
   { extGroupId: 8408, figure: 'Rip Cord',  accessories: ['A0093', 'A0094'] }, // Helmet / Helmet (with holes)
   { extGroupId: 8409, figure: 'Rip Cord',  accessories: ['A0097', 'A0098'] }, // SLR-W1L1 Rifle / SLR-W1L1 Rifle
   { extGroupId: 8412, figure: 'Scrap-Iron', accessories: ['A0111', 'A0112'] }, // Remote Activator thin/thick handle
+  { extGroupId: null,  figure: 'Recoil',     accessories: ['A0616', 'A0617'] }, // Mine Case thin/thick handle
   { extGroupId: 8415, figure: 'Thunder',   accessories: ['A0125', 'A0126'] }, // Radio Headset / Radio Headset
   { extGroupId: 8601, figure: 'A.V.A.C.',  accessories: ['A0225', 'A0226'] }, // Parachute pack soft/hard plastic
   // Firefly (1984): NOT from the CSV's group_id column (that one cross-paired

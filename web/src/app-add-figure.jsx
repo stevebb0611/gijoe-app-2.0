@@ -6,6 +6,7 @@ import { JoeStore, JoeData } from './store.js';
 import { DamageMap, GradeBadge, physicalGrade, paintGrade, dmEmpty } from './damage-map.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
+import { VersionChip, VariantBadge, VehicleTag } from './fig-identity.jsx';
 const AF_CATALOG = JoeData.CAT || [];
 const AF_FILECARDS = [{ letter: 'A', name: 'First print' }, { letter: 'B', name: "Reissue '85" }, { letter: 'C', name: 'Mail-away' }];
 const AF_YEARS = [...new Set(AF_CATALOG.map(f => f.year))].sort((a, b) => a - b);
@@ -40,6 +41,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const [owned, setOwnedAcc] = React.useState(() => presetAcc || {});   // accName -> units owned
   const [moc, setMoc] = React.useState(false);       // Mint on Card (sealed) — counts 100% complete
   const [filecard, setFilecard] = React.useState({ onFile: false, printing: 'A' });
+  const [coo, setCoo] = React.useState(''); // optional — country of origin, only offered when fig.coo has entries
   // condition — single zone-map value; dmg.clean is the explicit "no damage found"
   // confirmation (vs. not yet mapped), and travels with marks into the stored instance
   const [dmg, setDmg] = React.useState(() => dmEmpty('male'));
@@ -52,7 +54,6 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const variantKey = single ? '' : (selVar || '');
   const ownedHere = fig ? JoeData.ownedCount(fig.id, variantKey) : 0;
   const isNew = !!fig && ownedHere === 0;
-  const varLabel = multi ? (chosen ? "v" + fig.ver + " · " + chosen.letter : "") : (single ? "v" + fig.ver : null);
   const varTell = chosen ? chosen.tell : null;
 
   // selecting a figure clears variant + parts + condition; auto-pick for single-variant
@@ -60,7 +61,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
     if (!fig) return;
     setSelVar(isSingle(fig) ? '' : (presetVariant && fig.id === presetCatalogId ? presetVariant : null));
     setOwnedAcc(presetAcc && fig.id === presetCatalogId ? presetAcc : {});
-    setMoc(false); setFilecard({ onFile: false, printing: 'A' }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male'));
+    setMoc(false); setFilecard({ onFile: false, printing: 'A' }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male')); setCoo('');
   }, [selId]);
 
   const q = query.trim().toLowerCase();
@@ -125,6 +126,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
       marks: moc ? null : dmg,
       loc: loc.trim(), notes: notes.trim(),
       filecard: filecard.onFile ? { onFile: true, printing: filecard.printing } : { onFile: false, printing: 'A' },
+      coo: coo || '',
     });
     setDone(true);
   };
@@ -206,8 +208,13 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
               <div className="af-fig">
                 <span className="af-fig__thumb"></span>
                 <div>
-                  <div className="af-fig__name">{fig.name} <span className={"wf-fac wf-fac--" + fig.faction.toLowerCase() + " wf-fac--mini"}>{fig.faction}</span>{varLabel && <span className="af-fig__vtag">{varLabel}</span>}</div>
+                  <div className="af-fig__name">
+                    {fig.name}<VersionChip version={"v" + fig.ver} />
+                    <span className={"wf-fac wf-fac--" + fig.faction.toLowerCase() + " wf-fac--mini"}>{fig.faction}</span>
+                    {multi && chosen ? <VariantBadge letter={chosen.letter} /> : null}
+                  </div>
                   <div className="af-fig__var">{multi ? (varTell ? varTell + " · " + fig.year : fig.year) : (fig.role ? fig.role + " · " : "") + fig.year}</div>
+                  <VehicleTag vehicle={fig.vehicle} />
                 </div>
               </div>
 
@@ -245,6 +252,24 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
 
                 <p className="af-seclab" style={{ marginTop: 18 }}><b>Bin / box location</b> <i style={{ fontStyle: 'normal', color: 'var(--ink-soft)' }}>(optional)</i></p>
                 <input className="af-in" value={loc} onChange={e => setLoc(e.target.value)} placeholder="e.g. BIN C-04 · long-box" />
+
+                {fig.coo.length > 0 && (
+                  <div className="acc-list fc-list coo-list" style={{ marginTop: 18 }}>
+                    <div className="acc-list__cap"><span>COUNTRY OF ORIGIN</span><span>{coo && <b>{coo}</b>}</span></div>
+                    <div className="acc fc-coorow">
+                      {fig.coo.map(country => (
+                        <span key={country} className="fc-coo__opt">
+                          <span className="acc__name">{country}</span>
+                          <button type="button" className={"acc__box fc-box" + (coo === country ? " is-on" : "")}
+                                  onClick={() => setCoo(c => c === country ? '' : country)}
+                                  title={coo === country ? "Clear country of origin" : "Set as country of origin"}>
+                            {coo === country ? "✓" : ""}
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -300,7 +325,10 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
           {step === 3 && fig && !done && (
             <div className="af-confirm">
               <div className="af-sum">
-                <div className="af-sum__row"><span>Figure</span><b>{fig.name} · {multi ? varLabel : (fig.role || varLabel)} · {fig.year}</b></div>
+                <div className="af-sum__row"><span>Figure</span><b>
+                  {fig.name}<VersionChip version={"v" + fig.ver} />{multi && chosen ? <VariantBadge letter={chosen.letter} /> : null}
+                  {(!multi && fig.role) ? " · " + fig.role : ""} · {fig.year}
+                </b></div>
                 {multi && <div className="af-sum__row"><span>Variant</span><b>{varTell}</b></div>}
                 <div className="af-sum__row"><span>Copy</span><b>{isNew ? "first of this variant" : "additional copy"}</b></div>
                 <div className="af-sum__row"><span>Accessories</span><b>{moc ? "sealed on card · 100% (assumed present)" : (blueprint.length ? `${fullDone}/${bpReq} complete` : "none on file")}</b></div>
@@ -315,7 +343,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
           {step === 3 && done && (
             <div className="af-okwrap">
               <div className="af-ok">✓</div>
-              <div className="af-ok__h">{fig.name}{multi ? " " + varLabel : ""} added</div>
+              <div className="af-ok__h">{fig.name}<VersionChip version={"v" + fig.ver} /> added</div>
               <div className="af-ok__sub">
                 {moc ? "Mint on Card · 100% complete (sealed) · factory mint" : (
                   <React.Fragment>
