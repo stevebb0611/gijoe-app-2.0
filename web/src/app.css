@@ -381,7 +381,7 @@
   .inv-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 720px; max-width: calc(100vw - 40px); height: min(92vh, 620px); overflow: hidden; background: var(--paper); border: 2.5px solid var(--ink); box-shadow: 8px 8px 0 rgba(33,31,26,.5); display: grid; grid-template-columns: 230px 1fr; grid-template-rows: minmax(0, 1fr); z-index: 51; }
   .inv-modal > * { min-height: 0; }
   .inv-modal .inv-modal__r { overflow-y: auto; }
-  .inv-modal__x { position: absolute; top: -2px; right: -2px; background: var(--ink); color: var(--paper); border: none; width: 30px; height: 30px; cursor: pointer; font-size: 14px; z-index: 2; }
+  .inv-modal__x { position: absolute; top: 8px; right: 8px; background: var(--ink); color: var(--paper); border: none; width: 30px; height: 30px; cursor: pointer; font-size: 14px; z-index: 2; display: inline-grid; place-items: center; padding: 0; }
   .inv-modal__l { border-right: 2px solid var(--ink); padding: 18px; display: flex; flex-direction: column; align-items: center; gap: 10px; background: var(--card); overflow-y: auto; }
   .inv-modal__photo { width: 100%; height: 165px; }
   .inv-modal__name { font-family: var(--font-display); font-weight: 700; font-size: 24px; line-height: 1; text-align: center; }
@@ -427,15 +427,16 @@
     font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; color: var(--ink-soft);
     padding: 7px 12px; border-bottom: 1.5px solid var(--ink); background: var(--card); }
   .acc-list__cap b { color: var(--ink); font-weight: 700; }
-  .acc { display: grid; grid-template-columns: 1fr auto auto auto; column-gap: 14px; align-items: center; padding: 9px 12px; }
+  .acc { display: grid; grid-template-columns: 1fr auto auto; column-gap: 14px; align-items: center; padding: 9px 12px; }
   .acc + .acc { border-top: 1px solid var(--line-soft); }
   .acc.is-stack { align-items: center; }
   .acc__namewrap { display: flex; align-items: center; gap: 7px; min-width: 0; }
   .acc__name { font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .2px; line-height: 1.15; }
   .acc__tag { font-family: var(--font-mono); font-weight: 700; font-size: 9px; color: var(--accent); border: 1px solid var(--accent); padding: 0 4px; line-height: 1.6; flex: none; }
   /* reserved even when empty (like .acc__box.is-spacer) so the checkbox column
-     never shifts between damaged and undamaged rows */
-  .acc__dmgflag { width: 14px; text-align: center; color: var(--damage); font-size: 12px; }
+     never shifts between damaged and undamaged rows — lives ahead of acc__tag
+     inside acc__namewrap so the damage flag reads before the match_key badge */
+  .acc__dmgflag { width: 14px; text-align: center; color: var(--damage); font-size: 12px; flex: none; }
   .acc__boxes { display: grid; gap: 5px; justify-content: end; }
   .acc__box { width: 22px; height: 22px; border: 1.5px solid var(--ink); background: var(--paper);
     display: grid; place-items: center; padding: 0; cursor: pointer; line-height: 1;

@@ -42,7 +42,7 @@ const ACC_BY_ID = new Map(ACC.map(a => [a.id, a]));
 
 // ---- completeness math ----
 // Blueprint items are [name, quantity_required, accessory_id, group_id, release_context, match_key, color].
-// Three axes restructure the flat list (see PARTS_BIN.md "Accessory completeness model" + match_key.md):
+// Three axes restructure the flat list (see PARTS_BIN.md "Accessory completeness model" + ACCESSORY_GROUPS.md):
 //   group_id    — interchangeable variants ("own any one" satisfies the slot)
 //   match_key   — when 2+ group_id slots have members sharing a match_key, those
 //                 slots must resolve to the SAME key together (e.g. Firefly's

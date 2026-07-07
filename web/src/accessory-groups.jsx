@@ -1,7 +1,7 @@
 // accessory-groups.jsx — shared "own any one" variant-slot label and non-retail
 // context label, plus the blueprint-order walk that interleaves them with solo
 // items. Three mechanisms restructure a figure's flat blueprint list (see
-// PARTS_BIN.md "Accessory completeness model" + match_key.md):
+// PARTS_BIN.md "Accessory completeness model" + ACCESSORY_GROUPS.md):
 //   group_id        — interchangeable variants; owning any one satisfies the
 //                      slot (store.js math)
 //   match_key       — 2+ group_id slots that must resolve to the same tag
@@ -43,6 +43,16 @@
 // already uses for solo items (AccItem in app-detail.jsx, .af-acc__row in
 // app-add-figure.jsx), so the checkbox sits in the exact same right-hand
 // column as everywhere else in the list.
+//
+// 2026-07-07: a group_id slot can itself be non-retail (Zartan's single-/
+// double-sided heat stickers are both 'bonus', tied by match_key — see
+// ACCESSORY_GROUPS.md). Context buckets used to flatten every member to a solo row
+// regardless of group_id, which hid the "pick one" relationship. ContextGroup
+// now sub-clusters its items by group_id (clusterUnits) and nests a
+// VariantGroup — tag badge and all — for any grouped slot, same as a retail
+// group; only ungrouped context items still render as flat rows. This is
+// display-only: store.js already filters non-retail out before it ever builds
+// match_key buckets, so this cannot change what counts toward Complete.
 import React from 'react';
 import { JoeData } from './store.js';
 
@@ -64,15 +74,42 @@ export function VariantGroup({ items, renderOption }) {
 }
 
 // context: 'convention' | 'mail_in' | 'bonus' | 'exclusive'.
+// units: this context's items, already sub-clustered by group_id (see
+// clusterUnits below) — a group_id slot inside a context (e.g. Zartan's
+// single-/double-sided stickers, both 'bonus') renders as its own nested
+// VariantGroup with an A/B tag, same as a retail matched set; an ungrouped
+// context item still renders via renderRow.
 // renderRow(item): caller-supplied single-row renderer, so the row matches
 // whichever screen it's used from (app-detail.jsx's AccItem vs. app-add-figure.jsx's row).
-export function ContextGroup({ context, items, renderRow }) {
+export function ContextGroup({ context, units, renderRow, renderOption }) {
   return (
     <div className="sgw-group">
       <div className="sgw-label sgw-label--cap">{CTX_LABEL[context] || context}</div>
-      {items.map((it) => renderRow(it))}
+      {units.map((u, i) => u.type === 'group'
+        ? <VariantGroup key={'cg' + i} items={u.items} renderOption={renderOption} />
+        : renderRow(u.item))}
     </div>
   );
+}
+
+// Sub-clusters a flat item list by group_id, in first-appearance order —
+// same rule as orderedBlueprint's own pass, just scoped to one bucket
+// (a single release_context's items) instead of the whole blueprint.
+function clusterUnits(items) {
+  const groupMembers = new Map();
+  items.forEach((a) => { if (a[3] != null) { if (!groupMembers.has(a[3])) groupMembers.set(a[3], []); groupMembers.get(a[3]).push(a); } });
+  const units = [];
+  const seenGroups = new Set();
+  items.forEach((a) => {
+    if (a[3] != null) {
+      if (seenGroups.has(a[3])) return;
+      seenGroups.add(a[3]);
+      units.push({ type: 'group', items: groupMembers.get(a[3]) });
+      return;
+    }
+    units.push({ type: 'solo', item: a });
+  });
+  return units;
 }
 
 // Walks a blueprint in its authored (head-to-toe) order and buckets each item
@@ -100,7 +137,7 @@ export function orderedBlueprint(bp) {
     if (ctx) {
       if (seenContexts.has(ctx)) return;
       seenContexts.add(ctx);
-      order.push({ type: 'context', context: ctx, items: contextMembers.get(ctx) });
+      order.push({ type: 'context', context: ctx, units: clusterUnits(contextMembers.get(ctx)) });
       return;
     }
     if (a[3] != null) {
@@ -125,7 +162,8 @@ export function AccessoryList({ ordered, renderSolo, renderOption }) {
   return ordered.map((u, i) => {
     if (u.type === 'solo') return renderSolo(u.item, i);
     if (u.type === 'group') return <VariantGroup key={'g' + i} items={u.items} renderOption={renderOption} />;
-    if (u.type === 'context') return <ContextGroup key={'c' + i} context={u.context} items={u.items} renderRow={(a) => renderSolo(a, u.context + '-' + a[0])} />;
+    if (u.type === 'context') return <ContextGroup key={'c' + i} context={u.context} units={u.units} renderOption={renderOption}
+                                                    renderRow={(a) => renderSolo(a, u.context + '-' + a[0])} />;
     return null;
   });
 }

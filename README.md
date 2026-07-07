@@ -251,6 +251,7 @@ Representative sizes: year number ~23px/700 (boxed ink tab) · figure name 16px/
 - `INSTANCE_MODEL.md` — instance schema, the damage map, and the derived-grade engine (exact default weights/thresholds/caps).
 - `VARIANTS.md` — the **production-variant** model: the character → figure → variant → instance hierarchy, the physical "tell," and the **variant-required-at-Add** rule (the UNIDENTIFIED / identify-later lifecycle was dropped — §3).
 - `PARTS_BIN.md` — the loose-accessory inventory and the two-way figure↔bin flow.
+- `ACCESSORY_GROUPS.md` — per-figure operational log for grouped accessory slots (`group_id` "pick one" + the narrower `match_key` colorway tie); companion to `PARTS_BIN.md`'s "Accessory completeness model."
 - `NAVIGATION.md` — how screens connect; how Instance Detail and the Parts Bin are reached.
 - `OPEN_QUESTIONS.md` — **decisions to resolve before/early in implementation.** Read first.
 - `FRONTEND_STANDARDS.md` — architecture, accessibility, performance, code standards.

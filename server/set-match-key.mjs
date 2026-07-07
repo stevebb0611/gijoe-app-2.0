@@ -4,7 +4,7 @@
 // tagged with the same match_key, those slots must resolve to that SAME key
 // together for the figure to count as Complete (e.g. Firefly's light-green
 // Submachine Gun only completes alongside the light-green Walkie-Talkie,
-// never the dull-green one). See match_key.md for the running catalogue.
+// never the dull-green one). See ACCESSORY_GROUPS.md for the running catalogue.
 //
 // The accessory must already be in a group_id slot — run
 // server/migrate-accessory-groups.mjs (or add a GROUPS entry there) first.

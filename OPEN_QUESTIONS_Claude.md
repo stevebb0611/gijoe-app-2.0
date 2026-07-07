@@ -223,3 +223,15 @@ The vehicle-driver tag (`is_vehicle_driver` + `vehicle`, 139 figures — see `TA
 | Grand Slam | F016 (v1, `HAL`), F063 (v1.5, `HAL`), F064 (v2, `JUMP`) | all three = 1 | No inconsistency — flagged here only as the contrasting case that made Grunt's gap noticeable. |
 
 > **Do not bulk-edit without verifying against physical file cards or a trusted reference (YoJoe, HissTank)** — same caution as #18. Not verified independently; flagged from the data pattern alone.
+
+---
+
+## 20. TablePlus vs. live server — concurrent SQLite writes can silently fail (flagged July 2026)
+
+`gijoe_collection.db` is now edited two ways at once: through the running app (`server/index.js` holds one `better-sqlite3` connection open for the life of the process — `server/db.js`) and by hand in TablePlus. The db is in SQLite's default rollback-journal mode (`PRAGMA journal_mode` = `delete`, not `WAL`), which needs a brief exclusive lock to commit a write. Observed firsthand: editing `quantity_required` in TablePlus and hitting Cmd+S showed no blocking error, but a direct `sqlite3` read of the file immediately after still showed the old value — the write never landed while the server's connection was live.
+
+Two fixes, not yet chosen between:
+- **(a) Switch to WAL journal mode** (`PRAGMA journal_mode=WAL;` — one-time, reversible, no schema impact). WAL lets a reader (the server) and a writer (TablePlus) share the file without lock contention. **Recommended** — directly removes the friction of hand-editing the catalog without Claude Code.
+- **(b) Stop the server before every TablePlus edit**, save, restart, refresh the app. No lasting fix — has to be repeated by hand every time.
+
+Flagged here to revisit before relying on more TablePlus edits landing correctly.

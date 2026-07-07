@@ -10,8 +10,9 @@
 // Walkie-Talkie) and are NOT variant alternates — owner-confirmed these stay
 // independently required, so the CSV's own grouping is deliberately not used
 // for those. Entries below with extGroupId: null are hand-built slots (not
-// from that CSV column) for figures needing match_key cross-slot matching —
-// see match_key.md for the running catalogue and why.
+// from that CSV column) — some (Firefly, Duke, Recondo, Spirit, Zartan) need
+// match_key cross-slot matching, others (Recoil, T.A.R.G.A.T.) don't — see
+// ACCESSORY_GROUPS.md for the running catalogue and why.
 //
 // This does NOT touch instances/instance_accessories (owned collection data) —
 // only accessory_groups (empty today) and figure_accessories.group_id. Safe to
@@ -34,7 +35,7 @@ const GROUPS = [
   { extGroupId: 8415, figure: 'Thunder',   accessories: ['A0125', 'A0126'] }, // Radio Headset / Radio Headset
   { extGroupId: 8601, figure: 'A.V.A.C.',  accessories: ['A0225', 'A0226'] }, // Parachute pack soft/hard plastic
   // Firefly (1984): NOT from the CSV's group_id column (that one cross-paired
-  // gun+radio, which is wrong — see match_key.md). These two slots are each a
+  // gun+radio, which is wrong — see ACCESSORY_GROUPS.md). These two slots are each a
   // same-item colour pair; match_key (set separately, see set-match-key.mjs)
   // is what actually ties the two slots' light-green / dull-green members
   // together for completion.
@@ -48,6 +49,34 @@ const GROUPS = [
   // (set separately, see set-match-key.mjs) rather than by this grouping alone.
   { extGroupId: null, figure: 'Duke', accessories: ['A0024', 'A0039', 'A0040'] }, // Helmet (with holes) light/bright green + Helmet (no holes) green
   { extGroupId: null, figure: 'Duke', accessories: ['A0041', 'A0042'] }, // M-32 Submachine Gun green/bright green
+  // Recondo (1984, v1, F099 -> catalog id 58): two colorways, light green
+  // (variant A) and dark green (variant B) — the Backpack and Rifle each ship
+  // in the matching color, tied via match_key (set separately, see
+  // set-match-key.mjs) rather than by this grouping alone.
+  { extGroupId: null, figure: 'Recondo', accessories: ['A0089', 'A0090'] }, // Cross Country Backpack light/dark green
+  { extGroupId: null, figure: 'Recondo', accessories: ['A0091', 'A0092'] }, // M-14E2X Rifle light/dark green
+  // Spirit (1984, v1, F104 -> catalog id 62): two colorways, light green
+  // (variant A) and dark green (variant B) — the Arrow Cassette Pack and
+  // Auto-Arrow Launcher each ship in the matching color, tied via match_key
+  // (set separately, see set-match-key.mjs) rather than by this grouping alone.
+  { extGroupId: null, figure: 'Spirit', accessories: ['A0113', 'A0114'] }, // Arrow Cassette Pack light/dark green
+  { extGroupId: null, figure: 'Spirit', accessories: ['A0115', 'A0116'] }, // Auto-Arrow Launcher light/dark green
+  // Zartan (1984, v1, F112 -> catalog id 68): 'Zartan' also matches a later
+  // Ninja Force v2 (id 478, F578), but the lowest id (68, v1) is the one with
+  // these accessories, same pattern as Duke/Recondo/Spirit above. Chest Armor
+  // and Thigh Pad each came with a single-sided or double-sided heat sticker,
+  // tied via match_key (set separately, see set-match-key.mjs) so single
+  // pairs with single and double with double. Both slots are release_context
+  // 'bonus' (see set-accessory-context.mjs, 2026-07-06) — non-blocking either way.
+  { extGroupId: null, figure: 'Zartan', accessories: ['A0136', 'A0138'] }, // Chest Armor Heat Sticker single/double-sided
+  { extGroupId: null, figure: 'Zartan', accessories: ['A0137', 'A0139'] }, // Thigh Pad Heat Sticker single/double-sided
+  // T.A.R.G.A.T. (1989, v1, F335 -> catalog id 255): code_name has a trailing
+  // space ('T.A.R.G.A.T. ') shared by both v1 and v2, so the unqualified
+  // lookup resolves to the lower id (255, v1), same pattern as
+  // Duke/Recondo/Spirit/Zartan above. NOT a match_key case — a single slot,
+  // three interchangeable Laser Gun molds (rigid plastic / soft plastic
+  // opened clip / soft plastic closed clip); own any one for completion.
+  { extGroupId: null, figure: 'T.A.R.G.A.T. ', accessories: ['A0657', 'A0658', 'A0659'] }, // Laser Gun rigid/soft-open/soft-closed
 ];
 
 // Same label rule as the locked reference (subgroup-wire-v2.jsx groupLabel):

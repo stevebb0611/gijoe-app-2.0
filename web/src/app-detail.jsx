@@ -247,8 +247,10 @@ function AccItem({ name, req, checked, onSet, tone, color, tag, damaged }) {
   }
   return (
     <div className={"acc" + (rows === 2 ? " is-stack" : "") + (done ? " is-done" : "") + (dmg ? " is-damage-tone" : "")}>
-      <span className="acc__namewrap">{tag != null && <span className="acc__tag">{tag}</span>}{color && <AccSwatch color={color} />}<span className="acc__name">{name}</span></span>
-      <span className="acc__dmgflag" title={damaged ? name + " · has damaged units" : undefined} aria-hidden={!damaged}>{damaged ? "⚠" : ""}</span>
+      <span className="acc__namewrap">
+        <span className="acc__dmgflag" title={damaged ? name + " · has damaged units" : undefined} aria-hidden={!damaged}>{damaged ? "⚠" : ""}</span>
+        {tag != null && <span className="acc__tag">{tag}</span>}{color && <AccSwatch color={color} />}<span className="acc__name">{name}</span>
+      </span>
       <div className="acc__boxes" style={{ gridTemplateColumns: "repeat(" + cols + ", 22px)" }}>{cells}</div>
       <span className="acc__count">{own}/{req}</span>
     </div>
@@ -399,7 +401,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                                             onSet={(n) => setPreUnit(a[0], n)} />
                                  )} />
                 </div>}
-            <div className="inv-modal__btns"><button className="invbtn invbtn--go" onClick={() => onAddInstance(fig.id, null, preAcc)}>＋ ADD TO INVENTORY</button></div>
+            <div className="inv-modal__btns"><button className="invbtn invbtn--go" onClick={() => { onAddInstance(fig.id, null, preAcc); onClose(); }}>＋ ADD TO INVENTORY</button></div>
           </div>
         </div>
       </React.Fragment>
@@ -430,12 +432,18 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
     <React.Fragment>
       <div className="inv-scrim" onClick={onClose}></div>
       <div className={"inv-cardwrap" + (flipped ? " is-flipped" : "")}>
-        <button className="inv-modal__x" onClick={onClose}>✕</button>
+        <button className="inv-modal__x" title="Save & close" aria-label="Save & close" onClick={onClose}>
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M2 2h9l3 3v9H2z" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"></path>
+            <path d="M4.6 2v4.4h5.2V2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"></path>
+            <path d="M4.6 14v-5h6.8v5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"></path>
+          </svg>
+        </button>
         <div className={"inv-tabs-rail" + (tucked ? " is-tucked" : "")}>
           {copies.map((c) => (
             <button key={c.id} className={"inv-tab" + (cur.id === c.id ? " is-active" : "")} onClick={() => setCurId(c.id)}>No. {c.no}{c.whole ? " ✓" : ""}</button>
           ))}
-          <button className="inv-tab inv-tab--add" title="Add a copy" onClick={() => onAddInstance(fig.id, cur.variant)}>＋</button>
+          <button className="inv-tab inv-tab--add" title="Add a copy" onClick={() => { onAddInstance(fig.id, cur.variant); onClose(); }}>＋</button>
         </div>
 
         <div className="inv-flip">
