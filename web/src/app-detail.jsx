@@ -7,18 +7,11 @@ import { physicalGrade, paintGrade, dmEmpty, DamageMap, GradeBadge } from './dam
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip, VariantBadge, VehicleTag } from './fig-identity.jsx';
+import { FileCardRow, FileCardTell } from './filecards.jsx';
 
 const INV_CAT = JoeData.CAT || [];
 const INV_ERAS = {}; // was window.JOE_ERAS from the retired catalog-data.js — always {}
 const INV_CAT_BY_ID = new Map(INV_CAT.map(f => [f.id, f]));
-
-// File-card printings. On-file status is shown as a notation, not a completeness
-// requirement; the letter below is just which printing it is.
-const FILECARDS = [
-  { letter: 'A', name: 'First print' },
-  { letter: 'B', name: "Reissue '85" },
-  { letter: 'C', name: 'Mail-away' },
-];
 
 // Delete-copy dialog layout — trying a 4th button ("...Selected Accessories")
 // alongside the original 3. Flip to 3 to revert to [Remove Figure Only] /
@@ -43,6 +36,7 @@ function fvm(cf) {
     version: cf.ver ? 'v' + cf.ver : '',
     variants: (cf.variants || []).length,
     coo: cf.coo || [],
+    fileCards: cf.fileCards || [],
     specialty: cf.role || '', variant: cf.role || '', vehicle: cf.vehicle || null,
     owned, acc, blueprint: bp,
     _cf: cf, _sum: sum,
@@ -298,7 +292,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   // ---- live per-copy reads + writes ----
   const raw = cur ? (JoeStore.get().instances.find(i => i.id === cur.id) || {}) : {};
   const moc = !!raw.moc;
-  const filecard = raw.filecard || { onFile: false, printing: 'A' };
+  const filecard = raw.filecard || { onFile: false, fileCardId: null };
   const marks = (raw.marks && raw.marks.condition) ? raw.marks : dmEmpty(fig.body || 'male');
   const bp = fig.blueprint;
   const ordered = orderedBlueprint(bp);
@@ -541,10 +535,10 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                   <div className="acc-list__cap"><span>FILE CARD</span><span>{filecard.onFile && <b>ON FILE</b>}</span></div>
                   <div className="acc fc-row">
                     <span className="acc__name">Card on file</span>
-                    {filecard.onFile &&
-                      <span className="fc-selwrap"><select className="fc-sel" value={filecard.printing} onChange={e => setCard({ printing: e.target.value })}>{FILECARDS.map(c => <option key={c.letter} value={c.letter}>{c.letter} · {c.name}</option>)}</select><span className="fc-caret">▾</span></span>}
+                    {filecard.onFile && <FileCardRow fig={fig} printing={filecard.fileCardId} onChange={fileCardId => setCard({ fileCardId })} />}
                     <button className={"acc__box fc-box" + (filecard.onFile ? " is-on" : "")} onClick={() => setCard({ onFile: !filecard.onFile })} title={filecard.onFile ? "Mark card not on file" : "Mark file card on file"}>{filecard.onFile ? "✓" : ""}</button>
                   </div>
+                  {filecard.onFile && <FileCardTell fig={fig} printing={filecard.fileCardId} />}
                 </div>
 
                 <div className="inv-copymeta">

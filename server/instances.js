@@ -35,7 +35,7 @@ function accessoryIdForName(figureId, name) {
 const instanceRowsStmt = db.prepare(`
   SELECT i.id, i.figure_id AS catalogId, vl.letter AS variant, i.is_moc AS moc,
          i.damage AS marks, i.location AS loc, i.notes,
-         i.filecard_on_file, i.filecard_printing, i.country_of_origin AS coo,
+         i.filecard_on_file, i.filecard_id, i.country_of_origin AS coo,
          i.created_at
   FROM instances i
   LEFT JOIN variant_lookup vl ON vl.id = i.variant_id
@@ -60,7 +60,7 @@ function shapeInstance(row, accByInstance, damageByInstance) {
     marks: row.marks ? JSON.parse(row.marks) : null,
     loc: row.loc || '',
     notes: row.notes || '',
-    filecard: { onFile: !!row.filecard_on_file, printing: row.filecard_printing || 'A' },
+    filecard: { onFile: !!row.filecard_on_file, fileCardId: row.filecard_id || null },
     coo: row.coo || '',
     addedAt: row.created_at,
   };
@@ -106,8 +106,8 @@ function resolveVariantId(figureId, letter) {
 }
 
 const insertInstance = db.prepare(`
-  INSERT INTO instances (figure_id, variant_id, is_moc, damage, location, notes, filecard_on_file, filecard_printing, country_of_origin)
-  VALUES (@figure_id, @variant_id, @is_moc, @damage, @location, @notes, @filecard_on_file, @filecard_printing, @country_of_origin)
+  INSERT INTO instances (figure_id, variant_id, is_moc, damage, location, notes, filecard_on_file, filecard_id, country_of_origin)
+  VALUES (@figure_id, @variant_id, @is_moc, @damage, @location, @notes, @filecard_on_file, @filecard_id, @country_of_origin)
 `);
 const upsertInstanceAcc = db.prepare(`
   INSERT INTO instance_accessories (instance_id, accessory_id, units_owned) VALUES (?, ?, ?)
@@ -125,7 +125,7 @@ export const createInstance = db.transaction((payload) => {
     location: (loc || '').trim() || null,
     notes: (notes || '').trim() || null,
     filecard_on_file: filecard && filecard.onFile ? 1 : 0,
-    filecard_printing: (filecard && filecard.printing) || 'A',
+    filecard_id: (filecard && filecard.fileCardId) || null,
     country_of_origin: coo || null,
   }).lastInsertRowid;
 
@@ -159,8 +159,8 @@ export const updateInstance = db.transaction((id, patch) => {
   }
   if ('coo' in patch) setInstanceCoo.run(patch.coo || null, id);
   if ('filecard' in patch) {
-    db.prepare('UPDATE instances SET filecard_on_file = ?, filecard_printing = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
-      .run(patch.filecard.onFile ? 1 : 0, patch.filecard.printing || 'A', id);
+    db.prepare('UPDATE instances SET filecard_on_file = ?, filecard_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+      .run(patch.filecard.onFile ? 1 : 0, patch.filecard.fileCardId || null, id);
   }
   if ('acc' in patch) {
     const row = getInstanceFigure.get(id);

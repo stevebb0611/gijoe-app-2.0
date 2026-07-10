@@ -7,8 +7,8 @@ import { DamageMap, GradeBadge, physicalGrade, paintGrade, dmEmpty } from './dam
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip, VariantBadge, VehicleTag } from './fig-identity.jsx';
+import { FileCardRow, FileCardTell } from './filecards.jsx';
 const AF_CATALOG = JoeData.CAT || [];
-const AF_FILECARDS = [{ letter: 'A', name: 'First print' }, { letter: 'B', name: "Reissue '85" }, { letter: 'C', name: 'Mail-away' }];
 const AF_YEARS = [...new Set(AF_CATALOG.map(f => f.year))].sort((a, b) => a - b);
 
 const AF_STEPS = ["FIND", "DETAILS", "CONDITION", "FINALIZE"];
@@ -40,7 +40,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const [notes, setNotes] = React.useState("");
   const [owned, setOwnedAcc] = React.useState(() => presetAcc || {});   // accName -> units owned
   const [moc, setMoc] = React.useState(false);       // Mint on Card (sealed) — counts 100% complete
-  const [filecard, setFilecard] = React.useState({ onFile: false, printing: 'A' });
+  const [filecard, setFilecard] = React.useState({ onFile: false, fileCardId: null });
   const [coo, setCoo] = React.useState(''); // optional — country of origin, only offered when fig.coo has entries
   // condition — single zone-map value; dmg.clean is the explicit "no damage found"
   // confirmation (vs. not yet mapped), and travels with marks into the stored instance
@@ -61,7 +61,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
     if (!fig) return;
     setSelVar(isSingle(fig) ? '' : (presetVariant && fig.id === presetCatalogId ? presetVariant : null));
     setOwnedAcc(presetAcc && fig.id === presetCatalogId ? presetAcc : {});
-    setMoc(false); setFilecard({ onFile: false, printing: 'A' }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male')); setCoo('');
+    setMoc(false); setFilecard({ onFile: false, fileCardId: null }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male')); setCoo('');
   }, [selId]);
 
   const q = query.trim().toLowerCase();
@@ -125,7 +125,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
       paint: moc ? null : (ungraded ? null : paint.grade),
       marks: moc ? null : dmg,
       loc: loc.trim(), notes: notes.trim(),
-      filecard: filecard.onFile ? { onFile: true, printing: filecard.printing } : { onFile: false, printing: 'A' },
+      filecard: filecard.onFile ? { onFile: true, fileCardId: filecard.fileCardId } : { onFile: false, fileCardId: null },
       coo: coo || '',
     });
     setDone(true);
@@ -133,7 +133,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
 
   const resetAll = () => {
     setDone(false); setSelId(null); setQuery(""); setSelVar(null); setLoc(""); setNotes("");
-    setOwnedAcc({}); setMoc(false); setFilecard({ onFile: false, printing: 'A' }); setDmg(dmEmpty('male')); setYearF(""); goto(0);
+    setOwnedAcc({}); setMoc(false); setFilecard({ onFile: false, fileCardId: null }); setDmg(dmEmpty('male')); setYearF(""); goto(0);
   };
 
   return (
@@ -244,10 +244,10 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                   <div className="acc-list__cap"><span>FILE CARD</span><span>{filecard.onFile && <b>ON FILE</b>}</span></div>
                   <div className="acc fc-row">
                     <span className="acc__name">Card on file</span>
-                    {filecard.onFile &&
-                      <span className="fc-selwrap"><select className="fc-sel" value={filecard.printing} onChange={e => setFilecard(s => ({ ...s, printing: e.target.value }))}>{AF_FILECARDS.map(c => <option key={c.letter} value={c.letter}>{c.letter} · {c.name}</option>)}</select><span className="fc-caret">▾</span></span>}
+                    {filecard.onFile && <FileCardRow fig={fig} printing={filecard.fileCardId} onChange={fileCardId => setFilecard(s => ({ ...s, fileCardId }))} />}
                     <button type="button" className={"acc__box fc-box" + (filecard.onFile ? " is-on" : "")} onClick={() => setFilecard(s => ({ ...s, onFile: !s.onFile }))} title={filecard.onFile ? "Mark card not on file" : "Mark file card on file"}>{filecard.onFile ? "✓" : ""}</button>
                   </div>
+                  {filecard.onFile && <FileCardTell fig={fig} printing={filecard.fileCardId} />}
                 </div>
 
                 <p className="af-seclab" style={{ marginTop: 18 }}><b>Bin / box location</b> <i style={{ fontStyle: 'normal', color: 'var(--ink-soft)' }}>(optional)</i></p>

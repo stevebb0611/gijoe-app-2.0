@@ -26,6 +26,14 @@ const variantsStmt = db.prepare(`
   SELECT figure_id, letter, tell FROM variant_lookup ORDER BY figure_id, letter
 `);
 
+const fileCardsStmt = db.prepare(`
+  SELECT ffc.figure_id, fc.file_card_id, fc.file_card_code, fc.card_back, fc.card_color,
+         fc.release_type, fc.logo_version, fc.text_version, fc.country, fc.notes
+  FROM figure_file_cards ffc
+  JOIN file_cards fc ON fc.file_card_id = ffc.file_card_id
+  ORDER BY ffc.figure_id, fc.file_card_id
+`);
+
 const cooStmt = db.prepare(`
   SELECT figure_id, country FROM figure_coo ORDER BY figure_id, country
 `);
@@ -49,6 +57,12 @@ export function buildCatalog() {
   for (const c of cooStmt.all()) {
     if (!cooByFigure.has(c.figure_id)) cooByFigure.set(c.figure_id, []);
     cooByFigure.get(c.figure_id).push(c.country);
+  }
+
+  const fileCardsByFigure = new Map();
+  for (const fc of fileCardsStmt.all()) {
+    if (!fileCardsByFigure.has(fc.figure_id)) fileCardsByFigure.set(fc.figure_id, []);
+    fileCardsByFigure.get(fc.figure_id).push(fc);
   }
 
   const blueprintRowsByFigure = new Map();
@@ -78,6 +92,7 @@ export function buildCatalog() {
     // synthesized blank-letter entry so the frontend's isSingle() check holds.
     variants: variantsByFigure.get(f.id) || [{ letter: '', tell: f.single_tell || null }],
     coo: cooByFigure.get(f.id) || [],
+    fileCards: fileCardsByFigure.get(f.id) || [],
     blueprint: blueprintByFigure.get(f.id) || [],
   }));
 }

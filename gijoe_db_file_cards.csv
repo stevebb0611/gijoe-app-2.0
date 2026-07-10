@@ -1,22 +1,3 @@
-﻿file_card_id,file_card_code,code_name,series_id,release_type,card_back,card_color,logo_version,text_version,country,conditon_id,notes_,image_url_primary,image_url_detail,created_at,updated_at
-,,,,,,,,,,,,,,,
-,,,,,peach,,G.I. Joe,,,,,,,,
-,,,,,peach,,Cobra,,,,,,,,
-,,,,,gray,,G.I. Joe,,,,,,,,
-,,,,,gray,,Cobra,,,,,,,,
-,,,,,blue,,,,,,,,,,
-,,,,,orange,,,,,,,,,,
-,,,,,light green,,,,,,,,,,
-,,,,,cream,,,,,,,,,,
-,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,
-,,,,,peach,,,,,,Tripwire Listen N' Fun,,,,
-,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,
-https://www.3djoes.com/the-gi-joe-rolodex-the-digital-file-card-repository.html,,,,,,,,,,,,,,,
+file_card_code,code_name,release_type,card_back,card_color,logo_version,text_version,country,notes
+FC001,Breaker,first print,tan,,,,,Carded Tan
+FC002,Breaker,mail-away,red,,,,,"Mail-Away, Red Backed"

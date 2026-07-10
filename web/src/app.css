@@ -219,10 +219,12 @@
   .inv-stock__n { font-size: 11px; font-weight: 700; white-space: nowrap; color: var(--ink); flex: none; }
   .inv-stock__miss { font-size: 10px; color: var(--ink-soft); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .inv-stock__multi { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: .3px; color: var(--ink-soft); }
-  /* file-card notation — present-on-file badge; NOT a completeness factor */
+  /* file-card notation — present-on-file badge; NOT a completeness factor.
+     Flattened 2026-07-07 to match the .idver/.idvar treatment (0b73652) —
+     plain colored mono text, no border, sits inline in the stock-status text. */
   .inv-fc { display: inline-flex; align-items: center; font-family: var(--font-mono); font-weight: 700;
-    font-size: 10px; letter-spacing: .2px; color: #5f6b39; border: 1.5px solid #5f6b39;
-    padding: 1px 6px; margin-left: 8px; white-space: nowrap; flex: none; }
+    font-size: 10px; letter-spacing: .2px; color: #5f6b39;
+    margin-left: 8px; white-space: nowrap; flex: none; }
   .inv-ghosttag { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; color: var(--ink-soft); border: 1px dashed var(--line); padding: 3px 7px; }
   .inv-bar { width: 78px; flex: none; height: 12px; background: var(--paper); border: 1.5px solid var(--ink); overflow: hidden; }
   .inv-bar__fill { height: 100%; background: var(--ink-soft); background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.18) 0 4px, transparent 4px 8px); }
@@ -492,12 +494,15 @@
   .coo-list .acc { padding: 6px 12px; }
   .coo-list .acc__name { font-size: 11px; }
   .coo-list .acc__box { width: 16px; height: 16px; font-size: 10px; }
-  .fc-selwrap { position: relative; display: inline-flex; }
+  .fc-selwrap { position: relative; display: inline-flex; align-items: center; gap: 6px; }
   .fc-sel { appearance: none; -webkit-appearance: none; background: var(--card); border: 1.5px solid var(--ink); padding: 5px 26px 5px 9px; min-width: 152px; font: inherit; font-family: var(--font-display); font-weight: 600; font-size: 12px; letter-spacing: .3px; color: var(--ink); border-radius: 0; cursor: pointer; }
   .fc-caret { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 10px; color: var(--ink-soft); }
   .fc-box { color: transparent; }
   .fc-tellrow { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 12px; border-top: 1px solid var(--line-soft); font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft); line-height: 1.4; }
   .fc-cat { color: var(--accent); white-space: nowrap; }
+  /* empty state — figure has no rows in figure_file_cards yet (most figures, until
+     FILE_CARDS.md grows); sits inline where the select+swatch would otherwise render */
+  .fc-empty { font-family: var(--font-mono); font-size: 10px; font-style: italic; color: var(--ink-soft); }
   .inv-modal__btns { display: flex; gap: 8px; flex-wrap: wrap; }
   /* right column is a flex stack so the remove control can pin to the bottom-right */
   .inv-front-body .inv-modal__r { display: flex; flex-direction: column; }
