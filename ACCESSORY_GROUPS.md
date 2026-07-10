@@ -277,6 +277,28 @@ matched set does. Zartan's four stickers currently show as four flat rows under
   render group_id-based option groups today (see note above) — no visual change expected
   until that's built.
 
+### 1985 — Crimson Guard (v1, figure catalog id 75 — source F-codes F120/F121)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below. Not a
+  `match_key` case — a single slot with three interchangeable molds/colors, not a
+  cross-slot colorway tie (the AK-48AW Rifle outside the slot is solid black, no
+  colorway to match).
+- **Variants:** F120 · A "Lighter red uniform" / F121 · B "Darker red uniform" — folded
+  into one catalog row (id 75) per the standard variant-collapse rule (`VARIANTS.md`).
+  `code_name = 'Crimson Guard'` doesn't collide with the later Python/Immortal/Commander
+  rows (different code_names), so the unqualified lookup in
+  `migrate-accessory-groups.mjs` resolves unambiguously.
+- **Group_id slot:** Dress Backpack (solid back), light red (A0161) / Dress Backpack
+  (solid back), dark red (A0162) / Dress Backpack (hollow back), light red (A0163) —
+  three interchangeable molds/colors, own any one (`accessory_groups.id` 21).
+- **Unaffected (plain, independently required):** AK-48AW Rifle with Bayonet
+- **Source:** CSV `group_id` column, ext id `8501`. Owner-confirmed 2026-07-07 as a
+  plain "pick one of three" slot (not previously counted among the CSV's 8 trusted
+  ext groups — see `migrate-accessory-groups.mjs` header — now the 9th).
+- **Status:** ✅ group_id set in DB and verified via API round-trip
+  (`/api/catalog` shows all three Dress Backpack accessories carrying group_id 21,
+  no match_key; Rifle ungrouped), 2026-07-07. Not yet visually verified in-app.
+
 ### 1986 — A.V.A.C. (v1, figure catalog id 96 — source F-code F145)
 
 - **Mechanism:** plain `group_id` — own any one member of the slot below.

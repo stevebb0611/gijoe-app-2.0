@@ -469,8 +469,13 @@
      below it renders as a real row (AccItem or .af-acc__row) with its own
      padding and checkbox column, so the wrapper itself carries no padding. */
   .sgw-group { padding: 0; }
-  .sgw-group:not(:first-child) { border-top: 1px solid var(--line-soft); }
-  .sgw-group + .acc { border-top: 1px solid var(--line-soft); }
+  /* group boundaries (group-to-group, group-to-solo) read as a stronger break
+     than the hairline between two options inside one group — otherwise a
+     solo row right after a "pick one" group's last option is indistinguishable
+     from a fourth option (same hairline both places). Matches the weight
+     already used for .acc-list__cap's own section-boundary border. */
+  .sgw-group:not(:first-child) { border-top: 1.5px solid var(--ink); }
+  .sgw-group + .acc { border-top: 1.5px solid var(--ink); }
   .sgw-label { padding: 9px 12px 5px; }
   .sgw-label__name { font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .2px; color: var(--ink); }
   .sgw-label em { font-style: normal; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .6px; text-transform: uppercase; color: var(--accent); }

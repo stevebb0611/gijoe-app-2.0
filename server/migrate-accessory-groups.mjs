@@ -3,16 +3,17 @@
 // variant slots ("own any one member of this group") into the live DB.
 //
 // gijoe_db_figures_accessories_group_id.csv carries an external group_id column
-// on 19 distinct slots, but only 8 are genuine interchangeable-variant pairs
-// (same base item, different mold — Helmet/Helmet-with-holes, thin/thick
-// handle, etc.) matching PARTS_BIN.md's "Accessory completeness model". The
-// other 11 pair unrelated item types (e.g. Firefly's Submachine Gun +
-// Walkie-Talkie) and are NOT variant alternates — owner-confirmed these stay
-// independently required, so the CSV's own grouping is deliberately not used
-// for those. Entries below with extGroupId: null are hand-built slots (not
-// from that CSV column) — some (Firefly, Duke, Recondo, Spirit, Zartan) need
-// match_key cross-slot matching, others (Recoil, T.A.R.G.A.T.) don't — see
-// ACCESSORY_GROUPS.md for the running catalogue and why.
+// on 19 distinct slots, but only 9 are genuine interchangeable-variant pairs
+// (same base item, different mold/color — Helmet/Helmet-with-holes, thin/thick
+// handle, Crimson Guard's 3-way Dress Backpack, etc.) matching PARTS_BIN.md's
+// "Accessory completeness model". The other 10 pair unrelated item types (e.g.
+// Firefly's Submachine Gun + Walkie-Talkie) and are NOT variant alternates —
+// owner-confirmed these stay independently required, so the CSV's own
+// grouping is deliberately not used for those. Entries below with
+// extGroupId: null are hand-built slots (not from that CSV column) — some
+// (Firefly, Duke, Recondo, Spirit, Zartan) need match_key cross-slot
+// matching, others (Recoil, T.A.R.G.A.T.) don't — see ACCESSORY_GROUPS.md
+// for the running catalogue and why.
 //
 // This does NOT touch instances/instance_accessories (owned collection data) —
 // only accessory_groups (empty today) and figure_accessories.group_id. Safe to
@@ -34,6 +35,7 @@ const GROUPS = [
   { extGroupId: null,  figure: 'Recoil',     accessories: ['A0616', 'A0617'] }, // Mine Case thin/thick handle
   { extGroupId: 8415, figure: 'Thunder',   accessories: ['A0125', 'A0126'] }, // Radio Headset / Radio Headset
   { extGroupId: 8601, figure: 'A.V.A.C.',  accessories: ['A0225', 'A0226'] }, // Parachute pack soft/hard plastic
+  { extGroupId: 8501, figure: 'Crimson Guard', accessories: ['A0161', 'A0162', 'A0163'] }, // Dress Backpack solid-back light/dark red + hollow-back light red
   // Firefly (1984): NOT from the CSV's group_id column (that one cross-paired
   // gun+radio, which is wrong — see ACCESSORY_GROUPS.md). These two slots are each a
   // same-item colour pair; match_key (set separately, see set-match-key.mjs)
