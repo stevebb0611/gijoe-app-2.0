@@ -41,6 +41,32 @@ const asInt = (v) => (v === '' || v == null ? null : parseInt(v, 10));
 const asBool = (v) => (v ? 1 : 0);
 const asText = (v) => (v === '' || v == null ? null : v);
 
+// Safety check (added 2026-07-10, after a reseed silently wiped 231 owned
+// instances): this script fully rebuilds the DB file from schema + CSVs — it
+// does NOT preserve instances/instance_accessories/accessory_inventory (the
+// owned collection), and the checked-in schema can drift from ad hoc live
+// migrations (see the gijoe_collection.sql history around that date). Refuse
+// to run against a DB that has real owned data unless --force is passed;
+// always leave a timestamped backup behind first.
+if (fs.existsSync(DB_PATH)) {
+  const probe = new Database(DB_PATH, { readonly: true });
+  let instanceCount = 0;
+  try { instanceCount = probe.prepare('SELECT COUNT(*) AS n FROM instances').get().n; } catch { /* no instances table yet */ }
+  probe.close();
+
+  const backupPath = path.join(ROOT, `gijoe_collection.db.bak.${new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14)}`);
+  fs.copyFileSync(DB_PATH, backupPath);
+  console.log(`Backed up existing DB -> ${backupPath}`);
+
+  if (instanceCount > 0 && !process.argv.includes('--force')) {
+    console.error(`\nRefusing to reseed: the existing DB has ${instanceCount} owned instances that this script`);
+    console.error('would silently delete (it only rebuilds catalog data from CSVs, not owned instances).');
+    console.error('A backup was just written (see above). If you really mean to wipe and rebuild, re-run with --force,');
+    console.error('and plan to restore owned data afterward via the app\'s Export/Import (or server/instances.js).');
+    process.exit(1);
+  }
+}
+
 console.log('Rebuilding gijoe_collection.db from gijoe_collection.sql + current CSVs...');
 
 fs.rmSync(DB_PATH, { force: true });

@@ -45,6 +45,14 @@ Instance
   location: string         // free-text bin/box label, e.g. "BIN C-04 · long-box"
   notes: string
 
+  filecardOnFile: boolean  // this copy's file card is on hand — a notation, not a completeness gate
+  filecardId: number|null  // which real printing (FC001, …), FK to file_cards. NULL = on-file but
+                           // not yet identified/catalogued. See FILE_CARDS.md.
+  countryOfOrigin: 'China'|'Hong Kong'|'Indonesia'|null   // which of the figure's known
+                           // origins (figure_coo, catalog-level) this physical copy is —
+                           // a notation like filecardId, optional, doesn't affect completeness.
+                           // See OPEN_QUESTIONS_ISSUES_FOUND.md #17.
+
   // derived (not stored): physicalGrade, paintGrade  — computed from damage
 ```
 No acquisition / disposition / per-instance pricing fields — out of scope. **Remove** is a lifecycle action (see PARTS_BIN.md), not a stored status — a removed copy's record is deleted (after the accessory-disposition prompt).

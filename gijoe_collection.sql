@@ -181,7 +181,13 @@ CREATE TABLE IF NOT EXISTS instances (
     location    TEXT,   -- free-text bin/box label, e.g. "BIN C-04 · long-box"
     notes       TEXT,
     filecard_on_file  BOOLEAN DEFAULT 0,  -- this copy's file card is on hand (a notation, not a completeness gate)
-    filecard_printing TEXT,               -- which printing, e.g. 'A' first print / 'B' reissue / 'C' mail-away
+    filecard_printing TEXT,               -- legacy free-text printing tag ('A'/'B'/'C'); superseded by filecard_id below
+    filecard_id INTEGER REFERENCES file_cards(file_card_id) ON DELETE SET NULL,
+                -- which real printing (FILE_CARDS.md) this copy's card is. Nullable — NULL is
+                -- a legitimate "not identified yet" state, not a data gap.
+    country_of_origin TEXT CHECK (country_of_origin IN ('China', 'Hong Kong', 'Indonesia')),
+                -- which of the figure's known origins (figure_coo) this physical copy is.
+                -- A notation, like filecard_printing — optional, doesn't affect completeness.
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -235,6 +241,10 @@ CREATE TABLE IF NOT EXISTS figure_accessories (
     is_shared         BOOLEAN DEFAULT 0,
     quantity_required INTEGER DEFAULT 1,
     notes             TEXT,
+    match_key         TEXT,
+                      -- cross-slot matched-color tag (see ACCESSORY_GROUPS.md): when two or
+                      -- more of a figure's group_id slots have members sharing a match_key,
+                      -- those slots must resolve to the SAME key together for Complete.
     PRIMARY KEY (figure_id, accessory_id)
 );
 
@@ -320,6 +330,21 @@ CREATE TABLE IF NOT EXISTS figure_file_cards (
     is_original     BOOLEAN DEFAULT 1,
     notes           TEXT,
     PRIMARY KEY (figure_id, file_card_id)
+);
+
+-- ─────────────────────────────────────────────
+--  COUNTRY OF ORIGIN
+-- ─────────────────────────────────────────────
+-- Which countries a figure/version is known to have been produced in (a figure
+-- can have more than one, e.g. an early China run and a later Hong Kong run of
+-- the same mold/version). Sourced from gijoe_db_figures_coo.csv via
+-- server/import-coo.mjs. Companion to instances.country_of_origin (which of
+-- these a given physical copy actually is).
+
+CREATE TABLE IF NOT EXISTS figure_coo (
+    figure_id INTEGER NOT NULL REFERENCES figures(id) ON DELETE CASCADE,
+    country   TEXT NOT NULL CHECK(country IN ('China', 'Hong Kong', 'Indonesia')),
+    PRIMARY KEY (figure_id, country)
 );
 
 -- ─────────────────────────────────────────────
@@ -615,7 +640,8 @@ INSERT OR IGNORE INTO series(series_id, year, description, label) VALUES
     (11, 1991, 'Series 10',                'S10'),
     (12, 1992, 'Series 11',                'S11'),
     (13, 1993, 'Series 12',                'S12'),
-    (14, 1994, 'Series 13',                'S13');
+    (14, 1994, 'Series 13',                'S13'),
+    (15, 9999, 'Convention & Mail-In Block — 700-block + off-cycle reissues, not a real chronological year', 'CONV');
 
 INSERT OR IGNORE INTO factions(name) VALUES
     ('G.I. Joe'),

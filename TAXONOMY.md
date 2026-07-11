@@ -33,7 +33,7 @@ The prototype currently hard-codes a **2-faction** binary (JOE / COBRA) and grou
 Tune the two new hues to match the field-manual palette's chroma/lightness; vary hue only.
 
 ## Series (`series_id`) — primary grouping
-Map id → `YEAR · label` (short code for dense UI). Sort chronological; **S14 (Convention) sorts after S13**.
+Map id → `YEAR · label` (short code for dense UI). Sort chronological; **CONV (Convention) sorts last, regardless of numeric id** — it isn't a real chronological year, so nothing interpolates its sentinel year value (see below).
 
 | id | Year | Label | Code |
 |----|------|-------|------|
@@ -51,9 +51,9 @@ Map id → `YEAR · label` (short code for dense UI). Sort chronological; **S14 
 | 12 | 1992 | Series 11 | S11 |
 | 13 | 1993 | Series 12 | S12 |
 | 14 | 1994 | Series 13 | S13 |
-| 15 | 1992 | Convention | S14 |
+| 15 | 9999 (sentinel) | Convention & Mail-In Block — 700-block + off-cycle reissues, not a real chronological year | CONV |
 
-Section header reads e.g. **"1988 · Series 7"**; the Convention section reads **"1992 · Convention."** Replaces the current year-only sections — finer (separates the two 1983 waves and conventions) while staying year-legible.
+Section header reads e.g. **"1988 · Series 7"**; the Convention section reads **"Convention"** (no year number — `year` 9999 is a sentinel, never displayed literally). Built (July 2026) as `CONVENTION_YEAR` / `formatYear()` in `web/src/fig-identity.js`, used everywhere a catalog figure's year is printed (Inventory year sections + search filter, Add Figure's year picker/search/summary, Parts Bin's figure search and rebalance rows) so no screen ever leaks a literal "9999". Confirmed live: 1993 Jinx v2 (both production variants) sits under this Convention section, not 1993's Series 12 — see `OPEN_QUESTIONS_ISSUES_FOUND.md` #21.
 
 ## Sub-team (`sub_group_id`) — optional tag, faction-scoped
 71% of figures have **no** sub-team, so this is never a required field and **not** the default grouping (would yield a huge "—none—" bucket). It is: a small **tag** on rows that have one, a **filter**, and an **optional** group-by mode. Each sub-team belongs to a faction:
