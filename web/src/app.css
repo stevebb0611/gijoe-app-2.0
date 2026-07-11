@@ -165,11 +165,11 @@
   .invp-empty { padding: 60px; text-align: center; color: var(--ink-soft); font-family: var(--font-display); font-size: 18px; letter-spacing: 1px; }
   .ysec { border-bottom: 2px solid var(--ink); }
   .ysec__hd { position: sticky; top: var(--chrome-h); z-index: 20; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer;
-    display: grid; grid-template-columns: 92px 1fr 232px 50px 26px; gap: 18px; align-items: center; padding: 12px 12px; background: var(--paper); border-bottom: 1.5px dashed var(--line); }
+    display: grid; grid-template-columns: minmax(92px, auto) 1fr 232px 50px 26px; gap: 18px; align-items: center; padding: 12px 12px; background: var(--paper); border-bottom: 1.5px dashed var(--line); }
   .ysec.is-open .ysec__hd { background: var(--ink); color: var(--paper); border-bottom-color: var(--ink); }
   .ysec__hd:hover { background: var(--card); }
   .ysec.is-open .ysec__hd:hover { background: #2c2922; }
-  .ysec__yr { font-family: var(--font-display); font-weight: 700; font-size: 23px; line-height: 1; letter-spacing: .5px;
+  .ysec__yr { font-family: var(--font-display); font-weight: 700; font-size: 23px; line-height: 1; letter-spacing: .5px; white-space: nowrap;
     background: var(--ink); color: var(--paper); padding: 8px 10px; justify-self: start; align-self: center; box-shadow: 2px 2px 0 var(--line); }
   .ysec.is-open .ysec__yr { background: var(--paper); color: var(--ink); box-shadow: 2px 2px 0 rgba(243,238,226,.35); }
   .ysec__title { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
@@ -599,7 +599,7 @@
     .invp-top { grid-template-columns: 1fr; gap: 10px; }
     .inv-kpis { flex-wrap: wrap; }
     .inv-galgrid { grid-template-columns: repeat(2, 1fr); }
-    .ysec__hd { grid-template-columns: 64px 1fr 50px 26px; }
+    .ysec__hd { grid-template-columns: minmax(64px, auto) 1fr 50px 26px; }
     .ysec__meters { display: none; }
   }
 
@@ -765,7 +765,7 @@
     .invp-top { grid-template-columns: 1fr; gap: 10px; }
     .inv-kpis { flex-wrap: wrap; }
     .inv-galgrid { grid-template-columns: repeat(2, 1fr); }
-    .ysec__hd { grid-template-columns: 64px 1fr 50px 26px; }
+    .ysec__hd { grid-template-columns: minmax(64px, auto) 1fr 50px 26px; }
     .ysec__meters { display: none; }
     .inv-modal { grid-template-columns: 1fr; }
     .inv-modal__l { flex-direction: row; flex-wrap: wrap; justify-content: center; }
@@ -866,8 +866,7 @@
   .grp__meta em.is-fill { color: var(--ok); }
   .grp__body { display: flex; flex-direction: column; gap: 8px; padding: 8px 0 4px; }
 
-  /* part rows + category chip */
-  .pb-cat { font-family: var(--font-mono); font-weight: 700; font-size: 8px; letter-spacing: 1px; padding: 2px 6px; border: 1.5px solid var(--line); background: var(--paper); color: var(--ink-soft); }
+  /* part rows */
   .pbp-body { max-width: 880px; margin: 0 auto; padding: 16px 26px 90px; display: flex; flex-direction: column; gap: 16px; }
   .pbp-stack { display: flex; flex-direction: column; gap: 10px; }
   .pbp-secthead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-bottom: 2px solid var(--ink); padding-bottom: 5px; }
@@ -882,9 +881,6 @@
 
   .pb-main { min-width: 0; }
   .pb-name { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: .5px; display: flex; align-items: center; gap: 10px; }
-  .pb-type { font-family: var(--font-mono); font-weight: 700; font-size: 8px; letter-spacing: 1px; padding: 2px 6px; border: 1.5px solid var(--ink); }
-  .pb-type.is-shared { background: var(--olive); color: #fff; border-color: var(--ink); }
-  .pb-type.is-single { background: var(--paper); color: var(--ink-soft); border-color: var(--line); }
   .pb-fits { font-size: 11px; color: var(--ink-soft); margin-top: 3px; }
   .pb-status { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-top: 8px; }
   .pb-need { font-family: var(--font-mono); font-weight: 700; font-size: 11px; color: var(--ok); background: var(--paper); border: 1.5px solid var(--ok); padding: 4px 9px; cursor: pointer; }

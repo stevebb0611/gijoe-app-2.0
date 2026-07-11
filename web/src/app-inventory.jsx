@@ -13,6 +13,7 @@ import {
   InvDetailModal,
 } from './app-detail.jsx';
 import { VersionChip, VariantBadge, VehicleTag } from './fig-identity.jsx';
+import { formatYear, CONVENTION_YEAR } from './fig-identity.js';
 
 function useStore() {
   const [, force] = React.useReducer(x => x + 1, 0);
@@ -145,7 +146,7 @@ function YearSection({ year, figs, view, open, onToggleYear, rowProps }) {
   return (
     <section className={"ysec" + (open ? " is-open" : "")}>
       <button className="ysec__hd" onClick={() => onToggleYear(year)}>
-        <span className="ysec__yr">{year}</span>
+        <span className="ysec__yr">{formatYear(year)}</span>
         <span className="ysec__title">
           <span className="ysec__meta">{yp.ownedInstances} owned</span>
         </span>
@@ -199,7 +200,11 @@ const DUPE_OPTS = [{ key: 'single', label: 'Single' }, { key: 'pair', label: '2 
 const DUPE_LABEL = Object.fromEntries(DUPE_OPTS.map(o => [o.key, o.label]));
 const CONDITION_OPTS = ['Loose', 'MOC', 'MISB', 'AFA Graded'];
 const RELEASE_OPTS = ['Retail', 'Mail-away', 'Convention', 'Store exclusive'];
-const ALL_YEARS = [...new Set(INV_CAT.map(y => y.year))].sort((a, b) => a - b);
+// CONVENTION_YEAR (series_id 15's sentinel) is excluded from the year-range
+// facet (its two <select> dropdowns) so that control stays a real 1982–1994
+// range; the block still renders as its own YearSection below since that
+// grouping reads straight off INV_CAT, independent of ALL_YEARS.
+const ALL_YEARS = [...new Set(INV_CAT.map(y => y.year))].filter(y => y !== CONVENTION_YEAR).sort((a, b) => a - b);
 const YR_MIN = ALL_YEARS[0], YR_MAX = ALL_YEARS[ALL_YEARS.length - 1];
 
 // distinct production variants actually owned (>=1 copy of that letter)
@@ -287,7 +292,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
   const toggleSet = (setter) => (key) => setter(s => { const n = new Set(s); n.has(key) ? n.delete(key) : n.add(key); return n; });
   const clearFacets = () => { setStatus('all'); setFacFactions(new Set()); setFacComplete(new Set()); setFacDupes(new Set()); setFacYrMin(YR_MIN); setFacYrMax(YR_MAX); };
 
-  const matchQ = (fig) => !q || [fig.name, fig.variant, fig.specialty, fig.version, fig.faction, String(fig.year)].some(s => s && s.toLowerCase().includes(q)) || fig.acc.some(a => a[0].toLowerCase().includes(q));
+  const matchQ = (fig) => !q || [fig.name, fig.variant, fig.specialty, fig.version, fig.faction, formatYear(fig.year)].some(s => s && s.toLowerCase().includes(q)) || fig.acc.some(a => a[0].toLowerCase().includes(q));
   const passStatus = (fig) => {
     if (status === 'gaps') return isGap(fig);
     if (status === 'dupes') return fig.owned > 1;

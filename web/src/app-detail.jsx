@@ -7,6 +7,7 @@ import { physicalGrade, paintGrade, dmEmpty, DamageMap, GradeBadge } from './dam
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip, VariantBadge, VehicleTag } from './fig-identity.jsx';
+import { formatYear } from './fig-identity.js';
 import { FileCardRow, FileCardTell } from './filecards.jsx';
 
 const INV_CAT = JoeData.CAT || [];
@@ -371,7 +372,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
             <FactionTag faction={fig.faction} />
             <div className="inv-modal__id">
               <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /></div>
-              <div className="inv-modal__var">{fig.specialty} · {fig.year}</div>
+              <div className="inv-modal__var">{fig.specialty} · {formatYear(fig.year)}</div>
               {fig.variants > 1 ? <div className="inv-modal__variants"><span className="lyr"><b></b></span>{fig.variants} variants</div> : null}
               <VehicleTag vehicle={fig.vehicle} modal />
               {fig.coo.length > 0 && <div className="inv-modal__coo">Known origins: {fig.coo.join(', ')}</div>}
@@ -449,7 +450,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                 <FactionTag faction={fig.faction} />
                 <div className="inv-modal__id">
                   <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /></div>
-                  <div className="inv-modal__var">{cur.variant ? <React.Fragment><VariantBadge letter={cur.variant} /> · </React.Fragment> : null}{fig.specialty} · {fig.year}</div>
+                  <div className="inv-modal__var">{cur.variant ? <React.Fragment><VariantBadge letter={cur.variant} /> · </React.Fragment> : null}{fig.specialty} · {formatYear(fig.year)}</div>
                   {fig.variants > 1 ? (
                     <button type="button" className="inv-modal__variants inv-modal__variants--btn" title="Change production variant"
                             aria-expanded={varEdit} onClick={() => setVarEdit(v => !v)}>

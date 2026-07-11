@@ -9,7 +9,7 @@ import React from 'react';
 import { JoeStore, JoeData } from './store.js';
 import { figState, applyRebalance } from './app-detail.jsx';
 import { VersionChip } from './fig-identity.jsx';
-import { figIdentityText } from './fig-identity.js';
+import { figIdentityText, formatYear } from './fig-identity.js';
 
 const figLabel = (cf) => cf ? figIdentityText({ name: cf.name, version: cf.ver ? 'v' + cf.ver : '' }) : "—";
 
@@ -78,8 +78,6 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
       <div className="pb-main">
         <div className="pb-name">
           {entry.accessory}
-          <span className="pb-cat">{entry.categoryLabel || "—"}</span>
-          <span className={"pb-type " + (entry.shared ? "is-shared" : "is-single")}>{entry.shared ? "SHARED" : "SINGLE-USE"}</span>
         </div>
         <div className="pb-fits">home: <b>{home}</b></div>
         <div className="pb-status">
@@ -160,7 +158,7 @@ function AddPartModal({ onClose }) {
                   {results.length === 0 ? <div className="sugg__none">No figures match.</div>
                     : results.map(f => (
                       <button key={f.id} className="sugg__item" onClick={() => choose(f)}>
-                        <span>{f.name}<VersionChip version={f.ver ? "v" + f.ver : ""} /></span><em>{f.year} · {f.role || f.faction}</em>
+                        <span>{f.name}<VersionChip version={f.ver ? "v" + f.ver : ""} /></span><em>{formatYear(f.year)} · {f.role || f.faction}</em>
                       </button>
                     ))}
                 </div>
@@ -171,7 +169,7 @@ function AddPartModal({ onClose }) {
               <div className="fld">
                 <label className="fld__lab">FIGURE</label>
                 <div className="pb-pickfig">
-                  <span><b>{fig.name}</b><VersionChip version={fig.ver ? "v" + fig.ver : ""} /> <em>{fig.year} · {fig.role || fig.faction}</em></span>
+                  <span><b>{fig.name}</b><VersionChip version={fig.ver ? "v" + fig.ver : ""} /> <em>{formatYear(fig.year)} · {fig.role || fig.faction}</em></span>
                   <button className="pb-pickfig__x" onClick={() => { setFigId(null); setSel({}); }}>change</button>
                 </div>
               </div>
@@ -252,7 +250,7 @@ function RebalanceModal({ figs, onClose }) {
                 <div key={r.id} className={"rebal-fig" + (partial ? " rebal-fig--partial" : "")}>
                   <div className="rebal-fig__hd">
                     <span className="rebal-fig__name">{r.name}<VersionChip version={r.version} /></span>
-                    <span className="rebal-fig__meta">{r.specialty ? r.specialty + " · " : ""}{r.year} · ×{r.st.owned}</span>
+                    <span className="rebal-fig__meta">{r.specialty ? r.specialty + " · " : ""}{formatYear(r.year)} · ×{r.st.owned}</span>
                     <span className={"rebal-fig__goal" + (partial ? " is-partial" : "")}>
                       {partial
                         ? "No. " + r.st.partial.targetNo + ": " + r.st.partial.from + "→" + r.st.partial.to + "/" + r.st.partial.reqCount
@@ -299,10 +297,11 @@ function GroupSection({ sec, collapsed, toggle, NEEDS, openId, setOpenId }) {
 
 function buildSections(items, mode) {
   const byNeed = (a, b) => (b.ev.needed - a.ev.needed) || a.e.accessory.localeCompare(b.e.accessory);
-  let keyOf, labelOf, order = null;
+  let keyOf, labelOf, order = null, sortByCatId = false;
   if (mode === 'group') {
     keyOf = ({ e }) => e.categoryLabel || '—';
     labelOf = (k) => k.toUpperCase();
+    sortByCatId = true;
   } else if (mode === 'home') {
     keyOf = ({ e }) => e.shared ? 'Shared' : (e.homeFigureName || '—');
     labelOf = (k) => k === 'Shared' ? 'SHARED · FITS MULTIPLE FIGURES' : k;
@@ -311,9 +310,19 @@ function buildSections(items, mode) {
     labelOf = (k) => ({ gap: 'FILLS GAPS', none: 'NO CURRENT NEED' }[k]);
   }
   const map = new Map();
-  items.forEach(it => { const k = keyOf(it); if (!map.has(k)) map.set(k, []); map.get(k).push(it); });
+  const catIdOf = new Map(); // category label -> its numeric category_id (CSV order)
+  items.forEach(it => {
+    const k = keyOf(it);
+    if (!map.has(k)) map.set(k, []);
+    map.get(k).push(it);
+    if (sortByCatId && !catIdOf.has(k)) catIdOf.set(k, it.e.categoryId != null ? it.e.categoryId : Infinity);
+  });
   let keys = [...map.keys()];
-  keys.sort((a, b) => order ? order.indexOf(a) - order.indexOf(b) : String(a).localeCompare(String(b)));
+  if (sortByCatId) {
+    keys.sort((a, b) => catIdOf.get(a) - catIdOf.get(b));
+  } else {
+    keys.sort((a, b) => order ? order.indexOf(a) - order.indexOf(b) : String(a).localeCompare(String(b)));
+  }
   return keys.map(k => ({ key: k, label: labelOf(k), rows: map.get(k).sort(byNeed) }));
 }
 
@@ -331,7 +340,7 @@ function PartsBin({ onNavigate }) {
   // bin entries decorated with real accessory metadata
   const bin = store.bin.map(e => {
     const meta = JoeData.ACC_BY_ID.get(e.id) || {};
-    return { ...e, categoryLabel: meta.categoryLabel || null, shared: !!meta.shared, homeFigureName: meta.homeFigureName || null };
+    return { ...e, categoryId: meta.categoryId != null ? meta.categoryId : null, categoryLabel: meta.categoryLabel || null, shared: !!meta.shared, homeFigureName: meta.homeFigureName || null };
   });
   const NEEDS = React.useMemo(buildNeeds, [store]);
   const suggestions = buildSuggestions(bin, NEEDS);

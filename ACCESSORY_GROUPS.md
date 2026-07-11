@@ -1,14 +1,17 @@
-# Accessory Groups — grouped accessory slots (`group_id` · `match_key`)
+# Accessory Groups — grouped accessory slots (`group_id` · `match_key` · `release_context`)
 
 > Companion to `PARTS_BIN.md` → "Accessory completeness model." That doc locks the general
 > rules for two axes on `figure_accessories`: `group_id` (own any one member of a slot) and
 > `release_context` (retail vs tracked-but-non-blocking) — read it first for the rule
-> definitions. This doc is the **per-figure operational log**: every figure with a
-> `group_id` slot gets one entry below, chronological by year of release. Most figures use
-> plain `group_id` only ("pick one"); a subset also need `match_key`, a third, narrower
-> mechanism layered on top of `group_id` for a specific case those two don't cover (see
-> "The problem" below). Each entry's **Mechanism:** line says which applies — the behavior
-> differs, so don't assume from the figure alone.
+> definitions. This doc is the **per-figure operational log** for both axes: every figure
+> with a `group_id` slot, and every figure whose blueprint carries a non-`retail`
+> `release_context` accessory (convention/bonus/mail-in/exclusive), gets one entry below,
+> chronological by year of release then alphabetical. Most figures use plain `group_id`
+> only ("pick one"); a subset also need `match_key`, a narrower mechanism layered on top of
+> `group_id` for a specific case those two don't cover (see "The problem" below); a third,
+> independent case needs neither — it's logged solely for a non-retail `release_context`
+> accessory, tagged **Mechanism: `release_context`**. Each entry's **Mechanism:** line says
+> which applies — the behavior differs, so don't assume from the figure alone.
 
 ## The problem match_key solves
 
@@ -93,6 +96,22 @@ listed here so they aren't re-flagged by a future duplicate-color scan.
 it's now filed as a normal chronological entry below, tagged **Mechanism: plain**, since it
 does have `group_id` groups; see 1984 — Blowtorch.)*
 
+## `release_context` mechanism (non-retail accessories, no `group_id`)
+
+A figure can earn an entry below purely because part of its blueprint is tagged a
+non-`retail` `release_context` (`convention` · `bonus` · `mail-in` · `exclusive`) — no
+`group_id`/`match_key` involved. `PARTS_BIN.md` § *Accessory completeness model* has the
+full rule; short version: these accessories pull into their own per-context group (e.g.
+"Convention") at the point they fall in the blueprint, are tracked, and **never block
+Complete/percent** for that figure. Tag these entries **Mechanism: `release_context`**.
+
+**Scope discipline (same standard as match_key):** only add an entry here once the
+non-retail tag is individually confirmed — don't bulk-write up every figure the DB
+currently has flagged. As of 2026-07-10 the DB carries a generic `"Accessory Tree"` bonus
+row (leftover sprue) bulk-tagged across ~96 figures via import — that's an unreviewed
+artifact, not owner-confirmed, and is intentionally **not** enumerated below; see
+"Non-retail backlog" at the end of this doc.
+
 ## match_key on non-retail (bonus/context) accessories
 
 Zartan (below) is the first entry where `match_key` is set on accessories that are
@@ -111,6 +130,23 @@ matched set does. Zartan's four stickers currently show as four flat rows under
 "Bonus".
 
 ## Figures (chronological by year of release, then by catalog id)
+
+### 1982 — Cobra (v1, figure catalog id 3 — source F-code F007)
+
+- **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
+  group and never block Complete; no `group_id` on this figure.
+- **Variants:** none on file — single catalog row (`display_name` "Cobra v1 A"; `alt_name`
+  "Cobra Soldier or Cobra Trooper").
+- **Non-retail accessories:** M-16 Heavy Machine Gun (A0013), Bipod (A0014), Bazooka
+  single thin handle (A0028), Bazooka single thick handle (A0029) — all `release_context:
+  'convention'`.
+- **Unaffected (plain retail, required):** Dragunov (SVD) Sniper's Rifle (A0004) — the
+  only accessory required for Complete.
+- **Source:** live DB (`figure_accessories.release_context`), confirmed 2026-07-10. This
+  is the canonical example already cited in `PARTS_BIN.md` § *Accessory completeness
+  model* ("Cobra trooper" demo) — logged here as its own entry now that this doc's scope
+  covers `release_context`.
+- **Status:** data already set in DB; not newly changed by this doc.
 
 ### 1983 — Duke (v1, figure catalog id 27 — source F-codes F057–F061)
 
@@ -299,6 +335,35 @@ matched set does. Zartan's four stickers currently show as four flat rows under
   (`/api/catalog` shows all three Dress Backpack accessories carrying group_id 21,
   no match_key; Rifle ungrouped), 2026-07-07. Not yet visually verified in-app.
 
+### 1985 — Snow Serpent (v1, figure catalog id 89 — source F-code F137)
+
+- **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
+  group and never block Complete; no `group_id` on this figure.
+- **Variants:** none on file — single catalog row.
+- **Non-retail accessories:** Missile Launcher (A0701), Missile (A0702) —
+  reclassified `retail` → `convention` via `set-accessory-context.mjs`, 2026-07-10,
+  owner-confirmed.
+- **Unaffected (plain retail, required):** Survival Backpack (A0206), Parachute Pack
+  (A0207), AK-47 Assault Rifle (A0208), Snow Shoe (A0209), Anti-Tank EK99 Missile (A0210),
+  Missile Stand (A0211) — no `group_id` on any of these; the Anti-Tank EK99 Missile and
+  Missile Stand are separate items from the convention Missile Launcher/Missile pair
+  above, not the same accessories renamed.
+- **Status:** ✅ release_context set in DB via `set-accessory-context.mjs` and verified
+  via `/api/catalog`, 2026-07-10. Not yet visually verified in-app.
+
+### 1985 — Flint (v1, figure catalog id 78 — source F-code F125)
+
+- **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
+  group and never block Complete; no `group_id` on this figure.
+- **Variants:** none on file — single catalog row.
+- **Non-retail accessories:** Rifle (A0680), Grenade Launcher (Pistol) (A0681) —
+  reclassified `retail` → `convention` via `set-accessory-context.mjs`, 2026-07-10,
+  owner-confirmed.
+- **Unaffected (plain retail, required):** Infantry Field Pack (A0173), I-12 Short
+  Barrel Riot Shotgun (A0174).
+- **Status:** ✅ release_context set in DB via `set-accessory-context.mjs` and verified,
+  2026-07-10. Not yet visually verified in-app.
+
 ### 1986 — A.V.A.C. (v1, figure catalog id 96 — source F-code F145)
 
 - **Mechanism:** plain `group_id` — own any one member of the slot below.
@@ -334,3 +399,27 @@ matched set does. Zartan's four stickers currently show as four flat rows under
 - **Source:** hand-built (`extGroupId: null` in `server/migrate-accessory-groups.mjs` — not
   sourced from the CSV's `group_id` column).
 - **Status:** group_id set in DB; not individually owner-verified in-app.
+
+## Non-retail backlog (not yet reviewed)
+
+Figures with a non-`retail` `release_context` accessory currently in the DB that are
+**not** written up above, held here so a future scan doesn't re-flag them as missing
+coverage:
+
+- **~96 figures carry a single generic `"Accessory Tree"` accessory tagged
+  `release_context: 'bonus'`** — leftover-sprue bookkeeping bulk-applied during import,
+  not confirmed figure-by-figure the way Cobra/Duke/Zartan above were. A handful of these
+  have a more specific tree name (`Accessory Tree "Sea Sled Top"`, `"Parachute"`,
+  `"Bunker Two Pieces"`, `"Raft"`, …) but the same "not yet reviewed" status applies.
+  Regenerate the current list with:
+  ```sql
+  SELECT f.code_name, f.version, a.name, fa.release_context
+  FROM figure_accessories fa
+  JOIN figures f ON f.id = fa.figure_id
+  JOIN accessories a ON a.id = fa.accessory_id
+  WHERE fa.release_context != 'retail'
+  ORDER BY f.code_name, f.version;
+  ```
+- Promote an entry out of this backlog into the Figures list above only once it's been
+  individually confirmed with the owner (same discipline as match_key's "Scope
+  discipline" section) — don't bulk-write these up from the query alone.

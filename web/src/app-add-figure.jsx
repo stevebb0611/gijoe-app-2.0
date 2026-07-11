@@ -7,9 +7,16 @@ import { DamageMap, GradeBadge, physicalGrade, paintGrade, dmEmpty } from './dam
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip, VariantBadge, VehicleTag } from './fig-identity.jsx';
+import { formatYear, CONVENTION_YEAR } from './fig-identity.js';
 import { FileCardRow, FileCardTell } from './filecards.jsx';
 const AF_CATALOG = JoeData.CAT || [];
-const AF_YEARS = [...new Set(AF_CATALOG.map(f => f.year))].sort((a, b) => a - b);
+// CONVENTION_YEAR sorts to the end regardless of numeric value — it's not a
+// real year, so it doesn't belong interleaved by magnitude, but it does need
+// to be a pickable option here (unlike Inventory's min/max range facet,
+// this is a single-select filter, so one extra option is cheap and it was
+// previously only reachable via text search).
+const AF_YEARS = [...new Set(AF_CATALOG.map(f => f.year))].filter(y => y !== CONVENTION_YEAR).sort((a, b) => a - b);
+if (AF_CATALOG.some(f => f.year === CONVENTION_YEAR)) AF_YEARS.push(CONVENTION_YEAR);
 
 const AF_STEPS = ["FIND", "DETAILS", "CONDITION", "FINALIZE"];
 
@@ -65,7 +72,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   }, [selId]);
 
   const q = query.trim().toLowerCase();
-  const allResults = AF_CATALOG.filter(f => (!yearF || f.year === +yearF) && (!q || [f.name, f.role, String(f.year), f.faction]
+  const allResults = AF_CATALOG.filter(f => (!yearF || f.year === +yearF) && (!q || [f.name, f.role, formatYear(f.year), f.faction]
     .concat(f.variants.map(v => v.tell)).some(s => s && s.toLowerCase().includes(q))));
   const hasFilter = !!q || !!yearF;
   const results = !hasFilter ? [] : yearF ? allResults : allResults.slice(0, 60);
@@ -161,7 +168,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                 <span className="af-yearsel">
                   <select value={yearF} onChange={e => setYearF(e.target.value)}>
                     <option value="">All years</option>
-                    {AF_YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                    {AF_YEARS.map(y => <option key={y} value={y}>{formatYear(y)}</option>)}
                   </select>
                 </span>
               </div>
@@ -176,7 +183,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                   <React.Fragment key={f.id}>
                   <button className={"af-res" + (f.id === selId ? " is-sel" : "")} onClick={() => setSelId(f.id)}>
                     <span className="af-res__thumb"></span>
-                    <span className="af-res__name"><b>{f.name}</b><i>{sub} · {f.year}</i>{f.vehicle && <span className="idveh" title={"Vehicle driver — packaged with the " + f.vehicle}><b>VEHICLE</b> {f.vehicle}</span>}</span>
+                    <span className="af-res__name"><b>{f.name}</b><i>{sub} · {formatYear(f.year)}</i>{f.vehicle && <span className="idveh" title={"Vehicle driver — packaged with the " + f.vehicle}><b>VEHICLE</b> {f.vehicle}</span>}</span>
                     <span className={"wf-fac wf-fac--" + f.faction.toLowerCase() + " wf-fac--mini"}>{f.faction}</span>
                     <span className="af-res__own">{own === 0 ? "not owned" : "owned ×" + own}</span>
                     <span className="af-res__pick">{f.id === selId ? (isSingle(f) ? "● selected" : "▾ pick variant") : "select ›"}</span>
@@ -196,7 +203,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                   </React.Fragment>
                   );
                 })}
-                {hasFilter && results.length === 0 && <div className="af-nores">No catalog match{query ? ` for “${query}”` : ""}{yearF ? ` in ${yearF}` : ""}.</div>}
+                {hasFilter && results.length === 0 && <div className="af-nores">No catalog match{query ? ` for “${query}”` : ""}{yearF ? ` in ${formatYear(+yearF)}` : ""}.</div>}
                 {!hasFilter && <div className="af-prompt">Search by code name or specialty above, or pick a year — matching figures list here.</div>}
               </div>
             </div>
@@ -213,7 +220,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                     <span className={"wf-fac wf-fac--" + fig.faction.toLowerCase() + " wf-fac--mini"}>{fig.faction}</span>
                     {multi && chosen ? <VariantBadge letter={chosen.letter} /> : null}
                   </div>
-                  <div className="af-fig__var">{multi ? (varTell ? varTell + " · " + fig.year : fig.year) : (fig.role ? fig.role + " · " : "") + fig.year}</div>
+                  <div className="af-fig__var">{multi ? (varTell ? varTell + " · " + formatYear(fig.year) : formatYear(fig.year)) : (fig.role ? fig.role + " · " : "") + formatYear(fig.year)}</div>
                   <VehicleTag vehicle={fig.vehicle} />
                 </div>
               </div>
@@ -327,7 +334,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
               <div className="af-sum">
                 <div className="af-sum__row"><span>Figure</span><b>
                   {fig.name}<VersionChip version={"v" + fig.ver} />{multi && chosen ? <VariantBadge letter={chosen.letter} /> : null}
-                  {(!multi && fig.role) ? " · " + fig.role : ""} · {fig.year}
+                  {(!multi && fig.role) ? " · " + fig.role : ""} · {formatYear(fig.year)}
                 </b></div>
                 {multi && <div className="af-sum__row"><span>Variant</span><b>{varTell}</b></div>}
                 <div className="af-sum__row"><span>Copy</span><b>{isNew ? "first of this variant" : "additional copy"}</b></div>
