@@ -252,6 +252,41 @@ function AccItem({ name, req, checked, onSet, tone, color, tag, damaged }) {
   );
 }
 
+// Per-accessory damage marking — toggle + checklist, shared between the
+// Detail modal (live PATCH per click, via onSetDamage) and Add Figure's
+// CONDITION step (local state accumulated into the create payload). `extra`
+// is an optional per-row render prop for damaged-row-only actions (Detail
+// uses it for "swap for clean"; Add Figure omits it — nothing to swap into
+// yet on a copy that doesn't exist).
+function DamageModePanel({ ownedAcc, rawAcc, accDamage, onSetDamage, extra }) {
+  const [damageMode, setDamageMode] = React.useState(false);
+  const owned = ownedAcc.reduce((s, [n]) => s + (rawAcc[n] || 0), 0);
+  const damaged = ownedAcc.reduce((s, [n]) => s + (accDamage[n] || 0), 0);
+  return (
+    <React.Fragment>
+      <button type="button" className={"acc-dmgtoggle" + (damageMode ? " is-on" : "") + (damaged > 0 ? " has-damage" : "")}
+              onClick={() => setDamageMode(v => !v)}>
+        {damageMode ? "✕ done marking damage" : "⚠ mark as damaged"}
+      </button>
+      {damageMode && (
+        <div className="acc-list acc-list--dmg">
+          <div className="acc-list__cap"><span>DAMAGED ACCESSORIES</span><span><b>{damaged}</b>/{owned}</span></div>
+          {ownedAcc.length === 0
+            ? <div className="acc acc--note">No accessories owned yet on this copy.</div>
+            : ownedAcc.map((a) => (
+                <div key={a[0]} className="acc-dmgrow">
+                  <AccItem name={a[0]} req={rawAcc[a[0]] || 0} tone="damage" color={a[6]}
+                           checked={Array.from({ length: rawAcc[a[0]] || 0 }, (_, k) => k < (accDamage[a[0]] || 0))}
+                           onSet={(k) => onSetDamage(a[0], k)} />
+                  {extra && (accDamage[a[0]] || 0) > 0 && extra(a[0])}
+                </div>
+              ))}
+        </div>
+      )}
+    </React.Fragment>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Flip-card detail modal — figure front + condition back, persisted to store
 // ---------------------------------------------------------------------------
@@ -266,7 +301,6 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const [curId, setCurId] = React.useState(instId || (copies[0] && copies[0].id));
   const cur = copies.find(c => c.id === curId) || copies[0] || null;
   const [flipped, setFlipped] = React.useState(false);
-  const [damageMode, setDamageMode] = React.useState(false);
   const [varEdit, setVarEdit] = React.useState(false);
   React.useEffect(() => setVarEdit(false), [curId]);
   // ghost-only: accessories ticked before the figure is owned — carried into
@@ -299,12 +333,16 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const ordered = orderedBlueprint(bp);
   const accDamage = raw.accDamage || {};
   const ownedAcc = bp.filter(([n]) => ((raw.acc && raw.acc[n]) || 0) > 0);
-  const dmgOwned = ownedAcc.reduce((s, [n]) => s + ((raw.acc && raw.acc[n]) || 0), 0);
   const dmgDamaged = ownedAcc.reduce((s, [n]) => s + (accDamage[n] || 0), 0);
   const dmgShare = moc ? 0 : JoeData.accDamagePct(bp, raw.acc || {}, accDamage);
+  // Parts Bin lookup, by accessory name, for the swap-for-clean action below —
+  // a damaged unit can only trade for a unit the bin actually has clean.
+  const binByName = new Map(JoeStore.binEntries().map(e => [e.accessory, e]));
+  const cleanInBin = (name) => { const e = binByName.get(name); return e ? e.qty - (e.damaged || 0) : 0; };
 
   const setUnit = (name, n) => JoeStore.setAcc(cur.id, name, n);
   const setDamage = (name, n) => JoeStore.setAccDamage(cur.id, name, n);
+  const swapForClean = (name) => JoeStore.swapAccessoryForClean(cur.id, name);
   const setMoc = (v) => JoeStore.updateInstance(cur.id, { moc: v });
   const setCard = (patch) => JoeStore.updateInstance(cur.id, { filecard: { ...filecard, ...patch } });
   const setNotes = (v) => JoeStore.updateInstance(cur.id, { notes: v });
@@ -513,22 +551,17 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                                               checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
                                               onSet={(n) => setUnit(a[0], n)} />
                                    )} />
-                    <button type="button" className={"acc-dmgtoggle" + (damageMode ? " is-on" : "") + (dmgDamaged > 0 ? " has-damage" : "")}
-                            onClick={() => setDamageMode(v => !v)}>
-                      {damageMode ? "✕ done marking damage" : "⚠ mark as damaged"}
-                    </button>
-                    {damageMode && (
-                      <div className="acc-list acc-list--dmg">
-                        <div className="acc-list__cap"><span>DAMAGED ACCESSORIES</span><span><b>{dmgDamaged}</b>/{dmgOwned}</span></div>
-                        {ownedAcc.length === 0
-                          ? <div className="acc acc--note">No accessories owned yet on this copy.</div>
-                          : ownedAcc.map((a) => (
-                              <AccItem key={a[0]} name={a[0]} req={(raw.acc && raw.acc[a[0]]) || 0} tone="damage" color={a[6]}
-                                       checked={Array.from({ length: (raw.acc && raw.acc[a[0]]) || 0 }, (_, k) => k < (accDamage[a[0]] || 0))}
-                                       onSet={(k) => setDamage(a[0], k)} />
-                            ))}
-                      </div>
-                    )}
+                    <DamageModePanel ownedAcc={ownedAcc} rawAcc={raw.acc || {}} accDamage={accDamage} onSetDamage={setDamage}
+                      extra={(name) => {
+                        const canSwap = cleanInBin(name) > 0;
+                        return (
+                          <button type="button" className="acc-swap" disabled={!canSwap}
+                                  title={canSwap ? "Trade this damaged unit for a clean one from the Parts Bin" : "No clean units of this accessory in the Parts Bin"}
+                                  onClick={() => swapForClean(name)}>
+                            {canSwap ? "swap for clean ›" : "no clean stock in bin"}
+                          </button>
+                        );
+                      }} />
                   </div>
                 )}
 
@@ -693,5 +726,6 @@ export {
   INV_CAT, INV_ERAS, INV_CAT_BY_ID,
   fvm, figParts, figState, applyRebalance, yearParts, invTotals,
   FactionTag, CompRing, CompBar, PhotoSlot, StockBar, AccItem, boxLayout,
+  DamageModePanel,
   InvDetailModal,
 };

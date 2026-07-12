@@ -4,6 +4,7 @@
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
 import { DamageMap, GradeBadge, physicalGrade, paintGrade, dmEmpty } from './damage-map.jsx';
+import { DamageModePanel } from './app-detail.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip, VariantBadge, VehicleTag } from './fig-identity.jsx';
@@ -52,6 +53,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   // condition — single zone-map value; dmg.clean is the explicit "no damage found"
   // confirmation (vs. not yet mapped), and travels with marks into the stored instance
   const [dmg, setDmg] = React.useState(() => dmEmpty('male'));
+  const [accDamage, setAccDamage] = React.useState({}); // accName -> units damaged, a subset of owned
   const [done, setDone] = React.useState(false);
 
   const fig = AF_CATALOG.find(f => f.id === selId) || null;
@@ -68,7 +70,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
     if (!fig) return;
     setSelVar(isSingle(fig) ? '' : (presetVariant && fig.id === presetCatalogId ? presetVariant : null));
     setOwnedAcc(presetAcc && fig.id === presetCatalogId ? presetAcc : {});
-    setMoc(false); setFilecard({ onFile: false, fileCardId: null }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male')); setCoo('');
+    setMoc(false); setFilecard({ onFile: false, fileCardId: null }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male')); setCoo(''); setAccDamage({});
   }, [selId]);
 
   const q = query.trim().toLowerCase();
@@ -82,6 +84,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const unitsOf = (n) => owned[n] || 0;
   const bpReq = JoeData.bpReq(blueprint);
   const fullDone = JoeData.instOwn(blueprint, owned);
+  const ownedAcc = blueprint.filter(([n]) => (owned[n] || 0) > 0);
 
   const goto = (i) => { setStep(i); setMax(m => Math.max(m, i)); };
   const next = () => goto(Math.min(step + 1, AF_STEPS.length - 1));
@@ -128,6 +131,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
     JoeStore.addInstance({
       catalogId: fig.id, variant: variantKey, moc,
       acc: moc ? accFull : { ...owned },
+      accDamage: moc ? {} : { ...accDamage },
       phys: moc ? null : (ungraded ? null : phys.grade),
       paint: moc ? null : (ungraded ? null : paint.grade),
       marks: moc ? null : dmg,
@@ -140,7 +144,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
 
   const resetAll = () => {
     setDone(false); setSelId(null); setQuery(""); setSelVar(null); setLoc(""); setNotes("");
-    setOwnedAcc({}); setMoc(false); setFilecard({ onFile: false, fileCardId: null }); setDmg(dmEmpty('male')); setYearF(""); goto(0);
+    setOwnedAcc({}); setMoc(false); setFilecard({ onFile: false, fileCardId: null }); setDmg(dmEmpty('male')); setAccDamage({}); setYearF(""); goto(0);
   };
 
   return (
@@ -319,6 +323,13 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                     </React.Fragment>
                   )}
                 </section>
+                {!moc && blueprint.length > 0 && (
+                  <section className="panel">
+                    <div className="panel__hd">ACCESSORY DAMAGE <em>· optional</em></div>
+                    <DamageModePanel ownedAcc={ownedAcc} rawAcc={owned} accDamage={accDamage}
+                      onSetDamage={(name, k) => setAccDamage(d => ({ ...d, [name]: k }))} />
+                  </section>
+                )}
                 <section className="panel">
                   <div className="panel__hd">NOTES <em>· this copy only</em></div>
                   <textarea className="af-notes" value={notes} onChange={e => setNotes(e.target.value)}

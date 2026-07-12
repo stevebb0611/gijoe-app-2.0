@@ -74,7 +74,10 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
   const home = entry.shared ? "Shared · fits multiple figures" : (entry.homeFigureName || "—");
   return (
     <div className={"pb-row" + (ev.needed ? " is-needed" : "")}>
-      <div className="pb-qty"><span className="pb-qty__n">×{entry.qty}</span></div>
+      <div className="pb-qty">
+        <span className="pb-qty__n">×{entry.qty}</span>
+        {entry.damaged > 0 && <span className="pb-qty__dmg" title={entry.damaged + " of these units are damaged"}>{entry.damaged} damaged</span>}
+      </div>
       <div className="pb-main">
         <div className="pb-name">
           {entry.accessory}

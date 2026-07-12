@@ -67,7 +67,7 @@ function shapeInstance(row, accByInstance, damageByInstance) {
 }
 
 const binRowsStmt = db.prepare(`
-  SELECT ai.accessory_id, a.name AS accessory, ai.quantity_owned AS qty, ai.notes
+  SELECT ai.accessory_id, a.name AS accessory, ai.quantity_owned AS qty, ai.units_damaged AS damaged, ai.notes
   FROM accessory_inventory ai
   JOIN accessories a ON a.id = ai.accessory_id
   WHERE ai.quantity_owned > 0
@@ -75,7 +75,7 @@ const binRowsStmt = db.prepare(`
 `);
 
 function shapeBinEntry(row) {
-  return { id: row.accessory_id, catalogId: null, accessory: row.accessory, qty: row.qty, notes: row.notes || '', addedAt: null };
+  return { id: row.accessory_id, catalogId: null, accessory: row.accessory, qty: row.qty, damaged: row.damaged || 0, notes: row.notes || '', addedAt: null };
 }
 
 export function getState() {
@@ -115,7 +115,7 @@ const upsertInstanceAcc = db.prepare(`
 `);
 
 export const createInstance = db.transaction((payload) => {
-  const { catalogId, variant, moc, acc, marks, loc, notes, filecard, coo } = payload;
+  const { catalogId, variant, moc, acc, accDamage, marks, loc, notes, filecard, coo } = payload;
   const variantId = resolveVariantId(catalogId, variant);
   const id = insertInstance.run({
     figure_id: catalogId,
@@ -133,6 +133,18 @@ export const createInstance = db.transaction((payload) => {
     if (!units) continue;
     const accId = accessoryIdForName(catalogId, name);
     if (accId) upsertInstanceAcc.run(id, accId, units);
+  }
+  // accDamage is a condition notation on units already added above — clamped
+  // to [0, units_owned] same as setInstanceAccessoryDamage, since a copy
+  // can't arrive already-damaged for an accessory it doesn't own.
+  if (!moc) {
+    for (const [name, damaged] of Object.entries(accDamage || {})) {
+      if (!damaged) continue;
+      const accId = accessoryIdForName(catalogId, name);
+      if (!accId) continue;
+      const owned = acc && acc[name] ? acc[name] : 0;
+      if (owned) setInstanceAccDamage.run(Math.max(0, Math.min(damaged, owned)), id, accId);
+    }
   }
   return id;
 });
@@ -230,25 +242,68 @@ export function depositParts(catalogId, parts) {
   }
 }
 
+const getBinRow = db.prepare('SELECT quantity_owned, units_damaged FROM accessory_inventory WHERE accessory_id = ?');
+const setBinDamaged = db.prepare('UPDATE accessory_inventory SET units_damaged = ? WHERE accessory_id = ?');
+
+// units_damaged is app-clamped to [0, quantity_owned] (migration 006, same
+// rule as instance_accessories.units_damaged) — shrinking quantity_owned
+// below the current damaged count pulls units_damaged down with it.
 export function adjustPart(accessoryId, delta) {
-  const row = db.prepare('SELECT quantity_owned FROM accessory_inventory WHERE accessory_id = ?').get(accessoryId);
-  const next = (row ? row.quantity_owned : 0) + delta;
-  if (next <= 0) db.prepare('DELETE FROM accessory_inventory WHERE accessory_id = ?').run(accessoryId);
-  else upsertBin.run(accessoryId, next - (row ? row.quantity_owned : 0), null);
+  const row = getBinRow.get(accessoryId);
+  const nextQty = (row ? row.quantity_owned : 0) + delta;
+  if (nextQty <= 0) { db.prepare('DELETE FROM accessory_inventory WHERE accessory_id = ?').run(accessoryId); return; }
+  upsertBin.run(accessoryId, nextQty - (row ? row.quantity_owned : 0), null);
+  if (row && row.units_damaged > nextQty) setBinDamaged.run(nextQty, accessoryId);
 }
 
 export function removePart(accessoryId) {
   db.prepare('DELETE FROM accessory_inventory WHERE accessory_id = ?').run(accessoryId);
 }
 
-export function pullPart(accessoryId, instanceId) {
-  const row = db.prepare('SELECT quantity_owned FROM accessory_inventory WHERE accessory_id = ?').get(accessoryId);
+// Pulls one loose unit from the bin onto an instance. Prefers clean stock;
+// only reaches for damaged stock if that's all the bin has, in which case
+// the damage status carries over onto the instance rather than silently
+// laundering a broken part as clean. adjustPart's own units_damaged clamp
+// keeps the bin side correct once quantity_owned drops (see adjustPart).
+export const pullPart = db.transaction((accessoryId, instanceId) => {
+  const row = getBinRow.get(accessoryId);
   if (!row || row.quantity_owned <= 0) return false;
-  const cur = db.prepare('SELECT units_owned FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(instanceId, accessoryId);
-  upsertInstanceAcc.run(instanceId, accessoryId, (cur ? cur.units_owned : 0) + 1);
+  const pullingDamaged = row.units_damaged >= row.quantity_owned; // no clean stock left
+
+  const cur = db.prepare('SELECT units_owned, units_damaged FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(instanceId, accessoryId);
+  const ownedNow = cur ? cur.units_owned : 0;
+  upsertInstanceAcc.run(instanceId, accessoryId, ownedNow + 1);
+  if (pullingDamaged) {
+    const damagedNow = cur ? cur.units_damaged : 0;
+    setInstanceAccDamage.run(damagedNow + 1, instanceId, accessoryId);
+  }
+
   adjustPart(accessoryId, -1);
   return true;
-}
+});
+
+// Trades a damaged unit on an instance for a clean one from the bin. A
+// symmetric swap, not a quantity change: the instance's units_owned and the
+// bin's quantity_owned are untouched — only which units are flagged damaged
+// moves (instance -1 damaged, bin +1 damaged). Fails if the instance has no
+// damaged unit of this accessory, or the bin has no clean stock to trade for.
+export const swapAccessoryForClean = db.transaction((instanceId, name) => {
+  const row = getInstanceFigure.get(instanceId);
+  if (!row) return false;
+  const accId = accessoryIdForName(row.figure_id, name);
+  if (!accId) return false;
+
+  const instRow = db.prepare('SELECT units_owned, units_damaged FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(instanceId, accId);
+  if (!instRow || instRow.units_damaged <= 0) return false;
+
+  const binRow = getBinRow.get(accId);
+  const cleanInBin = binRow ? binRow.quantity_owned - binRow.units_damaged : 0;
+  if (cleanInBin <= 0) return false;
+
+  setInstanceAccDamage.run(instRow.units_damaged - 1, instanceId, accId);
+  setBinDamaged.run(binRow.units_damaged + 1, accId);
+  return true;
+});
 
 export function clearAll() {
   db.exec('DELETE FROM instances; DELETE FROM accessory_inventory;');

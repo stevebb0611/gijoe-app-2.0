@@ -463,6 +463,13 @@
   .acc-dmgtoggle.has-damage:not(.is-on) { color: var(--damage); }
   .acc-list--dmg { border: 1.5px solid var(--damage); margin-top: -1.5px; margin-bottom: 16px; }
   .acc-list--dmg .acc-list__cap { border-bottom-color: var(--damage); }
+  .acc-dmgrow { border-bottom: 1px solid var(--line-soft); }
+  .acc-dmgrow:last-child { border-bottom: none; }
+  .acc-swap { display: block; width: 100%; padding: 0 12px 8px; margin-top: -4px; border: none; background: var(--card);
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .3px; text-align: right;
+    color: var(--accent); cursor: pointer; }
+  .acc-swap:hover:not(:disabled) { text-decoration: underline; }
+  .acc-swap:disabled { color: var(--ink-soft); cursor: default; }
 
   /* ===== accessory groups — variant slots (group_id) + non-retail context
      rows. Flush with the plain checklist rhythm (Option 2, 2026-07-05 redesign
@@ -878,6 +885,7 @@
   .pb-row.is-needed { border-left: 5px solid var(--ok); }
   .pb-qty { display: grid; place-items: center; align-self: center; }
   .pb-qty__n { font-family: var(--font-display); font-weight: 700; font-size: 26px; line-height: 1; }
+  .pb-qty__dmg { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .3px; color: var(--damage); margin-top: 2px; }
 
   .pb-main { min-width: 0; }
   .pb-name { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: .5px; display: flex; align-items: center; gap: 10px; }

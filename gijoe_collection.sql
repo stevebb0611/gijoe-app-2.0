@@ -258,6 +258,7 @@ CREATE TABLE IF NOT EXISTS figure_accessories (
 CREATE TABLE IF NOT EXISTS accessory_inventory (
     accessory_id    INTEGER PRIMARY KEY REFERENCES accessories(id) ON DELETE CASCADE,
     quantity_owned  INTEGER NOT NULL DEFAULT 0,
+    units_damaged   INTEGER NOT NULL DEFAULT 0,   -- subset of quantity_owned; app-clamped (migration 006)
     notes           TEXT
 );
 
@@ -608,6 +609,8 @@ SELECT
     a.color,
     a.release_context,
     ai.quantity_owned       AS total_owned,
+    ai.units_damaged        AS damaged_owned,
+    ai.quantity_owned - ai.units_damaged AS clean_owned,
     ai.notes
 FROM accessory_inventory ai
 JOIN accessories            a  ON a.id          = ai.accessory_id
