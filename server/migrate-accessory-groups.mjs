@@ -36,6 +36,20 @@ const GROUPS = [
   { extGroupId: 8415, figure: 'Thunder',   accessories: ['A0125', 'A0126'] }, // Radio Headset / Radio Headset
   { extGroupId: 8601, figure: 'A.V.A.C.',  accessories: ['A0225', 'A0226'] }, // Parachute pack soft/hard plastic
   { extGroupId: 8501, figure: 'Crimson Guard', accessories: ['A0161', 'A0162', 'A0163'] }, // Dress Backpack solid-back light/dark red + hollow-back light red
+  // Dr. Mindbender (1986, v1, F154 -> catalog id 103): 'Dr. Mindbender' also
+  // matches a later v2 (id 406, F500), but the lowest id (103, v1) is the one
+  // with these accessories, same pattern as Duke/Recondo/Spirit/Zartan/
+  // T.A.R.G.A.T. above. NOT a match_key case — a single slot, two
+  // interchangeable Cobra Cape applications (sewn-on patch / iron-on decal);
+  // own any one for completion.
+  { extGroupId: null, figure: 'Dr. Mindbender', accessories: ['A0243', 'A0244'] }, // Cobra Cape (patch) / Cobra Cape (iron-on)
+  // Serpentor (1986, v1, F169 -> catalog id 117): single catalog row, no
+  // version collision. NOT a match_key case — one slot, five interchangeable
+  // colorways of the same "Snake" accessory (gold/bronze/dark brown/
+  // translucent brown/green), own any one for completion. Snake Headdress,
+  // Dagger, and Cape are separate items outside this slot, not tied to a
+  // specific snake color.
+  { extGroupId: null, figure: 'Serpentor', accessories: ['A0271', 'A0272', 'A0273', 'A0274', 'A0275'] }, // Snake gold/bronze/dark brown/translucent brown/green
   // Firefly (1984): NOT from the CSV's group_id column (that one cross-paired
   // gun+radio, which is wrong — see ACCESSORY_GROUPS.md). These two slots are each a
   // same-item colour pair; match_key (set separately, see set-match-key.mjs)

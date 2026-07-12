@@ -110,7 +110,68 @@ non-retail tag is individually confirmed — don't bulk-write up every figure th
 currently has flagged. As of 2026-07-10 the DB carries a generic `"Accessory Tree"` bonus
 row (leftover sprue) bulk-tagged across ~96 figures via import — that's an unreviewed
 artifact, not owner-confirmed, and is intentionally **not** enumerated below; see
-"Non-retail backlog" at the end of this doc.
+"Non-retail backlog" at the end of this doc. (2026-07-11 update: a narrower category-level
+form of confirmation is now also allowed — see "Category-level `release_context`
+reclassification" immediately below.)
+
+## Category-level `release_context` reclassification (2026-07-11)
+
+Distinct from the figure-by-figure recall that produced the Figures entries below: the
+owner scanned `accessory_categories` directly and confirmed that **every** accessory in
+three whole categories is non-blocking, regardless of which figure it ships with — no
+per-figure review needed since the category itself defines the mechanism (a decal/sticker,
+a lump of sculpting putty, or a bundled cassette/VHS tape isn't a returnable, gradable
+retail part).
+
+**Categories marked `bonus`:** Decal (`accessory_categories.category_id` 39), Putty (48),
+Cassette / VHS (52).
+
+**Tooling:** `server/set-category-bonus.mjs` — bulk `UPDATE figure_accessories SET
+release_context = 'bonus'` for every row whose accessory's `category_id` is in that list
+and isn't already `bonus`. Re-runnable (only non-`bonus` rows are touched; a second run
+reclassified 0). Only touches `figure_accessories.release_context` (what
+`catalog.js`/`store.js` actually read for completeness) — leaves the unused
+`accessories.release_context` top-level column at its default `retail`, same precedent as
+every earlier entry in this doc (e.g. Duke's flag, Zartan's stickers).
+
+**Already covered by earlier figure-specific entries (unaffected by this run — already
+`bonus`):** Duke's American Flag (decal, A0044) and Zartan's four heat stickers (Decal)
+— see their entries above.
+
+**Newly reclassified (15 pairings across 14 figures), 2026-07-11:**
+
+| Year | Figure | Category | Accessory |
+|---|---|---|---|
+| 1985 | Tripwire v2 | Cassette / VHS | Listen 'n Fun Cassette Tape (A0224) |
+| 1986 | Claymore v1 | Cassette / VHS | Special Mission: Brazil Cassette Tape (A0236) |
+| 1986 | Dial-Tone v2 | Cassette / VHS | Special Mission: Brazil Cassette Tape (A0236) |
+| 1986 | Leatherneck v2 | Cassette / VHS | Special Mission: Brazil Cassette Tape (A0236) |
+| 1986 | Mainframe v2 | Cassette / VHS | Special Mission: Brazil Cassette Tape (A0236) |
+| 1986 | Wet-Suit v2 | Cassette / VHS | Special Mission: Brazil Cassette Tape (A0236) |
+| 1987 | Gung-Ho v2 | Decal | Rank and Stripes (decal) (A0328) |
+| 1990 | Rapid-Fire v1 | Cassette / VHS | Video Cassette Tape (A0781) |
+| 1993 | Blast-Off v1 | Putty | Bio-Armor Putty (A1225) |
+| 1993 | Clutch v3 | Putty | Bio-Armor Putty (A1246) |
+| 1993 | Cyber-Vipers v1 | Putty | Bio-Armor Putty (A1283) |
+| 1993 | Gung-Ho v5 | Putty | Bio-Armor Putty (A1351) |
+| 1993 | Mega-Vipers v1 | Putty | Body-Armor Putty (A1410) |
+| 1993 | Mirage v1 | Putty | Body-Armor Putty (A1417) |
+| 1993 | Monstro-Vipers v1 | Putty | Body-Armor Putty (A1420) |
+
+Note: Claymore/Dial-Tone/Leatherneck/Mainframe/Wet-Suit's Cassette Tape is one shared
+accessory row (`accessories.id` 236) reused across all five figures' blueprints, not five
+separate accessories.
+
+**Status:** ✅ `release_context` set in DB via `server/set-category-bonus.mjs` and verified
+via `/api/catalog` (Mirage, Rapid-Fire, Tripwire spot-checked), 2026-07-11. Not yet visually
+verified in-app. None of these figures have a `group_id`/`match_key` slot, so no separate
+Figures-list entry is needed for them individually — this table is their record instead.
+
+**Scope discipline note:** this is a distinct, narrower exception to the rule above — it's
+category-level owner confirmation ("every Decal/Putty/Cassette-VHS accessory, whichever
+figure it's on"), not a bulk-write from an unreviewed import artifact like the "Accessory
+Tree" backlog. Don't extend this precedent to other categories without the same explicit,
+direct confirmation.
 
 ## match_key on non-retail (bonus/context) accessories
 
@@ -374,6 +435,47 @@ matched set does. Zartan's four stickers currently show as four flat rows under
 - **Source:** CSV `group_id` column, ext id `8601`.
 - **Status:** group_id set in DB; bulk-imported from the CSV column, not individually
   owner-verified in-app.
+
+### 1986 — Dr. Mindbender (v1, figure catalog id 103 — source F-code F154)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below. Not a
+  `match_key` case — a single slot with two interchangeable applications of the
+  same emblem, not a cross-slot colorway tie.
+- **Variants:** none on file — single catalog row. `code_name = 'Dr. Mindbender'`
+  also matches a later v2 (id 406, F500); the unqualified lookup in
+  `migrate-accessory-groups.mjs` resolves to id 103 (the lower id), same
+  pattern as Duke/Recondo/Spirit/Zartan/T.A.R.G.A.T. above.
+- **Group_id slot:** Cobra Cape (patch) / Cobra Cape (iron-on) — two
+  interchangeable ways the Cobra emblem was applied to the same cape, own any
+  one (`accessory_groups.id` 22).
+- **Unaffected (plain, independently required):** .45 Caliber Pistol, Electric
+  Prod, Generator, Hose 6" Long (long).
+- **Source:** hand-built (`extGroupId: null` in `server/migrate-accessory-groups.mjs`
+  — not sourced from the CSV's `group_id` column), owner-confirmed 2026-07-11.
+- **Status:** ✅ group_id set in DB and verified via API round-trip
+  (`/api/catalog` shows both Cobra Cape accessories carrying group_id 22, no
+  match_key), 2026-07-11. Not yet visually verified in-app.
+
+### 1986 — Serpentor (v1, figure catalog id 117 — source F-code F169)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below. Not a
+  `match_key` case — a single slot with five interchangeable colorways of the
+  same item, not a cross-slot colorway tie (Snake Headdress, Dagger, and Cape
+  don't pair to a specific snake color).
+- **Variants:** none on file — single catalog row, no version collision.
+- **Group_id slot:** Snake, gold (A0271) / bronze (A0272) / dark brown (A0273) /
+  translucent brown (A0274, source data spells it "transulent brown") / green
+  (A0275) — five interchangeable colorways, own any one
+  (`accessory_groups.id` 23). All five share the identical accessory name
+  ("Snake"); `disambiguateNames` appends each one's color, matching the
+  Crimson Guard/Dress Backpack precedent.
+- **Unaffected (plain, independently required):** Snake Headdress, Dagger, Cape.
+- **Source:** hand-built (`extGroupId: null` in `server/migrate-accessory-groups.mjs`
+  — not sourced from the CSV's `group_id` column), owner-confirmed 2026-07-11.
+- **Status:** ✅ group_id set in DB and verified via API round-trip
+  (`/api/catalog` shows all five Snake accessories carrying group_id 23, no
+  match_key, each disambiguated by color), 2026-07-11. Not yet visually
+  verified in-app.
 
 ### 1989 — Recoil (v1, figure catalog id 245 — source F-code F321)
 
