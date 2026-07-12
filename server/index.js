@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { buildCatalog } from './catalog.js';
 import { buildAccessoryCatalog } from './accessories.js';
+import { buildWorkbook } from './export-xlsx.js';
 import * as store from './instances.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -32,6 +33,18 @@ app.get('/api/state', (req, res) => {
   res.json(store.getState());
 });
 
+// Full-catalog Excel export for the Tweaks & Admin panel's "Export catalog"
+// button — figures, per-copy accessory checklist, and file cards. See
+// server/export-xlsx.js for scope (no condition/paint grades, by design).
+app.get('/api/export/xlsx', async (req, res) => {
+  const wb = buildWorkbook();
+  const date = new Date().toISOString().slice(0, 10);
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', `attachment; filename="gi-joe-catalog-${date}.xlsx"`);
+  await wb.xlsx.write(res);
+  res.end();
+});
+
 app.post('/api/instances', (req, res) => {
   const id = store.createInstance(req.body);
   res.status(201).json({ id });
@@ -51,6 +64,12 @@ app.patch('/api/instances/:id/accessory', (req, res) => {
 app.patch('/api/instances/:id/accessory-damage', (req, res) => {
   const ok = store.setInstanceAccessoryDamage(+req.params.id, req.body.name, req.body.units);
   if (!ok) return res.status(400).json({ error: 'accessory not owned on this copy' });
+  res.json({ ok: true });
+});
+
+app.post('/api/instances/:id/accessory/swap-clean', (req, res) => {
+  const ok = store.swapAccessoryForClean(+req.params.id, req.body.name);
+  if (!ok) return res.status(400).json({ error: 'no damaged unit to swap, or no clean stock in the Parts Bin' });
   res.json({ ok: true });
 });
 

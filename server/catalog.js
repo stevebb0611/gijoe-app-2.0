@@ -14,6 +14,7 @@ const FACTION_CODE = {
 const figuresStmt = db.prepare(`
   SELECT f.id, f.code_name, f.version, f.specialty, f.variant_lookup AS single_tell,
          f.is_vehicle_driver, f.vehicle,
+         f.is_mail_away, f.mail_in_notes, f.notes, f.release_context,
          fac.name AS faction_name,
          COALESCE(s.year, f.year_released) AS year
   FROM figures f
@@ -27,7 +28,7 @@ const variantsStmt = db.prepare(`
 `);
 
 const fileCardsStmt = db.prepare(`
-  SELECT ffc.figure_id, fc.file_card_id, fc.file_card_code, fc.card_back, fc.card_color,
+  SELECT ffc.figure_id, ffc.is_original, fc.file_card_id, fc.file_card_code, fc.card_back, fc.card_color,
          fc.release_type, fc.logo_version, fc.text_version, fc.country, fc.notes
   FROM figure_file_cards ffc
   JOIN file_cards fc ON fc.file_card_id = ffc.file_card_id
@@ -87,6 +88,10 @@ export function buildCatalog() {
     faction: FACTION_CODE[f.faction_name] || f.faction_name,
     role: f.specialty,
     vehicle: f.is_vehicle_driver && f.vehicle ? f.vehicle : null,
+    mailAway: !!f.is_mail_away,
+    mailInNotes: f.mail_in_notes || null,
+    notes: f.notes || null,
+    releaseContext: f.release_context || 'retail',
     // Every figure has at least one variants[] entry — single-variant figures
     // (or the handful with no usable variant letter, see server/seed.mjs) get a
     // synthesized blank-letter entry so the frontend's isSingle() check holds.

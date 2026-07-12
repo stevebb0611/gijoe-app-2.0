@@ -37,6 +37,15 @@ function App() {
     a.download = 'gi-joe-collection-' + new Date().toISOString().slice(0, 10) + '.json'; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   };
+  const doExportExcel = () => {
+    fetch('/api/export/xlsx')
+      .then((r) => r.blob())
+      .then((blob) => {
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = 'gi-joe-catalog-' + new Date().toISOString().slice(0, 10) + '.xlsx'; a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      });
+  };
   const doImport = (e) => {
     const f = e.target.files[0]; if (!f) return;
     const rd = new FileReader();
@@ -59,6 +68,7 @@ function App() {
         <TweakToggle label="Faction colors" value={t.factionColors} onChange={(v) => setTweak('factionColors', v)} />
         <TweakSection label="Collection data" />
         <TweakButton label="⬇ Export backup (.json)" onClick={doExport} />
+        <TweakButton label="⬇ Export catalog (.xlsx)" onClick={doExportExcel} />
         <TweakButton label="⬆ Import backup" secondary onClick={() => fileRef.current && fileRef.current.click()} />
         <TweakButton label="✕ Clear collection" secondary onClick={doClear} />
         <TweakSection label="Admin" />
