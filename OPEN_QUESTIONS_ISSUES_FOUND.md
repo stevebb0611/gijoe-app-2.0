@@ -78,7 +78,7 @@ Built: removed the "copy #" ordinal from both the success heading and the FINALI
 # 13 Figure Display/ View ✅
 remove the boxing around version and variants. 
 Built (July 2026): dropped the `border` from `.idver` (the "v1" version tag) and `.idvar` (the "N variants" pill) in `web/src/app.css` — both now read as plain inline text/icon instead of bordered boxes.
-move vehile in line with figure name. — still open, `idveh` still renders on its own line below the name/specialty in `.inv-name`'s column layout.
+move vehile in line with figure name. ✅ Built (July 2026): `VehicleTag` (`web/src/fig-identity.jsx`) takes a new `inline` prop; the Inventory list row (`web/src/app-inventory.jsx`) now renders it inside the name row (`<b>` — after the variant badge) instead of as a sibling below `<i>specialty</i>`. New `.idveh--inline` modifier in `web/src/app.css` swaps the standalone tag's `margin-top` for a `margin-left`, scoped so the modal/search-result usages of `.idveh` are unaffected. Verified live (headless Chromium against the real dev server, GRAND SLAM v1/v1.5/v2): the VEHICLE badge now sits on the name line next to the version/variant chips across all three rows.
 
 # 14 Figure 'mark for upgrade' 
 introduce an option for figures to be flagged for upgrade. 

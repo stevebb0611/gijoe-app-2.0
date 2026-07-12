@@ -7,7 +7,7 @@
 // against the real collection in the store.
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
-import { figState, applyRebalance } from './app-detail.jsx';
+import { figState, applyRebalance, AccItem } from './app-detail.jsx';
 import { VersionChip } from './fig-identity.jsx';
 import { figIdentityText, formatYear } from './fig-identity.js';
 
@@ -71,6 +71,7 @@ const GROUPBYS = [
 function PartRow({ entry, NEEDS, openId, setOpenId }) {
   const ev = evaluate(entry, NEEDS);
   const open = openId === entry.id;
+  const [dmgOpen, setDmgOpen] = React.useState(false);
   const home = entry.shared ? "Shared · fits multiple figures" : (entry.homeFigureName || "—");
   return (
     <div className={"pb-row" + (ev.needed ? " is-needed" : "")}>
@@ -101,11 +102,21 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
             ))}
           </div>
         )}
+        {dmgOpen && (
+          <div className="acc-list acc-list--dmg pb-dmgpanel">
+            <div className="acc-list__cap"><span>DAMAGED UNITS</span><span><b>{entry.damaged}</b>/{entry.qty}</span></div>
+            <AccItem name={entry.accessory} req={entry.qty} tone="damage"
+                     checked={Array.from({ length: entry.qty }, (_, k) => k < entry.damaged)}
+                     onSet={(k) => JoeStore.setPartDamage(entry.id, k)} />
+          </div>
+        )}
         {entry.notes && <div className="pb-noteline">✎ <span>{entry.notes}</span></div>}
       </div>
       <div className="pb-actions">
         <button className="pb-btn pb-btn--ghost" onClick={() => JoeStore.adjustPart(entry.id, +1)}>＋</button>
         <button className="pb-btn pb-btn--ghost" onClick={() => JoeStore.adjustPart(entry.id, -1)}>－</button>
+        <button className={"pb-btn pb-btn--ghost pb-btn--dmg" + (dmgOpen ? " is-on" : "") + (entry.damaged > 0 ? " has-damage" : "")}
+                title="Mark units of this loose part as damaged" onClick={() => setDmgOpen(v => !v)}>⚠</button>
       </div>
     </div>
   );

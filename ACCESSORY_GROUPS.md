@@ -303,6 +303,28 @@ matched set does. Zartan's four stickers currently show as four flat rows under
 - **Status:** group_id set in DB; bulk-imported from the CSV column, not individually
   owner-verified in-app.
 
+### 1984 — Roadblock (v1, figure catalog id 60 — source F-code F102)
+
+- **Mechanism:** `match_key` — tags `A`/`B` tie two `group_id` slots to the same colorway.
+- **Variants:** none on file — single catalog row. `code_name = 'Roadblock'` also matches 6
+  later versions (v2–v7), but the lowest id (60, v1) is the one with these accessories, same
+  pattern as Duke/Recondo/Spirit above.
+- **Matched pieces:** M-2X Heavy Machine Gun + Tripod, green (tag `A`) or dark green (tag `B`)
+  (`accessory_groups.id` 24/25). The CSV's own `group_id` column (ext `8410`/`8411`) cross-pairs
+  MG+Tripod by color directly rather than as two same-item slots — not used, same reasoning as
+  Firefly/Recondo/Spirit (see `migrate-accessory-groups.mjs` header); hand-built via
+  `extGroupId: null` instead.
+- **Unaffected (plain, independently required):** Helmet (no holes), Machine Gunner Backpack,
+  Ammo Box — no color pairing ties these to a specific MG/Tripod colorway.
+- **Source:** hand-built (`extGroupId: null`), owner-confirmed 2026-07-12.
+- **Status:** ✅ group_id (24/25) + match_key A/B set and verified via API round-trip
+  (`/api/catalog` shows both slots with group_id/match_key, `disambiguateNames` rendering
+  "M-2X Heavy Machine Gun (green)"/"(dark green)" and "Tripod (green)"/"(dark green)") and
+  direct DB read, 2026-07-12. Of the 3 real owned copies, two (ids 105/106) own the full green
+  set and now correctly resolve complete on this slot (previously would have wrongly also
+  required the dark-green counterparts); the third (id 107) is still missing a tripod of either
+  color, unaffected by this fix. Not yet visually verified in-app.
+
 ### 1984 — Scrap-Iron (v1, figure catalog id 61 — source F-code F103)
 
 - **Mechanism:** plain `group_id` — own any one member of the slot below.
@@ -455,6 +477,22 @@ matched set does. Zartan's four stickers currently show as four flat rows under
 - **Status:** ✅ group_id set in DB and verified via API round-trip
   (`/api/catalog` shows both Cobra Cape accessories carrying group_id 22, no
   match_key), 2026-07-11. Not yet visually verified in-app.
+
+### 1986 — Roadblock (v2, figure catalog id 115 — source F-code F167)
+
+- **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
+  group and never block Complete; no `group_id` on this figure.
+- **Variants:** none on file — single catalog row.
+- **Non-retail accessories:** Machine Gun (A0787), Mine Launcher (A0793) —
+  reclassified `retail` → `convention` via `set-accessory-context.mjs`, 2026-07-12,
+  owner-confirmed.
+- **Unaffected (plain retail, required):** L7A21 GPMG Heavy Machine Gun (A0264), Tripod
+  (A0265) — the actual belt-fed gun + tripod pairing this figure shipped with; distinct
+  items from the convention Machine Gun/Mine Launcher pair above, not the same
+  accessories renamed.
+- **Status:** ✅ release_context set in DB via `set-accessory-context.mjs` and verified
+  (`Machine Gun (A0787): retail → convention`, `Mine Launcher (A0793): retail →
+  convention`), 2026-07-12. Not yet visually verified in-app.
 
 ### 1986 — Serpentor (v1, figure catalog id 117 — source F-code F169)
 

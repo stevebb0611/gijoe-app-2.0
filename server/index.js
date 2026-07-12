@@ -94,6 +94,12 @@ app.patch('/api/parts-bin/:accessoryId', (req, res) => {
   res.json({ ok: true });
 });
 
+app.patch('/api/parts-bin/:accessoryId/damage', (req, res) => {
+  const ok = store.setPartDamage(+req.params.accessoryId, req.body.units);
+  if (!ok) return res.status(400).json({ error: 'no such bin entry' });
+  res.json({ ok: true });
+});
+
 app.delete('/api/parts-bin/:accessoryId', (req, res) => {
   store.removePart(+req.params.accessoryId);
   res.status(204).end();

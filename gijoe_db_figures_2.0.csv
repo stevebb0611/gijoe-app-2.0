@@ -402,7 +402,7 @@ year_released,id,figure_id,code_name,character_key,alt_name,version,variant,vari
 ,401,F401,Night Vulture,,,1,,,Night Vulture v1 ,,,2,,11,,,,,,,Retail,,,,1,Air Commandos (Night Vulture),,,,,
 ,402,F402,Ozone,,Eco Warrior Ozone,1,,,Ozone v1 ,"Kunitz, David P.",Environmental Health Specialist,1,5,11,,,,,,,Retail,,,,,,,,,,
 ,403,F403,Psyche-Out,,Sonic Fighter Psyche-Out,3,,,Psyche-Out v3 ,"Rich, Kenneth D.",Psy-Ops,1,,11,,,,,,,Retail,,,,,,,,,,
-,404,F404,Quick Kick,,,1,B,Peach-colored skin,Quick Kick v1 B,"Ito, MacArthur S.",Infantry,1,,11,,,,,,,Mail order,,1,Mail order,,,,,,,
+,404,F404,Quick Kick,,,,,Peach-colored skin,Quick Kick (convention),"Ito, MacArthur S.",Infantry,1,,15,,,,,,,Convention,,,,,,,,,,
 ,405,F405,Red Star,,,1,,,Red Star v1 ,"Krimov, Anatoly Fyodorovich",Commando Operations (Naval Infantry),3,,11,,,,,,,Retail,,,,,,,,,,
 ,406,F406,Road Pig,,Sonic Fighter Road Pig,2,,,Road Pig v2 ,"DeLuca, Donald",,4,,11,,,,,,,Retail,,,,,,,,,,
 ,407,F407,Rock 'N Roll,,Rock & Roll or Sonic Fighter Rock 'N Roll,3,,,Rock 'N Roll v3 ,"McConnel, Craig S.",Infantry,1,,11,,,,,,,Retail,,,,,,,,,,

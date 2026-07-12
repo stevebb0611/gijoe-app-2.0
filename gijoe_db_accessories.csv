@@ -186,11 +186,11 @@
 185,A0185,Surveillance Camera,,30,Comms/ Radio/ Tech,green,,,,,,,,,1985,Lady Jaye (v1),1
 186,A0186,Submachine Gun,,9,Weapon Submachine Gun,silver,,,,,,,,,1985,Lampreys (v1),1
 187,A0187,Backpack,,3,Backpack,gray,,,,,,,,,1985,Quick Kick (v1),1
-188,A0188,Backpack,,3,Backpack,dark gray,,,,,,,,,1985,Quick Kick (v1),1
+188,A0188,Backpack,,3,Backpack,dark gray,,,,,,,,,1985,Quick Kick (convention),1
 189,A0189,Samurai Sword,,17,Weapon Sword,silver,,,,,,,,,1985,Quick Kick (v1),1
-190,A0190,Samurai Sword,,17,Weapon Sword,silver (flimsy),,,,,,,,,1985,Quick Kick (v1),1
+190,A0190,Samurai Sword,,17,Weapon Sword,silver,,flimsy,,,,,,,1985,Quick Kick (convention),1
 191,A0191,Nunchuks,,18,Weapon Melee,silver,,,,,,,,,1985,Quick Kick (v1),1
-192,A0192,Nunchuks,,18,Weapon Melee,silver (flimsy),,,,,,,,,1985,Quick Kick (v1),1
+192,A0192,Nunchuks,,18,Weapon Melee,silver,,flimsy,,,,,,,1985,Quick Kick (convention),1
 193,A0193,Backpack Frame,,3,Backpack,silver,,,,,,,,,1985,Ripper (v1),1
 194,A0194,Power Pack,,3,Backpack,silver,,,,,,,,,1985,Ripper (v1),1
 195,A0195,Power Jaws,,21,Weapon Specialized,silver,,,,,,,,,1985,Ripper (v1),1

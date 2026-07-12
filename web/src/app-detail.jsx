@@ -3,6 +3,7 @@
 // so every tick, grade, MOC flag, note, file-card and rebalance PERSISTS.
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
+import { clusterBlueprint, matchedSetSatisfied, bpReq } from '../../shared/completeness.js';
 import { physicalGrade, paintGrade, dmEmpty, DamageMap, GradeBadge } from './damage-map.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
@@ -52,23 +53,86 @@ function figParts(fig) {
 }
 
 // ---- rebalance engine (REAL, against live per-copy data) ----
-function poolOf(bp, copies) {
-  const pool = {}; bp.forEach(([n]) => { pool[n] = copies.reduce((s, c) => s + (c.acc[n] || 0), 0); });
+// Built on the same clusterBlueprint() slots store.js already uses to decide
+// what counts as "whole" (shared/completeness.js) — a group_id is "own any one
+// member satisfies the slot" and a match_key set is ONE combined requirement
+// across 2+ group_id slots. The old version pooled every raw blueprint row
+// independently, so a production-variant option nobody owns (e.g. Duke's
+// "Helmet (with holes)") zeroed out the whole rebalance calc for that figure —
+// see the PartsBin "Rebalance" chip fix, 2026-07-12.
+function buildSlots(bp) {
+  const { solo, plain, matched } = clusterBlueprint(bp);
+  const slots = solo.map(([n, q]) => ({ kind: 'solo', names: [n], qty: q }));
+  plain.forEach((members) => slots.push({ kind: 'plain', names: [...new Set(members.map((m) => m[0]))] }));
+  if (matched.length) slots.push({ kind: 'matched', groups: matched });
+  return slots;
+}
+function poolOf(names, copies) {
+  const pool = {}; names.forEach((n) => { pool[n] = copies.reduce((s, c) => s + (c.acc[n] || 0), 0); });
   return pool;
 }
-function computeTarget(bp, copies, maxWhole, pool) {
-  const target = copies.map(() => ({}));
-  bp.forEach(([n, q]) => {
-    let left = pool[n];
-    copies.forEach((c, i) => { const give = i < maxWhole ? Math.min(q, left) : 0; target[i][n] = give; left -= give; });
-    for (let i = maxWhole; i < copies.length && left > 0; i++) { const give = Math.min(q, left); target[i][n] += give; left -= give; }
-    if (left > 0 && copies.length) target[copies.length - 1][n] += left; // conserve any surplus
+// every match_key value shared across the matched slot's groups, ranked by how
+// many copies it could complete (bounded by whichever group has the least of it)
+function matchedCapacities(slot, pool) {
+  const keys = new Set();
+  slot.groups.forEach((g) => g.forEach((m) => { if (m[5] != null) keys.add(m[5]); }));
+  const caps = [];
+  keys.forEach((k) => {
+    let min = Infinity;
+    slot.groups.forEach((g) => {
+      const have = g.filter((m) => m[5] === k).reduce((s, m) => s + (pool[m[0]] || 0), 0);
+      min = Math.min(min, have);
+    });
+    if (min !== Infinity) caps.push({ key: k, cap: min });
   });
-  return target;
+  caps.sort((a, b) => b.cap - a.cap);
+  return caps;
 }
-function diffMoves(bp, copies, target) {
+// how many additional whole copies this one slot alone could supply, capped at `cap`
+function slotCapacity(slot, pool, cap) {
+  if (slot.kind === 'solo') return Math.min(cap, Math.floor((pool[slot.names[0]] || 0) / slot.qty));
+  if (slot.kind === 'plain') return Math.min(cap, slot.names.reduce((s, n) => s + (pool[n] || 0), 0));
+  const caps = matchedCapacities(slot, pool);
+  return Math.min(cap, caps.length ? caps[0].cap : 0);
+}
+function slotSatisfiedOnCopy(slot, acc) {
+  if (slot.kind === 'solo') return (acc[slot.names[0]] || 0) >= slot.qty;
+  if (slot.kind === 'plain') return slot.names.some((n) => (acc[n] || 0) > 0);
+  return matchedSetSatisfied(slot.groups, acc);
+}
+// classic per-name redistribution for a solo slot: the first `maxWhole` copies
+// get up to `qty` units each, everyone else donates surplus, any leftover
+// conserves onto the last copy.
+function applySoloTarget(name, qty, copies, maxWhole, pool, target) {
+  let left = pool[name] || 0;
+  copies.forEach((c, i) => { const give = i < maxWhole ? Math.min(qty, left) : 0; target[i][name] = give; left -= give; });
+  for (let i = maxWhole; i < copies.length && left > 0; i++) { const give = Math.min(qty, left); target[i][name] = (target[i][name] || 0) + give; left -= give; }
+  if (left > 0 && copies.length) target[copies.length - 1][name] = (target[copies.length - 1][name] || 0) + left;
+}
+// "own any one of these names" redistribution: any copy in `receivers` lacking
+// a member gets one donated from wherever there's a spare unit. Copies in
+// `keepSet` that already have a member keep exactly one; every other copy can
+// be stripped bare (it isn't being targeted to end up whole via this slot).
+function applyPoolTarget(names, copies, keepSet, receivers, target) {
+  copies.forEach((c, i) => names.forEach((n) => { if (target[i][n] == null) target[i][n] = c.acc[n] || 0; }));
+  const has = (i) => names.some((n) => target[i][n] > 0);
+  const donors = [];
+  copies.forEach((c, j) => {
+    let keepOne = keepSet.has(j) && has(j);
+    names.forEach((n) => {
+      let qty = target[j][n];
+      while (qty > 0) { if (keepOne) { keepOne = false; qty--; continue; } donors.push({ j, n }); qty--; }
+    });
+  });
+  receivers.forEach((i) => {
+    if (has(i)) return;
+    const d = donors.shift(); if (!d) return;
+    target[d.j][d.n] -= 1; target[i][d.n] = (target[i][d.n] || 0) + 1;
+  });
+}
+function diffMoves(names, copies, target) {
   const moves = [];
-  bp.forEach(([n]) => {
+  names.forEach((n) => {
     const donors = [], receivers = [];
     copies.forEach((c, i) => {
       const cur = c.acc[n] || 0, tgt = target[i][n] || 0;
@@ -92,7 +156,7 @@ function figState(fig) {
   const bp = fig.blueprint || (fig._cf && fig._cf.blueprint) || [];
   const copies = sum ? sum.copies : [];
   const owned = copies.length;
-  const reqPer = bp.reduce((s, a) => s + a[1], 0);
+  const reqPer = bpReq(bp);
   const instances = copies.map(c => ({
     id: c.id, no: c.no, own: c.own, req: c.req, pct: c.pct, whole: c.whole, missing: c.missing, moc: !!c.moc,
     have: c.moc ? bp.map(([, q]) => q) : bp.map(([n, q]) => Math.min(c.acc[n] || 0, q)),
@@ -104,36 +168,71 @@ function figState(fig) {
   const loose = copies.filter(c => !c.moc);
   const mocWhole = owned - loose.length;
   const looseWhole = loose.filter(c => c.whole).length;
-  const pool = poolOf(bp, loose);
-  const optimalLoose = bp.length === 0 ? loose.length
-    : (loose.length ? Math.min(loose.length, ...bp.map(([n, q]) => Math.floor(pool[n] / q))) : 0);
+
+  const slots = buildSlots(bp);
+  const allNames = [...new Set(bp.map(([n]) => n))]; // every row, incl. non-retail + unused group members — for pooling + the write-back below
+  const pool = poolOf(allNames, loose);
+  const optimalLoose = slots.length === 0 ? loose.length
+    : (loose.length ? Math.min(loose.length, ...slots.map((s) => slotCapacity(s, pool, loose.length))) : 0);
   const optimalWhole = optimalLoose + mocWhole;
-  const target = computeTarget(bp, loose, optimalLoose, pool);
-  const moves = optimalLoose > looseWhole ? diffMoves(bp, loose, target) : [];
+
+  const target = loose.map(() => ({}));
+  if (loose.length) {
+    const keep = new Set(); const receivers = [];
+    for (let i = 0; i < optimalLoose && i < loose.length; i++) { keep.add(i); receivers.push(i); }
+    slots.forEach((s) => {
+      if (s.kind === 'solo') applySoloTarget(s.names[0], s.qty, loose, optimalLoose, pool, target);
+      else if (s.kind === 'plain') applyPoolTarget(s.names, loose, keep, receivers, target);
+      else {
+        const best = matchedCapacities(s, pool)[0];
+        if (best) s.groups.forEach((g) => {
+          const names = g.filter((m) => m[5] === best.key).map((m) => m[0]);
+          applyPoolTarget(names, loose, keep, receivers, target);
+        });
+      }
+    });
+    // non-retail rows and any group member that wasn't this figure's chosen
+    // colorway/variant never move — carry them over untouched so applyRebalance's
+    // write-back below doesn't wipe ownership it never meant to touch
+    allNames.forEach((n) => loose.forEach((c, i) => { if (target[i][n] == null) target[i][n] = c.acc[n] || 0; }));
+  }
+  const moves = optimalLoose > looseWhole ? diffMoves(allNames, loose, target) : [];
 
   // ---- best-partial: when NO new whole copy is possible, consolidate scattered
   // parts onto one loose copy to make it as complete as it can be (e.g. 3/6 → 5/6).
   // Only offered when whole-copy `moves` is empty — completing a copy always wins. ----
   let partial = null;
-  if (moves.length === 0 && loose.length > 1 && bp.length) {
-    const qOf = Object.fromEntries(bp);
-    const includable = bp.filter(([n, q]) => pool[n] >= q).map(([n]) => n); // parts that fit FULLY on one copy
+  if (moves.length === 0 && loose.length > 1 && slots.length) {
+    const includable = slots.filter((s) => slotCapacity(s, pool, 1) >= 1); // slots that fit FULLY on one copy
     const maxPartial = includable.length;
-    const partsHad = (c) => includable.filter(n => (c.acc[n] || 0) >= qOf[n]).length;
+    const partsHad = (c) => includable.filter((s) => slotSatisfiedOnCopy(s, c.acc)).length;
     let targetIdx = 0, best = -1;
-    loose.forEach((c, i) => { const s = partsHad(c); if (s > best) { best = s; targetIdx = i; } }); // fewest moves
+    loose.forEach((c, i) => { const n = partsHad(c); if (n > best) { best = n; targetIdx = i; } }); // fewest moves
     if (maxPartial > best) {
-      const ptarget = loose.map(c => { const o = {}; bp.forEach(([n]) => o[n] = c.acc[n] || 0); return o; });
-      includable.forEach(n => {
-        let need = qOf[n] - (ptarget[targetIdx][n] || 0);
-        for (let i = 0; i < loose.length && need > 0; i++) {
-          if (i === targetIdx) continue;
-          const give = Math.min(need, ptarget[i][n] || 0);
-          ptarget[i][n] -= give; ptarget[targetIdx][n] += give; need -= give;
+      const ptarget = loose.map(c => ({ ...c.acc }));
+      const vcopies = ptarget.map((acc) => ({ acc }));
+      includable.forEach((s) => {
+        if (slotSatisfiedOnCopy(s, ptarget[targetIdx])) return;
+        if (s.kind === 'solo') {
+          const [n] = s.names, q = s.qty;
+          let need = q - (ptarget[targetIdx][n] || 0);
+          for (let i = 0; i < loose.length && need > 0; i++) {
+            if (i === targetIdx) continue;
+            const give = Math.min(need, ptarget[i][n] || 0);
+            ptarget[i][n] -= give; ptarget[targetIdx][n] = (ptarget[targetIdx][n] || 0) + give; need -= give;
+          }
+        } else if (s.kind === 'plain') {
+          applyPoolTarget(s.names, vcopies, new Set(), [targetIdx], ptarget);
+        } else {
+          const bestKey = matchedCapacities(s, pool)[0];
+          if (bestKey) s.groups.forEach((g) => {
+            const names = g.filter((m) => m[5] === bestKey.key).map((m) => m[0]);
+            applyPoolTarget(names, vcopies, new Set(), [targetIdx], ptarget);
+          });
         }
       });
-      const pmoves = diffMoves(bp, loose, ptarget);
-      if (pmoves.length) partial = { moves: pmoves, target: ptarget, from: best, to: maxPartial, reqCount: bp.length, targetNo: loose[targetIdx].no };
+      const pmoves = diffMoves(allNames, loose, ptarget);
+      if (pmoves.length) partial = { moves: pmoves, target: ptarget, from: best, to: maxPartial, reqCount: slots.length, targetNo: loose[targetIdx].no };
     }
   }
 

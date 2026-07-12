@@ -93,6 +93,18 @@ const GROUPS = [
   // three interchangeable Laser Gun molds (rigid plastic / soft plastic
   // opened clip / soft plastic closed clip); own any one for completion.
   { extGroupId: null, figure: 'T.A.R.G.A.T. ', accessories: ['A0657', 'A0658', 'A0659'] }, // Laser Gun rigid/soft-open/soft-closed
+  // Roadblock (1984, v1, F102 -> catalog id 60): 'Roadblock' also matches 6
+  // later versions by code_name, but the lowest id (60, v1) is the one with
+  // these accessories, same pattern as Duke/Recondo/Spirit above. The CSV's
+  // own group_id column (ext 8410/8411) cross-pairs MG+Tripod by color
+  // instead of slotting each item separately — not used here, same reasoning
+  // as Firefly/Recondo/Spirit. Two colorways, green (variant A) and dark
+  // green (variant B) — the M-2X Heavy Machine Gun and Tripod each ship in
+  // the matching color, tied via match_key (set separately, see
+  // set-match-key.mjs) rather than by this grouping alone. Owner-confirmed
+  // 2026-07-12.
+  { extGroupId: null, figure: 'Roadblock', accessories: ['A0101', 'A0102'] }, // M-2X Heavy Machine Gun green/dark green
+  { extGroupId: null, figure: 'Roadblock', accessories: ['A0103', 'A0104'] }, // Tripod green/dark green
 ];
 
 // Same label rule as the locked reference (subgroup-wire-v2.jsx groupLabel):

@@ -214,6 +214,7 @@
   .idveh { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .3px; color: var(--ink); background: var(--paper); border: 1.5px solid var(--ink); padding: 2px 7px; box-shadow: 1.5px 1.5px 0 var(--line-soft); }
   span.idveh b { font-family: var(--font-display); font-weight: 700; font-size: 8px; letter-spacing: .6px; color: var(--ink-soft); }
   .idveh--modal { margin: 0; }
+  .idveh--inline { margin: 0 0 0 8px; vertical-align: 1px; }
   .inv-owned { font-family: var(--font-display); font-weight: 700; font-size: 16px; }
   .inv-stock { display: flex; align-items: center; gap: 8px; min-width: 0; }
   .inv-stock__n { font-size: 11px; font-weight: 700; white-space: nowrap; color: var(--ink); flex: none; }
@@ -904,9 +905,13 @@
   .pb-noteline { font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft); margin-top: 8px; display: flex; gap: 7px; align-items: baseline; line-height: 1.4; }
   .pb-noteline span { color: var(--ink); }
 
+  .pb-dmgpanel { margin-top: 10px; }
+
   .pb-actions { display: flex; gap: 6px; align-items: center; }
   .pb-btn { font-family: var(--font-display); font-weight: 700; font-size: 12px; letter-spacing: 1px; padding: 6px 10px; cursor: pointer; border: 1.5px solid var(--ink); background: var(--paper); color: var(--ink); }
   .pb-btn--ghost { width: 30px; padding: 6px 0; }
+  .pb-btn--dmg.has-damage { color: var(--damage); border-color: var(--damage); }
+  .pb-btn--dmg.is-on { background: var(--damage); color: #fff; border-color: var(--damage); }
 
   /* add-part form fields (reuse .modal shell) */
   .fld { display: flex; flex-direction: column; gap: 6px; }

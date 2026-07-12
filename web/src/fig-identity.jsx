@@ -26,10 +26,10 @@ export function VariantBadge({ letter, count, onClick, title }) {
   );
 }
 
-export function VehicleTag({ vehicle, modal }) {
+export function VehicleTag({ vehicle, modal, inline }) {
   if (!vehicle) return null;
   return (
-    <span className={"idveh" + (modal ? " idveh--modal" : "")} title={"Vehicle driver — packaged with the " + vehicle}>
+    <span className={"idveh" + (modal ? " idveh--modal" : "") + (inline ? " idveh--inline" : "")} title={"Vehicle driver — packaged with the " + vehicle}>
       <b>VEHICLE</b> {vehicle}
     </span>
   );

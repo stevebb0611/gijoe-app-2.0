@@ -260,6 +260,16 @@ export function removePart(accessoryId) {
   db.prepare('DELETE FROM accessory_inventory WHERE accessory_id = ?').run(accessoryId);
 }
 
+// Direct write for loose-stock damage — e.g. sorting the bin turns up a
+// broken part, with no instance/swap involved. Same [0, quantity_owned]
+// clamp as everywhere else units_damaged is set.
+export function setPartDamage(accessoryId, units) {
+  const row = getBinRow.get(accessoryId);
+  if (!row) return false;
+  setBinDamaged.run(Math.max(0, Math.min(units, row.quantity_owned)), accessoryId);
+  return true;
+}
+
 // Pulls one loose unit from the bin onto an instance. Prefers clean stock;
 // only reaches for damaged stock if that's all the bin has, in which case
 // the damage status carries over onto the instance rather than silently

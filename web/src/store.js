@@ -143,6 +143,10 @@ export const JoeStore = {
       api('PATCH', '/api/parts-bin/' + id, { delta });
       refresh(); emit();
     },
+    setPartDamage(id, units) {
+      api('PATCH', '/api/parts-bin/' + id + '/damage', { units });
+      refresh(); emit();
+    },
     removePart(id) {
       api('DELETE', '/api/parts-bin/' + id);
       refresh(); emit();

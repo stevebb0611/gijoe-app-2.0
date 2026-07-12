@@ -54,9 +54,8 @@ function Row({ fig, selId, openIds, onToggle, onOpen }) {
               onClick={() => ghost ? onOpen(fig.id, null) : onToggle(fig.id)}>
         <span className="inv-thumb" data-tag={ghost ? "—" : ""}></span>
         <span className="inv-name">
-          <b>{fig.name}<VersionChip version={fig.version} /><VariantBadge count={fig.variants} /></b>
+          <b>{fig.name}<VersionChip version={fig.version} /><VariantBadge count={fig.variants} /><VehicleTag vehicle={fig.vehicle} inline /></b>
           <i>{fig.specialty}</i>
-          <VehicleTag vehicle={fig.vehicle} />
         </span>
         <FactionTag faction={fig.faction} mini />
         <span className="inv-owned">{ghost ? "—" : "×" + fig.owned}</span>
