@@ -198,7 +198,7 @@ An audit of `gijoe_db_figures_2.0.csv` for code names shared by multiple `full_n
 
 | Code name | Figures | Variants found | Likely correct | Notes |
 |---|---|---|---|---|
-| Flint | F125, F248, F389, F597, F701 | Faireborn / Faireborne / Fairborne | Faireborn | Three spellings; F701 has no name at all |
+| Flint | F125, F248, F389, F597, F701 | Faireborn / Faireborne / Fairborne | **not a typo — owner-confirmed** | ✅ Checked (July 2026): owner confirmed all three spellings are real, era-correct file-card text, not a typo — 1985 v1 (F125) + 1988 v2 (F248) = "Faireborn, Dashiell R.", 1991 v3 (F389) = "Faireborne, Dashiell R.", 1994 v4 (F597) = "Fairborne, Dashiell R.". No `full_name` correction needed; F125/F248/F389/F597 already carry the right values in both the CSV and the live DB. **Two unrelated bugs surfaced while checking:** (1) F125's `release_context` is wrongly `"1992 Convention"` despite `series_id`=5 (1985/Series 4, a real retail release) — should be `"Retail"`. (2) **F701 (the real 1992 Convention-exclusive Flint) is missing from the live DB entirely** — it shares `version="1"` with F125, and `server/seed.mjs`'s dedup key (`code_name\|version\|character_key`, `seed.mjs:86`) silently drops the higher-id row on rebuild, same bug class as #21's Jinx incident and already fixed once for Quick Kick (`server/split-quick-kick-convention.mjs`). Owner deferred fixing this — parked as a bigger project, see the new pattern note below the table. F701's `full_name`/`display_name`/accessories are blank in the source CSV and need owner input to reconstruct before it can be restored. |
 | General Flagg | F434, F508 | "James Longstreet" vs "James L." | James Longstreet | Middle name abbreviated on one card |
 | Gung-Ho | F067, F203, F436, F514, F515, F702 | La Fitte / LaFitte; Etienne / Ettiene | LaFitte, Etienne R. | Spacing + spelling vary; F702 has no name |
 | Heavy Duty | F392, F519 | Lamont vs Lemont | Lamont | One-letter typo |
@@ -210,6 +210,8 @@ An audit of `gijoe_db_figures_2.0.csv` for code names shared by multiple `full_n
 | Sci-Fi | F168, F408, F563, F616 | Fine vs Pine | Pine | Likely OCR/scan error on F168 |
 | Snake-Eyes | F565, F620 | "Classified" vs "Top Secret" | Both intentional | Name obfuscation varies by card; same character |
 | Storm Shadow | F107, F280, F456, F457, F625 | "Classified" → "Arashikage, Thomas S." | Both intentional | Name revealed mid-line; same character |
+
+**🔭 Parked (July 2026) — systemic mainline/convention version collision.** Investigating Flint's F701 gap turned up the same `(code_name, version)` dedup collision across roughly 20+ other code names with a 700-block convention/mail-in row: Falcon, Fighter Pilot, Gung-Ho, Heavy Metal, Ice Viper, Motor Viper, Outback, Python Officer, Python Tele-Viper, Roadblock, Rumbler, Shortfuse, Skystriker, Snake Eyes, Snow Serpent, Stalker, Starduster, Steeler, Tripwire, Undercover Scarlett, Zarana — each has a low-id "mainline" row and a 700-block row sharing the same `version` (some 3–4-way, e.g. Skystriker/Starduster), so `seed.mjs`'s dedup silently drops all but the lowest-id row on every reseed. Jinx (#21) and Quick Kick (`server/split-quick-kick-convention.mjs`) are the two cases already fixed one-off; the rest are un-audited. **Owner decision (July 2026): too big to tackle right now — parked, not started.** When revisited: audit each pair/group against a real reference before restoring (some may be genuine duplicate CSV rows rather than real distinct releases, per the Quick Kick precedent), fix the miscategorized `release_context` on the surviving mainline row where present, and blank the colliding `version` on the convention row (or otherwise disambiguate the dedup key) so a from-scratch reseed stops dropping them.
 
 ---
 
@@ -231,3 +233,17 @@ The vehicle-driver tag (`is_vehicle_driver` + `vehicle`, 139 figures — see `TA
 `gijoe_collection.db` was in SQLite's default rollback-journal mode (`PRAGMA journal_mode` = `delete`), which needs a brief exclusive lock to commit a write — editing `quantity_required` in TablePlus and hitting Cmd+S showed no blocking error, but the write never landed while the server's `better-sqlite3` connection was live.
 
 **Fixed: switched to WAL journal mode.** Applied directly to the live db file (`PRAGMA journal_mode=WAL;`, confirmed via `sqlite3 gijoe_collection.db "PRAGMA journal_mode;"` → `wal`) without needing to restart the already-running server — WAL is a file-level setting, and the live server kept serving (`/api/catalog` → 200) straight through the switch. Also added `db.pragma('journal_mode = WAL')` to `server/db.js` so any fresh connection (new deploy, fresh clone) sets it too; harmless to re-run since WAL is sticky on the file. TablePlus and the server can now read/write the same file concurrently without lock contention.
+
+---
+
+## 21. Live DB has no backup or version control — data loss risk ⚠️ HIGH PRIORITY (flagged July 2026)
+
+`gijoe_collection.db` (repo root) is the actual live/authoritative state of the whole collection — every UI write (Parts Bin damage tracking, instance/accessory edits, notes) plus every one-off migration script (`set-category-bonus.mjs`, `set-accessory-context.mjs`, `add-figure.mjs`, `set-match-key.mjs`, and direct SQL edits like the 2026-07-12 Psyche-Out `.45 Assault Pistol` recolor) lands there directly.
+
+**The problem:** `*.db` is gitignored (`.gitignore:7`) and `git log` shows zero commits ever touching the file — none of this cumulative work is version-controlled or backed up. It exists only on this one machine's disk.
+
+The original seed CSVs (`gijoe_db_accessories.csv`, `gijoe_db_figures_2.0.csv`, `gijoe_db_figures_accessories_group_id.csv`, `gijoe_db_figures_coo.csv`) that `server/seed.mjs` reads to rebuild the DB from scratch are a day-one snapshot that's only been manually re-synced a handful of times (COO tagging, the Quick Kick/rebalance commit, the pistol-color fix) — most DB-only migrations never made it back into them, so the two drift further apart every session. There's also a stale, **unused** `seed/` copy of these CSVs (`seed.mjs`'s `ROOT` resolves to the repo root, not `seed/`) that has already diverged from the real seed files — a landmine if anyone later assumes it's current.
+
+**Net effect: there is no single up-to-date, human-readable "master document."** The DB is the master, but it's an unbacked-up binary file; the CSVs are stale. The Tweaks & Admin **"Export catalog (.xlsx)"** button (`server/export-xlsx.js`) is the closest thing to a live, readable snapshot — it reads straight from the DB on demand — but it produces a report, not a re-importable seed source.
+
+**Owner decision (July 2026): flagged high priority, revisit soon — not started.** Options on the table when revisited: (a) un-gitignore and commit the `.db` file directly (simple, but binary diffs aren't readable); (b) build a DB→CSV export script so the seed CSVs become regenerable and stay commit-able as readable history; (c) simple periodic file backup as a stopgap. Also worth deleting or reconciling the stale `seed/` folder while this is being sorted out.

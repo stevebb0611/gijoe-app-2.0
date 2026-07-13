@@ -10,7 +10,7 @@
 import ExcelJS from 'exceljs';
 import { buildCatalog } from './catalog.js';
 import { getState } from './instances.js';
-import { instWhole } from '../shared/completeness.js';
+import { instWhole, bpForVariant } from '../shared/completeness.js';
 
 // Excel's own built-in "Good"/"Neutral"/"Bad" conditional-format colors, plus a
 // neutral gray for "not owned" / non-retail bonus rows (which aren't bad, just
@@ -83,7 +83,10 @@ function buildFiguresSheet(wb, catalog, instancesByFigure) {
   for (const fig of catalog) {
     const insts = instancesByFigure.get(fig.id) || [];
     const bp = fig.blueprint || [];
-    const wholeCount = insts.filter((inst) => inst.moc || instWhole(bp, inst.acc || {})).length;
+    // Each copy only owes accessories scoped to its own production variant
+    // (e.g. Blocker's v1 B-only Visor) — see bpForVariant + ACCESSORY_GROUPS.md
+    // "variant_id".
+    const wholeCount = insts.filter((inst) => inst.moc || instWhole(bpForVariant(bp, inst.variant), inst.acc || {})).length;
     const status = insts.length === 0 ? 'unowned' : (wholeCount > 0 ? 'complete' : 'incomplete');
 
     const cooVals = [...new Set(insts.map((i) => i.coo).filter(Boolean))];
@@ -153,7 +156,9 @@ function buildAccessoriesSheet(wb, catalog, instancesByFigure) {
 
     insts.forEach((inst, idx) => {
       const acc = inst.acc || {};
-      for (const [name, , , groupId, releaseContext, matchKey] of bp) {
+      // Only list accessories this copy's own production variant actually
+      // calls for — see bpForVariant + ACCESSORY_GROUPS.md "variant_id".
+      for (const [name, , , groupId, releaseContext, matchKey] of bpForVariant(bp, inst.variant)) {
         const context = releaseContext || 'retail';
         const owned = inst.moc || (acc[name] || 0) > 0;
         const row = ws.addRow({

@@ -3,7 +3,7 @@
 // so every tick, grade, MOC flag, note, file-card and rebalance PERSISTS.
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
-import { clusterBlueprint, matchedSetSatisfied, bpReq } from '../../shared/completeness.js';
+import { clusterBlueprint, matchedSetSatisfied, bpReq, bpForVariant } from '../../shared/completeness.js';
 import { physicalGrade, paintGrade, dmEmpty, DamageMap, GradeBadge } from './damage-map.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
@@ -14,12 +14,6 @@ import { FileCardRow, FileCardTell } from './filecards.jsx';
 const INV_CAT = JoeData.CAT || [];
 const INV_ERAS = {}; // was window.JOE_ERAS from the retired catalog-data.js — always {}
 const INV_CAT_BY_ID = new Map(INV_CAT.map(f => [f.id, f]));
-
-// Delete-copy dialog layout — trying a 4th button ("...Selected Accessories")
-// alongside the original 3. Flip to 3 to revert to [Remove Figure Only] /
-// [Remove Figure and All Accessories] / [Cancel] if the 4-button version
-// doesn't earn its place; every handler below already supports both.
-const DELETE_DIALOG_BUTTONS = 4; // 3 | 4
 
 // ---------------------------------------------------------------------------
 // View-model: merge a catalog entry with its current ownership.
@@ -40,6 +34,7 @@ function fvm(cf) {
     coo: cf.coo || [],
     fileCards: cf.fileCards || [],
     specialty: cf.role || '', variant: cf.role || '', vehicle: cf.vehicle || null,
+    image: cf.image || null,
     owned, acc, blueprint: bp,
     _cf: cf, _sum: sum,
   };
@@ -154,13 +149,25 @@ function diffMoves(names, copies, target) {
 function figState(fig) {
   const sum = fig._sum || JoeData.figureSummary(fig.id);
   const bp = fig.blueprint || (fig._cf && fig._cf.blueprint) || [];
+  // The rebalance/pooling machinery below assumes every loose copy owes the
+  // SAME blueprint — true for group_id/match_key/release_context, but not for
+  // a variant-scoped row (ACCESSORY_GROUPS.md "variant_id"): a v1 B-only Visor
+  // can't be "moved onto" a v1 A copy, and pooling it in would corrupt the
+  // optimal-whole-copy math the same way a shared item across mixed variants
+  // would. Simplest correct fix: variant-scoped rows sit out of rebalance
+  // entirely (per-copy completeness above still requires/shows them correctly
+  // via bpForVariant — this only affects the ⚖ suggestion engine).
+  const rebalanceBp = bp.filter((row) => !row[7]);
   const copies = sum ? sum.copies : [];
   const owned = copies.length;
   const reqPer = bpReq(bp);
-  const instances = copies.map(c => ({
-    id: c.id, no: c.no, own: c.own, req: c.req, pct: c.pct, whole: c.whole, missing: c.missing, moc: !!c.moc,
-    have: c.moc ? bp.map(([, q]) => q) : bp.map(([n, q]) => Math.min(c.acc[n] || 0, q)),
-  }));
+  const instances = copies.map(c => {
+    const bpv = bpForVariant(bp, c.variant);
+    return {
+      id: c.id, no: c.no, own: c.own, req: c.req, pct: c.pct, whole: c.whole, missing: c.missing, moc: !!c.moc,
+      have: c.moc ? bpv.map(([, q]) => q) : bpv.map(([n, q]) => Math.min(c.acc[n] || 0, q)),
+    };
+  });
   const currentWhole = instances.filter(i => i.whole).length;
 
   // ---- rebalance runs ONLY over loose (non-MOC) copies — sealed parts can't move,
@@ -169,8 +176,8 @@ function figState(fig) {
   const mocWhole = owned - loose.length;
   const looseWhole = loose.filter(c => c.whole).length;
 
-  const slots = buildSlots(bp);
-  const allNames = [...new Set(bp.map(([n]) => n))]; // every row, incl. non-retail + unused group members — for pooling + the write-back below
+  const slots = buildSlots(rebalanceBp);
+  const allNames = [...new Set(rebalanceBp.map(([n]) => n))]; // every row, incl. non-retail + unused group members — for pooling + the write-back below
   const pool = poolOf(allNames, loose);
   const optimalLoose = slots.length === 0 ? loose.length
     : (loose.length ? Math.min(loose.length, ...slots.map((s) => slotCapacity(s, pool, loose.length))) : 0);
@@ -237,7 +244,7 @@ function figState(fig) {
   }
 
   return { owned, reqPer, instances, currentWhole, optimalWhole,
-    completeNow: currentWhole > 0, completable: optimalWhole > 0, moves, target, partial, _copies: loose, _bp: bp };
+    completeNow: currentWhole > 0, completable: optimalWhole > 0, moves, target, partial, _copies: loose, _bp: rebalanceBp };
 }
 function applyRebalance(catalogId, mode) {
   const cf = INV_CAT_BY_ID.get(catalogId); if (!cf) return;
@@ -306,7 +313,15 @@ function CompBar({ pct, height = 8 }) {
   const done = pct === 100;
   return <div className="wf-bar" style={{ height }}><div className={"wf-bar__fill" + (done ? " is-done" : "")} style={{ width: Math.max(pct, 2) + "%" }}></div></div>;
 }
-function PhotoSlot({ className }) {
+function PhotoSlot({ className, src }) {
+  const [failed, setFailed] = React.useState(false);
+  if (src && !failed) {
+    return (
+      <div className={"wf-photo " + (className || "")}>
+        <img className="wf-photo__img" src={src} alt="" onError={() => setFailed(true)} />
+      </div>
+    );
+  }
   return <div className={"wf-photo " + (className || "")}><span className="wf-photo__tag">FIG. PHOTO</span></div>;
 }
 function StockBar({ pct }) {
@@ -428,7 +443,10 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const moc = !!raw.moc;
   const filecard = raw.filecard || { onFile: false, fileCardId: null };
   const marks = (raw.marks && raw.marks.condition) ? raw.marks : dmEmpty(fig.body || 'male');
-  const bp = fig.blueprint;
+  // Scope the checklist to this copy's own production variant — a v1 A copy
+  // shouldn't be asked (or able) to check off a v1 B-only accessory. See
+  // bpForVariant (shared/completeness.js) + ACCESSORY_GROUPS.md "variant_id".
+  const bp = bpForVariant(fig.blueprint, cur ? cur.variant : null);
   const ordered = orderedBlueprint(bp);
   const accDamage = raw.accDamage || {};
   const ownedAcc = bp.filter(([n]) => ((raw.acc && raw.acc[n]) || 0) > 0);
@@ -452,18 +470,14 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
     const pg = physicalGrade(val), pt = paintGrade(val);
     JoeStore.updateInstance(cur.id, { marks: val, phys: pg.zones ? pg.grade : null, paint: pt.zones ? pt.grade : null });
   };
-  // ---- delete sequence (see DELETE_DIALOG_BUTTONS) ----
-  // 3-button: [Remove Figure Only] [Remove Figure and All Accessories] [Cancel].
-  // "Remove Figure Only" opens a secondary checklist (only when the copy has
-  // accessories on file) so the owner can choose which pieces move to the
-  // Parts Bin vs. get discarded, instead of an all-or-nothing pick.
-  // 4-button: adds [Remove Figure and Selected Accessories] between them —
-  // "Remove Figure Only" becomes a one-click keep-everything action, and the
-  // checklist (same component, opposite default) moves to the new button,
-  // framed as picking which pieces to *discard* rather than which to *keep*.
+  // ---- delete sequence ----
+  // [Remove Figure Only] [Remove Figure and Selected Accessories] [Remove Figure
+  // and All Accessories] [Cancel]. "Remove Figure Only" is a one-click
+  // keep-everything action; "...Selected Accessories" opens a checklist
+  // (only when the copy has accessories on file) framed as picking which
+  // pieces to *discard* — unchecked pieces move to the Parts Bin.
   const [delStep, setDelStep] = React.useState(null); // null | 'confirm' | 'pick'
-  const [keepSel, setKeepSel] = React.useState({}); // name -> keep-in-Parts-Bin (true) regardless of which button opened the picker
-  const [pickMode, setPickMode] = React.useState('keep'); // 'keep' | 'discard' — only affects the checklist's labels/checkbox polarity
+  const [keepSel, setKeepSel] = React.useState({}); // name -> keep-in-Parts-Bin (true)
   const keepable = bp.map(([n, q]) => [n, Math.min((raw.acc && raw.acc[n]) || 0, q)]).filter(([, o]) => o > 0);
 
   const finishRemove = (deposit) => {
@@ -473,20 +487,12 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
     const rest = copies.filter(c => c.id !== cur.id);
     if (rest.length) setCurId(rest[0].id); else onClose();
   };
-  const openPicker = (mode) => {
-    setKeepSel(Object.fromEntries(keepable.map(([n]) => [n, true]))); // default: keep everything either way
-    setPickMode(mode);
-    setDelStep('pick');
-  };
   const removeAll = () => finishRemove([]);
-  const removeKeepAll = () => finishRemove(keepable); // 4-button "Remove Figure Only" — no picker, keeps every piece
-  const removeOnly = () => { // 3-button "Remove Figure Only"
+  const removeKeepAll = () => finishRemove(keepable); // "Remove Figure Only" — no picker, keeps every piece
+  const removeSelected = () => { // "Remove Figure and Selected Accessories"
     if (!keepable.length) { finishRemove([]); return; }
-    openPicker('keep');
-  };
-  const removeSelected = () => { // 4-button "Remove Figure and Selected Accessories"
-    if (!keepable.length) { finishRemove([]); return; }
-    openPicker('discard');
+    setKeepSel(Object.fromEntries(keepable.map(([n]) => [n, true]))); // default: keep everything
+    setDelStep('pick');
   };
   const confirmPick = () => finishRemove(keepable.filter(([n]) => keepSel[n]));
   const toggleKeep = (n) => setKeepSel(s => ({ ...s, [n]: !s[n] }));
@@ -505,7 +511,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
         <div className="inv-modal">
           <button className="inv-modal__x" onClick={onClose}>✕</button>
           <div className="inv-modal__l">
-            <PhotoSlot className="inv-modal__photo" />
+            <PhotoSlot className="inv-modal__photo" src={fig.image} />
             <FactionTag faction={fig.faction} />
             <div className="inv-modal__id">
               <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /></div>
@@ -583,7 +589,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
             {cardHeader}
             <div className="inv-front-body">
               <div className="inv-modal__l">
-                <PhotoSlot className="inv-modal__photo" />
+                <PhotoSlot className="inv-modal__photo" src={fig.image} />
                 <FactionTag faction={fig.faction} />
                 <div className="inv-modal__id">
                   <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /></div>
@@ -760,23 +766,14 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                   : 'This copy has no accessories on file.'}
               </div>
               <div className="inv-confirm__btns">
-                {DELETE_DIALOG_BUTTONS === 4 ? (
-                  <React.Fragment>
-                    <button className="inv-confirm__btn" onClick={removeKeepAll}>
-                      REMOVE FIGURE ONLY
-                      {keepable.length ? <i>all accessories move to the Parts Bin</i> : null}
-                    </button>
-                    <button className="inv-confirm__btn inv-confirm__btn--warn" onClick={removeSelected}>
-                      REMOVE FIGURE AND SELECTED ACCESSORIES
-                      {keepable.length ? <i>choose which accessories to discard</i> : null}
-                    </button>
-                  </React.Fragment>
-                ) : (
-                  <button className="inv-confirm__btn" onClick={removeOnly}>
-                    REMOVE FIGURE ONLY
-                    {keepable.length ? <i>accessories move to the Parts Bin</i> : null}
-                  </button>
-                )}
+                <button className="inv-confirm__btn" onClick={removeKeepAll}>
+                  REMOVE FIGURE ONLY
+                  {keepable.length ? <i>all accessories move to the Parts Bin</i> : null}
+                </button>
+                <button className="inv-confirm__btn inv-confirm__btn--warn" onClick={removeSelected}>
+                  REMOVE FIGURE AND SELECTED ACCESSORIES
+                  {keepable.length ? <i>choose which accessories to discard</i> : null}
+                </button>
                 <button className="inv-confirm__btn inv-confirm__btn--danger" onClick={removeAll}>
                   REMOVE FIGURE AND ALL ACCESSORIES
                   {keepable.length ? <i>everything is discarded</i> : null}
@@ -786,23 +783,19 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
             </div>
           ) : (
             <div className="inv-confirm">
-              <div className="inv-confirm__hd">{pickMode === 'discard' ? 'Discard which accessories?' : 'Keep which accessories?'}</div>
+              <div className="inv-confirm__hd">Discard which accessories?</div>
               <div className="inv-confirm__sub">
-                {pickMode === 'discard'
-                  ? 'Checked pieces are discarded with the figure; unchecked pieces move to the Parts Bin as loose parts.'
-                  : 'Checked pieces move to the Parts Bin as loose parts; unchecked pieces are discarded with the figure.'}
+                Checked pieces are discarded with the figure; unchecked pieces move to the Parts Bin as loose parts.
               </div>
               <div className="inv-confirm__list">
                 {keepable.map(([name, qty]) => {
-                  const on = pickMode === 'discard' ? !keepSel[name] : keepSel[name];
+                  const on = !keepSel[name];
                   return (
                     <div key={name} className="inv-confirm__row">
                       <span className="acc__name">{name}{qty > 1 ? <i> ×{qty}</i> : null}</span>
                       <button type="button" className={"acc__box" + (on ? " is-on" : "")}
                               onClick={() => toggleKeep(name)}
-                              title={on
-                                ? (pickMode === 'discard' ? "Discard with figure" : "Keep in Parts Bin")
-                                : (pickMode === 'discard' ? "Keep in Parts Bin" : "Discard with figure")}>
+                              title={on ? "Discard with figure" : "Keep in Parts Bin"}>
                         {on ? "✓" : ""}
                       </button>
                     </div>

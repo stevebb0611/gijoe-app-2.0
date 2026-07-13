@@ -120,7 +120,7 @@ function GalleryCard({ fig, onOpen }) {
   return (
     <button className={"card inv-card" + (ghost ? " is-ghostcard" : "")} onClick={() => ghost ? onOpen(fig.id, null) : onOpen(fig.id, copies[0].id)}>
       <div className="card__corner"><FactionTag faction={fig.faction} mini /></div>
-      <PhotoSlot className="card__photo" />
+      <PhotoSlot className="card__photo" src={fig.image} />
       <div className="card__name">{fig.name}<VersionChip version={fig.version} /><VariantBadge count={fig.variants} /></div>
       <div className="card__var">{fig.specialty}</div>
       {!ghost && multi && st.moves.length > 0 && <div className="card__rebal">Rebalance</div>}

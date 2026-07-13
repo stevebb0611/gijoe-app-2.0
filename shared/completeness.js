@@ -3,7 +3,7 @@
 // functions over plain arrays/objects only — no DOM/XHR/Node dependencies — so
 // the same file imports cleanly from both a Vite bundle and a Node ESM module.
 //
-// Blueprint items are [name, quantity_required, accessory_id, group_id, release_context, match_key, color].
+// Blueprint items are [name, quantity_required, accessory_id, group_id, release_context, match_key, color, variantLetter].
 // Three axes restructure the flat list (see PARTS_BIN.md "Accessory completeness model" + ACCESSORY_GROUPS.md):
 //   group_id    — interchangeable variants ("own any one" satisfies the slot)
 //   match_key   — when 2+ group_id slots have members sharing a match_key, those
@@ -11,6 +11,18 @@
 //                 light-green gun only counts alongside the light-green radio)
 //   release_context — only 'retail' counts toward completion; convention/mail_in/
 //                      bonus items are tracked but never block Complete
+// variantLetter (index 7) is a fourth, orthogonal axis: when set, the row only
+// applies to instances pinned to that production variant (e.g. Blocker's Visor
+// is 'B'-only — see ACCESSORY_GROUPS.md "variant_id"). Unlike the three axes
+// above, this isn't handled inside clusterBlueprint() — it's instance-specific,
+// so callers filter with bpForVariant() BEFORE handing bp to any function below.
+// Scope a figure's full blueprint down to the rows that apply to one instance's
+// production variant — rows with no variantLetter apply everywhere. Call this
+// before bpReq/instOwn/instPct/instWhole/missingList/clusterBlueprint/orderedBlueprint
+// whenever bp is being used for a specific owned (or about-to-be-added) copy.
+export function bpForVariant(bp, variantLetter) {
+  return (bp || []).filter((a) => !a[7] || a[7] === variantLetter);
+}
 export function clusterBlueprint(bp) {
   const retail = (bp || []).filter((a) => !a[4] || a[4] === 'retail');
   const groupMap = new Map(); // group_id -> items[]

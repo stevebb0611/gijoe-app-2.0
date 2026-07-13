@@ -21,7 +21,7 @@
 import { physicalGrade, paintGrade } from './damage-map.jsx';
 import {
   clusterBlueprint, matchedSetSatisfied, bpReq, instOwn, instPct, instWhole,
-  groupLabel, optLabel, accDamagePct, missingList,
+  groupLabel, optLabel, accDamagePct, missingList, bpForVariant,
 } from '../../shared/completeness.js';
 
 function api(method, url, body) {
@@ -77,7 +77,12 @@ function figureSummary(catalogId) {
   const insts = instancesOf(catalogId);
   const bp = fig.blueprint || [];
   const copies = insts.map(i => {
-    const acc = i.acc || {}, moc = !!i.moc, req = bpReq(bp);
+    const acc = i.acc || {}, moc = !!i.moc;
+    // A copy's own production variant only owes the accessories scoped to it
+    // (e.g. Blocker v1 B's Visor doesn't apply to a v1 A copy) — see
+    // bpForVariant (shared/completeness.js) and ACCESSORY_GROUPS.md "variant_id".
+    const bpv = bpForVariant(bp, i.variant);
+    const req = bpReq(bpv);
     // The file card does NOT gate completeness — it's a separate notation.
     // (A sealed/MOC copy carries its card on the backer, so it reads as on file.)
     const card = moc || !!(i.filecard && i.filecard.onFile);
@@ -85,9 +90,9 @@ function figureSummary(catalogId) {
     return {
       id: i.id, variant: i.variant, coo: i.coo, loc: i.loc, notes: i.notes, moc,
       phys, paint, acc, cardOnFile: card,
-      own: moc ? req : instOwn(bp, acc), req,
-      pct: moc ? 100 : instPct(bp, acc), whole: moc ? true : instWhole(bp, acc),
-      missing: moc ? [] : missingList(bp, acc),
+      own: moc ? req : instOwn(bpv, acc), req,
+      pct: moc ? 100 : instPct(bpv, acc), whole: moc ? true : instWhole(bpv, acc),
+      missing: moc ? [] : missingList(bpv, acc),
     };
   });
   // best copy first
@@ -179,4 +184,4 @@ export const JoeStore = {
       return false;
     },
   };
-export const JoeData = { CAT, CAT_BY_ID, ACC, ACC_BY_ID, bpReq, instOwn, instPct, instWhole, accDamagePct, clusterBlueprint, groupLabel, optLabel, instancesOf, ownedCount, figureSummary, totals };
+export const JoeData = { CAT, CAT_BY_ID, ACC, ACC_BY_ID, bpReq, instOwn, instPct, instWhole, accDamagePct, clusterBlueprint, bpForVariant, groupLabel, optLabel, instancesOf, ownedCount, figureSummary, totals };

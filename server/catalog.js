@@ -15,6 +15,7 @@ const figuresStmt = db.prepare(`
   SELECT f.id, f.code_name, f.version, f.specialty, f.variant_lookup AS single_tell,
          f.is_vehicle_driver, f.vehicle,
          f.is_mail_away, f.mail_in_notes, f.notes, f.release_context,
+         f.image_url_primary,
          fac.name AS faction_name,
          COALESCE(s.year, f.year_released) AS year
   FROM figures f
@@ -41,9 +42,10 @@ const cooStmt = db.prepare(`
 
 const blueprintStmt = db.prepare(`
   SELECT fa.figure_id, a.name, a.color, fa.quantity_required, a.id AS accessory_id,
-         fa.group_id, fa.release_context, fa.match_key
+         fa.group_id, fa.release_context, fa.match_key, vl.letter AS variant_letter
   FROM figure_accessories fa
   JOIN accessories a ON a.id = fa.accessory_id
+  LEFT JOIN variant_lookup vl ON vl.id = fa.variant_id
   ORDER BY fa.figure_id, fa.rowid
 `);
 
@@ -77,7 +79,7 @@ export function buildCatalog() {
     // above but dropped here before this fix — the frontend's AccSwatch
     // (web/src/acc-colors.jsx) had nothing to render off of until now.
     blueprintByFigure.set(figureId, disambiguateNames(rows)
-      .map((b) => [b.name, b.quantity_required, b.accessory_id, b.group_id, b.release_context, b.match_key, b.color]));
+      .map((b) => [b.name, b.quantity_required, b.accessory_id, b.group_id, b.release_context, b.match_key, b.color, b.variant_letter]));
   }
 
   return figuresStmt.all().map((f) => ({
@@ -91,6 +93,7 @@ export function buildCatalog() {
     mailAway: !!f.is_mail_away,
     mailInNotes: f.mail_in_notes || null,
     notes: f.notes || null,
+    image: f.image_url_primary || null,
     releaseContext: f.release_context || 'retail',
     // Every figure has at least one variants[] entry — single-variant figures
     // (or the handful with no usable variant letter, see server/seed.mjs) get a

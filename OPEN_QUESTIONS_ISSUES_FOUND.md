@@ -38,11 +38,13 @@ Built (July 2026, see #11.b): per-copy rows now read "Breaker No. 1 · B" (owned
 incorportate a damaged accessories notation
 Built (July 2026): per-instance `units_damaged` on `instance_accessories` (migration 004), clamped <= units_owned — a condition notation, not a completeness input (Complete still = owned >= required). In the detail modal's ACCESSORIES panel, a "⚠ mark as damaged" toggle opens a DAMAGED ACCESSORIES box listing only currently-owned pieces; ticking a unit flags it damaged (rust/hashed box fill, same visual language as the figure-body damage map). The completeness ring shows a hashed rust wedge sized to the damaged share of owned accessories.
 
-# 8.b Damaged Accessories
+# 8.b Damaged Accessories ✅
 damaged needs to be accounted for at time of import. not just as a callback edit. 
+Built (July 2026, commit 485f01c): Add Figure's CONDITION step gained an optional "ACCESSORY DAMAGE" panel (`DamageModePanel`, reused from Instance Detail — `web/src/app-add-figure.jsx`) so a copy's per-accessory damage can be logged at intake, before the first commit, instead of only via a later edit. `createInstance` (`server/instances.js`) accepts the `accDamage` map and clamps each entry to the accessory's owned quantity server-side. Since Add Instance reuses this same overlay (no separate component — see #8 in `OPEN_QUESTIONS_Claude.md`), the same intake step covers additional copies too. Verified live against the real DB: walked Add Figure through FIND → DETAILS → CONDITION for Duke v2 and confirmed the panel renders with the mark-as-damaged toggle (did not commit).
 
-# 8.c Damaged Accessories
+# 8.c Damaged Accessories ✅
 notations need to be callable in PartsBin
+Built (July 2026, commit 485f01c): loose stock (`accessory_inventory`) gained `units_damaged` (migration 006), mirroring the per-instance column from #8. Each Parts Bin row shows a "N damaged" badge when applicable and a ⚠ toggle (`pb-btn--dmg` in `web/src/parts-bin.jsx`) that opens a DAMAGED UNITS checklist to mark/unmark specific units via `JoeStore.setPartDamage`. New `swapAccessoryForClean` (`server/instances.js`) trades a damaged unit on an owned instance for clean stock from the bin (flag swap, not a quantity change), and `pullPart` carries a unit's damage status over if the bin has no clean stock left. Verified live: 15 stocked rows in the real Parts Bin render the ⚠ toggle and the damage panel opens on click.
 
 # 8.d Damaged Accessories (follow-up) ✅
 the mark-as-damaged toggle box was the only place damage showed up — the main checklist only had an aggregate "⚠ N damaged" count in the mini header, no way to tell *which* row from a glance.
@@ -60,7 +62,8 @@ Follow-ups (July 2026):
 # 10 Refined Delete Sequence ✅
 [Remove Figure Only] (Accessories drop into PartsBin)
 [Remove Figure and Accessories]
-Built (July 2026): the trash icon now opens an in-card confirm step instead of the old two-step `window.confirm` sequence — "Remove Figure Only" (every on-file accessory moves to the Parts Bin) vs. "Remove Figure and All Accessories" (everything discarded) vs. Cancel. Also trying a 4-button variant (`DELETE_DIALOG_BUTTONS` in `web/src/app-detail.jsx`, currently `4`) that inserts a third "Remove Figure and Selected Accessories" option, opening a per-accessory keep/discard checklist; flip the constant to `3` to fall back to the simpler two-button-plus-picker version (picker framed as "which to keep" instead of "which to discard") if the extra button doesn't earn its place. Both variants share the same checklist component and `finishRemove`/`depositParts` plumbing — not yet decided which the owner prefers.
+Built (July 2026): the trash icon now opens an in-card confirm step instead of the old two-step `window.confirm` sequence — "Remove Figure Only" (every on-file accessory moves to the Parts Bin) vs. "Remove Figure and All Accessories" (everything discarded) vs. Cancel.
+**Decision locked (July 2026): 4-button variant.** A third "Remove Figure and Selected Accessories" option sits between them, opening a per-accessory discard checklist (unchecked = kept, moves to the Parts Bin) — "Remove Figure Only" became a one-click keep-everything action once the picker moved to its own button. The rejected 3-button variant (single dual-purpose "Remove Figure Only" that opened a keep-framed picker) was removed from `web/src/app-detail.jsx`: the `DELETE_DIALOG_BUTTONS` toggle, the `removeOnly` handler, and the dead `pickMode`/"keep" framing are gone — only the discard-framed picker remains. Verified live against the real DB: opened the confirm dialog and the selected-accessories picker on an owned Breaker copy, confirmed both render correctly, backed out without removing anything.
 
 # 11 Show Collection Gaps ✅
 needs to account for variants. 

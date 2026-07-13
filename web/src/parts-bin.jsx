@@ -29,7 +29,9 @@ function buildNeeds() {
     const sum = JoeData.figureSummary(id); if (!sum) return;
     const fig = figLabel(cf);
     sum.copies.forEach(c => {
-      bp.forEach(([name, q, accessoryId]) => {
+      // A copy only "needs" what its own production variant actually calls
+      // for — see bpForVariant + ACCESSORY_GROUPS.md "variant_id".
+      JoeData.bpForVariant(bp, c.variant).forEach(([name, q, accessoryId]) => {
         const have = (c.acc && c.acc[name]) || 0;
         if (have < q) needs.push({ instanceId: c.id, catalogId: id, no: c.no, fig, accessory: name, accessoryId, missing: q - have });
       });

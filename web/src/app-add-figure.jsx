@@ -79,7 +79,10 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const hasFilter = !!q || !!yearF;
   const results = !hasFilter ? [] : yearF ? allResults : allResults.slice(0, 60);
 
-  const blueprint = fig ? fig.blueprint : [];
+  // Scoped to the variant picked in DETAILS (variantKey) — a variant-exclusive
+  // accessory (e.g. Blocker's v1 B-only Visor) shouldn't be offered until that
+  // variant is chosen. See bpForVariant + ACCESSORY_GROUPS.md "variant_id".
+  const blueprint = fig ? JoeData.bpForVariant(fig.blueprint, variantKey) : [];
   const ordered = orderedBlueprint(blueprint);
   const unitsOf = (n) => owned[n] || 0;
   const bpReq = JoeData.bpReq(blueprint);

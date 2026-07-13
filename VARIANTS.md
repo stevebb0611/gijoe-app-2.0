@@ -206,14 +206,18 @@ Net: decision #2 is no longer a data-merge task. It's a small product decision �
 
 Keep `rare` in the data. Surface it **only** on Instance Detail and the modal's variant rail as a small ★ next to the tell — **no collection-wide RARE filter or list tag** (the earlier all-over treatment was pulled back as an oversteer, see §6.5). A wanted-list boost is parked until the wanted-list feature exists.
 
-### 7.5 Completeness × variant (decision #6/#3 — RESOLVED: no override needed)
+### 7.5 Completeness × variant (decision #6/#3 — RESOLVED for the channel case; amended 2026-07-12 for the same-channel hardware case)
 
 The mail-in / convention question is settled by how the catalog is structured (see 7.2.1): **whole-figure mail-in/convention/exclusive releases get their own catalog row** (the 700-block), so a release with different gear is simply a *different Figure* with its own blueprint. Therefore:
 
-- **Blueprint keys on `figureId`, full stop.** All production variants of one Figure share its required-accessory set. There is **no `variant_blueprint_override` table** — the earlier escape hatch is dropped, because the case it guarded against (one row, two channel-different gear sets) doesn't occur: each channel release is its own row.
+- **Blueprint keys on `figureId`, full stop — for channel differences.** All production variants of one Figure still share its required-accessory set *by default*. There is **no `variant_blueprint_override` table** — the earlier escape hatch is dropped, because the case it guarded against (one row, two channel-different gear sets, e.g. retail vs. mail-away) doesn't occur: each channel release is its own row.
 - **A lone accessory that only came via a channel** (a single bonus piece, mail-in only, on an otherwise-retail figure) stays handled by the existing **`release_context`** flag on the accessory (`retail` counts toward completion; `convention`/`mail-in`/`bonus`/`exclusive` tracked but excluded) — see `PARTS_BIN.md` / OQ#5. That's an accessory-level concern, not a variant-level one.
 
-So completeness never needs to know about production variants at all — clean separation.
+**Amendment (Blocker, 1987, 2026-07-12):** the case above assumed the only way a blueprint could legitimately differ *within one catalog row* was a channel difference — it didn't anticipate two **same-channel (both retail)** production variants shipping with different hardware. Blocker v1 B ("With visor") included a Visor; v1 A ("No visor") never did — confirmed by the owner, not a channel/mail-in distinction. A plain, unscoped blueprint row had no way to express "required for B, doesn't exist for A" and was marking every v1 A copy permanently incomplete for a part it can't physically have.
+
+Resolution: a fourth, narrow, optional axis — nullable `figure_accessories.variant_id` (FK → `variant_lookup.id`; `NULL` = applies to every variant, unchanged default for every pre-existing row). Full mechanism, data model, and the completeness-engine wiring (still per-instance, not a figure-level override — each *copy* filters its own blueprint by its own pinned variant at read time) are in `ACCESSORY_GROUPS.md` → "`variant_id` mechanism". The "no override needed" framing above still holds for the channel case; it just isn't the only case that exists.
+
+So completeness mostly doesn't need to know about production variants — but per-copy checks now do, when a variant-scoped row is present (the common case remains untouched).
 
 ### 7.5.1 Catalog ID scheme & owner-extensibility (new — from the real CSV)
 

@@ -245,6 +245,10 @@ CREATE TABLE IF NOT EXISTS figure_accessories (
                       -- cross-slot matched-color tag (see ACCESSORY_GROUPS.md): when two or
                       -- more of a figure's group_id slots have members sharing a match_key,
                       -- those slots must resolve to the SAME key together for Complete.
+    variant_id        INTEGER REFERENCES variant_lookup(id) ON DELETE SET NULL,
+                      -- migration 007: scopes this row to one production variant (e.g.
+                      -- Blocker's Visor only shipped on v1 B). NULL (default) = applies
+                      -- to every variant of the figure, unchanged from before this column.
     PRIMARY KEY (figure_id, accessory_id)
 );
 
@@ -398,6 +402,7 @@ CREATE INDEX IF NOT EXISTS idx_acc_release_context      ON accessories(release_c
 CREATE INDEX IF NOT EXISTS idx_fa_accessory             ON figure_accessories(accessory_id);
 CREATE INDEX IF NOT EXISTS idx_fa_group                 ON figure_accessories(group_id);
 CREATE INDEX IF NOT EXISTS idx_fa_release_context       ON figure_accessories(release_context);
+CREATE INDEX IF NOT EXISTS idx_fa_variant                ON figure_accessories(variant_id);
 CREATE INDEX IF NOT EXISTS idx_acc_groups_figure        ON accessory_groups(figure_id);
 CREATE INDEX IF NOT EXISTS idx_vehicles_faction         ON vehicles(faction_id);
 CREATE INDEX IF NOT EXISTS idx_file_cards_code          ON file_cards(code_name);
@@ -471,6 +476,7 @@ SELECT
             SELECT 1 FROM figure_accessories fa
             WHERE fa.figure_id       = f.id
               AND fa.release_context = 'retail'
+              AND (fa.variant_id IS NULL OR fa.variant_id = i.variant_id)
               AND fa.quantity_required > COALESCE((
                 SELECT ia.units_owned FROM instance_accessories ia
                 WHERE ia.instance_id  = i.id
@@ -508,6 +514,7 @@ LEFT JOIN instance_accessories ia ON ia.instance_id  = i.id
                                  AND ia.accessory_id = fa.accessory_id
 WHERE fa.release_context = 'retail'
   AND i.is_moc           = 0          -- MOC copies have no missing accessories
+  AND (fa.variant_id IS NULL OR fa.variant_id = i.variant_id)
   AND COALESCE(ia.units_owned, 0) < fa.quantity_required
 ORDER BY f.code_name, i.id, a.name;
 
@@ -530,11 +537,13 @@ SELECT
     fa.is_shared,
     fa.quantity_required,
     fa.group_id,
+    vl.letter                AS variant_letter,
     fa.notes
 FROM figures f
 JOIN figure_accessories fa ON fa.figure_id    = f.id
 JOIN accessories        a  ON a.id            = fa.accessory_id
 LEFT JOIN accessory_categories ac ON ac.category_id = a.category_id
+LEFT JOIN variant_lookup vl ON vl.id = fa.variant_id
 ORDER BY f.code_name, fa.release_context, ac.name, a.name;
 
 

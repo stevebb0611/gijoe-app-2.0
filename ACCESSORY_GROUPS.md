@@ -1,17 +1,20 @@
-# Accessory Groups — grouped accessory slots (`group_id` · `match_key` · `release_context`)
+# Accessory Groups — grouped accessory slots (`group_id` · `match_key` · `release_context` · `variant_id`)
 
 > Companion to `PARTS_BIN.md` → "Accessory completeness model." That doc locks the general
 > rules for two axes on `figure_accessories`: `group_id` (own any one member of a slot) and
 > `release_context` (retail vs tracked-but-non-blocking) — read it first for the rule
-> definitions. This doc is the **per-figure operational log** for both axes: every figure
-> with a `group_id` slot, and every figure whose blueprint carries a non-`retail`
-> `release_context` accessory (convention/bonus/mail-in/exclusive), gets one entry below,
-> chronological by year of release then alphabetical. Most figures use plain `group_id`
-> only ("pick one"); a subset also need `match_key`, a narrower mechanism layered on top of
-> `group_id` for a specific case those two don't cover (see "The problem" below); a third,
-> independent case needs neither — it's logged solely for a non-retail `release_context`
-> accessory, tagged **Mechanism: `release_context`**. Each entry's **Mechanism:** line says
-> which applies — the behavior differs, so don't assume from the figure alone.
+> definitions. This doc is the **per-figure operational log** for all four axes: every
+> figure with a `group_id` slot, every figure whose blueprint carries a non-`retail`
+> `release_context` accessory (convention/bonus/mail-in/exclusive), and every figure with a
+> `variant_id`-scoped row, gets one entry below, chronological by year of release then
+> alphabetical. Most figures use plain `group_id` only ("pick one"); a subset also need
+> `match_key`, a narrower mechanism layered on top of `group_id` for a specific case those
+> two don't cover (see "The problem" below); a third, independent case needs neither — it's
+> logged solely for a non-retail `release_context` accessory, tagged **Mechanism:
+> `release_context`**; a fourth, also independent, is a row exclusive to one production
+> variant, tagged **Mechanism: `variant_id`** (see that section below). Each entry's
+> **Mechanism:** line says which applies — the behavior differs, so don't assume from the
+> figure alone.
 
 ## The problem match_key solves
 
@@ -189,6 +192,59 @@ at all. So today, `group_id`/`match_key` on a bonus item is bookkeeping only: it
 doesn't (yet) render as a "pick one" option group with an A/B tag the way a retail
 matched set does. Zartan's four stickers currently show as four flat rows under
 "Bonus".
+
+## `variant_id` mechanism (an accessory exclusive to one production variant)
+
+A fourth, independent axis on `figure_accessories` — migration `007_variant_scoped_accessories.sql`.
+`group_id`/`match_key`/`release_context` all describe *how* a blueprint row counts toward
+Complete; `variant_id` describes *which copies the row applies to at all*.
+
+**The problem:** production variants fold into one catalog row (the variant-collapse
+rule — see `VARIANTS.md`), so when two variants of the same figure physically shipped
+with different hardware, both variants' accessories land as siblings on one flat
+blueprint list, same as a `match_key` colorway would. But a variant-exclusive part isn't
+an "own any one" choice like a `group_id` slot — it's a hard requirement for *one*
+variant and flatly doesn't exist for the other. Blocker (below) is the first case:
+v1 B ("With visor, red inner arm") shipped with a Visor; v1 A ("No visor, black inner
+arm") never did. Leaving the Visor as a plain, unscoped row meant every v1 A copy was
+permanently marked incomplete for a part it physically cannot have.
+
+**Rule:** `figure_accessories.variant_id` (`INTEGER`, nullable, FK → `variant_lookup.id`).
+`NULL` (the default, and every pre-`007` row) = the row applies to every variant of the
+figure, unchanged from before this column existed. Set = the row only counts toward, and
+is only shown/checkable for, an **instance** (`instances.variant_id`) pinned to that exact
+`variant_lookup` letter.
+
+**Data model:**
+```
+figure_id  accessory        variant_id → letter
+---------  ---------------  -------------------
+132        Visor            109 → B
+132        XL-13 Laser      (null — every variant)
+```
+
+**Completeness/display (`shared/completeness.js` `bpForVariant(bp, variantLetter)`):**
+unlike the other three axes, this isn't handled inside `clusterBlueprint()` — it's
+instance-specific (a figure's `bp` array has no single "variant" of its own), so every
+caller filters with `bpForVariant()` *before* handing `bp` to `clusterBlueprint`/`bpReq`/
+`instOwn`/`instPct`/`instWhole`/`missingList`/`orderedBlueprint`. Wired into: `store.js`
+`figureSummary` (per-copy required/owned/whole/%/missing), `app-detail.jsx`'s Instance
+Detail checklist, `app-add-figure.jsx`'s DETAILS checklist (scoped to whichever variant is
+picked; nothing variant-exclusive shows before a variant is chosen), `parts-bin.jsx`'s
+reverse-lookup needs list, and the Excel export.
+
+**Rebalance engine scope boundary:** `figState()`'s ⚖ pooling/reshuffle math
+(`app-detail.jsx`) assumes every loose copy of a figure owes the *same* blueprint — true
+for the other three axes, not for `variant_id` (a v1 B-only Visor can't be "moved onto" a
+v1 A copy). Rather than rework that engine's optimal-whole-copy math for heterogeneous
+per-copy requirements, variant-scoped rows are excluded from its pooling input entirely
+(`rebalanceBp = bp.filter(row => !row[7])`) — per-copy completeness above still requires
+and displays them correctly, this only means the ⚖ suggestion engine won't try to
+move/count a variant-exclusive part. Also prevents a real hazard: `applyRebalance`'s
+write-back (`JoeStore.updateInstance(c.id, { acc: accMap })`) only touches names present
+in `st._bp` (now `rebalanceBp`) — if a variant-scoped name had leaked into that set, the
+write-back would upsert `0` for it on every copy the plan touches, silently wiping an
+already-owned variant-exclusive part on copies whose variant it doesn't even apply to.
 
 ## Figures (chronological by year of release, then by catalog id)
 
@@ -514,6 +570,53 @@ matched set does. Zartan's four stickers currently show as four flat rows under
   (`/api/catalog` shows all five Snake accessories carrying group_id 23, no
   match_key, each disambiguated by color), 2026-07-11. Not yet visually
   verified in-app.
+
+### 1986 — Zarana (v1, figure catalog id 127 — source F-codes F182/F183/F184/F716, variants A/B/C)
+
+- **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
+  group and never block Complete; no `group_id` on this figure.
+- **Variants:** three production variants fold into this single catalog row — A
+  ("Earrings, darker red gloves & kneepads") and B ("No earrings, lighter red gloves
+  & kneepads") are retail; C ("No earrings") is the 1992 convention re-release. See
+  `VARIANTS.md`.
+- **Non-retail accessories:** Submachine Gun (A0822), Sword (barbed) (A0759) —
+  reclassified `retail` → `convention` via `set-accessory-context.mjs`, 2026-07-12,
+  owner-confirmed.
+- **Blueprint correction:** Grenade-Adorned Quiver Backpack (A0284) and Harpoon Rifle
+  (A0285) were removed from this figure's blueprint — a source-CSV data-entry error
+  had duplicated Zandar's (1986, figure catalog id 126, F181) accessories onto
+  Zarana's row; they belong to Zandar only, owner-confirmed. Fixed directly in
+  `figure_accessories` (and the corresponding zero-owned `instance_accessories` rows)
+  plus the source `gijoe_db_figures_accessories_group_id.csv` (F182 rows), 2026-07-12.
+- **Unaffected (plain retail, required):** Backpack (A0286), Razor Honed Spur Cutting
+  Weapon (A0287).
+- **Status:** ✅ release_context set in DB via `set-accessory-context.mjs`
+  (`Submachine Gun (A0822): retail → convention`, `Sword (barbed) (A0759): retail →
+  convention`) and the blueprint correction applied directly to `figure_accessories` +
+  source CSV, verified via SQL query, 2026-07-12. Not yet visually verified in-app.
+
+### 1987 — Blocker (v1, figure catalog id 132 — source F-codes F190 A / F191 B)
+
+- **Mechanism:** `variant_id` — the Visor is scoped to variant B only (see the
+  "`variant_id` mechanism" section above); no `group_id`/`match_key` on this figure.
+- **Variants:** F190 · A "No visor, black inner arm" / F191 · B "With visor, red inner
+  arm" — folded into one catalog row (id 132) per the standard variant-collapse rule
+  (`VARIANTS.md`).
+- **Blueprint correction:** green Mouthpiece (A0297) and DK-528 Infra-Green Laser Pistol
+  (A0298) were removed from this figure's blueprint — a source-CSV data-entry error had
+  duplicated Blaster's (1987, figure catalog id 131, F189) accessories onto Blocker's row;
+  they belong to Blaster only, owner-confirmed. No owned Blocker instance had ever
+  recorded units for either, so no `instance_accessories` data was orphaned. Fixed
+  directly in `figure_accessories`, 2026-07-12.
+- **Variant-scoped:** Visor (A0299) — v1 B only (`variant_lookup.id` 109); a v1 A copy is
+  never asked for it and can't check it off.
+- **Unaffected (plain retail, required, every variant):** XL-13 Light Refraction
+  Submachine Laser (A0300).
+- **Status:** ✅ applied directly to `figure_accessories` (delete + `variant_id` scope) via
+  `migrations/007_variant_scoped_accessories.sql`, verified against
+  `v_figure_completeness`/`v_instance_missing_accessories` and the two owned v1 A
+  instances (356, 357) re-evaluating correctly, 2026-07-12. Not yet visually verified
+  in-app.
 
 ### 1989 — Recoil (v1, figure catalog id 245 — source F-code F321)
 

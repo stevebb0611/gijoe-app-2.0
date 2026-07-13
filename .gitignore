@@ -6,3 +6,5 @@ dist/
 .vite/
 *.db
 *.db.bak*
+*.db-shm
+*.db-wal
