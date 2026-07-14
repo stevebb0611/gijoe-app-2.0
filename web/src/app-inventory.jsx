@@ -339,17 +339,19 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
       <div className="invp-chrome" ref={chromeRef}>
         <header className="invp-top">
           <div className="inv-brand">
-            <span className="inv-brand__mk" aria-hidden="true">
-              <svg width="32" height="32" viewBox="0 0 34 34" fill="none">
-                <rect x="3.5" y="8" width="27" height="18" rx="2" stroke="#f3eee2" strokeWidth="2" strokeLinejoin="round" />
-                <line x1="3.5" y1="12.5" x2="30.5" y2="12.5" stroke="#f3eee2" strokeWidth="2" />
-                <rect x="6.5" y="14.5" width="7.5" height="8.5" stroke="#f3eee2" strokeWidth="2" strokeLinejoin="round" />
-                <line x1="17.5" y1="16" x2="27.5" y2="16" stroke="#f3eee2" strokeWidth="2" strokeLinecap="round" />
-                <line x1="17.5" y1="19" x2="27.5" y2="19" stroke="#f3eee2" strokeWidth="2" strokeLinecap="round" />
-                <path d="M29 21.5 H21 L22.7 24.5 H29 Z" fill="#f3eee2" />
-              </svg>
-            </span>
-            <span className="inv-brand__name">G.I. JOE<br/>COLLECTION</span>
+            <button type="button" className="inv-brand__home" onClick={() => onNavigate('figures')} aria-label="Go to Figures">
+              <span className="inv-brand__mk" aria-hidden="true">
+                <svg width="32" height="32" viewBox="0 0 34 34" fill="none">
+                  <rect x="3.5" y="8" width="27" height="18" rx="2" stroke="#f3eee2" strokeWidth="2" strokeLinejoin="round" />
+                  <line x1="3.5" y1="12.5" x2="30.5" y2="12.5" stroke="#f3eee2" strokeWidth="2" />
+                  <rect x="6.5" y="14.5" width="7.5" height="8.5" stroke="#f3eee2" strokeWidth="2" strokeLinejoin="round" />
+                  <line x1="17.5" y1="16" x2="27.5" y2="16" stroke="#f3eee2" strokeWidth="2" strokeLinecap="round" />
+                  <line x1="17.5" y1="19" x2="27.5" y2="19" stroke="#f3eee2" strokeWidth="2" strokeLinecap="round" />
+                  <path d="M29 21.5 H21 L22.7 24.5 H29 Z" fill="#f3eee2" />
+                </svg>
+              </span>
+              <span className="inv-brand__name">G.I. JOE<br/>COLLECTION</span>
+            </button>
             <nav className="inv-nav">
               <button type="button" className="is-active">Figures</button>
               <a className="inv-nav__soon" href="GI Joe Tracker - Vehicles.html" title="Vehicles & Playsets — in development">Vehicles<em className="inv-nav__tag">In Dev</em></a>

@@ -339,11 +339,11 @@ function InstanceDetail() {
               <label className="idp-meta__field">
                 <span className="idp-meta__lab">NOTES · THIS COPY</span>
                 <textarea className="idp-meta__in idp-meta__in--area" value={notes} onChange={e => setNotes(e.target.value)}
-                          placeholder="joint feel, provenance, where you bought it, paint quirks…"></textarea>
+                          placeholder="damage notes — figure/accessory, damage…"></textarea>
               </label>
               <label className="idp-meta__field">
                 <span className="idp-meta__lab">BIN / BOX LOCATION</span>
-                <input className="idp-meta__in" value={loc} onChange={e => setLoc(e.target.value)} placeholder="e.g. BIN C-04 · long-box" />
+                <input className="idp-meta__in" value={loc} onChange={e => setLoc(e.target.value)} placeholder="box 1, box 2, small tote" />
               </label>
             </div>
           </section>

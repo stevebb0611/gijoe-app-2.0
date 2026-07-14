@@ -13,6 +13,16 @@ import { figIdentityText, formatYear } from './fig-identity.js';
 
 const figLabel = (cf) => cf ? figIdentityText({ name: cf.name, version: cf.ver ? 'v' + cf.ver : '' }) : "—";
 
+// "Shared · fits X / Y / Z" — capped so hyper-common parts (e.g. a battle
+// stand shared by 90+ figures) don't blow out the row.
+const FITS_CAP = 4;
+function fitsLabel(names) {
+  if (!names || !names.length) return "fits multiple figures";
+  const shown = names.slice(0, FITS_CAP).join(" / ");
+  const extra = names.length - FITS_CAP;
+  return "fits " + shown + (extra > 0 ? " +" + extra + " more" : "");
+}
+
 function useStore() {
   const [, force] = React.useReducer(x => x + 1, 0);
   React.useEffect(() => JoeStore.subscribe(force), []);
@@ -74,7 +84,7 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
   const ev = evaluate(entry, NEEDS);
   const open = openId === entry.id;
   const [dmgOpen, setDmgOpen] = React.useState(false);
-  const home = entry.shared ? "Shared · fits multiple figures" : (entry.homeFigureName || "—");
+  const home = entry.shared ? "Shared · " + fitsLabel(entry.homeFigureNames) : (entry.homeFigureName || "—");
   return (
     <div className={"pb-row" + (ev.needed ? " is-needed" : "")}>
       <div className="pb-qty">
@@ -85,7 +95,7 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
         <div className="pb-name">
           {entry.accessory}
         </div>
-        <div className="pb-fits">home: <b>{home}</b></div>
+        <div className="pb-fits">figure: <b>{home}</b></div>
         <div className="pb-status">
           {ev.needed > 0 ? (
             <button className="pb-need" onClick={() => setOpenId(open ? null : entry.id)}>
@@ -290,10 +300,10 @@ function RebalanceModal({ figs, onClose }) {
 }
 
 // ============================================================ group section
-function GroupSection({ sec, collapsed, toggle, NEEDS, openId, setOpenId }) {
+function GroupSection({ sec, sep, collapsed, toggle, NEEDS, openId, setOpenId }) {
   const t = sec.rows.reduce((o, { e, ev }) => { o.pieces += e.qty; o.fills += ev.fillable; return o; }, { pieces: 0, fills: 0 });
   return (
-    <section className="grp">
+    <section className={"grp" + (sep ? " grp--sep" : "")}>
       <button className="grp__head" onClick={() => toggle(sec.key)}>
         <span className={"grp__chev" + (collapsed ? " is-closed" : "")}>▾</span>
         <span className="grp__title">{sec.label}</span>
@@ -336,10 +346,14 @@ function buildSections(items, mode) {
   let keys = [...map.keys()];
   if (sortByCatId) {
     keys.sort((a, b) => catIdOf.get(a) - catIdOf.get(b));
+  } else if (mode === 'home') {
+    // "Shared" isn't a figure — keep it out of the alphabetical run and
+    // always trailing, set off by a divider (see .grp--sep).
+    keys.sort((a, b) => (a === 'Shared') - (b === 'Shared') || String(a).localeCompare(String(b)));
   } else {
     keys.sort((a, b) => order ? order.indexOf(a) - order.indexOf(b) : String(a).localeCompare(String(b)));
   }
-  return keys.map(k => ({ key: k, label: labelOf(k), rows: map.get(k).sort(byNeed) }));
+  return keys.map(k => ({ key: k, label: labelOf(k), rows: map.get(k).sort(byNeed), sep: mode === 'home' && k === 'Shared' }));
 }
 
 // ============================================================ app
@@ -356,7 +370,7 @@ function PartsBin({ onNavigate }) {
   // bin entries decorated with real accessory metadata
   const bin = store.bin.map(e => {
     const meta = JoeData.ACC_BY_ID.get(e.id) || {};
-    return { ...e, categoryId: meta.categoryId != null ? meta.categoryId : null, categoryLabel: meta.categoryLabel || null, shared: !!meta.shared, homeFigureName: meta.homeFigureName || null };
+    return { ...e, categoryId: meta.categoryId != null ? meta.categoryId : null, categoryLabel: meta.categoryLabel || null, shared: !!meta.shared, homeFigureName: meta.homeFigureName || null, homeFigureNames: meta.homeFigureNames || null };
   });
   const NEEDS = React.useMemo(buildNeeds, [store]);
   const suggestions = buildSuggestions(bin, NEEDS);
@@ -380,7 +394,7 @@ function PartsBin({ onNavigate }) {
   const q = query.trim().toLowerCase();
   const items = bin
     .map(e => ({ e, ev: evaluate(e, NEEDS) }))
-    .filter(({ e }) => !q || e.accessory.toLowerCase().includes(q) || (e.homeFigureName || "").toLowerCase().includes(q) || (e.categoryLabel || "").toLowerCase().includes(q))
+    .filter(({ e }) => !q || e.accessory.toLowerCase().includes(q) || (e.homeFigureName || "").toLowerCase().includes(q) || (e.homeFigureNames || []).some(n => n.toLowerCase().includes(q)) || (e.categoryLabel || "").toLowerCase().includes(q))
     .filter(({ e }) => {
       if (filter === 'shared') return e.shared;
       if (filter === 'single') return !e.shared;
@@ -400,17 +414,19 @@ function PartsBin({ onNavigate }) {
       <div className="invp-chrome">
         <header className="invp-top">
           <div className="inv-brand">
-            <span className="inv-brand__mk" aria-hidden="true">
-              <svg width="32" height="32" viewBox="0 0 34 34" fill="none">
-                <rect x="3.5" y="8" width="27" height="18" rx="2" stroke="#f3eee2" strokeWidth="2" strokeLinejoin="round" />
-                <line x1="3.5" y1="12.5" x2="30.5" y2="12.5" stroke="#f3eee2" strokeWidth="2" />
-                <rect x="6.5" y="14.5" width="7.5" height="8.5" stroke="#f3eee2" strokeWidth="2" strokeLinejoin="round" />
-                <line x1="17.5" y1="16" x2="27.5" y2="16" stroke="#f3eee2" strokeWidth="2" strokeLinecap="round" />
-                <line x1="17.5" y1="19" x2="27.5" y2="19" stroke="#f3eee2" strokeWidth="2" strokeLinecap="round" />
-                <path d="M29 21.5 H21 L22.7 24.5 H29 Z" fill="#f3eee2" />
-              </svg>
-            </span>
-            <span className="inv-brand__name">G.I. JOE<br/>COLLECTION</span>
+            <button type="button" className="inv-brand__home" onClick={() => onNavigate('figures')} aria-label="Go to Figures">
+              <span className="inv-brand__mk" aria-hidden="true">
+                <svg width="32" height="32" viewBox="0 0 34 34" fill="none">
+                  <rect x="3.5" y="8" width="27" height="18" rx="2" stroke="#f3eee2" strokeWidth="2" strokeLinejoin="round" />
+                  <line x1="3.5" y1="12.5" x2="30.5" y2="12.5" stroke="#f3eee2" strokeWidth="2" />
+                  <rect x="6.5" y="14.5" width="7.5" height="8.5" stroke="#f3eee2" strokeWidth="2" strokeLinejoin="round" />
+                  <line x1="17.5" y1="16" x2="27.5" y2="16" stroke="#f3eee2" strokeWidth="2" strokeLinecap="round" />
+                  <line x1="17.5" y1="19" x2="27.5" y2="19" stroke="#f3eee2" strokeWidth="2" strokeLinecap="round" />
+                  <path d="M29 21.5 H21 L22.7 24.5 H29 Z" fill="#f3eee2" />
+                </svg>
+              </span>
+              <span className="inv-brand__name">G.I. JOE<br/>COLLECTION</span>
+            </button>
             <nav className="inv-nav">
               <button type="button" onClick={() => onNavigate('figures')}>Figures</button>
               <a className="inv-nav__soon" href="GI Joe Tracker - Vehicles.html" title="Vehicles & Playsets — in development">Vehicles<em className="inv-nav__tag">In Dev</em></a>
@@ -420,7 +436,7 @@ function PartsBin({ onNavigate }) {
           <div className="invp-mid">
             <label className="inv-search invp-search">
               <span>⌕</span>
-              <input value={query} onChange={e => setQuery(e.target.value)} placeholder="search part · category · home figure…" />
+              <input value={query} onChange={e => setQuery(e.target.value)} placeholder="search part · category · figure…" />
               {query && <button className="invp-search__x" onClick={() => setQuery('')}>✕</button>}
             </label>
             <button className="inv-addfig" onClick={() => setAddOpen(true)}><span className="inv-addfig__mk">＋</span>Add Part</button>
@@ -509,8 +525,8 @@ function PartsBin({ onNavigate }) {
               </div>
               {shownCount === 0
                 ? <div className="pbp-empty">No parts match.</div>
-                : sections.map(sec => (
-                    <GroupSection key={sec.key} sec={sec} collapsed={collapsed.has(sec.key)} toggle={toggle}
+                : sections.map((sec, i) => (
+                    <GroupSection key={sec.key} sec={sec} sep={i > 0 && sec.sep} collapsed={collapsed.has(sec.key)} toggle={toggle}
                       NEEDS={NEEDS} openId={openId} setOpenId={setOpenId} />
                   ))}
             </section>

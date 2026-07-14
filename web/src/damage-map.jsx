@@ -117,12 +117,33 @@ function dmInjectCss() {
   if (typeof document === 'undefined' || document.getElementById('dmx-styles')) return;
   const css = `
   .dmx { --dmx-c1:#d4a73a; --dmx-c2:#c0612f; --dmx-c3:#9a2f24; display:flex; flex-direction:column; gap:10px; }
-  .dmx__bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-  .dmx__bar .dmx__sp { flex:1; }
+  .dmx__bar { display:flex; align-items:flex-start; gap:10px; flex-wrap:nowrap; }
+  .dmx__bar .dmx__sp { flex:1; min-width:8px; }
+  .dmx__bar-l { display:flex; flex-direction:column; gap:0; flex-shrink:0; }
+  .dmx__bar-r { display:flex; align-items:center; gap:10px; flex-shrink:0; }
   .dmx__seg { display:inline-flex; border:1.5px solid var(--ink); }
-  .dmx__seg button { font-family:var(--font-display,sans-serif); font-weight:600; font-size:11px; letter-spacing:.4px; padding:5px 11px; background:var(--paper); color:var(--ink-soft); border:none; cursor:pointer; min-height:30px; }
+  .dmx__seg button { font-family:var(--font-display,sans-serif); font-weight:600; font-size:14px; letter-spacing:.4px; padding:5px 11px; min-height:30px; background:var(--paper); color:var(--ink-soft); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; }
   .dmx__seg button.on { background:var(--ink); color:var(--paper); }
   .dmx__seg button + button { border-left:1.5px solid var(--ink); }
+  /* left grouping — condition/paint chips and the color row beneath them share one 150px total width,
+     divided with flex:1 (not fixed px) so a narrow host column can never squeeze one swatch out of line. */
+  .dmx__seg--tab { width:150px; }
+  .dmx__seg--tab button { flex:1; height:34px; min-height:0; padding:0; }
+  .dmx__bulk-row { width:150px; display:flex; }
+  .dmx__bulk-grp { flex:1; display:flex; }
+  .dmx__bulk-sq { flex:1; height:18px; padding:0; border:1.5px solid var(--ink); cursor:pointer; }
+  .dmx__bulk-sq + .dmx__bulk-sq { border-left:1.5px solid var(--ink); }
+  /* right grouping — justified to the far right, opposite the tab group; shares the left
+     grouping's chip height only (34px), not the color row */
+  .dmx__seg--fr { width:90px; }
+  .dmx__seg--fr button { flex:1; height:34px; min-height:0; padding:0; }
+  .dmx__bulk-sq.f1 { background:var(--dmx-c1); }
+  .dmx__bulk-sq.f2 { background:var(--dmx-c2); }
+  .dmx__bulk-sq.f3 { background:var(--dmx-c3); }
+  .dmx__bulk-sq:hover { box-shadow: inset 0 0 0 2px var(--paper); }
+  .dmx__bulk-sq:active { filter:brightness(.9); }
+  .dmx__bulk-sq.on { outline:1.5px solid var(--ink); outline-offset:1.5px; }
+  .dmx__bulk-cap { font-size:10px; color:var(--ink-soft); }
   .dmx__stage { position:relative; width:100%; background:var(--card-2,#efe9dc); border:1.5px solid var(--ink); }
   .dmx__inner { position:relative; width:100%; }
   .dmx__inner img { position:relative; display:block; width:100%; height:auto; pointer-events:none; z-index:2; user-select:none; -webkit-user-drag:none; }
@@ -164,6 +185,26 @@ function DamageMap({ value, onChange, genderLocked }) {
   const marks = (val[tab] && val[tab][view]) || {};
 
   const setGender = (g) => onChange({ ...val, gender: g });
+  // one-click bulk fill: mark every zone (front + rear) for a tab at a single severity,
+  // so a badly-worn figure doesn't need each of its ~17 zones tagged by hand per view.
+  // Clicking the swatch that's already applied everywhere clears it back out (undo),
+  // and the map jumps to that tab so the fill is visible immediately, not just implied.
+  const zoneIds = (DM_ZONES[gender] || []).map(z => z.id);
+  const marksAt = (tabKey, v) => (val[tabKey] && val[tabKey][v]) || {};
+  const isBulkOn = (tabKey, lvl) => zoneIds.length > 0 && DM_VIEWS.every(v => {
+    const mv = marksAt(tabKey, v);
+    return zoneIds.every(id => (mv[id] || 0) === lvl);
+  });
+  const bulkMark = (tabKey, lvl) => {
+    setTab(tabKey);
+    if (isBulkOn(tabKey, lvl)) {
+      onChange({ ...val, [tabKey]: { front: {}, rear: {} } });
+      return;
+    }
+    const filled = {};
+    zoneIds.forEach(id => { filled[id] = lvl; });
+    onChange({ ...val, [tabKey]: { front: { ...filled }, rear: { ...filled } }, clean: false });
+  };
   const cycleZone = (zid) => {
     const cur = marks[zid] || 0;
     const next = (cur + 1) % 4;
@@ -205,14 +246,30 @@ function DamageMap({ value, onChange, genderLocked }) {
   const e = React.createElement;
   return e('div', { className: 'dmx' },
     e('div', { className: 'dmx__bar' },
-      e('div', { className: 'dmx__seg' },
-        Object.keys(DM_TABS).map(k => e('button', { key: k, className: tab === k ? 'on' : '', onClick: () => setTab(k) }, DM_TABS[k].label))),
+      e('div', { className: 'dmx__bar-l' },
+        e('div', { className: 'dmx__seg dmx__seg--tab' },
+          Object.keys(DM_TABS).map(k => e('button', { key: k, className: tab === k ? 'on' : '', onClick: () => setTab(k) }, DM_TABS[k].label))),
+        e('div', { className: 'dmx__bulk-row' },
+          Object.keys(DM_TABS).map(k => e('div', { key: k, className: 'dmx__bulk-grp' },
+            DM_SEV_ORDER.map(lvl => {
+              const on = isBulkOn(k, lvl);
+              return e('button', {
+                key: lvl, type: 'button', className: 'dmx__bulk-sq f' + lvl + (on ? ' on' : ''),
+                title: (on ? 'Clear — ' : 'Mark entire figure — ') + DM_TABS[k].sevLabel(lvl),
+                onClick: () => bulkMark(k, lvl),
+              });
+            })))
+        )
+      ),
       e('div', { className: 'dmx__sp' }),
-      e('div', { className: 'dmx__seg' },
-        DM_VIEWS.map(v => e('button', { key: v, className: view === v ? 'on' : '', onClick: () => setView(v) }, v === 'front' ? 'Front' : 'Rear'))),
-      !genderLocked && e('div', { className: 'dmx__seg' },
-        ['male', 'female'].map(g => e('button', { key: g, className: gender === g ? 'on' : '', onClick: () => setGender(g) }, g === 'male' ? 'Male' : 'Female')))
+      e('div', { className: 'dmx__bar-r' },
+        e('div', { className: 'dmx__seg dmx__seg--fr' },
+          DM_VIEWS.map(v => e('button', { key: v, className: view === v ? 'on' : '', onClick: () => setView(v) }, v === 'front' ? 'Front' : 'Rear'))),
+        !genderLocked && e('div', { className: 'dmx__seg' },
+          ['male', 'female'].map(g => e('button', { key: g, className: gender === g ? 'on' : '', onClick: () => setGender(g) }, g === 'male' ? 'Male' : 'Female')))
+      )
     ),
+    e('div', { className: 'dmx__bulk-cap' }, 'click to mark the whole figure · click again to clear'),
     e('div', { className: 'dmx__stage' },
       f ? e('div', { className: 'dmx__inner', style: { aspectRatio: f.w + ' / ' + f.h } },
         e('div', { className: 'dmx__cells', style: { gridTemplateColumns: 'repeat(' + f.cols + ',1fr)', gridTemplateRows: 'repeat(' + f.rows + ',1fr)' } }, cells),

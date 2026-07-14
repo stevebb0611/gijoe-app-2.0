@@ -1,7 +1,7 @@
 # Handoff → Claude Code (start here in VS Code)
 
 Quick checklist for moving this design bundle into a real build. Read order:
-**CLAUDE.md → README.md → BACKEND_AND_SCALE.md → PARTS_BIN.md → OPEN_QUESTIONS.md.**
+**CLAUDE.md → README.md → BACKEND_AND_SCALE.md → PARTS_BIN.md → OPEN_QUESTIONS_Claude.md.**
 
 ## Updates since last handoff (June 2026)
 - **File card = notation, NOT completeness (revisited & locked).** A copy's completeness is **figure + accessories only**. Whether the **file card** (cardback) is on file is tracked per copy and shown as a **notation badge** — it is never folded into the `%` / `whole` / `missing` math. A sealed **MOC** copy reads as on-file (the card rides on the backer). We briefly prototyped making the card count toward completeness, then reverted to notation.
@@ -21,7 +21,7 @@ Quick checklist for moving this design bundle into a real build. Read order:
 
 ## Clean slate — empty ONE kind of data, not both
 - **Catalog / reference tables (figures, accessories, the join): SEED these.** This is the master list of everything that ever existed — the yardstick completeness measures against. Do **not** leave it empty or "gaps" and "missing N parts" become meaningless.
-- **Ownership tables (`owned_figures`, `owned_accessories`, notes, bin contents): EMPTY on deploy.** The collection starts clean and grows one figure at a time via Add Figure. (Decision: `OPEN_QUESTIONS.md #3`.)
+- **Ownership tables (`owned_figures`, `owned_accessories`, notes, bin contents): EMPTY on deploy.** The collection starts clean and grows one figure at a time via Add Figure. (Decision: `OPEN_QUESTIONS_Claude.md #3`.)
 
 ## Data you must supply (not in this bundle)
 The real seed source files — the prototype only has generated stand-ins (`wf-data.jsx`, `add-figure-catalog.js`, `catalog-data.js`, sample bins):
@@ -33,7 +33,7 @@ The real seed source files — the prototype only has generated stand-ins (`wf-d
 - Browser-Babel + `Object.assign(window, …)` module pattern → real build tooling/imports.
 - Unicode-glyph icons → a real icon set.
 - In-session React state for edits/notes (Inventory modal) → real persistence.
-- Synthesized `figState` per-instance allocation → a real per-instance Instance entity (`OPEN_QUESTIONS.md #1/#13`).
+- Synthesized `figState` per-instance allocation → a real per-instance Instance entity (`OPEN_QUESTIONS_Claude.md #1/#13`).
 
 ## Suggested opening prompt
 > Read CLAUDE.md, README.md, then BACKEND_AND_SCALE.md and PARTS_BIN.md. Scaffold the real app from the schema in BACKEND_AND_SCALE.md (Next.js + the cloud DB noted there). Seed the **catalog** tables from the reference CSVs, but leave all **ownership** tables empty — the collection starts clean and grows via Add Figure. The HTML files are visual/behavior references only; rebuild the UI per FRONTEND_STANDARDS.md.

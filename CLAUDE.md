@@ -5,15 +5,31 @@
 > file or `FRONTEND_STANDARDS.md` say "recreate / rebuild / clean component tree,"
 > `PORT_VERBATIM.md` overrides them.
 
-You are working inside a **design handoff bundle**, not a production codebase. Read this first, then `README.md`, then `OPEN_QUESTIONS.md`.
+> ✅ **STATUS UPDATE (July 2026): the port already happened.** Everything below this line
+> describes the original design-handoff bundle and the porting job as a task still to do.
+> That job (`OPEN_QUESTIONS_Claude.md` #17a/#17b) is **done** — there is now a real,
+> running app: a Vite build in **`web/`** (`web/src/*.jsx`, built to `web/dist`) served by a
+> local **Express + `better-sqlite3`** server (**`server/`**), reading/writing the live
+> `gijoe_collection.db`. **Run it with `npm start`**, not `npx serve .` — that serves the
+> real built app + `/api/*` routes at `http://localhost:3000`; the raw HTML/JSX files below
+> remain reachable only as reference mockups the server also serves statically. Dozens of
+> real features (variants, damage tracking, Parts Bin, file cards, country-of-origin, the
+> rebalance engine, accessory groups) have shipped into `web/`/`server/` since the port —
+> see the git log and `OPEN_QUESTIONS_ISSUES_FOUND.md` for what's actually built. Treat this
+> file's framing ("design handoff, not production," "your job: port it") as historical
+> context for the prototype files, not as the current task — **the current task is
+> extending the live app in `web/`/`server/`, following the design rules below.**
+
+You are working inside a **design handoff bundle**, not a production codebase. Read this first, then `README.md`, then `OPEN_QUESTIONS_Claude.md`.
 
 ## What this bundle is
 
 A personal **inventory + condition tracker** for a large vintage G.I. Joe collection (target **700–800 figures**). It contains two layers:
 
-- **A WORKING APP** (`GI Joe Tracker - Collection App.html`) — starts empty, searches the real catalog parsed from the CSVs, and saves owned copies to `localStorage`. This is the test-drivable product, not a mockup.
-- **6 static reference mockups** + **9 JSX/JS modules** — the original visual prototypes (fixed sample data).
-- **10 markdown specs** — the source of truth for design, data model, and decisions.
+- **The live app** (`web/` + `server/`, see below) — the real, ported, database-backed build; run it with `npm start`.
+- **A WORKING APP prototype** (`GI Joe Tracker - Collection App.html`) — the pre-port reference: starts empty, searches the real catalog parsed from the CSVs, and saved owned copies to `localStorage`. Superseded by the live app for anything but visual/behavioral reference.
+- **Static reference mockups** + **JSX/JS modules** — the original visual prototypes (fixed sample data).
+- **Markdown specs** — the source of truth for design, data model, and decisions (see the Specs list below — now includes `FILE_CARDS.md`).
 
 ### The working app (start here to run it)
 - `GI Joe Tracker - Collection App.html` — shell (combined CSS, mounts the app, Tweaks panel with Export/Import/Clear).
@@ -29,7 +45,7 @@ A personal **inventory + condition tracker** for a large vintage G.I. Joe collec
 
 - Treat the **HTML/JSX as the source of truth for visual design and behavior.**
 - Treat **`FRONTEND_STANDARDS.md` as the source of truth for how to build it properly.**
-- Treat **`OPEN_QUESTIONS.md` as a blocker list** — several modeling decisions (notably the per-instance data model) must be resolved before or early in implementation. Surface these to the user rather than guessing.
+- Treat **`OPEN_QUESTIONS_Claude.md` as a blocker list** — several modeling decisions (notably the per-instance data model) must be resolved before or early in implementation. Surface these to the user rather than guessing.
 
 ## Fidelity
 
@@ -51,6 +67,18 @@ npx serve .          # then open the printed URL (e.g. http://localhost:3000)
 
 ## Map of the bundle
 
+**The live app** (query this, not the prototype, when checking current behavior):
+
+| Path | What it is |
+|---|---|
+| `server/index.js` | Express entry point — serves `web/dist` + the `/api/*` routes, falls back to the raw repo root for reference mockups |
+| `server/catalog.js`, `server/accessories.js`, `server/instances.js`, `server/export-xlsx.js` | API handlers reading/writing `gijoe_collection.db` (`better-sqlite3`) |
+| `gijoe_collection.db` + `gijoe_collection.sql` (schema) + `migrations/*.sql` | The live database and its schema/migration history — the actual source of truth, not the CSVs |
+| `web/src/main.jsx` | Vite app root — mounts `InventoryView` / `PartsBin` + the Tweaks panel |
+| `web/src/app-inventory.jsx`, `app-detail.jsx`, `app-add-figure.jsx`, `parts-bin.jsx`, `damage-map.jsx`, `store.js`, `accessory-groups.jsx`, `fig-identity.js`/`.jsx`, `filecards.jsx` | The ported + since-extended real components — these, not the root `.jsx` files, are what's running |
+
+**The original prototype** (visual/behavioral reference only — see `PORT_VERBATIM.md`):
+
 | File | What it is |
 |---|---|
 | `index.html` | Landing page — run instructions + links to all screens & docs |
@@ -66,11 +94,11 @@ npx serve .          # then open the printed URL (e.g. http://localhost:3000)
 | `tweaks-panel.jsx` | Theme panel (paper/accent/faction/wobble) — informs a real theme config, not shipped as-is |
 
 ### Specs
-`README.md` (start here) · `OPEN_QUESTIONS.md` (decisions — read second) · `FRONTEND_STANDARDS.md` · `INSTANCE_MODEL.md` · `VARIANTS.md` · `PARTS_BIN.md` · `ACCESSORY_GROUPS.md` · `TAXONOMY.md` · `NAVIGATION.md` · `BACKEND_AND_SCALE.md`.
+`README.md` (start here) · `OPEN_QUESTIONS_Claude.md` + `OPEN_QUESTIONS_ISSUES_FOUND.md` (decisions/issues — read second) · `FRONTEND_STANDARDS.md` · `INSTANCE_MODEL.md` · `VARIANTS.md` · `PARTS_BIN.md` · `ACCESSORY_GROUPS.md` · `FILE_CARDS.md` · `TAXONOMY.md` · `NAVIGATION.md` · `BACKEND_AND_SCALE.md`.
 
 ## Known prototype shortcuts to NOT carry over
 
-- **Per-instance data is synthesized** in `wf-data.jsx` (`figState()`) — the sample stores only aggregate accessory counts and derives a plausible per-copy allocation. A real **Instance** entity must replace this (`OPEN_QUESTIONS.md` #1/#5).
-- **Add Figure runs on superseded, name-keyed sample data** (`OPEN_QUESTIONS.md` #8).
+- **Per-instance data is synthesized** in `wf-data.jsx` (`figState()`) — the sample stores only aggregate accessory counts and derives a plausible per-copy allocation. A real **Instance** entity must replace this (`OPEN_QUESTIONS_Claude.md` #1/#5).
+- **Add Figure runs on superseded, name-keyed sample data** (`OPEN_QUESTIONS_Claude.md` #8).
 - **All figure images are hatched placeholders** — real photography is a TODO (source + storage).
-- Brand name is **"G.I. Joe Collection"** (decided June 2026; replaced the "Joe Dossier" placeholder) with a vintage-ARAH-file-card outline mark — live across every current surface (Figures, Vehicles, Parts Bin, and the Scale States reference). The old "Joe Dossier" working app and the name-exploration sheet are in `_archive/`. The name uses the Hasbro mark by choice (fine for private use; revisit before any public release — see OPEN_QUESTIONS #10).
+- Brand name is **"G.I. Joe Collection"** (decided June 2026; replaced the "Joe Dossier" placeholder) with a vintage-ARAH-file-card outline mark — live across every current surface (Figures, Vehicles, Parts Bin, and the Scale States reference). The old "Joe Dossier" working app and the name-exploration sheet are in `_archive/`. The name uses the Hasbro mark by choice (fine for private use; revisit before any public release — see OPEN_QUESTIONS_Claude.md #10).

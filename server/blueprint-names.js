@@ -11,17 +11,24 @@
 // variant) — without this, both options collapse onto the same tracked row
 // and toggling either one toggles both in the UI. Disambiguate by appending
 // "(color)" when that's enough to tell rows apart; fall back to a numbered
-// suffix for the rare case where even color collides (untouched today, but
-// exists so the underlying figure-scoped-uniqueness invariant always holds).
+// suffix for the case where even color collides (first hit: Outback v1's
+// retail vs. convention green Flashlight, 2026-07-13) — two passes, since the
+// color-appended label needs its own collision check rather than assuming
+// color alone always resolves it.
 export function disambiguateNames(rows) {
   const counts = new Map();
   for (const r of rows) counts.set(r.name, (counts.get(r.name) || 0) + 1);
+  const withColor = rows.map((r) => {
+    if (counts.get(r.name) <= 1) return { ...r };
+    return { ...r, name: r.color ? `${r.name} (${r.color})` : r.name };
+  });
+  const labelCounts = new Map();
+  for (const r of withColor) labelCounts.set(r.name, (labelCounts.get(r.name) || 0) + 1);
   const seen = new Map();
-  return rows.map((r) => {
-    if (counts.get(r.name) <= 1) return r;
+  return withColor.map((r) => {
+    if (labelCounts.get(r.name) <= 1) return r;
     const idx = (seen.get(r.name) || 0) + 1;
     seen.set(r.name, idx);
-    const label = r.color ? `${r.name} (${r.color})` : `${r.name} #${idx}`;
-    return { ...r, name: label };
+    return { ...r, name: `${r.name} #${idx}` };
   });
 }

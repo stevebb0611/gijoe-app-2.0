@@ -229,7 +229,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                 </div>
 
                 <p className="af-seclab" style={{ marginTop: 18 }}><b>Bin / box location</b> <i style={{ fontStyle: 'normal', color: 'var(--ink-soft)' }}>(optional)</i></p>
-                <input className="af-in" value={loc} onChange={e => setLoc(e.target.value)} placeholder="e.g. BIN C-04 · long-box" />
+                <input className="af-in" value={loc} onChange={e => setLoc(e.target.value)} placeholder="box 1, box 2, small tote" />
               </div>
             </div>
           )}
@@ -267,7 +267,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                 <section className="panel">
                   <div className="panel__hd">NOTES <em>· this copy only</em></div>
                   <textarea className="af-notes" value={notes} onChange={e => setNotes(e.target.value)}
-                            placeholder={moc ? "optional — card grade, bubble crush, AFA number, sticker condition…" : "optional — joint feel, provenance, where you bought it, paint quirks…"}></textarea>
+                            placeholder={moc ? "optional — card grade, bubble crush, AFA number, sticker condition…" : "damage notes — figure/accessory, damage…"}></textarea>
                 </section>
               </div>
             </div>

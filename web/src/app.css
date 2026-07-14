@@ -51,11 +51,10 @@
   .wf-ring__hole { position: relative; z-index: 1; background: var(--paper); border-radius: 50%; width: 68%; height: 68%; display: grid; place-items: center; }
   .wf-ring__pct { font-family: var(--font-display); font-weight: 700; font-size: 16px; line-height: 1; }
   .wf-ring__pct small { font-size: 8px; font-family: var(--font-mono); }
-  /* hashed pie-slice overlay showing the damaged share of the completed arc */
+  /* solid wedge showing the damaged share of the completed arc, ink hairline at its trailing edge */
   .wf-ring__dmg { position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
-    background: repeating-conic-gradient(var(--damage) 0deg 8deg, transparent 8deg 16deg);
-    -webkit-mask: conic-gradient(#000 var(--dmg-end), transparent 0);
-            mask: conic-gradient(#000 var(--dmg-end), transparent 0); }
+    background: conic-gradient(var(--damage) 0deg calc(var(--dmg-end) - 2.5deg),
+      var(--ink) calc(var(--dmg-end) - 2.5deg) var(--dmg-end), transparent var(--dmg-end) 360deg); }
 
   /* ===== page shell ===== */
   .invp { color: var(--ink); font-family: var(--font-mono); font-size: 13px; min-height: 100vh; }
@@ -70,6 +69,7 @@
   .inv-addfig { cursor: pointer; }
   .inv-addfig__mk { font-size: 15px; margin-right: 4px; }
   .inv-brand { display: flex; align-items: center; gap: 14px; }
+  .inv-brand__home { display: inline-flex; align-items: center; gap: 14px; background: none; border: none; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; }
   .inv-brand__mk { display: inline-flex; align-items: center; }
   .inv-brand__name { font-family: var(--font-display); font-weight: 700; font-size: 19px; letter-spacing: .5px; line-height: 1; }
   .inv-brand__sub { font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px; opacity: .6; }
@@ -874,6 +874,7 @@
   .grp__meta em { font-style: normal; }
   .grp__meta em.is-fill { color: var(--ok); }
   .grp__body { display: flex; flex-direction: column; gap: 8px; padding: 8px 0 4px; }
+  .grp--sep { margin-top: 10px; padding-top: 18px; border-top: 2px dashed var(--line); }
 
   /* part rows */
   .pbp-body { max-width: 880px; margin: 0 auto; padding: 16px 26px 90px; display: flex; flex-direction: column; gap: 16px; }

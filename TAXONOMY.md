@@ -33,6 +33,16 @@ The prototype currently hard-codes a **2-faction** binary (JOE / COBRA) and grou
 Tune the two new hues to match the field-manual palette's chroma/lightness; vary hue only.
 
 ## Series (`series_id`) — primary grouping
+
+> **Gap (flagged July 2026): this recommendation was never implemented.** The live Inventory
+> (`web/src/app-inventory.jsx`) still groups strictly by calendar **year**, exactly as the
+> original prototype did — `series_id` only powers the Convention-block sentinel-year
+> formatting (`CONVENTION_YEAR` / `formatYear()` in `fig-identity.js`, so 1993 Jinx sorts
+> into "Convention" instead of literal year 9999) and is not yet a grouping axis, a group-by
+> switch, a filter, or a tag anywhere in the app. Series 1 (1982) and Series 1.5/2 (both
+> 1983) are still merged under one "1983" year header today, which is exactly the case this
+> doc's "Series > Year" argument was written to fix. Treat "Default grouping = Series" (the
+> Open/recommended decisions bullet below) as **not started**, not done.
 Map id → `YEAR · label` (short code for dense UI). Sort chronological; **CONV (Convention) sorts last, regardless of numeric id** — it isn't a real chronological year, so nothing interpolates its sentinel year value (see below).
 
 | id | Year | Label | Code |
@@ -63,6 +73,29 @@ Section header reads e.g. **"1988 · Series 7"**; the Convention section reads *
 - **Dreadnoks (4):** Dreadnoks *(redundant with faction 4 — ignore the sub-group row, classify via `faction_id`)*
 
 ## Release context / vehicle / mail-away — filters
+
+> **Naming collision (flagged July 2026, unresolved — same shape as the `variant` collision
+> `VARIANTS.md` §7.0 fixed): `release_context` is two different columns on two different
+> tables with two different value sets.** This section's `figures.release_context` is a
+> **per-figure release channel** (`retail` / `convention` / `mail_in`, CHECK-constrained in
+> `gijoe_collection.sql`) — e.g. "this whole figure was a 1992 convention exclusive." A
+> *separate* `figure_accessories.release_context` (`retail` / `convention` / `mail_in` /
+> `bonus`) is a **per-accessory-pairing completion flag** — "this one accessory in an
+> otherwise-retail figure's blueprint doesn't count toward Complete" — see `PARTS_BIN.md` →
+> *Accessory completeness model* and `ACCESSORY_GROUPS.md`. They are read by different code
+> (`server/catalog.js`'s `f.release_context` vs. `fa.release_context`), serve unrelated
+> purposes, and one is actively used (the accessory-level one, extensively) while the other
+> (the figure-level one below) still drives nothing but a disabled filter mock (see the
+> status note just below). Don't conflate the two when reading either doc; renaming one is
+> an open decision, same as `variant` was.
+>
+> **Status of the filter described below: still a disabled mock.** `OPEN_QUESTIONS_Claude.md`
+> §7's "More Filters" panel confirms the **Release** facet (Retail · Mail-away · Convention ·
+> Store exclusive, i.e. `figures.release_context`) is rendered greyed-out with a "not tracked
+> yet" note (`web/src/app-inventory.jsx`, `NOT TRACKED YET` footer row) — even though the
+> column exists and is populated in the live schema. It hasn't been wired live; treat this
+> section as the target shape, not current behavior.
+
 - **Release context** (`release_context`): Retail (545), Mail order (42), 1992 Convention (35), Toys R Us (19), + small store-exclusive tail (Sears, Target, Kellogg's…). Collapse to a facet: **Retail · Mail-away · Convention · Store exclusive.**
 - **Vehicle driver** (`is_vehicle_driver` / `vehicle`): 139 figures shipped with a vehicle (Clutch→VAMP…). Filter "came with a vehicle"; show the vehicle name on the detail.
 - **Mail-away** (`is_mail_away`): 45 figures; folds into the release-context facet.

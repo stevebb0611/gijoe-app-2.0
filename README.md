@@ -1,5 +1,14 @@
 # Handoff: G.I. Joe Collection — Inventory App
 
+> ✅ **The real app is built and running (July 2026).** `npm start` boots a local Express
+> server (`server/index.js`) that serves the ported Vite build (`web/`) and its `/api/*`
+> routes against the live `gijoe_collection.db` — that's the thing to open and test, not a
+> static server over the raw HTML. The "Run it locally" / "Overview" text below describes
+> the **original design-handoff prototype** and predates the port + weeks of feature work
+> (Add Figure, Add Instance, the Parts Bin, variants, damage tracking, file cards, COO,
+> the rebalance engine — all shipped; see `OPEN_QUESTIONS_ISSUES_FOUND.md`). Kept below as
+> the prototype's own run instructions/overview, still accurate for the reference mockups.
+
 ## ▶ Run it locally (VS Code + Claude Code)
 The prototypes compile JSX in the browser, so they must be served over **http://localhost** — opening the HTML files directly (`file://`) leaves the screens blank.
 
@@ -13,7 +22,7 @@ Keep an internet connection for the first load (React, Babel, and fonts come fro
 ## Overview
 A personal **inventory + condition tracker** for a large vintage action-figure collection (target: **700–800 figures**, spanning 1982–1994+). The primary job is **inventory tracking**: knowing which figures you own, how many of each, which accessories each one still needs, and the condition of every copy. The landing screen is the full collection ("All"), grouped by release year, with fast filtering, search, and two display modes (List / Gallery).
 
-This bundle documents the **"All / Inventory" home screen** and the **Instance Detail** screen (single-copy condition + accessories). The Instance Detail page introduces the **damage-map condition system** and the **Parts Bin** relationship — see `INSTANCE_MODEL.md`, `PARTS_BIN.md`, and `NAVIGATION.md`. Other flows (Add Figure, Add Instance) are **not yet designed** — see `OPEN_QUESTIONS.md`.
+This bundle documents the **"All / Inventory" home screen** and the **Instance Detail** screen (single-copy condition + accessories). The Instance Detail page introduces the **damage-map condition system** and the **Parts Bin** relationship — see `INSTANCE_MODEL.md`, `PARTS_BIN.md`, and `NAVIGATION.md`. Other flows (Add Figure, Add Instance) were **not yet designed as of this writing — both are since built**; see `NAVIGATION.md` → *Undesigned but referenced here* and `OPEN_QUESTIONS_Claude.md` #8.
 
 ---
 
@@ -91,7 +100,7 @@ A column header row (`.inv-cols`, Space Mono 9px labels: CODE NAME / FACTION / O
 - *Catalog gap* (`owned == 0`): dashed muted row, "not yet owned". Does not expand — clicking opens the acquire modal directly.
 
 **3a. Inline instance accordion** (List only). Clicking **any owned row** — single-copy or multi — expands indented sub-rows beneath it, connected by a dashed left guide (`.inv-insts` / `.inv-inst`); *(July 2026: previously multi-copy only — single-copy rows opened straight into the modal, which hid variant-gap info for the common "own 1 of N variants" case.)* Each sub-row shows: `↳ {Figure Name} No. n · {variant letter}` (title-cased) + a condition note, its **own** short bar + fraction + missing-parts/whole text, and its own NEED chip. Copies are **sorted most-complete-first and numbered contiguously** (No. 1 = most complete; removing a copy renumbers the rest — no gaps). When the figure is *completable but not complete-now*, a **`⚖ REBALANCE`** box heads the accordion with the move list. When the catalog lists a production variant no owned copy carries, a **`⚠ Missing variant(s)`** callout (`.inv-gapbox`, dashed rust border) closes out the *bottom* of the accordion, below the copy rows. Multiple figures may be expanded at once. Clicking a sub-row opens the modal focused on that copy.
-> ⚠️ Per-instance completeness is **synthesized** in the prototype (`figState()` in `wf-data.jsx`) — the sample data stores only aggregate accessory counts, so a deterministic per-copy allocation (scattered "as-stored" + greedy "optimal") is derived to demo complete-now vs. completable and the rebalance recommender. Real per-instance data must replace this — see `OPEN_QUESTIONS.md`.
+> ⚠️ Per-instance completeness is **synthesized** in the prototype (`figState()` in `wf-data.jsx`) — the sample data stores only aggregate accessory counts, so a deterministic per-copy allocation (scattered "as-stored" + greedy "optimal") is derived to demo complete-now vs. completable and the rebalance recommender. Real per-instance data must replace this — see `OPEN_QUESTIONS_Claude.md`.
 
 ### 4. Gallery view — cardback cards
 A 4-column grid (`.inv-galgrid`, gap 16px) of cards per year. **Card** (`.card`) — `--card` fill, `2px --ink` border, hard shadow, padding 14px, photo placeholder 132px tall, code name (Oswald 700, 18px), variant (10px), and a footer with `OWNED ×N` (Space Mono 700 on ink) plus:
@@ -121,7 +130,7 @@ Centered fixed overlay (`.inv-modal`, 720px wide, grid `230px 1fr`) over a scrim
 - **Gallery card click**: open modal.
 - **Modal**: copy tabs (`No. 1…N`) switch the per-copy view (derived by `figState`); an optional `⚖ REBALANCE` callout lists moves; `Esc`/scrim/✕ close.
 - **Hover states**: rows nudge + deepen shadow; chips/buttons invert or fill; year headers lighten.
-- **Responsive** (≤900px in prototype): header collapses to one column, gallery → 2 columns, year header drops the two meters. This is a rough-in — confirm real mobile scope (`OPEN_QUESTIONS.md`).
+- **Responsive** (≤900px in prototype): header collapses to one column, gallery → 2 columns, year header drops the two meters. This is a rough-in — confirm real mobile scope (`OPEN_QUESTIONS_Claude.md`).
 
 ---
 
@@ -136,7 +145,7 @@ From `InventoryApp` (`inventory-app.jsx`). Recreate as component state or a stor
 - `yrAsc`: year sort direction *(persist: prefs)*
 - Derived: filtered+grouped `sections`, `shownCount`, the `--chrome-h` measurement.
 
-Data fetching: the prototype reads a static in-memory catalog. Production needs a real data layer (see `OPEN_QUESTIONS.md`) — likely a paginated/queryable API given 700–800 figures.
+Data fetching: the prototype reads a static in-memory catalog. Production needs a real data layer (see `OPEN_QUESTIONS_Claude.md`) — likely a paginated/queryable API given 700–800 figures.
 
 ---
 
@@ -158,7 +167,7 @@ Figure (catalog entry + ownership rollup)
   owned: number             // count of owned instances (0 = catalog gap)
   acc: [name, required, owned][]   // accessory blueprint + aggregate owned
 
-Completeness math (figParts / figState / yearParts / totals) — PER-INSTANCE (see OPEN_QUESTIONS #5):
+Completeness math (figParts / figState / yearParts / totals) — PER-INSTANCE (see OPEN_QUESTIONS_Claude.md #5):
   figure.req  = Σ required;  figure.own = Σ min(owned, required)   // = the BEST/optimal copy's parts
   figure.pct  = own/req
   completable  = pct === 100                 // parts owned COULD make a copy whole
@@ -177,11 +186,11 @@ Completeness math (figParts / figState / yearParts / totals) — PER-INSTANCE (s
   // denominator (the full series roster) so "Figures" and "Complete" read as
   // two cuts of the one true total, not complete-of-owned. This is the
   // roster/coverage axis only — the accessory blueprint itself still keys on
-  // figureId with no per-variant override (OPEN_QUESTIONS.md §7.5).
+  // figureId with no per-variant override (OPEN_QUESTIONS_Claude.md §7.5).
   totals: figs, instances(=Σowned), inInventory(owned≥1), complete(=complete-now), missing(req−own)
 ```
 
-**Key modeling gap:** `acc` stores an *aggregate* owned count per accessory, and `owned` is just an instance count. There is **no real per-instance record** — `figState()` derives a plausible per-copy allocation so the per-instance completeness + rebalance UI can be shown. The real model must define an **Instance** entity (see `OPEN_QUESTIONS.md`, the #1 decision).
+**Key modeling gap:** `acc` stores an *aggregate* owned count per accessory, and `owned` is just an instance count. There is **no real per-instance record** — `figState()` derives a plausible per-copy allocation so the per-instance completeness + rebalance UI can be shown. The real model must define an **Instance** entity (see `OPEN_QUESTIONS_Claude.md`, the #1 decision).
 
 **Variant modeling gap:** the flat `variant` string above is only the version/role descriptor. A separate **production-variant** layer (letter + physical "tell", e.g. Breaker v1·A thin-thumbs vs v1·B thick-thumbs) is already built into **Add Figure** and **Instance Detail**, including an **UNIDENTIFIED** "pin it later" state. The full model — hierarchy, schema, the identify-later lifecycle, and how to fold it into the Inventory — is specified in **`VARIANTS.md`**.
 
@@ -233,7 +242,7 @@ Representative sizes: year number ~23px/700 (boxed ink tab) · figure name 16px/
 ## Assets
 - **No raster assets.** Every figure image is a **hatched placeholder** (`.wf-photo` / `PhotoSlot`) with a "FIG. PHOTO" tag. Real figure photography is a TODO and an open question (source + storage).
 - **Fonts** via Google Fonts (Oswald, Space Mono, Patrick Hand). In production, self-host or use the codebase's font pipeline.
-- **Brand / name** — decided (June 2026): **G.I. Joe Collection**, with a vintage-ARAH-file-card outline mark, applied consistently across every current surface (Figures, Vehicles, Parts Bin, and the Scale States reference). The prior “Joe Dossier” placeholder + its unicode-glyph mark are retired; the old working app and name-exploration sheet live in `_archive/` (OPEN_QUESTIONS #10).
+- **Brand / name** — decided (June 2026): **G.I. Joe Collection**, with a vintage-ARAH-file-card outline mark, applied consistently across every current surface (Figures, Vehicles, Parts Bin, and the Scale States reference). The prior “Joe Dossier” placeholder + its unicode-glyph mark are retired; the old working app and name-exploration sheet live in `_archive/` (OPEN_QUESTIONS_Claude.md #10).
 
 ---
 
@@ -241,7 +250,7 @@ Representative sizes: year number ~23px/700 (boxed ink tab) · figure name 16px/
 - `GI Joe Tracker - Inventory.html` — **the design of record** for the home screen. Full-page inventory: tokens + all component CSS + page shell.
 - `inventory-app.jsx` — inventory logic: `InventoryApp`, `YearSection`, `Row`, `GalleryCard`, `InvModal`, plus filter/sort/search.
 - `GI Joe Tracker - Instance Detail.html` + `instance-detail.jsx` — **the single-copy detail + damage-map condition system** (see `INSTANCE_MODEL.md`). Also hosts the **VARIANT IDENTITY** panel — for *correcting* a copy's variant (the identify-later / unidentified state was removed — `VARIANTS.md` §3).
-- `GI Joe Tracker - Add Figure.html` + `add-figure.jsx` — **the Add Figure wizard** (Find → Details → Condition), incl. the **production-variant picker** (a variant is **required** — the UNIDENTIFIED / identify-later path was removed, `VARIANTS.md` §3) and the Parts-Bin pull (runs on superseded name-keyed sample data — `OPEN_QUESTIONS.md` #8).
+- `GI Joe Tracker - Add Figure.html` + `add-figure.jsx` — **the Add Figure wizard** (Find → Details → Condition), incl. the **production-variant picker** (a variant is **required** — the UNIDENTIFIED / identify-later path was removed, `VARIANTS.md` §3) and the Parts-Bin pull (runs on superseded name-keyed sample data — `OPEN_QUESTIONS_Claude.md` #8).
 - `GI Joe Tracker - Parts Bin.html` + `parts-bin.jsx` — **the Parts Bin page** (loose accessories, compatibility, reverse-lookup, and the `⚖ REBALANCE` header tag; see `PARTS_BIN.md`). Loads `parts-catalog.js` (the accessory catalog) and `wf-data.jsx` (for the rebalance panel's figure data).
 - `parts-catalog.js` — the 798-entry accessory catalog (category / home figure / shared-ness) that drives the Parts Bin.
 - `wf-data.jsx` — sample catalog (1982–1992) + completeness math (`figParts`, `figState`, `yearParts`, `totals`) and shared widgets. Shared by Inventory and (for the rebalance panel) the Parts Bin.
@@ -251,9 +260,13 @@ Representative sizes: year number ~23px/700 (boxed ink tab) · figure name 16px/
 - `INSTANCE_MODEL.md` — instance schema, the damage map, and the derived-grade engine (exact default weights/thresholds/caps).
 - `VARIANTS.md` — the **production-variant** model: the character → figure → variant → instance hierarchy, the physical "tell," and the **variant-required-at-Add** rule (the UNIDENTIFIED / identify-later lifecycle was dropped — §3).
 - `PARTS_BIN.md` — the loose-accessory inventory and the two-way figure↔bin flow.
-- `ACCESSORY_GROUPS.md` — per-figure operational log for grouped accessory slots (`group_id` "pick one" + the narrower `match_key` colorway tie) and for non-`retail` `release_context` accessories (convention/bonus/mail-in/exclusive — tracked, non-blocking); companion to `PARTS_BIN.md`'s "Accessory completeness model."
+- `ACCESSORY_GROUPS.md` — per-figure operational log for grouped accessory slots (`group_id` "pick one" + the narrower `match_key` colorway tie), non-`retail` `release_context` accessories (convention/bonus/mail-in/exclusive — tracked, non-blocking), and `variant_id`-scoped rows (an accessory exclusive to one production variant); companion to `PARTS_BIN.md`'s "Accessory completeness model."
+- `FILE_CARDS.md` — the per-figure file-card printing catalog (`file_cards` / `figure_file_cards`) and its on-file/printing notation on an instance (companion to `INSTANCE_MODEL.md`).
+- `TAXONOMY.md` — faction/series/sub-team/release-context classification and how it maps to grouping, tags, and filters.
 - `NAVIGATION.md` — how screens connect; how Instance Detail and the Parts Bin are reached.
-- `OPEN_QUESTIONS.md` — **decisions to resolve before/early in implementation.** Read first.
+- `OPEN_QUESTIONS_Claude.md` — **decisions to resolve before/early in implementation.** Read first.
+- `OPEN_QUESTIONS_ISSUES_FOUND.md` — the running log of bugs/asks the owner filed while using the app and what got built in response; check here before assuming something is undesigned.
+- `BACKEND_AND_SCALE.md` — the backend/scale decision record (see its July 2026 update note for what actually got built vs. the original Next.js/Turso plan).
 - `FRONTEND_STANDARDS.md` — architecture, accessibility, performance, code standards.
 
 > Also in the project (not bundled, for reference): `GI Joe Tracker - Home Wireframes.html` holds three **archived alternate directions** (Roster Ledger, Cardback Wall, Mission Status) that were explored before this one was chosen. Ignore unless you want prior art.

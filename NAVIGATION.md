@@ -9,7 +9,7 @@ The app has a small set of peer destinations, surfaced in the dark header (left 
 
 1. **Figures** *(home / default, was “Inventory”)* — the “All” collection grouped by year. The spine of the app.
 2. **Parts Bin** — the loose-accessory inventory (see `PARTS_BIN.md`). Header nav item (the **count badge was removed** in the June 2026 header pass — it read as clutter). Its own page: searchable, groupable by accessory type, with quantities and reverse-lookup to the instances that need each part.
-3. *(future)* **Vehicles (+ Playsets)** — planned major expansion; a non-functional **[Vehicles] “In Dev”** placeholder chip (dashed/striped) already sits between Figures and Parts Bin as a visual reminder. Direction set in `OPEN_QUESTIONS.md` §15.
+3. *(future)* **Vehicles (+ Playsets)** — planned major expansion; a non-functional **[Vehicles] “In Dev”** placeholder chip (dashed/striped) already sits between Figures and Parts Bin as a visual reminder. Direction set in `OPEN_QUESTIONS_Claude.md` §15.
 4. *(future)* **Wanted list** — the figures and loose parts you still need to complete the collection (graduates from the existing “needs” / catalog-gap data). Optional.
 
 Header nav (June 2026): `G.I. Joe Collection` · `[ Figures ] [ Vehicles · In Dev ] [ Parts Bin ]` · centered search + **＋ Add Figure** · three KPI stat boxes (Unique / Total / Complete). All nav/chip labels are Title case (no ALL CAPS) — see `FRONTEND_STANDARDS.md`. Keep nav to a few items; this is a focused tool, not a portal.
@@ -17,6 +17,20 @@ Header nav (June 2026): `G.I. Joe Collection` · `[ Figures ] [ Vehicles · In D
 ---
 
 ## Reaching Instance Detail from Inventory
+
+> **Update (July 2026 — built differently than specced below.)** The real app never built
+> a separate Instance Detail **page**. Instead, `web/src/app-detail.jsx` implements a single
+> **flip-card detail modal** — the same modal, front face **FIGURE** / back face
+> **CONDITION** — that flips in place (`.inv-cardwrap.is-flipped`, see
+> `OPEN_QUESTIONS_ISSUES_FOUND.md` #18 for the Safari flip-rendering bug fix, which confirms
+> this is how it actually renders). The damage map, grade badges, per-copy accessories,
+> location, notes, and Remove all live on that back face — there is no dedicated route, no
+> breadcrumb, and no `instance-detail.jsx` counterpart under `web/src/`. The **"modal =
+> glance, page = instance-level work"** rule below was the original design intent but isn't
+> what shipped; read this section as history of the plan, not the current architecture. If
+> the page-based version is still wanted, it's a real gap between the design docs
+> (`INSTANCE_MODEL.md` → *Instance Detail screen*) and the build, not just a doc lag.
+
 Two levels of detail, deliberately separated:
 
 - **Figure-level → quick-look modal.** Clicking a figure (single-owned row, or a gallery card) opens the existing **detail modal**: a fast summary — instance overview, accessory rollup, and primary actions. Good for triage without leaving the list.
@@ -60,7 +74,7 @@ Add Figure (pop-out modal, launched from Figures header ＋)
 
 ---
 
-## Undesigned but referenced here (see OPEN_QUESTIONS.md)
+## Undesigned but referenced here (see OPEN_QUESTIONS_Claude.md)
 - **Add Figure** — ✅ built, and **reworked June 2026 into a pop-out modal** launched from the header **＋ Add Figure** button (no longer a full-page navigation — it opens over the Inventory; Esc / ✕ / backdrop closes). Three steps: **FIND → DETAILS → CONDITION** (the old FINALIZE step was dropped; ＋ ADD lives on Condition). FIND offers two **independent** paths — a fuzzy catalog **search** (matches `alt_name`, so “Snake-Eyes”≈“Snake Eyes”, “Rock & Roll”≈“Rock 'N Roll”) and a **Year → Figure** dropdown that resolves to a single figure (no long scrollable year list). The standalone `GI Joe Tracker - Add Figure.html` remains as a thin host that renders the same modal and returns to Figures on close. The **custom / not-in-catalog** path is still open.
 - **Add Instance** — ✅ built (`GI Joe Tracker - Add Instance.html`): the lighter two-step copy-adder (This copy → Condition) launched from a figure you already own; bin matches appear as a quiet hint.
 - **Remove** flow confirmation (the deposit-to-bin branch).

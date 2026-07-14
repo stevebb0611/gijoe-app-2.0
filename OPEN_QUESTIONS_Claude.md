@@ -173,20 +173,18 @@ Beyond sub-team as a *filter / grouping axis* (#6), an early prototype explored 
 
 Four gaps identified at the Claude Code handoff that must be resolved before the app can be used for real collection data. Ordered by dependency.
 
-### 17a. Backend — app is disconnected from the database ⬅ NEXT
-The running app reads `catalog-data.js` (a static generated file) and writes to `localStorage`. The SQLite database (`gijoe_collection.db`) is edited independently via TablePlus and has **no connection to the app**. Changes in TablePlus are invisible to the browser; changes via the app are invisible to the DB. A local backend (small Express/Fastify server or Next.js API routes) is required to bridge them. Until this exists, the DB and the app are two separate systems drifting apart.
-- **Blocking:** every other item below depends on this.
-- **Decision needed:** confirm the local stack — Next.js App Router + Turso/libSQL (as `BACKEND_AND_SCALE.md` specifies) or a simpler local-only Express + better-sqlite3 first.
+### 17a. Backend — ✅ RESOLVED (built)
+**Decided and built: a local Express server + `better-sqlite3`, not Next.js/Turso.** `server/index.js` serves the built app and a full `/api/*` surface (`server/catalog.js`, `server/accessories.js`, `server/instances.js`, `server/export-xlsx.js`) reading/writing `gijoe_collection.db` directly — no TablePlus/app drift anymore. This **supersedes** `BACKEND_AND_SCALE.md`'s "confirmed" Next.js App Router + Turso/libSQL stack, which was the right read of the owner's sample `route.js` at the time but isn't what got built; see the correction note at the top of that doc. The API is also a single-payload shape (`GET /api/catalog` returns the whole catalog, `GET /api/state` the whole owned collection) rather than the paginated/queryable routes `BACKEND_AND_SCALE.md §3` sketched — fine at the current ~650-figure/~a-few-hundred-instance scale, revisit if the 1,500–2,000 ceiling (§4/§6 there) is approached.
+- No auth/multi-user seam was added (no `user_id` column anywhere) — still genuinely single-user, unchanged from the original decision.
 
-### 17b. Vite port — prototype is still browser-Babel compiled
-The JSX files (`app-inventory.jsx`, `app-add-figure.jsx`, `damage-map.jsx`, etc.) are compiled at runtime by Babel loaded from CDN. There is no real build. `PORT_VERBATIM.md` specifies the mechanical steps: scaffold a Vite React project, swap `Object.assign(window, …)` exports for real `import`/`export`, extract `<style>` blocks to `.css` files, mount root in `main.jsx`. The visual output must be pixel-identical to the prototype — this is a compilation change, not a redesign.
-- **Blocking:** a real build is required before the backend can be wired in, and before the app can be deployed anywhere.
+### 17b. Vite port — ✅ RESOLVED (built)
+The live app is a real Vite build in `web/` (`web/src/*.jsx` + `web/src/app.css`, built to `web/dist`, served by `server/index.js`). Confirmed pixel-identical to the prototype at port time. The root-level `.jsx`/`.html` files (`inventory-app.jsx`, `add-figure.jsx`, `instance-detail.jsx`, …) remain in place as the original browser-Babel reference mockups — **note:** some of them are still being hand-edited in parallel with their `web/src` counterparts (e.g. copy tweaks applied to both `add-figure.jsx` and `web/src/app-add-figure.jsx` in the same session), which risks the two drifting out of sync now that the port is the thing actually running. No doc currently states whether that dual maintenance is intentional going forward — worth a decision.
 
 ### 17c. Per-instance data model — ✅ RESOLVED (June 2026)
 Schema updated and migration applied to `gijoe_collection.db`. `figures` is now pure catalog (read-only reference). `instances` (one row per physical copy), `instance_accessories` (one row per accessory per copy), and `variant_lookup` (owner-authored production variant tells) are live. `quantity_owned`, `condition_id`, `year_acquired`, and `is_moc` removed from `figures`; `quantity_owned` and `condition_id` removed from `figure_accessories`. Migration script: `migrations/001_per_instance_model.sql`. Schema source of truth: `gijoe_collection.sql`.
 
-### 17d. catalog-data.js → DB sync — edits in TablePlus don't reach the app
-`catalog-data.js` was generated once from the CSVs and is now a static snapshot. If figures or accessories are edited in TablePlus (corrections, additions), those changes don't appear in the app until `catalog-data.js` is manually regenerated. Once the backend (17a) is wired up, the app should query the DB directly and this file becomes obsolete. Until then, treat `catalog-data.js` as read-only and do not edit it while real collection data depends on it — a regeneration with changed IDs or code names will orphan owned figures stored in localStorage.
+### 17d. catalog-data.js → DB sync — ✅ RESOLVED
+`server/catalog.js` (`buildCatalog()`) computes the catalog payload live from `figures`/`accessories`/`variant_lookup`/`figure_accessories`/`figure_coo`/`figure_file_cards` on every `/api/catalog` request — the DB is the only source of truth the running app reads. `catalog-data.js` (root) is no longer read by the live app; it's a leftover static snapshot from before 17a/17b and can be treated as historical, not a dependency. Same for `wf-data.jsx` / `add-figure-catalog.js` — the live app under `web/` doesn't import them.
 
 ---
 

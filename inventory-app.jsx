@@ -449,7 +449,7 @@ function InvModal({ fig, onClose, initialInst = 1, onEdit }) {
               <div className="inv-notes">
                 <div className="inv-notes__cap">NOTES</div>
                 {editNote ? (
-                  <textarea className="inv-notes__in" rows={2} autoFocus defaultValue={notes[inst - 1]} placeholder="Notes on this copy…"
+                  <textarea className="inv-notes__in" rows={2} autoFocus defaultValue={notes[inst - 1]} placeholder="damage notes — figure/accessory, damage…"
                             onBlur={(e) => { const v = e.target.value; setNotes(prev => prev.map((n, i) => i === inst - 1 ? v : n)); setEditNote(false); }}></textarea>
                 ) : (
                   <div className={"inv-notes__txt" + (notes[inst - 1] ? "" : " is-empty")} onClick={() => setEditNote(true)} title="Click to edit">{notes[inst - 1] || "Click to add notes on this copy…"}</div>
@@ -458,7 +458,7 @@ function InvModal({ fig, onClose, initialInst = 1, onEdit }) {
               <div className="inv-notes inv-loc">
                 <div className="inv-notes__cap">BIN / BOX LOCATION</div>
                 {editLoc ? (
-                  <input className="inv-notes__in inv-loc__in" autoFocus defaultValue={loc[inst - 1]} placeholder="e.g. BIN C-04 · long-box"
+                  <input className="inv-notes__in inv-loc__in" autoFocus defaultValue={loc[inst - 1]} placeholder="box 1, box 2, small tote"
                          onBlur={(e) => { const v = e.target.value; setLoc(prev => prev.map((x, i) => i === inst - 1 ? v : x)); setEditLoc(false); }} />
                 ) : (
                   <div className={"inv-notes__txt inv-loc__txt" + (loc[inst - 1] ? "" : " is-empty")} onClick={() => setEditLoc(true)} title="Click to edit">{loc[inst - 1] || "Click to add this copy's bin / box location…"}</div>

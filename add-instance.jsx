@@ -199,7 +199,7 @@ function AddInstance() {
               {/* bin / box location — closes the step */}
               <div className="af-block af-block--last">
                 <p className="af-seclab"><b>Bin / box location</b> · where this copy lives</p>
-                <input className="af-in" value={loc} onChange={e => setLoc(e.target.value)} placeholder="e.g. BIN C-04 · long-box" />
+                <input className="af-in" value={loc} onChange={e => setLoc(e.target.value)} placeholder="box 1, box 2, small tote" />
               </div>
             </div>
           )}
@@ -226,7 +226,7 @@ function AddInstance() {
                 <section className="panel">
                   <div className="panel__hd">NOTES <em>· this copy only</em></div>
                   <textarea className="af-notes" value={notes} onChange={e => setNotes(e.target.value)}
-                            placeholder="optional — joint feel, provenance, where you bought it, paint quirks…"></textarea>
+                            placeholder="damage notes — figure/accessory, damage…"></textarea>
                 </section>
 
                 <button className="af-add" onClick={() => setDone(true)}>＋ ADD COPY TO INVENTORY</button>

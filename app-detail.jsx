@@ -413,12 +413,12 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                   <div className="inv-copymeta__cap">THIS COPY</div>
                   <div className="inv-notes">
                     <div className="inv-notes__cap">NOTES</div>
-                    <textarea className="inv-notes__in" rows={2} defaultValue={raw.notes || ""} placeholder="Notes on this copy…"
+                    <textarea className="inv-notes__in" rows={2} defaultValue={raw.notes || ""} placeholder="damage notes — figure/accessory, damage…"
                               onBlur={e => setNotes(e.target.value)} key={cur.id}></textarea>
                   </div>
                   <div className="inv-notes inv-loc">
                     <div className="inv-notes__cap">BIN / BOX LOCATION</div>
-                    <input className="inv-notes__in inv-loc__in" defaultValue={raw.loc || ""} placeholder="e.g. BIN C-04 · long-box"
+                    <input className="inv-notes__in inv-loc__in" defaultValue={raw.loc || ""} placeholder="box 1, box 2, small tote"
                            onBlur={e => setLoc(e.target.value)} key={cur.id} />
                   </div>
                 </div>

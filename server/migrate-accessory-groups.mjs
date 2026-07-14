@@ -105,6 +105,15 @@ const GROUPS = [
   // 2026-07-12.
   { extGroupId: null, figure: 'Roadblock', accessories: ['A0101', 'A0102'] }, // M-2X Heavy Machine Gun green/dark green
   { extGroupId: null, figure: 'Roadblock', accessories: ['A0103', 'A0104'] }, // Tripod green/dark green
+  // Dodger (1987, v1, F198 -> catalog id 138): 'Dodger' also matches a later
+  // v2 (id 268, F349), but the lowest id (138, v1) is the one with these
+  // accessories, same pattern as Duke/Recondo/Spirit/Zartan/Dr. Mindbender/
+  // T.A.R.G.A.T./Roadblock above. NOT a match_key case — a single slot, two
+  // interchangeable Ultra-Sonic Photon Rifle molds (thin handle/thick handle),
+  // same shape as Scrap-Iron/Recoil's Remote Activator/Mine Case above; own
+  // any one for completion. Not in the CSV's group_id column (blank for both
+  // A0315/A0316), so hand-built.
+  { extGroupId: null, figure: 'Dodger', accessories: ['A0315', 'A0316'] }, // Ultra-Sonic Photon Rifle thin/thick handle
 ];
 
 // Same label rule as the locked reference (subgroup-wire-v2.jsx groupLabel):

@@ -500,6 +500,13 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const DMap = DamageMap, DGrade = GradeBadge;
   const dmgPhys = !ghost && !moc ? physicalGrade(marks) : null;
   const dmgPaint = !ghost && !moc ? paintGrade(marks) : null;
+  // Zero zones marked reads as "ungraded" (not yet mapped) on the dashboard
+  // (see gradeOf, store.js) unless this copy carries an explicit marks.clean
+  // confirmation — mirrors the Add Figure CONDITION step's "mark clean" flow.
+  const marksCount = (dmgPhys ? dmgPhys.zones : 0) + (dmgPaint ? dmgPaint.zones : 0);
+  const clean = !!marks.clean;
+  const ungraded = marksCount === 0 && !clean;
+  const setClean = (v) => setMarks({ ...marks, clean: v });
   const ringPct = ghost ? 0 : moc ? 100 : cur.pct;
 
   // ---- ghost / catalog-gap acquire modal (simple, non-flip) ----
@@ -683,12 +690,12 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                 <div className="inv-copymeta">
                   <div className="inv-notes">
                     <div className="inv-notes__cap">NOTES</div>
-                    <textarea className="inv-notes__in" rows={2} defaultValue={raw.notes || ""} placeholder="Notes on this copy…"
+                    <textarea className="inv-notes__in" rows={2} defaultValue={raw.notes || ""} placeholder="damage notes — figure/accessory, damage…"
                               onBlur={e => setNotes(e.target.value)} key={cur.id}></textarea>
                   </div>
                   <div className="inv-notes inv-loc">
                     <div className="inv-notes__cap">BIN / BOX LOCATION</div>
-                    <input className="inv-notes__in inv-loc__in" defaultValue={raw.loc || ""} placeholder="e.g. BIN C-04 · long-box"
+                    <input className="inv-notes__in inv-loc__in" defaultValue={raw.loc || ""} placeholder="box 1, box 2, small tote"
                            onBlur={e => setLoc(e.target.value)} key={cur.id} />
                   </div>
                 </div>
@@ -738,13 +745,22 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
               </div>
               <div className="inv-cardback__side">
                 <section className="panel">
-                  <div className="panel__hd">CONDITION <em>· {moc ? "mint on card" : "derived from damage"}</em></div>
+                  <div className="panel__hd">CONDITION <em>· {moc ? "mint on card" : ungraded ? "ungraded" : marksCount === 0 ? "clean · confirmed" : "derived from damage"}</em></div>
                   {moc ? (
                     <div className="id-mocgrade"><span className="id-mocgrade__badge">MOC</span><div className="id-mocgrade__txt"><b>Factory mint · sealed</b><i>100% complete — not graded on the loose scale while carded.</i></div></div>
+                  ) : ungraded ? (
+                    <div className="panel__note">
+                      <div>Tag the diagram to record condition, or mark it clean.</div>
+                      <button className="af-markall" onClick={() => setClean(true)}>✓ MARK CLEAN — NO DAMAGE</button>
+                    </div>
                   ) : (
                     <React.Fragment>
                       <div className="grades"><DGrade kind="PHYSICAL" result={dmgPhys} /><DGrade kind="PAINT" result={dmgPaint} /></div>
-                      <div className="panel__note">Grades update live from the map. Click a zone to cycle its severity; use the Condition / Paint tabs to grade each.</div>
+                      {clean && marksCount === 0 ? (
+                        <div className="panel__note">Confirmed clean — no damage mapped. <button className="af-clear" onClick={() => setClean(false)}>undo</button></div>
+                      ) : (
+                        <div className="panel__note">Grades update live from the map. Click a zone to cycle its severity; use the Condition / Paint tabs to grade each.</div>
+                      )}
                     </React.Fragment>
                   )}
                 </section>

@@ -104,7 +104,7 @@ The Inventory already shows variants on rows, gallery cards, and the detail moda
 4. **Surface variants in Inventory.** ✅ **DONE** — per-variant pips (rows + cards), a grouped accordion, and a variant rail in the modal. (No unidentified group/filter — that state is dropped, §3/§7.3.)
 5. **Rarity treatment.** `rare: true` exists on the data (e.g. Cobra Commander v1·A "Mickey Mouse" logo). A ★ RARE tag was prototyped across the Inventory but **pulled back as an oversteer** — the field is retained in the data, just not surfaced. Open: decide a lighter-touch rare treatment (e.g. only on the copy detail / wanted-list), and whether rare gets a filter or a wanted-list boost.
 6. **Completeness × variant.** Accessory blueprints currently attach to the Figure, not the variant. Confirm whether any variant has a *different* required-accessory set (e.g. a mail-away variant shipped bagged with no gear) — if so, the blueprint must key on `variantId`, not `figureId`.
-7. **Figures not in the catalog — ✅ RESOLVED (June 2026).** Only one path: **append a real missing figure** (a mail-away/convention/exclusive not in `figures_2.0` yet) as a normal catalog row. The **custom / homemade path was dropped** (doesn't fit completionism) and `isCustom` is retired. Designed in `GI Joe Tracker - Add Missing Figure.html` — see 7.6 / `OPEN_QUESTIONS.md` #8.
+7. **Figures not in the catalog — ✅ RESOLVED (June 2026).** Only one path: **append a real missing figure** (a mail-away/convention/exclusive not in `figures_2.0` yet) as a normal catalog row. The **custom / homemade path was dropped** (doesn't fit completionism) and `isCustom` is retired. Designed in `GI Joe Tracker - Add Missing Figure.html` — see 7.6 / `OPEN_QUESTIONS_Claude.md` #8.
 
 ---
 
@@ -234,7 +234,7 @@ The catalog is owner-extensible (7.5.1), so "this figure isn't a clean pick" ori
 
 ~~2. Add a custom / homemade figure~~ — **DROPPED.** No `isCustom` figures; the flag is **retired from the data model** (see 7.1 schema). Every Figure is a real catalog entry.
 
-**Designed** — `GI Joe Tracker - Add Missing Figure.html` (`add-missing-figure.jsx`): a single owner-as-admin "append catalog row" form (hand-allocated 700-block ID + blueprint + variant count), handing off to Details → Condition. It's a **rare** action — the seed catalog is assumed essentially complete, and the same rows can be added by editing the reference DB directly (both write the same catalog table). Build follow-ups (wire the FIND link, gate the admin form, persist the row) live in `OPEN_QUESTIONS.md` #8.
+**Designed** — `GI Joe Tracker - Add Missing Figure.html` (`add-missing-figure.jsx`): a single owner-as-admin "append catalog row" form (hand-allocated 700-block ID + blueprint + variant count), handing off to Details → Condition. It's a **rare** action — the seed catalog is assumed essentially complete, and the same rows can be added by editing the reference DB directly (both write the same catalog table). Build follow-ups (wire the FIND link, gate the admin form, persist the row) live in `OPEN_QUESTIONS_Claude.md` #8.
 
 ### 7.7 Inventory wiring follow-up (decision #4 — make it data-driven)
 

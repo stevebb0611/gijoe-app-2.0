@@ -618,6 +618,95 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
   instances (356, 357) re-evaluating correctly, 2026-07-12. Not yet visually verified
   in-app.
 
+### 1987 — Dodger (v1, figure catalog id 138 — source F-code F198)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below. Not a
+  `match_key` case — a single slot with two interchangeable molds of the same
+  item, same shape as Scrap-Iron's Remote Activator / Recoil's Mine Case above.
+- **Variants:** none on file — single catalog row. `code_name = 'Dodger'` also
+  matches a later v2 (id 268, F349), but the lowest id (138, v1) is the one
+  with these accessories, same pattern as Duke/Recondo/Spirit/Zartan/Dr.
+  Mindbender/T.A.R.G.A.T./Roadblock above.
+- **Group_id slot:** Ultra-Sonic Photon Rifle (thin handle) / Ultra-Sonic
+  Photon Rifle (thick handle) (`accessory_groups.id` 26).
+- **Unaffected (plain, independently required):** Microphone.
+- **Source:** hand-built (`extGroupId: null` in `server/migrate-accessory-groups.mjs`
+  — blank in the CSV's `group_id` column for both A0315/A0316).
+- **Status:** ✅ group_id set in DB and verified via direct DB read (figure_id
+  138: A0315/A0316 both carry group_id 26, no match_key; Microphone
+  ungrouped), 2026-07-13. Not yet visually verified in-app.
+
+### 1987 — Falcon (v1, figure catalog id 139 — source F-code F199)
+
+- **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
+  group and never block Complete; no `group_id` on this figure.
+- **Variants:** none on file — single catalog row.
+- **Non-retail accessories:** Rifle (A0692), Flare Gun (A0807) — reclassified
+  `retail` → `convention` via `set-accessory-context.mjs`, 2026-07-13, owner-confirmed.
+- **Unaffected (plain retail, required):** Special Forces Field Commications Pack
+  Backpack (A0317), Antenna (A0318), 12-Gauge Pump Shotgun (A0319), Bowie Survival
+  Knife (A0320).
+- **Status:** ✅ release_context set in DB via `set-accessory-context.mjs` and verified
+  (`Rifle (A0692): retail → convention`, `Flare Gun (A0807): retail → convention`) via
+  SQL query, 2026-07-13. Not yet visually verified in-app.
+
+### 1987 — Gung-Ho (v2, figure catalog id 142 — source F-code F203)
+
+- **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
+  group and never block Complete; no `group_id` on this figure.
+- **Variants:** none on file — single catalog row. Part of the parked mainline/convention
+  `(code_name, version)` dedup collision noted in `OPEN_QUESTIONS_Claude.md` (F203 vs.
+  the 700-block F702 row) — not resolved here; this entry only reclassifies the
+  accessories already attached to the surviving F203 row, per owner instruction.
+- **Non-retail accessories:** Kris (wavy) (A0758), Sword (barbed) (A0759) — reclassified
+  `retail` → `convention` via `set-accessory-context.mjs`, 2026-07-13, owner-confirmed.
+- **Unaffected:** Non-Com Dress Sabre (A0327) stays plain retail, required. Rank and
+  Stripes (decal) (A0328) was already `bonus` (bulk Decal reclassification, 2026-07-11 —
+  see the table above), untouched by this change.
+- **Status:** ✅ release_context set in DB via `set-accessory-context.mjs` and verified
+  (`Kris (wavy) (A0758): retail → convention`, `Sword (barbed) (A0759): retail →
+  convention`) via SQL query, 2026-07-13. Not yet visually verified in-app.
+
+### 1987 — Outback (v1, figure catalog id 152 — source F-code F213)
+
+- **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
+  group and never block Complete; no `group_id` on this figure.
+- **Variants:** none on file — single catalog row. Part of the parked mainline/convention
+  dedup collision noted in `OPEN_QUESTIONS_Claude.md` (Outback is on the ~20-name list);
+  not resolved here — this entry only fixes the accessories on the surviving F213 row,
+  per owner instruction.
+- **Blueprint correction:** Flashlight (black, A0463) removed outright — it belongs to
+  Outback v2 (F262/id 192, the Toys R Us black-uniform release) only; a source-CSV
+  duplication had leaked it onto v1's blueprint too, same bug class as the Blocker/Blaster
+  mixup (`migrations/007_variant_scoped_accessories.sql`).
+- **Non-retail accessories:** Rifle (white, A0647), Machine Gun (brown, A0652) —
+  reclassified `retail` → `convention` via `set-accessory-context.mjs`, 2026-07-13,
+  owner-confirmed.
+- **New accessory:** the convention release also shipped its own Flashlight (green) —
+  same name+color as the retail one (A0352), but a physically distinct pack-in, not a
+  reused row (no spare green Flashlight existed anywhere else in the catalog to
+  repurpose). Created `A1931` (`server/fix-outback-v1-blueprint.mjs`), attached
+  convention-only.
+- **Unaffected (plain retail, required):** Survival Backpack (A0349), Heckler & Koch G3
+  Rifle (A0350), Web Belt (A0351), Flashlight (green, A0352, retail copy).
+- **Bug found + fixed:** two rows sharing both name *and* color on one figure (retail vs.
+  convention Flashlight, both "Flashlight"/green) exposed a latent bug in
+  `server/blueprint-names.js`'s `disambiguateNames()` — its own header comment described a
+  numbered-suffix fallback for this exact case ("even color collides") but never actually
+  implemented it, so both rows rendered as the identical label "Flashlight (green)" and
+  `instances.js`'s name→id `Map` silently collapsed them to whichever row sorted second
+  (`instance_accessories` itself is keyed by `accessory_id`, so no stored ownership data
+  was corrupted — this only affected live name resolution for toggling). Fixed with a
+  second disambiguation pass keyed on the color-appended label; now renders "Flashlight
+  (green) #1" (retail) / "Flashlight (green) #2" (convention). Also self-corrects four
+  other figures with pre-existing, unrelated same-name-same-color collisions (Major Bludd
+  v2, Mercer v2, Chun Li v1, Alley Viper v3) that had the same latent bug.
+- **Status:** ✅ release_context/removal/new-accessory applied via
+  `server/fix-outback-v1-blueprint.mjs`, `disambiguateNames()` fixed in
+  `server/blueprint-names.js`, both verified via `/api/catalog` (blueprint shows Backpack/
+  Rifle/Web Belt/Flashlight #1 retail, Rifle/Machine Gun/Flashlight #2 convention, no black
+  Flashlight), 2026-07-13. Not yet visually verified in-app.
+
 ### 1989 — Recoil (v1, figure catalog id 245 — source F-code F321)
 
 - **Mechanism:** plain `group_id` — own any one member of the slot below.

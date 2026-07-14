@@ -296,11 +296,11 @@ function AddFigure({ onClose }) {
                   <label className="af-meta__field">
                     <span className="af-meta__lab">NOTES · THIS COPY</span>
                     <textarea className="af-in af-in--area" value={notes} onChange={e => setNotes(e.target.value)}
-                              placeholder={moc ? "optional — card grade, bubble crush, sun-fade, AFA number…" : "optional — joint feel, provenance, where you bought it, paint quirks…"}></textarea>
+                              placeholder={moc ? "optional — card grade, bubble crush, sun-fade, AFA number…" : "damage notes — figure/accessory, damage…"}></textarea>
                   </label>
                   <label className="af-meta__field">
                     <span className="af-meta__lab">BIN / BOX LOCATION</span>
-                    <input className="af-in" value={loc} onChange={e => setLoc(e.target.value)} placeholder="e.g. BIN C-04 · long-box" />
+                    <input className="af-in" value={loc} onChange={e => setLoc(e.target.value)} placeholder="box 1, box 2, small tote" />
                   </label>
                 </div>
                 {cooOpts.length > 0 && (

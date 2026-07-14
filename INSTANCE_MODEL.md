@@ -97,7 +97,7 @@ Each grade badge shows the word, the demerit score, and the cap reason when capp
 ---
 
 ## Completeness & the rebalance engine
-Completeness is **per-instance** (decided May 2026 — see `OPEN_QUESTIONS.md` #5). An instance is **whole** when, for every required accessory, `have-quantity ≥ required-quantity` (partials give proportional credit: 1 of 2 skis = 1 of the 2 needed). A **figure** is **complete-now** when **≥ 1 of its copies is whole**.
+Completeness is **per-instance** (decided May 2026 — see `OPEN_QUESTIONS_Claude.md` #5). An instance is **whole** when, for every required accessory, `have-quantity ≥ required-quantity` (partials give proportional credit: 1 of 2 skis = 1 of the 2 needed). A **figure** is **complete-now** when **≥ 1 of its copies is whole**.
 
 ### Two states
 - **complete-now** — a copy is whole *as parts are currently assigned to copies*.
@@ -123,6 +123,15 @@ Year headers show **COVERAGE** (`ownedFigures ÷ rosterFigures`) and **COMPLETE*
 ---
 
 ## Instance Detail screen (layout)
+
+> **Update (July 2026):** the build below is the original spec, not what shipped. The live
+> app (`web/src/app-detail.jsx`) folds this into the Inventory's **detail modal** as a
+> flip-card — **FIGURE** front face / **CONDITION** back face — instead of a separate page;
+> see `NAVIGATION.md` → *Reaching Instance Detail from Inventory* for the confirmed
+> divergence. The content below (damage map, grade badges, accessories, location, Remove)
+> is accurate for *what's on the CONDITION face*, just not as a standalone page with its own
+> breadcrumb/route.
+
 A **dedicated full page** (not a modal — the damage map needs room). Two columns:
 - **Left (sticky):** the **damage map** — Front/Back + Male/Female toggles, the schematic figure, clickable o-ring **nodes** (open a Log-Damage panel: pick type × severity) and clickable **paint regions** (cycle severity), plus a severity legend.
 - **Right:** `CONDITION` (Physical + Paint grade badges + derivation note) · a contextual `LOG DAMAGE` panel when a node is selected · the `DAMAGE LOG` table (every mark: side · location · category · severity; removable) · `ACCESSORIES` checklist with **pull-from-Parts-Bin** on missing parts · `PARTS BIN` strip · `LOCATION` field · **Remove** action.

@@ -33,7 +33,7 @@ That's the entire allowed change set. Everything else stays byte-identical.
 ## The ONE real refactor (and only when asked)
 The single thing that is genuinely not portable is the **synthesized per-instance data**
 in `wf-data.jsx` (`figState()` derives a fake per-copy allocation from aggregate counts).
-That gets replaced by a real **Instance** entity + DB later (`OPEN_QUESTIONS.md #1/#13`).
+That gets replaced by a real **Instance** entity + DB later (`OPEN_QUESTIONS_Claude.md #1/#13`).
 **Do this as a separate, explicit step — after the verbatim port is confirmed pixel-identical, and only when the owner asks.** It is not part of the port.
 
 ## Why this matters
