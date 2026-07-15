@@ -707,6 +707,74 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
   Rifle/Web Belt/Flashlight #1 retail, Rifle/Machine Gun/Flashlight #2 convention, no black
   Flashlight), 2026-07-13. Not yet visually verified in-app.
 
+### 1989 — Countdown (v1, figure catalog id 220 — source F-code F294)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below. Not a
+  `match_key` case — a single slot with two interchangeable molds of the same
+  item, same shape as Scrap-Iron/Recoil/Dodger's thin/thick-handle slots above.
+- **Variants:** none on file — single catalog row. `code_name = 'Countdown'`
+  also matches a later v2 (id 397, F491) and v3 (id 492, F592), but the lowest
+  id (220, v1) is the one with these accessories, same pattern as
+  Duke/Recondo/Spirit/Zartan/Dr. Mindbender/T.A.R.G.A.T./Roadblock/Dodger above.
+- **Group_id slot:** Space Helmet (soft plastic) / Space Helmet (hard plastic)
+  (`accessory_groups.id` 27).
+- **Unaffected (plain, independently required):** Backpack, Grappling Hook,
+  Counterweight, Pistol, String.
+- **Source:** hand-built (`extGroupId: null` in `server/migrate-accessory-groups.mjs`
+  — blank in the CSV's `group_id` column for both A0547/A0548).
+- **Status:** ✅ group_id set in DB and verified via direct DB read (figure_id
+  220: A0547/A0548 both carry group_id 27, no match_key), 2026-07-14. Not yet
+  visually verified in-app.
+
+### 1989 — Python Officer (v1, figure catalog id 240 — source F-code F316)
+
+- **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
+  group and never block Complete; no `group_id` on this figure.
+- **Variants:** none on file — single catalog row.
+- **Non-retail accessories:** Pistol (A0626), Rifle (A0614) — reclassified `retail` →
+  `convention` via `set-accessory-context.mjs`, 2026-07-14, owner-confirmed.
+- **Unaffected (plain retail, required):** Dragunov (SVD) Sniper's Rifle (A0004) — the
+  only accessory required for Complete.
+- **Status:** ✅ release_context set in DB via `set-accessory-context.mjs` and verified
+  via `/api/catalog` (`Pistol (A0626): retail → convention`, `Rifle (A0614): retail →
+  convention`), 2026-07-14. Not yet visually verified in-app.
+
+### 1989 — Python Tele-Viper (v1, figure catalog id 241 — source F-code F317)
+
+- **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
+  group and never block Complete; no `group_id` on this figure.
+- **Variants:** none on file — single catalog row.
+- **Non-retail accessories:** Pistol (A0552), Knife (A0778) — reclassified `retail` →
+  `convention` via `set-accessory-context.mjs`, 2026-07-14, owner-confirmed.
+- **Blueprint correction:** Pistol (A0552) `quantity_required` raised 1 → 2 (the
+  convention release requires two), applied directly to `figure_accessories`,
+  2026-07-14, owner-confirmed.
+- **Unaffected (plain retail, required):** Communications Backpack (A0215), Hose 6"
+  Long (long) (A1902), VS-11 Scanner Rifle (A0216).
+- **Status:** ✅ release_context/quantity set in DB via `set-accessory-context.mjs` +
+  direct `figure_accessories` update and verified via direct DB read (`Pistol
+  (A0552): retail → convention, qty 1 → 2`, `Knife (A0778): retail → convention`),
+  2026-07-14. Not yet visually verified in-app.
+
+### 1989 — Python Trooper (v1, figure catalog id 242 — source F-code F318)
+
+- **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
+  group and never block Complete; no `group_id` on this figure.
+- **Variants:** none on file — single catalog row.
+- **Non-retail accessories:** AK-47 Assault Rifle, white (A0610) — reclassified
+  `retail` → `convention` via `set-accessory-context.mjs`, 2026-07-14, owner-confirmed.
+- **Catalog correction:** A0610 was misnamed "AK-47 Rifle" (inconsistent with A0006/
+  A0208's "AK-47 Assault Rifle"); renamed to match. A0610 is used only by this figure,
+  so the rename is scoped safely — no other figure's blueprint is affected. Applied
+  directly to `accessories.name`, 2026-07-14, owner-confirmed.
+- **Unaffected (plain retail, required):** AK-47 Assault Rifle, black (A0006) — the
+  retail pack-in; distinct row from the white convention rifle above, disambiguated
+  by color.
+- **Status:** ✅ release_context/rename set in DB via `set-accessory-context.mjs` +
+  direct `accessories` update and verified via direct DB read (`AK-47 Rifle → AK-47
+  Assault Rifle (A0610): retail → convention`), 2026-07-14. Not yet visually verified
+  in-app.
+
 ### 1989 — Recoil (v1, figure catalog id 245 — source F-code F321)
 
 - **Mechanism:** plain `group_id` — own any one member of the slot below.
@@ -731,6 +799,129 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
 - **Source:** hand-built (`extGroupId: null` in `server/migrate-accessory-groups.mjs` — not
   sourced from the CSV's `group_id` column).
 - **Status:** group_id set in DB; not individually owner-verified in-app.
+
+### 1990 — Dial-Tone (v3, figure catalog id 266 — source F-code F347)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below. Not a
+  `match_key` case — a single slot, two interchangeable Sonic Backpack molds, same
+  shape as Dodger(v1)/Countdown above.
+- **Variants:** none on file — single catalog row.
+- **Group_id slot:** Sonic Backpack (raised edges around buttons) / Sonic Backpack (no
+  edges around buttons) (`accessory_groups.id` 28).
+- **Catalog correction:** the "no edges around buttons" accessory row (A0710) carried
+  two trailing tab characters baked into `accessories.name` (CSV import glitch,
+  invisible in most views) — trimmed, 2026-07-15, owner-confirmed. Same fix applied to
+  the five sibling rows below (A0718/A0732/A0741/A0825/A0839).
+- **Unaffected (plain, independently required):** Battery Cover, Pistol, Machine Gun,
+  Flamethrower, Grenade Launcher, Grenade Launcher Cylinder.
+- **Source:** hand-built (`extGroupId: null` in `server/migrate-accessory-groups.mjs` —
+  blank in the CSV's `group_id` column for both A0709/A0710), owner-found 2026-07-15.
+- **Figure/accessory swap correction:** this whole 8-item set (A0709-A0716) was
+  originally attached to figure catalog id **267 (Decimator v1, F348)** instead of
+  266, and Decimator's real gear (Helmet A0707, Speargun A0708) was attached to 266
+  instead of 267 — `gijoe_db_figures_accessories.csv` swapped the F-code on these two
+  adjacent blocks (code_name label stayed correct, F-code didn't), and the live DB was
+  originally seeded off that F-code column. `gijoe_db_accessories.csv`'s independent
+  `host_figure` column had it right the whole time. Fixed directly in the DB —
+  `migrations/010_dial_tone_decimator_swap.sql` — and in
+  `server/migrate-accessory-groups.mjs` (`fcode` flipped from F348 to F347),
+  owner-confirmed against the physical figure 2026-07-15.
+- **Status:** ✅ group_id set in DB and figure/accessory assignment corrected, verified
+  via direct DB read (figure_id 266: A0709-A0716 including group_id 28 on A0709/A0710;
+  figure_id 267/Decimator: A0707/A0708), 2026-07-15. Not yet visually verified in-app.
+
+### 1990 — Dodger (v2, figure catalog id 268 — source F-code F349)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below.
+- **Variants:** none on file — single catalog row. `Dodger` also matches an earlier v1
+  (id 138, F198 — already grouped above for its own Ultra-Sonic Photon Rifle slot), so
+  unlike the Duke/Recondo/Spirit/Zartan/…/Countdown cases above where the plain
+  code_name lookup's "lowest id" happens to be the right figure, here it would resolve
+  to the WRONG one — disambiguated via `fcode: 'F349'` in
+  `server/migrate-accessory-groups.mjs`.
+- **Group_id slot:** Sonic Backpack (raised edges around buttons) / Sonic Backpack (no
+  edges around buttons) (`accessory_groups.id` 29).
+- **Unaffected (plain, independently required):** Battery Cover, Submachine Gun, Rifle,
+  Proton Rifle, Laser Rifle.
+- **Source:** hand-built (`extGroupId: null`), owner-found 2026-07-15.
+- **Status:** ✅ group_id set in DB and verified via direct DB read (figure_id 268:
+  A0717/A0718 both carry group_id 29), 2026-07-15. Not yet visually verified in-app.
+
+### 1990 — Lampreys (v2, figure catalog id 271 — source F-code F352)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below.
+- **Variants:** none on file — single catalog row. `Lampreys` also matches an earlier v1
+  (id 84, F132, no `group_id` slot of its own) — disambiguated via `fcode: 'F352'`, same
+  reason as Dodger above.
+- **Group_id slot:** Sonic Backpack (raised edges around buttons) / Sonic Backpack (no
+  edges around buttons) (`accessory_groups.id` 30).
+- **Unaffected (plain, independently required):** Rifle, Submachine Gun with Silencer,
+  Machine Gun with Bayonet, Battery Cover.
+- **Source:** hand-built (`extGroupId: null`), owner-found 2026-07-15.
+- **Status:** ✅ group_id set in DB and verified via direct DB read (figure_id 271:
+  A0731/A0732 both carry group_id 30), 2026-07-15. Not yet visually verified in-app.
+
+### 1990 — Law (v2, figure catalog id 273 — source F-code F354)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below.
+- **Variants:** none on file — single catalog row. `Law` also matches a later v3
+  (id 432, F528) — the plain code_name lookup's "lowest id" already resolves correctly
+  here, but `fcode: 'F354'` was used for consistency with the rest of this pass.
+- **Group_id slot:** Sonic Backpack (raised edges around buttons) / Sonic Backpack (no
+  edges around buttons) (`accessory_groups.id` 31).
+- **Unaffected (plain, independently required):** Helmet, Browning Double Action 9mm
+  Pistol, Battery Cover, Pistol, Rifle, L7A21 GPMG Heavy Machine Gun, Tripod.
+- **Source:** hand-built (`extGroupId: null`), owner-found 2026-07-15.
+- **Status:** ✅ group_id set in DB and verified via direct DB read (figure_id 273:
+  A0740/A0741 both carry group_id 31), 2026-07-15. Not yet visually verified in-app.
+
+### 1990 — Tunnel Rat (v3, figure catalog id 290 — source F-code F373)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below.
+- **Variants:** none on file — single catalog row. `Tunnel Rat` also matches an earlier
+  v1 (id 166, F230) and v2 (id 210, F284) — disambiguated via `fcode: 'F373'`, same
+  reason as Dodger/Lampreys above.
+- **Group_id slot:** Sonic Backpack (raised edges around buttons) / Sonic Backpack (no
+  edges around buttons) (`accessory_groups.id` 32).
+- **Unaffected (plain, independently required):** Assault Pistol, Air-Cooled 7.62
+  Calibre Machine Gun with Infrared Scope, Battery Cover, Experimental Ground-to-Air
+  Pistol, Anti-Tank EK99 Missile, Missile Stand.
+- **Source:** hand-built (`extGroupId: null`), owner-found 2026-07-15.
+- **Status:** ✅ group_id set in DB and verified via direct DB read (figure_id 290:
+  A0824/A0825 both carry group_id 32), 2026-07-15. Not yet visually verified in-app.
+
+### 1990 — Viper (v2, figure catalog id 294 — source F-code F377)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below.
+- **Variants:** none on file — single catalog row. `Viper` also matches a later v3
+  (id 522, F628) — the plain code_name lookup's "lowest id" already resolves correctly
+  here, but `fcode: 'F377'` was used for consistency with the rest of this pass.
+- **Group_id slot:** Sonic Backpack (raised edges around buttons) / Sonic Backpack (no
+  edges around buttons) (`accessory_groups.id` 33).
+- **Unaffected (plain, independently required):** Battery Cover, .45 Caliber Pistol,
+  Submachine Gun, Laser Pistol, Mortar, Mortar Mount, Mortar Stand (Traversing
+  Assembly).
+- **Source:** hand-built (`extGroupId: null`), owner-found 2026-07-15.
+- **Status:** ✅ group_id set in DB and verified via direct DB read (figure_id 294:
+  A0838/A0839 both carry group_id 33), 2026-07-15. Not yet visually verified in-app.
+
+### 1991 — Psyche-Out (v3, figure catalog id 318 — source F-code F403)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below. Not a
+  `match_key` case — a single slot, two interchangeable Sonic Backpack molds.
+- **Variants:** none on file — single catalog row. `Psyche-Out` also matches an earlier
+  v1 (id 154, F215) and v2 (id 193, F263) — disambiguated via `fcode: 'F403'`, same
+  reason as Dodger/Lampreys/Tunnel Rat above.
+- **Group_id slot:** Sonic Backpack (raised peg on side) / Sonic Backpack (hole on side)
+  — same pick-one mechanism as the button-edge pairs above, different mold detail (a
+  peg/hole attachment rather than button edges), owner-confirmed same treatment,
+  2026-07-15 (`accessory_groups.id` 34).
+- **Unaffected (plain, independently required):** Microphone, Battery Cover, Antenna,
+  Radar Dish, Radar Screen, E.C.M. (Laser Rifle), E.C.M. (small, attach to Psyche-Out),
+  E.C.M. (large, attach to rifle), Action Figure Battle Stand, Hose 6" Long (long).
+- **Source:** hand-built (`extGroupId: null`), owner-found 2026-07-15.
+- **Status:** ✅ group_id set in DB and verified via direct DB read (figure_id 318:
+  A0953/A0954 both carry group_id 34), 2026-07-15. Not yet visually verified in-app.
 
 ## Non-retail backlog (not yet reviewed)
 

@@ -5,7 +5,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
-import { buildCatalog } from './catalog.js';
+import { buildCatalog, setFigureMasterTarget, setVariantMasterTarget } from './catalog.js';
 import { buildAccessoryCatalog } from './accessories.js';
 import { buildWorkbook } from './export-xlsx.js';
 import * as store from './instances.js';
@@ -31,6 +31,21 @@ app.get('/api/accessories', (req, res) => {
 
 app.get('/api/state', (req, res) => {
   res.json(store.getState());
+});
+
+// Master Collection target quantities (migration 009). setFigureMasterTarget
+// targets figures.master_target (single-variant figures); setVariantMasterTarget
+// targets a specific variant_lookup row for figures with recorded variants —
+// the frontend picks between the two based on whether the catalog's variants[]
+// entry has a real `id` or the synthesized single-variant placeholder's `null`.
+app.patch('/api/figures/:id', (req, res) => {
+  setFigureMasterTarget(+req.params.id, req.body.masterTarget);
+  res.json({ ok: true });
+});
+
+app.patch('/api/variants/:id', (req, res) => {
+  setVariantMasterTarget(+req.params.id, req.body.masterTarget);
+  res.json({ ok: true });
 });
 
 // Full-catalog Excel export for the Tweaks & Admin panel's "Export catalog"
@@ -67,6 +82,12 @@ app.patch('/api/instances/:id/accessory-damage', (req, res) => {
   res.json({ ok: true });
 });
 
+app.patch('/api/instances/:id/accessory-damage-notes', (req, res) => {
+  const ok = store.setInstanceAccessoryDamageNotes(+req.params.id, req.body.name, req.body.notes);
+  if (!ok) return res.status(400).json({ error: 'no damaged unit of this accessory on this copy' });
+  res.json({ ok: true });
+});
+
 app.post('/api/instances/:id/accessory/swap-clean', (req, res) => {
   const ok = store.swapAccessoryForClean(+req.params.id, req.body.name);
   if (!ok) return res.status(400).json({ error: 'no damaged unit to swap, or no clean stock in the Parts Bin' });
@@ -96,6 +117,12 @@ app.patch('/api/parts-bin/:accessoryId', (req, res) => {
 
 app.patch('/api/parts-bin/:accessoryId/damage', (req, res) => {
   const ok = store.setPartDamage(+req.params.accessoryId, req.body.units);
+  if (!ok) return res.status(400).json({ error: 'no such bin entry' });
+  res.json({ ok: true });
+});
+
+app.patch('/api/parts-bin/:accessoryId/damage-notes', (req, res) => {
+  const ok = store.setPartDamageNotes(+req.params.accessoryId, req.body.notes);
   if (!ok) return res.status(400).json({ error: 'no such bin entry' });
   res.json({ ok: true });
 });

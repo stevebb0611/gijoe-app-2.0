@@ -18,6 +18,13 @@
 --    - v_figure_completeness: ADDED (per-figure complete-now summary)
 --    - v_orphan_accessories: REMOVED (concept moves to app layer)
 --    - instances trigger + indexes: ADDED
+--
+--  Migration 009 (Master Collection, July 2026):
+--    - figures.master_target, variant_lookup.master_target: ADDED (per-variant
+--              target quantity, default 1; figures.master_target is the
+--              fallback for single-variant figures with no variant_lookup rows)
+--    - instances.is_master: ADDED (the star — this copy is a committed keeper)
+--    - v_master_collection_progress: ADDED (target vs. starred_count per figure/variant)
 -- ============================================================
 
 PRAGMA foreign_keys = ON;
@@ -93,6 +100,11 @@ CREATE TABLE IF NOT EXISTS figures (
     notes             TEXT,                -- catalog-level annotation (not per-copy)
     image_url_primary TEXT,
     image_url_detail  TEXT,
+    master_target     INTEGER NOT NULL DEFAULT 1,
+                      -- Master Collection target (migration 009): how many copies of
+                      -- this figure the owner wants as permanent keepers. Used only
+                      -- for figures with NO variant_lookup rows — multi-variant
+                      -- figures target per variant_lookup.master_target instead.
     created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at        DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -132,11 +144,14 @@ CREATE TABLE IF NOT EXISTS accessories (
 -- See VARIANTS.md for the full model.
 
 CREATE TABLE IF NOT EXISTS variant_lookup (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    figure_id   INTEGER NOT NULL REFERENCES figures(id) ON DELETE CASCADE,
-    letter      TEXT    NOT NULL,   -- 'A', 'B', 'C' …
-    tell        TEXT    NOT NULL,   -- plain-English physical description, e.g. "thin thumbs"
-    notes       TEXT,
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    figure_id     INTEGER NOT NULL REFERENCES figures(id) ON DELETE CASCADE,
+    letter        TEXT    NOT NULL,   -- 'A', 'B', 'C' …
+    tell          TEXT    NOT NULL,   -- plain-English physical description, e.g. "thin thumbs"
+    notes         TEXT,
+    master_target INTEGER NOT NULL DEFAULT 1,
+                  -- Master Collection target for this specific production variant
+                  -- (migration 009), e.g. a troop-builder variant set to 3.
     UNIQUE (figure_id, letter)
 );
 
@@ -188,6 +203,10 @@ CREATE TABLE IF NOT EXISTS instances (
     country_of_origin TEXT CHECK (country_of_origin IN ('China', 'Hong Kong', 'Indonesia')),
                 -- which of the figure's known origins (figure_coo) this physical copy is.
                 -- A notation, like filecard_printing — optional, doesn't affect completeness.
+    is_master   BOOLEAN NOT NULL DEFAULT 0,
+                -- Master Collection star (migration 009): this copy is a committed
+                -- permanent keeper, counted toward its figure/variant's master_target.
+                -- Free to set regardless of completeness/file-card status — not a gate.
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -625,6 +644,24 @@ FROM accessory_inventory ai
 JOIN accessories            a  ON a.id          = ai.accessory_id
 LEFT JOIN accessory_categories ac ON ac.category_id = a.category_id
 ORDER BY a.name;
+
+
+-- Master Collection progress (migration 009) — TablePlus reporting only;
+-- the app computes this client-side. One row per figure × variant.
+CREATE VIEW IF NOT EXISTS v_master_collection_progress AS
+SELECT
+    f.id                                        AS figure_id,
+    f.code_name,
+    f.display_name,
+    vl.letter                                   AS variant_letter,
+    COALESCE(vl.master_target, f.master_target)  AS target,
+    COUNT(CASE WHEN i.is_master = 1 THEN 1 END)  AS starred_count
+FROM figures f
+LEFT JOIN variant_lookup vl ON vl.figure_id = f.id
+LEFT JOIN instances i ON i.figure_id = f.id
+  AND (i.variant_id = vl.id OR (vl.id IS NULL AND i.variant_id IS NULL))
+GROUP BY f.id, vl.id
+ORDER BY f.code_name, vl.letter;
 
 
 -- ─────────────────────────────────────────────

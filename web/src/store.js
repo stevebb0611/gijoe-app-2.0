@@ -9,7 +9,10 @@
 // Instance shape (one owned physical copy) — unchanged from before:
 //   { id, catalogId, variant, coo, moc, acc:{[name]:units}, accDamage:{[name]:units},
 //     phys, paint, marks:{gender,condition,paint}, filecard:{onFile,printing},
-//     loc, notes, addedAt }
+//     loc, notes, masterCollection, addedAt }
+//   masterCollection: true = this copy is starred as a Master Collection keeper
+//   (migration 009) — counts toward its figure/variant's target quantity. Free
+//   to set regardless of completeness/file-card status, not a gate.
 //   accDamage: how many of acc[name]'s owned units are damaged (<= acc[name]).
 //   A condition notation, not a completeness input — see accDamagePct().
 //   variant: '' (single-variant figure) | 'A'|'B'… (a production variant)
@@ -89,7 +92,7 @@ function figureSummary(catalogId) {
     const { phys, paint } = gradeOf(i);
     return {
       id: i.id, variant: i.variant, coo: i.coo, loc: i.loc, notes: i.notes, moc,
-      phys, paint, acc, cardOnFile: card,
+      phys, paint, acc, cardOnFile: card, masterCollection: !!i.masterCollection,
       own: moc ? req : instOwn(bpv, acc), req,
       pct: moc ? 100 : instPct(bpv, acc), whole: moc ? true : instWhole(bpv, acc),
       missing: moc ? [] : missingList(bpv, acc),
@@ -106,6 +109,27 @@ function totals() {
   let complete = 0;
   owned.forEach(id => { const s = figureSummary(id); if (s && s.whole > 0) complete++; });
   return { unique: owned.size, instances: state.instances.length, complete };
+}
+// Master Collection aggregate (migration 009) — walks every figure/variant
+// slot in the catalog (not just owned ones, since target defaults to 1
+// everywhere) tallying starred copies against target. metSum/targetSum caps
+// each slot's contribution at its target, so over-starring past a troop-
+// builder's target doesn't inflate the overall completion fraction.
+function masterTotals() {
+  let figuresIn = 0, starredCopies = 0, targetSum = 0, metSum = 0;
+  CAT.forEach((fig) => {
+    const copies = instancesOf(fig.id);
+    if (copies.some((c) => c.masterCollection)) figuresIn++;
+    (fig.variants || []).forEach((v) => {
+      const letter = v.letter || '';
+      const count = copies.filter((c) => (c.variant || '') === letter && c.masterCollection).length;
+      const target = v.masterTarget || 0;
+      targetSum += target;
+      metSum += Math.min(count, target);
+      starredCopies += count;
+    });
+  });
+  return { figuresIn, starredCopies, targetSum, metSum };
 }
 
 export const JoeStore = {
@@ -127,6 +151,10 @@ export const JoeStore = {
       api('PATCH', '/api/instances/' + id + '/accessory-damage', { name, units });
       refresh(); emit();
     },
+    setAccDamageNotes(id, name, notes) {
+      api('PATCH', '/api/instances/' + id + '/accessory-damage-notes', { name, notes });
+      refresh(); emit();
+    },
     // trades a damaged unit on this instance for a clean one from the Parts Bin
     swapAccessoryForClean(id, name) {
       api('POST', '/api/instances/' + id + '/accessory/swap-clean', { name });
@@ -135,6 +163,32 @@ export const JoeStore = {
     removeInstance(id) {
       api('DELETE', '/api/instances/' + id);
       refresh(); emit();
+    },
+    // Master Collection target quantities (migration 009) — id is either a
+    // figures.id (single-variant figure) or a variant_lookup.id (a specific
+    // production variant); see catalog `variants[].id` (null = figure-level).
+    // The catalog (CAT/CAT_BY_ID) is otherwise pure read-only reference data
+    // fetched once at load, so unlike updateInstance there's no /api/catalog
+    // refetch to reflect this write — instead patch the cached figure object
+    // in place (same references app-detail.jsx's INV_CAT_BY_ID holds) so the
+    // change shows up on the next render without a full page reload.
+    setFigureMasterTarget(id, target) {
+      api('PATCH', '/api/figures/' + id, { masterTarget: target });
+      const fig = CAT_BY_ID.get(id);
+      if (fig) {
+        fig.masterTarget = target;
+        const placeholder = (fig.variants || []).find(v => v.id == null);
+        if (placeholder) placeholder.masterTarget = target;
+      }
+      emit();
+    },
+    setVariantMasterTarget(id, target) {
+      api('PATCH', '/api/variants/' + id, { masterTarget: target });
+      for (const fig of CAT) {
+        const v = (fig.variants || []).find(v => v.id === id);
+        if (v) { v.masterTarget = target; break; }
+      }
+      emit();
     },
 
     // ---- Parts Bin: loose accessories (global stock — see server/instances.js) ----
@@ -150,6 +204,10 @@ export const JoeStore = {
     },
     setPartDamage(id, units) {
       api('PATCH', '/api/parts-bin/' + id + '/damage', { units });
+      refresh(); emit();
+    },
+    setPartDamageNotes(id, notes) {
+      api('PATCH', '/api/parts-bin/' + id + '/damage-notes', { notes });
       refresh(); emit();
     },
     removePart(id) {
@@ -184,4 +242,4 @@ export const JoeStore = {
       return false;
     },
   };
-export const JoeData = { CAT, CAT_BY_ID, ACC, ACC_BY_ID, bpReq, instOwn, instPct, instWhole, accDamagePct, clusterBlueprint, bpForVariant, groupLabel, optLabel, instancesOf, ownedCount, figureSummary, totals };
+export const JoeData = { CAT, CAT_BY_ID, ACC, ACC_BY_ID, bpReq, instOwn, instPct, instWhole, accDamagePct, clusterBlueprint, bpForVariant, groupLabel, optLabel, instancesOf, ownedCount, figureSummary, totals, masterTotals };

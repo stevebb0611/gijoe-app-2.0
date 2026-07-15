@@ -14,6 +14,7 @@
     --dreadnok: oklch(0.55 0.108 58);
     --ring-track: rgba(33,31,26,.16);
     --card: #e9e2d2;
+    --gold: #b8952e;
     --font-display: 'Oswald', sans-serif;
     --font-mono: 'Space Mono', monospace;
     --shadow: 3px 3px 0 var(--ink);
@@ -92,6 +93,14 @@
   .invk__v { font-family: var(--font-display); font-weight: 700; font-size: 20px; line-height: 1; }
   .invk__v small { font-family: var(--font-mono); font-size: 11px; opacity: .55; font-weight: 400; }
   .invk__k { font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: .2px; opacity: .6; margin-top: 3px; }
+  /* Master Collection nav chip — same .invk shape/scale as the other three KPIs;
+     the gold border + a small corner badge are what set it apart, not extra
+     height. See MASTER_COLLECTION.md and app-detail.jsx's MasterBadge. */
+  .invk--master { position: relative; background: transparent; border-color: var(--gold); cursor: pointer; font: inherit; color: inherit; transition: background .12s, box-shadow .12s; }
+  .invk--master .mcbadge { position: absolute; top: -8px; right: -8px; }
+  .invk--master:hover { background: rgba(184,149,46,.14); }
+  .invk--master.is-active { background: rgba(184,149,46,.24); box-shadow: inset 0 0 0 1.5px var(--gold); }
+  .invk--master .invk__k { opacity: .85; }
 
   /* toolbar */
   .invp-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 9px 26px; background: var(--card); border-bottom: 2px solid var(--ink); }
@@ -349,6 +358,7 @@
   .inv-tab { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; letter-spacing: .5px; line-height: 1; padding: 11px 15px; min-width: 68px; text-align: left; color: var(--ink-soft); background: var(--card); border: 2px solid var(--ink); border-right: none; box-shadow: -3px 3px 0 rgba(33,31,26,.22); cursor: pointer; transform: translateX(10px); transition: transform .14s, background .14s, color .14s; }
   .inv-tab:hover { transform: translateX(4px); }
   .inv-tab.is-active { background: var(--ink); color: var(--paper); transform: translateX(3px); box-shadow: -3px 3px 0 rgba(33,31,26,.4); }
+  .inv-tab.is-master { outline: 2.5px solid var(--gold); outline-offset: -2px; }
   .inv-tab--add { min-width: 0; text-align: center; font-size: 15px; color: var(--ink); padding: 8px 12px; }
 
   .inv-cardback { display: flex; flex-direction: column; }
@@ -369,6 +379,21 @@
   .inv-cardhd__moc.is-on .inv-cardhd__mocbox { background: var(--ok); border-color: var(--ok); }
   .inv-cardhd__moclab { font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: 1px; color: rgba(255,255,255,.7); }
   .inv-cardhd__moc.is-on .inv-cardhd__moclab { color: #fff; }
+  /* Master Collection star — sits left of MOC in the shared header */
+  .inv-cardhd__master { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; user-select: none; background: transparent; border: none; padding: 0; color: rgba(255,255,255,.55); }
+  .inv-cardhd__master svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.4; }
+  .inv-cardhd__master.is-on { color: var(--gold); }
+  .inv-cardhd__master.is-on svg { fill: var(--gold); }
+
+  /* Master Collection target/progress stepper — sits under the variant line */
+  .inv-mc { display: flex; justify-content: center; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .5px; color: var(--ink-soft); margin-top: 2px; }
+  .inv-mc__label { display: inline-flex; align-items: center; gap: 5px; }
+  .inv-mc__label svg { width: 11px; height: 11px; fill: var(--gold); stroke: none; flex: none; }
+  .inv-mc__count { color: var(--ink); font-weight: 700; }
+  .inv-mc__count.is-met { color: var(--gold); }
+  .inv-mc__btn { width: 16px; height: 16px; border: 1.5px solid var(--line); background: var(--paper); color: var(--ink); font-family: var(--font-mono); font-size: 11px; line-height: 1; display: inline-grid; place-items: center; cursor: pointer; padding: 0; }
+  .inv-mc__btn:hover { border-color: var(--ink); }
+  .inv-mc__btn:disabled { opacity: .35; cursor: default; }
   .inv-cardback__hd { display: flex; align-items: center; gap: 14px; padding: 10px 14px; background: var(--ink); color: var(--paper); }
   .inv-flipback { font-family: var(--font-display); font-weight: 700; font-size: 12px; letter-spacing: .5px; color: var(--paper); background: transparent; border: 1.5px solid rgba(255,255,255,.35); padding: 6px 11px; cursor: pointer; }
   .inv-flipback:hover { background: rgba(255,255,255,.1); }
@@ -908,6 +933,8 @@
   .pb-noteline span { color: var(--ink); }
 
   .pb-dmgpanel { margin-top: 10px; }
+  .pb-dmgnotes { width: 100%; min-height: 44px; resize: vertical; background: var(--paper); border: 1px solid var(--line); margin-top: 8px; padding: 7px 9px; font-family: var(--font-mono); font-size: 11px; color: var(--ink); }
+  .pb-dmgnotes:focus { outline: 2px solid var(--damage); outline-offset: -2px; }
 
   .pb-actions { display: flex; gap: 6px; align-items: center; }
   .pb-btn { font-family: var(--font-display); font-weight: 700; font-size: 12px; letter-spacing: 1px; padding: 6px 10px; cursor: pointer; border: 1.5px solid var(--ink); background: var(--paper); color: var(--ink); }

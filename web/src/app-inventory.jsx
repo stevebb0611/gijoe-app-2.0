@@ -8,8 +8,8 @@ import React from 'react';
 import { JoeStore } from './store.js';
 import {
   INV_CAT, INV_ERAS, INV_CAT_BY_ID,
-  fvm, figParts, figState, yearParts, invTotals,
-  FactionTag, CompRing, CompBar, PhotoSlot, StockBar,
+  fvm, figParts, figState, yearParts, invTotals, invMasterTotals,
+  FactionTag, CompRing, CompBar, PhotoSlot, StockBar, MasterBadge,
   InvDetailModal,
 } from './app-detail.jsx';
 import { VersionChip, VariantBadge, VehicleTag } from './fig-identity.jsx';
@@ -251,9 +251,10 @@ function FacetRow({ label, sub, options, selected, onToggle, facColors, off, not
 // ---------------------------------------------------------------------------
 // Root
 // ---------------------------------------------------------------------------
-function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
+function InventoryView({ onAddFigure, onAddInstance, onNavigate, masterOnly = false }) {
   useStore();
   const t = invTotals();
+  const mt = invMasterTotals();
   const [view, setView] = React.useState('list');
   const [query, setQuery] = React.useState('');
   const [status, setStatus] = React.useState('all');
@@ -311,13 +312,17 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
     }
     return true;
   };
+  // Master Collection page: only figures with at least one starred copy —
+  // "in" the collection, not just aspirational (every figure defaults to a
+  // target of 1, so filtering on target alone would show the whole catalog).
+  const passMaster = (fig) => !masterOnly || (fig._sum && fig._sum.copies.some(c => c.masterCollection));
 
   // Build view-models grouped by year (catalog roster; filtered to what shows)
   const byYear = {};
   INV_CAT.forEach(cf => { (byYear[cf.year] = byYear[cf.year] || []).push(cf); });
   const years = Object.keys(byYear).map(Number).sort((a, b) => yrAsc ? a - b : b - a);
   const sections = years.map(y => {
-    const figs = byYear[y].map(fvm).filter(f => matchQ(f) && passStatus(f) && passFacets(f)).sort((a, b) => a.name.localeCompare(b.name));
+    const figs = byYear[y].map(fvm).filter(f => matchQ(f) && passStatus(f) && passFacets(f) && passMaster(f)).sort((a, b) => a.name.localeCompare(b.name));
     return { year: y, figs };
   }).filter(s => s.figs.length > 0);
 
@@ -353,7 +358,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
               <span className="inv-brand__name">G.I. JOE<br/>COLLECTION</span>
             </button>
             <nav className="inv-nav">
-              <button type="button" className="is-active">Figures</button>
+              <button type="button" className={masterOnly ? "" : "is-active"} onClick={() => onNavigate('figures')}>Figures</button>
               <a className="inv-nav__soon" href="GI Joe Tracker - Vehicles.html" title="Vehicles & Playsets — in development">Vehicles<em className="inv-nav__tag">In Dev</em></a>
               <button type="button" onClick={() => onNavigate('parts-bin')}>Parts Bin</button>
             </nav>
@@ -367,9 +372,26 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
             <button className="inv-addfig" onClick={onAddFigure}><span className="inv-addfig__mk">＋</span>Add Figure</button>
           </div>
           <div className="inv-kpis">
-            <div className="invk"><span className="invk__v">{t.inInventory}</span><span className="invk__k">Unique Figures</span></div>
-            <div className="invk"><span className="invk__v">{t.instances}</span><span className="invk__k">Total Figures</span></div>
-            <div className="invk"><span className="invk__v">{t.complete}<small>/{t.inInventory}</small></span><span className="invk__k">Complete</span></div>
+            {masterOnly ? (
+              <React.Fragment>
+                <div className="invk"><span className="invk__v">{mt.figuresIn}</span><span className="invk__k">Figures In</span></div>
+                <div className="invk"><span className="invk__v">{mt.starredCopies}</span><span className="invk__k">Starred Copies</span></div>
+                <div className="invk"><span className="invk__v">{mt.metSum}<small>/{mt.targetSum}</small></span><span className="invk__k">Target Filled</span></div>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <div className="invk"><span className="invk__v">{t.inInventory}</span><span className="invk__k">Unique Figures</span></div>
+                <div className="invk"><span className="invk__v">{t.instances}</span><span className="invk__k">Total Figures</span></div>
+                <div className="invk"><span className="invk__v">{t.complete}<small>/{t.inInventory}</small></span><span className="invk__k">Complete</span></div>
+              </React.Fragment>
+            )}
+            <button type="button" className={"invk invk--master" + (masterOnly ? " is-active" : "")}
+                    title={masterOnly ? "Back to all Figures" : "Open the Master Collection"}
+                    onClick={() => onNavigate(masterOnly ? 'figures' : 'master-collection')}>
+              <MasterBadge size={20} />
+              <span className="invk__v">{mt.metSum}<small>/{mt.targetSum}</small></span>
+              <span className="invk__k">Master Collection</span>
+            </button>
           </div>
         </header>
 
@@ -395,7 +417,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
                 More Filters{facetCount ? <span className="txtbtn__n">{facetCount}</span> : null}<span className="txtbtn__caret">{showMore ? "▴" : "▾"}</span>
               </button>
               <span className="invp-bar__spacer"></span>
-              <span className="invp-bar__count">{filtering ? `${shownCount} of ${t.inInventory}` : `${t.inInventory} figure${t.inInventory !== 1 ? "s" : ""}`}</span>
+              <span className="invp-bar__count">{filtering ? `${shownCount} of ${masterOnly ? mt.figuresIn : t.inInventory}` : `${masterOnly ? mt.figuresIn : t.inInventory} figure${(masterOnly ? mt.figuresIn : t.inInventory) !== 1 ? "s" : ""}`}</span>
               <button className="txtbtn" onClick={() => setYrAsc(v => !v)}>YEAR {yrAsc ? "↑" : "↓"}</button>
               {!q && <button className="txtbtn" onClick={open.size ? collapseAll : expandAll}>{open.size ? "Collapse All" : "Expand All"}</button>}
               <div className="inv-seg">

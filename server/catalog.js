@@ -15,7 +15,7 @@ const figuresStmt = db.prepare(`
   SELECT f.id, f.code_name, f.version, f.specialty, f.variant_lookup AS single_tell,
          f.is_vehicle_driver, f.vehicle,
          f.is_mail_away, f.mail_in_notes, f.notes, f.release_context,
-         f.image_url_primary,
+         f.image_url_primary, f.master_target,
          fac.name AS faction_name,
          COALESCE(s.year, f.year_released) AS year
   FROM figures f
@@ -25,7 +25,7 @@ const figuresStmt = db.prepare(`
 `);
 
 const variantsStmt = db.prepare(`
-  SELECT figure_id, letter, tell FROM variant_lookup ORDER BY figure_id, letter
+  SELECT id, figure_id, letter, tell, master_target FROM variant_lookup ORDER BY figure_id, letter
 `);
 
 const fileCardsStmt = db.prepare(`
@@ -53,7 +53,7 @@ export function buildCatalog() {
   const variantsByFigure = new Map();
   for (const v of variantsStmt.all()) {
     if (!variantsByFigure.has(v.figure_id)) variantsByFigure.set(v.figure_id, []);
-    variantsByFigure.get(v.figure_id).push({ letter: v.letter, tell: v.tell });
+    variantsByFigure.get(v.figure_id).push({ id: v.id, letter: v.letter, tell: v.tell, masterTarget: v.master_target });
   }
 
   const cooByFigure = new Map();
@@ -95,12 +95,33 @@ export function buildCatalog() {
     notes: f.notes || null,
     image: f.image_url_primary || null,
     releaseContext: f.release_context || 'retail',
+    masterTarget: f.master_target,
     // Every figure has at least one variants[] entry — single-variant figures
     // (or the handful with no usable variant letter, see server/seed.mjs) get a
     // synthesized blank-letter entry so the frontend's isSingle() check holds.
-    variants: variantsByFigure.get(f.id) || [{ letter: '', tell: f.single_tell || null }],
+    // Its `id: null` doubles as the Master Collection target's signal to PATCH
+    // /api/figures/:id (figures.master_target) instead of /api/variants/:id.
+    variants: variantsByFigure.get(f.id) || [{ id: null, letter: '', tell: f.single_tell || null, masterTarget: f.master_target }],
     coo: cooByFigure.get(f.id) || [],
     fileCards: fileCardsByFigure.get(f.id) || [],
     blueprint: blueprintByFigure.get(f.id) || [],
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Master Collection target quantities. Each figure/variant defaults to 1
+// (migration 009) — these let the owner raise it for troop-builders (e.g.
+// 3 Vipers) or favorites (e.g. 5 Airtights). setFigureMasterTarget targets
+// figures.master_target (used for single-variant figures, which have no
+// variant_lookup rows); setVariantMasterTarget targets a specific
+// variant_lookup row for figures with recorded production variants.
+// ---------------------------------------------------------------------------
+const setFigureMasterTargetStmt = db.prepare('UPDATE figures SET master_target = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
+const setVariantMasterTargetStmt = db.prepare('UPDATE variant_lookup SET master_target = ? WHERE id = ?');
+
+export const setFigureMasterTarget = db.transaction((id, target) => {
+  setFigureMasterTargetStmt.run(Math.max(0, Math.trunc(target) || 0), id);
+});
+export const setVariantMasterTarget = db.transaction((id, target) => {
+  setVariantMasterTargetStmt.run(Math.max(0, Math.trunc(target) || 0), id);
+});

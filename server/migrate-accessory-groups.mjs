@@ -114,6 +114,33 @@ const GROUPS = [
   // any one for completion. Not in the CSV's group_id column (blank for both
   // A0315/A0316), so hand-built.
   { extGroupId: null, figure: 'Dodger', accessories: ['A0315', 'A0316'] }, // Ultra-Sonic Photon Rifle thin/thick handle
+  // Countdown (1989, v1, F294 -> catalog id 220): 'Countdown' also matches a
+  // later v2 (id 397, F491) and v3 (id 492, F592), but the lowest id (220,
+  // v1) is the one with these accessories, same pattern as Duke/Recondo/
+  // Spirit/Zartan/Dr. Mindbender/T.A.R.G.A.T./Roadblock/Dodger above. NOT a
+  // match_key case — a single slot, two interchangeable Space Helmet molds
+  // (soft plastic/hard plastic); own any one for completion. Blank in the
+  // CSV's group_id column, so hand-built.
+  { extGroupId: null, figure: 'Countdown', accessories: ['A0547', 'A0548'] }, // Space Helmet soft/hard plastic
+  // Sonic Backpack pick-one pass (2026-07-15, owner-found): six 1990 Series 9
+  // figures share the exact same interchangeable-mold pair (raised edges
+  // around the backpack's buttons / no edges around the buttons), same shape
+  // as Dodger/Countdown above. Each of these code_names also matches an
+  // earlier or later version WITHOUT this accessory, so — unlike the
+  // Duke/Recondo/Spirit/Zartan/… cases above where the lowest id happens to
+  // be correct — the plain code_name lookup would resolve to the WRONG
+  // figure here. Disambiguated via `fcode` (figures.figure_id, the unique
+  // F-code) instead.
+  { extGroupId: null, fcode: 'F347', figure: 'Dial-Tone',   accessories: ['A0709', 'A0710'] }, // Sonic Backpack raised/no edges around buttons
+  { extGroupId: null, fcode: 'F349', figure: 'Dodger',      accessories: ['A0717', 'A0718'] }, // Sonic Backpack raised/no edges around buttons
+  { extGroupId: null, fcode: 'F352', figure: 'Lampreys',    accessories: ['A0731', 'A0732'] }, // Sonic Backpack raised/no edges around buttons
+  { extGroupId: null, fcode: 'F354', figure: 'Law',         accessories: ['A0740', 'A0741'] }, // Sonic Backpack raised/no edges around buttons
+  { extGroupId: null, fcode: 'F373', figure: 'Tunnel Rat',  accessories: ['A0824', 'A0825'] }, // Sonic Backpack raised/no edges around buttons
+  { extGroupId: null, fcode: 'F377', figure: 'Viper',       accessories: ['A0838', 'A0839'] }, // Sonic Backpack raised/no edges around buttons
+  // Psyche-Out (1991, v3, F403): same mechanism, different mold detail
+  // (raised peg on side / hole on side rather than button edges) but the
+  // same interchangeable-backpack pattern — owner-confirmed same treatment.
+  { extGroupId: null, fcode: 'F403', figure: 'Psyche-Out',  accessories: ['A0953', 'A0954'] }, // Sonic Backpack raised peg/hole on side
 ];
 
 // Same label rule as the locked reference (subgroup-wire-v2.jsx groupLabel):
@@ -123,7 +150,8 @@ function slotName(firstMemberName) {
   return m ? m[1].trim() : firstMemberName;
 }
 
-const getFigure = db.prepare('SELECT id FROM figures WHERE code_name = ?');
+const getFigureByName = db.prepare('SELECT id FROM figures WHERE code_name = ?');
+const getFigureByCode = db.prepare('SELECT id FROM figures WHERE figure_id = ?');
 const getAccessory = db.prepare('SELECT id, name, group_id FROM figure_accessories fa JOIN accessories a ON a.id = fa.accessory_id WHERE fa.figure_id = ? AND a.accessory_code = ?');
 const insertGroup = db.prepare('INSERT INTO accessory_groups (figure_id, slot_name, quantity_required) VALUES (?, ?, 1)');
 const setGroupId = db.prepare('UPDATE figure_accessories SET group_id = ? WHERE figure_id = ? AND accessory_id = ?');
@@ -132,7 +160,9 @@ const summary = [];
 
 const run = db.transaction(() => {
   for (const g of GROUPS) {
-    const fig = getFigure.get(g.figure);
+    // `fcode` (figures.figure_id, unique) disambiguates when code_name
+    // matches multiple versions and the target isn't the lowest catalog id.
+    const fig = g.fcode ? getFigureByCode.get(g.fcode) : getFigureByName.get(g.figure);
     if (!fig) { summary.push(`✕ SKIP ${g.figure} — figure not found`); continue; }
 
     const tag = g.extGroupId != null ? `ext group ${g.extGroupId}` : g.accessories.join('/');

@@ -291,12 +291,30 @@ function invTotals() {
   const t = JoeData.totals();
   return { inInventory: t.unique, instances: t.instances, complete: t.complete };
 }
+function invMasterTotals() {
+  return JoeData.masterTotals();
+}
 
 // ---------------------------------------------------------------------------
 // Shared low-fi widgets
 // ---------------------------------------------------------------------------
 function FactionTag({ faction, mini }) {
   return <span className={"wf-fac wf-fac--" + faction.toLowerCase() + (mini ? " wf-fac--mini" : "")}>{faction}</span>;
+}
+// Compact military-badge motif for the Master Collection nav chip — layered
+// gold/paper/ink rings + a single gold star, echoing the per-instance star
+// toggle (app-detail.jsx's inv-cardhd__master) at header-KPI scale. A 32-unit
+// viewBox scales crisply via width/height, unlike the original design
+// reference's absolutely-positioned 150px prototype (see MASTER_COLLECTION.md).
+function MasterBadge({ size = 26 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" className="mcbadge">
+      <circle cx="16" cy="16" r="15" fill="var(--gold)" />
+      <circle cx="16" cy="16" r="13" fill="var(--paper)" />
+      <circle cx="16" cy="16" r="11" fill="var(--ink)" />
+      <path d="M16 8.2l2.2 4.6 5 .6-3.7 3.5 1 5-4.5-2.5-4.5 2.5 1-5-3.7-3.5 5-.6z" fill="var(--gold)" />
+    </svg>
+  );
 }
 function CompRing({ pct, size = 46, neutral, damagedPct = 0 }) {
   const done = pct === 100;
@@ -372,7 +390,7 @@ function AccItem({ name, req, checked, onSet, tone, color, tag, damaged }) {
 // is an optional per-row render prop for damaged-row-only actions (Detail
 // uses it for "swap for clean"; Add Figure omits it — nothing to swap into
 // yet on a copy that doesn't exist).
-function DamageModePanel({ ownedAcc, rawAcc, accDamage, onSetDamage, extra }) {
+function DamageModePanel({ ownedAcc, rawAcc, accDamage, onSetDamage, extra, accDamageNotes, onSetDamageNotes }) {
   const [damageMode, setDamageMode] = React.useState(false);
   const owned = ownedAcc.reduce((s, [n]) => s + (rawAcc[n] || 0), 0);
   const damaged = ownedAcc.reduce((s, [n]) => s + (accDamage[n] || 0), 0);
@@ -392,6 +410,11 @@ function DamageModePanel({ ownedAcc, rawAcc, accDamage, onSetDamage, extra }) {
                   <AccItem name={a[0]} req={rawAcc[a[0]] || 0} tone="damage" color={a[6]}
                            checked={Array.from({ length: rawAcc[a[0]] || 0 }, (_, k) => k < (accDamage[a[0]] || 0))}
                            onSet={(k) => onSetDamage(a[0], k)} />
+                  {onSetDamageNotes && (accDamage[a[0]] || 0) > 0 && (
+                    <textarea className="pb-dmgnotes" key={a[0]} defaultValue={(accDamageNotes || {})[a[0]] || ''}
+                              placeholder="what's damaged — e.g. cracked strap, faded paint…"
+                              onBlur={e => onSetDamageNotes(a[0], e.target.value)}></textarea>
+                  )}
                   {extra && (accDamage[a[0]] || 0) > 0 && extra(a[0])}
                 </div>
               ))}
@@ -449,6 +472,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const bp = bpForVariant(fig.blueprint, cur ? cur.variant : null);
   const ordered = orderedBlueprint(bp);
   const accDamage = raw.accDamage || {};
+  const accDamageNotes = raw.accDamageNotes || {};
   const ownedAcc = bp.filter(([n]) => ((raw.acc && raw.acc[n]) || 0) > 0);
   const dmgDamaged = ownedAcc.reduce((s, [n]) => s + (accDamage[n] || 0), 0);
   const dmgShare = moc ? 0 : JoeData.accDamagePct(bp, raw.acc || {}, accDamage);
@@ -461,6 +485,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const setDamage = (name, n) => JoeStore.setAccDamage(cur.id, name, n);
   const swapForClean = (name) => JoeStore.swapAccessoryForClean(cur.id, name);
   const setMoc = (v) => JoeStore.updateInstance(cur.id, { moc: v });
+  const setMaster = (v) => JoeStore.updateInstance(cur.id, { masterCollection: v });
   const setCard = (patch) => JoeStore.updateInstance(cur.id, { filecard: { ...filecard, ...patch } });
   const setNotes = (v) => JoeStore.updateInstance(cur.id, { notes: v });
   const setLoc = (v) => JoeStore.updateInstance(cur.id, { loc: v });
@@ -556,10 +581,31 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const liveOwn = cur.own;
   const liveWhole = cur.whole;
 
+  // Master Collection target/progress for the CURRENTLY SELECTED copy's
+  // production variant — each variant gets its own independent target
+  // (see MASTER_COLLECTION.md). mcSlot.id is a variant_lookup id for a real
+  // variant, or null for the synthesized single-variant placeholder, which
+  // routes the write to figures.master_target instead.
+  const mcSlot = cf.variants.find(v => (v.letter || '') === (cur.variant || '')) || cf.variants[0];
+  const mcCount = copies.filter(c => (c.variant || '') === (cur.variant || '') && c.masterCollection).length;
+  const mcTarget = mcSlot ? mcSlot.masterTarget : 1;
+  const setMcTarget = (n) => {
+    const next = Math.max(0, n);
+    if (mcSlot && mcSlot.id != null) JoeStore.setVariantMasterTarget(mcSlot.id, next);
+    else JoeStore.setFigureMasterTarget(fig.id, next);
+  };
+
   const cardHeader = (
     <div className="inv-cardhd">
       <div className="inv-cardhd__id"><b>{fig.name}</b><span className="inv-cardhd__no">No. {cur.no}</span></div>
       <div className="inv-cardhd__ctrls">
+        <button type="button" className={"inv-cardhd__master" + (raw.masterCollection ? " is-on" : "")}
+                title={raw.masterCollection ? "In the Master Collection — click to remove" : "Add to Master Collection"}
+                onClick={() => setMaster(!raw.masterCollection)}>
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M8 1.4l1.9 4.2 4.6.5-3.5 3.1 1 4.5L8 11.4l-4 2.3 1-4.5-3.5-3.1 4.6-.5z" strokeLinejoin="round" />
+          </svg>
+        </button>
         <label className={"inv-cardhd__moc" + (moc ? " is-on" : "")} title="Mint on Card — sealed & unopened; locks this copy 100% complete">
           <input type="checkbox" checked={moc} onChange={e => setMoc(e.target.checked)} />
           <span className="inv-cardhd__mocbox">{moc ? "\u2713" : ""}</span>
@@ -586,7 +632,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
         </button>
         <div className={"inv-tabs-rail" + (tucked ? " is-tucked" : "")}>
           {copies.map((c) => (
-            <button key={c.id} className={"inv-tab" + (cur.id === c.id ? " is-active" : "")} onClick={() => setCurId(c.id)}>No. {c.no}{c.whole ? " ✓" : ""}</button>
+            <button key={c.id} className={"inv-tab" + (cur.id === c.id ? " is-active" : "") + (c.masterCollection ? " is-master" : "")} onClick={() => setCurId(c.id)}>No. {c.no}{c.whole ? " ✓" : ""}</button>
           ))}
           <button className="inv-tab inv-tab--add" title="Add a copy" onClick={() => { onAddInstance(fig.id, cur.variant); onClose(); }}>＋</button>
         </div>
@@ -601,6 +647,14 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                 <div className="inv-modal__id">
                   <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /></div>
                   <div className="inv-modal__var">{cur.variant ? <React.Fragment><VariantBadge letter={cur.variant} /> · </React.Fragment> : null}{fig.specialty} · {formatYear(fig.year)}</div>
+                  <div className="inv-mc" title="Master Collection — how many keeper copies of this production variant you want">
+                    <span className="inv-mc__label">
+                      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.4l1.9 4.2 4.6.5-3.5 3.1 1 4.5L8 11.4l-4 2.3 1-4.5-3.5-3.1 4.6-.5z" /></svg>
+                      <span className={"inv-mc__count" + (mcCount >= mcTarget && mcTarget > 0 ? " is-met" : "")}>{mcCount}/{mcTarget}</span>
+                    </span>
+                    <button type="button" className="inv-mc__btn" title="Lower target" disabled={mcTarget <= 0} onClick={() => setMcTarget(mcTarget - 1)}>−</button>
+                    <button type="button" className="inv-mc__btn" title="Raise target" onClick={() => setMcTarget(mcTarget + 1)}>+</button>
+                  </div>
                   {fig.variants > 1 ? (
                     <button type="button" className="inv-modal__variants inv-modal__variants--btn" title="Change production variant"
                             aria-expanded={varEdit} onClick={() => setVarEdit(v => !v)}>
@@ -664,6 +718,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                                               onSet={(n) => setUnit(a[0], n)} />
                                    )} />
                     <DamageModePanel ownedAcc={ownedAcc} rawAcc={raw.acc || {}} accDamage={accDamage} onSetDamage={setDamage}
+                      accDamageNotes={accDamageNotes} onSetDamageNotes={(name, v) => JoeStore.setAccDamageNotes(cur.id, name, v)}
                       extra={(name) => {
                         const canSwap = cleanInBin(name) > 0;
                         return (
@@ -832,8 +887,8 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
 
 export {
   INV_CAT, INV_ERAS, INV_CAT_BY_ID,
-  fvm, figParts, figState, applyRebalance, yearParts, invTotals,
-  FactionTag, CompRing, CompBar, PhotoSlot, StockBar, AccItem, boxLayout,
+  fvm, figParts, figState, applyRebalance, yearParts, invTotals, invMasterTotals,
+  FactionTag, CompRing, CompBar, PhotoSlot, StockBar, AccItem, boxLayout, MasterBadge,
   DamageModePanel,
   InvDetailModal,
 };

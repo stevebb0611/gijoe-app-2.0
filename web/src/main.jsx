@@ -16,7 +16,7 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 
 function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
-  const [page, setPage] = React.useState('figures'); // 'figures' | 'parts-bin'
+  const [page, setPage] = React.useState('figures'); // 'figures' | 'parts-bin' | 'master-collection'
   const [overlay, setOverlay] = React.useState(null); // null | { presetId, presetVariant }
   const fileRef = React.useRef(null);
 
@@ -58,7 +58,7 @@ function App() {
     <React.Fragment>
       {page === 'parts-bin'
         ? <PartsBin onNavigate={setPage} />
-        : <InventoryView onAddFigure={openAdd} onAddInstance={addInstance} onNavigate={setPage} />}
+        : <InventoryView onAddFigure={openAdd} onAddInstance={addInstance} onNavigate={setPage} masterOnly={page === 'master-collection'} />}
       {overlay && <AddFigureOverlay onClose={() => setOverlay(null)} presetCatalogId={overlay.presetId} presetVariant={overlay.presetVariant} presetAcc={overlay.presetAcc} />}
       <input ref={fileRef} type="file" accept="application/json" style={{ display: 'none' }} onChange={doImport} />
       <TweaksPanel title="Tweaks & Admin">

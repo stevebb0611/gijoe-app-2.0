@@ -8,19 +8,23 @@
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
 import { figState, applyRebalance, AccItem } from './app-detail.jsx';
+import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip } from './fig-identity.jsx';
 import { figIdentityText, formatYear } from './fig-identity.js';
 
 const figLabel = (cf) => cf ? figIdentityText({ name: cf.name, version: cf.ver ? 'v' + cf.ver : '' }) : "—";
 
-// "Shared · fits X / Y / Z" — capped so hyper-common parts (e.g. a battle
-// stand shared by 90+ figures) don't blow out the row.
-const FITS_CAP = 4;
-function fitsLabel(names) {
-  if (!names || !names.length) return "fits multiple figures";
+// "Shared by N · fits X / Y / Z / ..." — name list capped so hyper-common
+// parts (e.g. a battle stand shared by 90+ figures) don't blow out the row.
+// `count` (distinct figure_id rows from the server) is passed separately from
+// `names` because names are deduped by code_name — two versions of the same
+// figure (e.g. Budo v1/v2) collapse to one name but still count as 2 shares.
+const FITS_CAP = 5;
+function fitsLabel(names, count) {
+  if (!names || !names.length) return "shared by multiple figures";
   const shown = names.slice(0, FITS_CAP).join(" / ");
   const extra = names.length - FITS_CAP;
-  return "fits " + shown + (extra > 0 ? " +" + extra + " more" : "");
+  return "shared by " + (count || names.length) + " · fits " + shown + (extra > 0 ? " +" + extra + " more" : "");
 }
 
 function useStore() {
@@ -84,7 +88,7 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
   const ev = evaluate(entry, NEEDS);
   const open = openId === entry.id;
   const [dmgOpen, setDmgOpen] = React.useState(false);
-  const home = entry.shared ? "Shared · " + fitsLabel(entry.homeFigureNames) : (entry.homeFigureName || "—");
+  const home = entry.shared ? fitsLabel(entry.homeFigureNames, entry.figureCount) : (entry.homeFigureName || "—");
   return (
     <div className={"pb-row" + (ev.needed ? " is-needed" : "")}>
       <div className="pb-qty">
@@ -93,7 +97,7 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
       </div>
       <div className="pb-main">
         <div className="pb-name">
-          {entry.accessory}
+          {entry.color && <AccSwatch color={entry.color} />}{entry.accessory}
         </div>
         <div className="pb-fits">figure: <b>{home}</b></div>
         <div className="pb-status">
@@ -120,6 +124,11 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
             <AccItem name={entry.accessory} req={entry.qty} tone="damage"
                      checked={Array.from({ length: entry.qty }, (_, k) => k < entry.damaged)}
                      onSet={(k) => JoeStore.setPartDamage(entry.id, k)} />
+            {entry.damaged > 0 && (
+              <textarea className="pb-dmgnotes" key={entry.id} defaultValue={entry.damageNotes}
+                        placeholder="what's damaged — e.g. cracked strap, faded paint…"
+                        onBlur={e => JoeStore.setPartDamageNotes(entry.id, e.target.value)}></textarea>
+            )}
           </div>
         )}
         {entry.notes && <div className="pb-noteline">✎ <span>{entry.notes}</span></div>}
@@ -370,7 +379,7 @@ function PartsBin({ onNavigate }) {
   // bin entries decorated with real accessory metadata
   const bin = store.bin.map(e => {
     const meta = JoeData.ACC_BY_ID.get(e.id) || {};
-    return { ...e, categoryId: meta.categoryId != null ? meta.categoryId : null, categoryLabel: meta.categoryLabel || null, shared: !!meta.shared, homeFigureName: meta.homeFigureName || null, homeFigureNames: meta.homeFigureNames || null };
+    return { ...e, categoryId: meta.categoryId != null ? meta.categoryId : null, categoryLabel: meta.categoryLabel || null, color: meta.color || null, shared: !!meta.shared, figureCount: meta.figureCount || null, homeFigureName: meta.homeFigureName || null, homeFigureNames: meta.homeFigureNames || null };
   });
   const NEEDS = React.useMemo(buildNeeds, [store]);
   const suggestions = buildSuggestions(bin, NEEDS);
