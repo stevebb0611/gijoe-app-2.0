@@ -56,7 +56,7 @@
 import React from 'react';
 import { JoeData } from './store.js';
 
-const CTX_LABEL = { convention: 'Convention', mail_in: 'Mail-in', bonus: 'Bonus', exclusive: 'Exclusive' };
+const CTX_LABEL = { convention: 'Convention', mail_in: 'Mail-in', bonus: 'Bonus', exclusive: 'Exclusive', retailer_exclusive: 'Retailer Exclusive' };
 
 // Blueprint tuples: [name, quantity_required, accessory_id, group_id, release_context, match_key, color]
 // renderOption(item): caller-supplied single-row renderer for one option —

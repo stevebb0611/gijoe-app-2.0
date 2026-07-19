@@ -110,6 +110,7 @@ const csvFigureIdToDb = new Map();
 let multiVariantGroups = 0;
 let skippedBlankVariant = 0;
 const skippedDupeLetters = []; // pre-existing CSV data-quality dupes (see OPEN_QUESTIONS #18) — not fixed here
+const skippedBlankVariantRows = []; // identities for the blank-variant drops counted above — see OPEN_QUESTIONS #18
 
 const insertFiguresTxn = db.transaction(() => {
   for (const rows of groups.values()) {
@@ -150,7 +151,16 @@ const insertFiguresTxn = db.transaction(() => {
       multiVariantGroups++;
       const seenLetters = new Set();
       for (const r of rows) {
-        if (!r.variant) { skippedBlankVariant++; continue; }
+        if (!r.variant) {
+          skippedBlankVariant++;
+          if (r.figure_id !== canon.figure_id) {
+            skippedBlankVariantRows.push(
+              `${canon.code_name} v${canon.version || ''} (kept ${canon.figure_id}, dropped ${r.figure_id} — ` +
+              `blank variant, release_context=${r.release_context || ''}, series_id=${r.series_id || ''})`
+            );
+          }
+          continue;
+        }
         if (seenLetters.has(r.variant)) {
           skippedDupeLetters.push(`${canon.code_name} v${canon.version} ${r.variant} (kept ${rows.find(x=>x.variant===r.variant).figure_id}, dropped ${r.figure_id})`);
           continue;
@@ -171,6 +181,13 @@ if (skippedDupeLetters.length) {
   console.log(`\nNOTE: ${skippedDupeLetters.length} pre-existing duplicate-letter rows in the CSV were skipped ` +
     `(likely the same data-quality backlog as OPEN_QUESTIONS #18 — not corrected here, just not allowed to crash the seed):`);
   skippedDupeLetters.forEach((s) => console.log('  -', s));
+}
+if (skippedBlankVariantRows.length) {
+  console.log(`\nNOTE: ${skippedBlankVariantRows.length} rows were dropped entirely (same code_name+version, ` +
+    `blank variant letter on both — often a mainline row colliding with a 700-block convention/mail-in row; ` +
+    `see OPEN_QUESTIONS_Claude.md #18 before restoring any of these — some are genuine second editions, ` +
+    `some are accidental CSV duplicates):`);
+  skippedBlankVariantRows.forEach((s) => console.log('  -', s));
 }
 
 // ---------------------------------------------------------------------------

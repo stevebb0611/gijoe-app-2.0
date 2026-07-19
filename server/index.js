@@ -5,7 +5,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
-import { buildCatalog, setFigureMasterTarget, setVariantMasterTarget } from './catalog.js';
+import { buildCatalog, setFigureMasterTarget, setVariantMasterTarget, setFigureMasterNotes } from './catalog.js';
 import { buildAccessoryCatalog } from './accessories.js';
 import { buildWorkbook } from './export-xlsx.js';
 import * as store from './instances.js';
@@ -38,8 +38,10 @@ app.get('/api/state', (req, res) => {
 // targets a specific variant_lookup row for figures with recorded variants —
 // the frontend picks between the two based on whether the catalog's variants[]
 // entry has a real `id` or the synthesized single-variant placeholder's `null`.
+// masterNotes (migration 013) is figure-level only — no variant equivalent.
 app.patch('/api/figures/:id', (req, res) => {
-  setFigureMasterTarget(+req.params.id, req.body.masterTarget);
+  if ('masterTarget' in req.body) setFigureMasterTarget(+req.params.id, req.body.masterTarget);
+  if ('masterNotes' in req.body) setFigureMasterNotes(+req.params.id, req.body.masterNotes);
   res.json({ ok: true });
 });
 

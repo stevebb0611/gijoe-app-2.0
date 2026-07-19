@@ -12,10 +12,10 @@ const FACTION_CODE = {
 };
 
 const figuresStmt = db.prepare(`
-  SELECT f.id, f.code_name, f.version, f.specialty, f.variant_lookup AS single_tell,
+  SELECT f.id, f.code_name, f.version, f.full_name, f.specialty, f.variant_lookup AS single_tell,
          f.is_vehicle_driver, f.vehicle,
          f.is_mail_away, f.mail_in_notes, f.notes, f.release_context,
-         f.image_url_primary, f.master_target,
+         f.image_url_primary, f.master_target, f.master_notes,
          fac.name AS faction_name,
          COALESCE(s.year, f.year_released) AS year
   FROM figures f
@@ -86,6 +86,7 @@ export function buildCatalog() {
     id: f.id,
     name: (f.code_name || '').toUpperCase(),
     ver: f.version,
+    fullName: f.full_name || null,
     year: f.year,
     faction: FACTION_CODE[f.faction_name] || f.faction_name,
     role: f.specialty,
@@ -96,6 +97,7 @@ export function buildCatalog() {
     image: f.image_url_primary || null,
     releaseContext: f.release_context || 'retail',
     masterTarget: f.master_target,
+    masterNotes: f.master_notes || '',
     // Every figure has at least one variants[] entry — single-variant figures
     // (or the handful with no usable variant letter, see server/seed.mjs) get a
     // synthesized blank-letter entry so the frontend's isSingle() check holds.
@@ -124,4 +126,16 @@ export const setFigureMasterTarget = db.transaction((id, target) => {
 });
 export const setVariantMasterTarget = db.transaction((id, target) => {
   setVariantMasterTargetStmt.run(Math.max(0, Math.trunc(target) || 0), id);
+});
+
+// ---------------------------------------------------------------------------
+// Master Collection note (migration 013) — free-text, figure-level (not
+// per-instance): the Master Collection card groups by figure, and the note
+// is about the figure/variant slate as a whole (e.g. "yellowing, look for
+// upgrade"), not a single physical copy.
+// ---------------------------------------------------------------------------
+const setFigureMasterNotesStmt = db.prepare('UPDATE figures SET master_notes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
+
+export const setFigureMasterNotes = db.transaction((id, notes) => {
+  setFigureMasterNotesStmt.run((notes || '').trim() || null, id);
 });

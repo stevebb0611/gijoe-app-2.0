@@ -102,6 +102,20 @@
   .invk--master.is-active { background: rgba(184,149,46,.24); box-shadow: inset 0 0 0 1.5px var(--gold); }
   .invk--master .invk__k { opacity: .85; }
 
+  /* ===== Master Collection page — instance-level cards, not figure rows ===== */
+  .mc-list { display: flex; flex-direction: column; gap: 14px; padding-top: 18px; }
+  .mc-card { border: 1.5px solid var(--ink); background: var(--card); }
+  .mc-card__hd { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--ink); color: var(--paper); flex-wrap: wrap; }
+  .mc-card__name { font-family: var(--font-display); font-weight: 700; font-size: 15px; display: flex; align-items: baseline; gap: 8px; }
+  .mc-card__year { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; opacity: .65; }
+  .mc-card__targets { margin-left: auto; display: flex; gap: 8px; }
+  .mc-target { font-family: var(--font-mono); font-size: 10px; letter-spacing: .5px; display: inline-flex; align-items: center; gap: 4px; color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.3); padding: 2px 6px; }
+  .mc-target.is-met { color: var(--gold); border-color: var(--gold); }
+  .mc-card__note { flex: 1 1 100%; order: 99; background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.3); padding: 6px 10px; color: var(--paper); font-family: var(--font-mono); font-size: 12px; outline: none; }
+  .mc-card__note::placeholder { color: rgba(255,255,255,.45); }
+  .mc-card__note:focus { border-color: var(--gold); }
+  .mc-card__insts { display: flex; flex-direction: column; gap: 6px; padding: 10px; }
+
   /* toolbar */
   .invp-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 9px 26px; background: var(--card); border-bottom: 2px solid var(--ink); }
   .invp-bar__chips { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
@@ -115,6 +129,7 @@
   .invp-bar__spacer { flex: 1; }
   .txtbtn { font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .2px; color: var(--ink); background: transparent; border: 1.5px solid var(--ink); padding: 6px 12px; cursor: pointer; white-space: nowrap; }
   .txtbtn:hover { background: var(--paper); }
+  .txtbtn.is-on { background: var(--ink); color: var(--paper); }
   .inv-seg { display: inline-flex; border: 1.5px solid var(--ink); }
   .inv-seg button { font: inherit; font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .2px; padding: 5px 12px; background: var(--paper); color: var(--ink); border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
   .inv-seg button svg { display: block; }
@@ -213,17 +228,30 @@
   .inv-name i { font-style: normal; font-size: 10px; color: var(--ink-soft); line-height: 1.2; }
   .idver { font-style: normal; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .3px; color: var(--ink-soft); padding: 0 4px; margin-left: 7px; vertical-align: 2px; }
   .idver--lg { font-size: 11px; padding: 1px 6px; margin-left: 9px; vertical-align: 3px; }
+  /* release-edition badge — flags a non-retail catalog row (convention/mail-in
+     re-release sharing a code_name+version with a retail edition) since
+     otherwise it reads identically to the retail row (VARIANTS.md §7.5.2) */
+  .idedition { font-style: normal; display: inline-flex; align-items: center; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .3px; color: var(--accent); border: 1.5px solid var(--accent); padding: 1px 6px; margin-left: 8px; vertical-align: 1px; }
+  .idedition--lg { font-size: 11px; padding: 2px 7px; margin-left: 9px; vertical-align: 2px; }
   /* variant indicator — "layers + count" pill (sits apart from the version chip) */
   .idvar { font-style: normal; display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-weight: 700; font-size: 9px; color: var(--accent); padding: 1px 6px; margin-left: 8px; vertical-align: 1px; --lyrbg: var(--card); }
+  .idvar--lg { font-size: 11px; padding: 1px 5px; margin-left: 6px; vertical-align: 2px; gap: 4px; }
+  button.idvar { border: none; background: none; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+  button.idvar:hover { color: var(--ink); }
   .lyr { width: 13px; height: 12px; position: relative; display: inline-block; flex: none; }
   .lyr b, .lyr::before, .lyr::after { content: ""; position: absolute; width: 8px; height: 8px; border: 1.4px solid currentColor; background: var(--lyrbg, transparent); box-sizing: border-box; }
   .lyr b { top: 0; left: 4px; }
   .lyr::before { top: 2px; left: 2px; }
   .lyr::after { top: 4px; left: 0; }
+  .lyr--lg { width: 14px; height: 13px; }
+  .lyr--lg b, .lyr--lg::before, .lyr--lg::after { width: 9px; height: 9px; }
+  .lyr--lg b { top: 0; left: 4px; }
+  .lyr--lg::before { top: 2px; left: 2px; }
+  .lyr--lg::after { top: 4px; left: 0; }
   .idfull { display: block; font-style: normal; font-family: var(--font-display); font-weight: 500; font-size: 11px; color: var(--ink-soft); line-height: 1.15; margin-top: 2px; }
   .idveh { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .3px; color: var(--ink); background: var(--paper); border: 1.5px solid var(--ink); padding: 2px 7px; box-shadow: 1.5px 1.5px 0 var(--line-soft); }
   span.idveh b { font-family: var(--font-display); font-weight: 700; font-size: 8px; letter-spacing: .6px; color: var(--ink-soft); }
-  .idveh--modal { margin: 0; }
+  .idveh--modal { flex-direction: column; align-items: center; gap: 2px; margin: 0; padding: 0; border: none; background: none; box-shadow: none; text-align: center; }
   .idveh--inline { margin: 0 0 0 8px; vertical-align: 1px; }
   .inv-owned { font-family: var(--font-display); font-weight: 700; font-size: 16px; }
   .inv-stock { display: flex; align-items: center; gap: 8px; min-width: 0; }

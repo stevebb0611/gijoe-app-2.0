@@ -94,7 +94,7 @@ npx serve .          # then open the printed URL (e.g. http://localhost:3000)
 | `tweaks-panel.jsx` | Theme panel (paper/accent/faction/wobble) — informs a real theme config, not shipped as-is |
 
 ### Specs
-`README.md` (start here) · `OPEN_QUESTIONS_Claude.md` + `OPEN_QUESTIONS_ISSUES_FOUND.md` (decisions/issues — read second) · `FRONTEND_STANDARDS.md` · `INSTANCE_MODEL.md` · `VARIANTS.md` · `PARTS_BIN.md` · `ACCESSORY_GROUPS.md` · `FILE_CARDS.md` · `MASTER_COLLECTION.md` · `TAXONOMY.md` · `NAVIGATION.md` · `BACKEND_AND_SCALE.md`.
+`README.md` (start here) · `OPEN_QUESTIONS_Claude.md` + `OPEN_QUESTIONS_ISSUES_FOUND.md` (decisions/issues — read second) · `FRONTEND_STANDARDS.md` · `INSTANCE_MODEL.md` · `VARIANTS.md` · `PARTS_BIN.md` · `ACCESSORY_GROUPS.md` · `FIGURE_SPLITS.md` · `FILE_CARDS.md` · `MASTER_COLLECTION.md` · `TAXONOMY.md` · `NAVIGATION.md` · `BACKEND_AND_SCALE.md`.
 
 ## Known prototype shortcuts to NOT carry over
 

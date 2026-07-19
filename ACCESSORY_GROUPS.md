@@ -5,7 +5,7 @@
 > `release_context` (retail vs tracked-but-non-blocking) — read it first for the rule
 > definitions. This doc is the **per-figure operational log** for all four axes: every
 > figure with a `group_id` slot, every figure whose blueprint carries a non-`retail`
-> `release_context` accessory (convention/bonus/mail-in/exclusive), and every figure with a
+> `release_context` accessory (convention/bonus/mail-in/exclusive/retailer_exclusive), and every figure with a
 > `variant_id`-scoped row, gets one entry below, chronological by year of release then
 > alphabetical. Most figures use plain `group_id` only ("pick one"); a subset also need
 > `match_key`, a narrower mechanism layered on top of `group_id` for a specific case those
@@ -102,11 +102,19 @@ does have `group_id` groups; see 1984 — Blowtorch.)*
 ## `release_context` mechanism (non-retail accessories, no `group_id`)
 
 A figure can earn an entry below purely because part of its blueprint is tagged a
-non-`retail` `release_context` (`convention` · `bonus` · `mail-in` · `exclusive`) — no
-`group_id`/`match_key` involved. `PARTS_BIN.md` § *Accessory completeness model* has the
-full rule; short version: these accessories pull into their own per-context group (e.g.
-"Convention") at the point they fall in the blueprint, are tracked, and **never block
-Complete/percent** for that figure. Tag these entries **Mechanism: `release_context`**.
+non-`retail` `release_context` (`convention` · `bonus` · `mail-in` · `exclusive` ·
+`retailer_exclusive`) — no `group_id`/`match_key` involved. `PARTS_BIN.md` § *Accessory
+completeness model* has the full rule; short version: these accessories pull into their own
+per-context group (e.g. "Convention") at the point they fall in the blueprint, are tracked,
+and **never block Complete/percent** for that figure. Tag these entries **Mechanism:
+`release_context`**.
+
+`retailer_exclusive` (migration `012_retailer_exclusive_context.sql`, 2026-07-16) is for a
+**retail-channel** exclusive — a specific store's exclusive pack-in/variant set (JC Penney,
+Toys R Us, Kmart, …) — as distinct from `convention` (a fan-club/con exclusive) or
+`mail_in`. Same non-blocking treatment as the other three; the only difference is which
+label the group renders under (`CTX_LABEL` in `web/src/accessory-groups.jsx`: "Retailer
+Exclusive").
 
 **Scope discipline (same standard as match_key):** only add an entry here once the
 non-retail tag is individually confirmed — don't bulk-write up every figure the DB
@@ -250,20 +258,39 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
 
 ### 1982 — Cobra (v1, figure catalog id 3 — source F-code F007)
 
-- **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
-  group and never block Complete; no `group_id` on this figure.
+- **Mechanism:** `release_context` — accessories tagged `retailer_exclusive` sit in their
+  own group and never block Complete; no `group_id` on this figure.
 - **Variants:** none on file — single catalog row (`display_name` "Cobra v1 A"; `alt_name`
   "Cobra Soldier or Cobra Trooper").
 - **Non-retail accessories:** M-16 Heavy Machine Gun (A0013), Bipod (A0014), Bazooka
-  single thin handle (A0028), Bazooka single thick handle (A0029) — all `release_context:
-  'convention'`.
+  single thin handle (A0028, light green), Bazooka single thick handle (A0029, dark
+  green) — all `release_context: 'retailer_exclusive'` (reclassified from `convention`,
+  2026-07-16 — see "Reclassification" below).
+- **Retailer-exclusive source (YoJoe.com, 1982 Cobra):** "JC Penney released an exclusive
+  three pack set: two Cobras and one Cobra Officer. For this set, one of the Cobras came
+  with Rock 'n Roll's machine gun and bipod. The other came with either the thin-handled
+  version of Zap's bazooka or a dark green version of the bazooka." One Cobra in the
+  3-pack got the M-16/Bipod pair; the other got one of the two Bazooka moldings (already
+  correctly distinguished in the DB by color: A0028 light green/thin handle, A0029 dark
+  green/thick handle) — not both. No `group_id`/`match_key` structuring added for that
+  "either/or" relationship (both bazookas still render as flat rows in the group, same as
+  before); scope of this change is the `release_context` value only, per owner decision
+  2026-07-16.
 - **Unaffected (plain retail, required):** Dragunov (SVD) Sniper's Rifle (A0004) — the
   only accessory required for Complete.
-- **Source:** live DB (`figure_accessories.release_context`), confirmed 2026-07-10. This
-  is the canonical example already cited in `PARTS_BIN.md` § *Accessory completeness
-  model* ("Cobra trooper" demo) — logged here as its own entry now that this doc's scope
-  covers `release_context`.
-- **Status:** data already set in DB; not newly changed by this doc.
+- **Reclassification (2026-07-16):** this figure's non-retail gear was JC Penney's own
+  retail-channel exclusive, not a fan-club/convention exclusive — `convention` was the
+  wrong bucket. Reclassified `convention` → `retailer_exclusive` via
+  `migrations/012_retailer_exclusive_context.sql`, which also widened the
+  `figure_accessories.release_context` CHECK constraint to add the new value (the CHECK
+  is SQLite-rebuilt, not `ALTER`-able in place). `server/set-accessory-context.mjs` and
+  `web/src/accessory-groups.jsx`'s `CTX_LABEL` (→ "Retailer Exclusive") updated to match.
+  Originally logged 2026-07-10 as the canonical `convention` example cited in
+  `PARTS_BIN.md` § *Accessory completeness model* ("Cobra trooper" demo, now itself
+  updated to reflect `retailer_exclusive`).
+- **Status:** ✅ release_context set in DB via the migration and verified via direct DB
+  read (all four accessories: `convention` → `retailer_exclusive`), 2026-07-16. Not yet
+  visually verified in-app.
 
 ### 1983 — Duke (v1, figure catalog id 27 — source F-codes F057–F061)
 
@@ -492,16 +519,18 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
 
 ### 1985 — Flint (v1, figure catalog id 78 — source F-code F125)
 
-- **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
-  group and never block Complete; no `group_id` on this figure.
-- **Variants:** none on file — single catalog row.
-- **Non-retail accessories:** Rifle (A0680), Grenade Launcher (Pistol) (A0681) —
-  reclassified `retail` → `convention` via `set-accessory-context.mjs`, 2026-07-10,
-  owner-confirmed.
-- **Unaffected (plain retail, required):** Infantry Field Pack (A0173), I-12 Short
-  Barrel Riot Shotgun (A0174).
-- **Status:** ✅ release_context set in DB via `set-accessory-context.mjs` and verified,
-  2026-07-10. Not yet visually verified in-app.
+- **⚠ SUPERSEDED 2026-07-16 — see `FIGURE_SPLITS.md`.** This entry originally documented
+  Rifle (A0680)/Grenade Launcher (Pistol) (A0681) as Flint's own `convention`-tagged
+  accessories, reclassified on this same row 2026-07-10. That data was wrong — those two
+  accessory codes actually belong to **Ambush**, leaked onto F125's blueprint via a
+  `seed.mjs` dedup collision with the (until then, missing) F701 convention row. The real
+  fix was a full release-edition split, not an accessory reclassification: A0680/A0681 were
+  removed outright, and Flint's actual convention gear (Rifle A0692, Flare Gun A0807 — same
+  two Falcon uses below) now lives on its own catalog row, F701. Full writeup:
+  `FIGURE_SPLITS.md`, "1985 — Flint."
+- **Mechanism (current):** none — F125 is now a plain retail figure, no `group_id`/
+  `match_key`/`release_context` complexity. Its complete blueprint is just Infantry Field
+  Pack (A0173) and I-12 Short Barrel Riot Shotgun (A0174).
 
 ### 1986 — A.V.A.C. (v1, figure catalog id 96 — source F-code F145)
 

@@ -5,6 +5,13 @@
 // Part flow always starts from a figure's blueprint.
 import db from './db.js';
 
+// series_id 15's sentinel "year" (gijoe_collection.sql) — the Convention &
+// Mail-In Block, not a real chronological year. Mirrors web/src/fig-identity.js's
+// formatYear(); duplicated here (not shared/) since it's two lines and server/
+// doesn't otherwise import from web/src.
+const CONVENTION_YEAR = 9999;
+const formatYear = (year) => (year === CONVENTION_YEAR ? 'Convention' : String(year));
+
 const accessoriesStmt = db.prepare(`
   SELECT a.id, a.name, a.color, a.category_id, ac.name AS category_name,
          COUNT(DISTINCT fa.figure_id) AS figure_count,
@@ -42,7 +49,7 @@ function nameYearLabels(rows) {
   return [...byName.entries()]
     .map(([name, years]) => {
       const sorted = [...years].sort((a, b) => a - b);
-      return sorted.length > 1 ? name + ' (' + sorted.join('/') + ')' : name;
+      return sorted.length > 1 ? name + ' (' + sorted.map(formatYear).join('/') + ')' : name;
     })
     .sort();
 }

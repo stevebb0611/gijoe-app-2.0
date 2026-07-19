@@ -7,7 +7,7 @@ import { DamageMap, GradeBadge, physicalGrade, paintGrade, dmEmpty } from './dam
 import { DamageModePanel } from './app-detail.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
-import { VersionChip, VariantBadge, VehicleTag } from './fig-identity.jsx';
+import { VersionChip, VariantBadge, VehicleTag, EditionTag } from './fig-identity.jsx';
 import { formatYear, CONVENTION_YEAR } from './fig-identity.js';
 import { FileCardRow, FileCardTell } from './filecards.jsx';
 const AF_CATALOG = JoeData.CAT || [];
@@ -185,12 +185,12 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                   const own = JoeData.ownedCount(f.id);
                   // always lead with the version — role/variant-count alone isn't enough to
                   // tell apart same-name/same-year rows like Grunt v1.5 vs v2 (both "Infantry")
-                  const sub = "v" + f.ver + (isSingle(f) ? (f.role ? " · " + f.role : "") : " · " + f.variants.length + " variants");
+                  const sub = [f.ver ? "v" + f.ver : null, isSingle(f) ? f.role : f.variants.length + " variants"].filter(Boolean).join(" · ");
                   return (
                   <React.Fragment key={f.id}>
                   <button className={"af-res" + (f.id === selId ? " is-sel" : "")} onClick={() => setSelId(f.id)}>
                     <span className="af-res__thumb"></span>
-                    <span className="af-res__name"><b>{f.name}</b><i>{sub} · {formatYear(f.year)}</i>{f.vehicle && <span className="idveh" title={"Vehicle driver — packaged with the " + f.vehicle}><b>VEHICLE</b> {f.vehicle}</span>}</span>
+                    <span className="af-res__name"><b>{f.name}</b><i>{sub} · {formatYear(f.year)}</i><EditionTag context={f.releaseContext} />{f.vehicle && <span className="idveh" title={"Vehicle driver — packaged with the " + f.vehicle}><b>VEHICLE</b> {f.vehicle}</span>}</span>
                     <span className={"wf-fac wf-fac--" + f.faction.toLowerCase() + " wf-fac--mini"}>{f.faction}</span>
                     <span className="af-res__own">{own === 0 ? "not owned" : "owned ×" + own}</span>
                     <span className="af-res__pick">{f.id === selId ? (isSingle(f) ? "● selected" : "▾ pick variant") : "select ›"}</span>
@@ -223,7 +223,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                 <span className="af-fig__thumb"></span>
                 <div>
                   <div className="af-fig__name">
-                    {fig.name}<VersionChip version={"v" + fig.ver} />
+                    {fig.name}<VersionChip version={fig.ver ? "v" + fig.ver : ""} /><EditionTag context={fig.releaseContext} />
                     <span className={"wf-fac wf-fac--" + fig.faction.toLowerCase() + " wf-fac--mini"}>{fig.faction}</span>
                     {multi && chosen ? <VariantBadge letter={chosen.letter} /> : null}
                   </div>
@@ -347,7 +347,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
             <div className="af-confirm">
               <div className="af-sum">
                 <div className="af-sum__row"><span>Figure</span><b>
-                  {fig.name}<VersionChip version={"v" + fig.ver} />{multi && chosen ? <VariantBadge letter={chosen.letter} /> : null}
+                  {fig.name}<VersionChip version={fig.ver ? "v" + fig.ver : ""} /><EditionTag context={fig.releaseContext} />{multi && chosen ? <VariantBadge letter={chosen.letter} /> : null}
                   {(!multi && fig.role) ? " · " + fig.role : ""} · {formatYear(fig.year)}
                 </b></div>
                 {multi && <div className="af-sum__row"><span>Variant</span><b>{varTell}</b></div>}
@@ -364,7 +364,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
           {step === 3 && done && (
             <div className="af-okwrap">
               <div className="af-ok">✓</div>
-              <div className="af-ok__h">{fig.name}<VersionChip version={"v" + fig.ver} /> added</div>
+              <div className="af-ok__h">{fig.name}<VersionChip version={fig.ver ? "v" + fig.ver : ""} /><EditionTag context={fig.releaseContext} /> added</div>
               <div className="af-ok__sub">
                 {moc ? "Mint on Card · 100% complete (sealed) · factory mint" : (
                   <React.Fragment>

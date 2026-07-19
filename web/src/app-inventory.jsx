@@ -12,7 +12,7 @@ import {
   FactionTag, CompRing, CompBar, PhotoSlot, StockBar, MasterBadge,
   InvDetailModal,
 } from './app-detail.jsx';
-import { VersionChip, VariantBadge, VehicleTag } from './fig-identity.jsx';
+import { VersionChip, VariantBadge, VehicleTag, EditionTag } from './fig-identity.jsx';
 import { formatYear, CONVENTION_YEAR } from './fig-identity.js';
 
 function useStore() {
@@ -54,7 +54,7 @@ function Row({ fig, selId, openIds, onToggle, onOpen }) {
               onClick={() => ghost ? onOpen(fig.id, null) : onToggle(fig.id)}>
         <span className="inv-thumb" data-tag={ghost ? "—" : ""}></span>
         <span className="inv-name">
-          <b>{fig.name}<VersionChip version={fig.version} /><VariantBadge count={fig.variants} /><VehicleTag vehicle={fig.vehicle} inline /></b>
+          <b>{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><VariantBadge count={fig.variants} /><VehicleTag vehicle={fig.vehicle} inline /></b>
           <i>{fig.specialty}</i>
         </span>
         <FactionTag faction={fig.faction} mini />
@@ -121,7 +121,7 @@ function GalleryCard({ fig, onOpen }) {
     <button className={"card inv-card" + (ghost ? " is-ghostcard" : "")} onClick={() => ghost ? onOpen(fig.id, null) : onOpen(fig.id, copies[0].id)}>
       <div className="card__corner"><FactionTag faction={fig.faction} mini /></div>
       <PhotoSlot className="card__photo" src={fig.image} />
-      <div className="card__name">{fig.name}<VersionChip version={fig.version} /><VariantBadge count={fig.variants} /></div>
+      <div className="card__name">{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><VariantBadge count={fig.variants} /></div>
       <div className="card__var">{fig.specialty}</div>
       {!ghost && multi && st.moves.length > 0 && <div className="card__rebal">Rebalance</div>}
       <div className="card__foot">
@@ -251,10 +251,10 @@ function FacetRow({ label, sub, options, selected, onToggle, facColors, off, not
 // ---------------------------------------------------------------------------
 // Root
 // ---------------------------------------------------------------------------
-function InventoryView({ onAddFigure, onAddInstance, onNavigate, masterOnly = false }) {
+function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
   useStore();
   const t = invTotals();
-  const mt = invMasterTotals();
+  const mt = invMasterTotals(); // for the header's Master Collection nav chip only
   const [view, setView] = React.useState('list');
   const [query, setQuery] = React.useState('');
   const [status, setStatus] = React.useState('all');
@@ -312,17 +312,13 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate, masterOnly = fa
     }
     return true;
   };
-  // Master Collection page: only figures with at least one starred copy —
-  // "in" the collection, not just aspirational (every figure defaults to a
-  // target of 1, so filtering on target alone would show the whole catalog).
-  const passMaster = (fig) => !masterOnly || (fig._sum && fig._sum.copies.some(c => c.masterCollection));
 
   // Build view-models grouped by year (catalog roster; filtered to what shows)
   const byYear = {};
   INV_CAT.forEach(cf => { (byYear[cf.year] = byYear[cf.year] || []).push(cf); });
   const years = Object.keys(byYear).map(Number).sort((a, b) => yrAsc ? a - b : b - a);
   const sections = years.map(y => {
-    const figs = byYear[y].map(fvm).filter(f => matchQ(f) && passStatus(f) && passFacets(f) && passMaster(f)).sort((a, b) => a.name.localeCompare(b.name));
+    const figs = byYear[y].map(fvm).filter(f => matchQ(f) && passStatus(f) && passFacets(f)).sort((a, b) => a.name.localeCompare(b.name));
     return { year: y, figs };
   }).filter(s => s.figs.length > 0);
 
@@ -358,7 +354,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate, masterOnly = fa
               <span className="inv-brand__name">G.I. JOE<br/>COLLECTION</span>
             </button>
             <nav className="inv-nav">
-              <button type="button" className={masterOnly ? "" : "is-active"} onClick={() => onNavigate('figures')}>Figures</button>
+              <button type="button" className="is-active">Figures</button>
               <a className="inv-nav__soon" href="GI Joe Tracker - Vehicles.html" title="Vehicles & Playsets — in development">Vehicles<em className="inv-nav__tag">In Dev</em></a>
               <button type="button" onClick={() => onNavigate('parts-bin')}>Parts Bin</button>
             </nav>
@@ -372,22 +368,10 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate, masterOnly = fa
             <button className="inv-addfig" onClick={onAddFigure}><span className="inv-addfig__mk">＋</span>Add Figure</button>
           </div>
           <div className="inv-kpis">
-            {masterOnly ? (
-              <React.Fragment>
-                <div className="invk"><span className="invk__v">{mt.figuresIn}</span><span className="invk__k">Figures In</span></div>
-                <div className="invk"><span className="invk__v">{mt.starredCopies}</span><span className="invk__k">Starred Copies</span></div>
-                <div className="invk"><span className="invk__v">{mt.metSum}<small>/{mt.targetSum}</small></span><span className="invk__k">Target Filled</span></div>
-              </React.Fragment>
-            ) : (
-              <React.Fragment>
-                <div className="invk"><span className="invk__v">{t.inInventory}</span><span className="invk__k">Unique Figures</span></div>
-                <div className="invk"><span className="invk__v">{t.instances}</span><span className="invk__k">Total Figures</span></div>
-                <div className="invk"><span className="invk__v">{t.complete}<small>/{t.inInventory}</small></span><span className="invk__k">Complete</span></div>
-              </React.Fragment>
-            )}
-            <button type="button" className={"invk invk--master" + (masterOnly ? " is-active" : "")}
-                    title={masterOnly ? "Back to all Figures" : "Open the Master Collection"}
-                    onClick={() => onNavigate(masterOnly ? 'figures' : 'master-collection')}>
+            <div className="invk"><span className="invk__v">{t.inInventory}</span><span className="invk__k">Unique Figures</span></div>
+            <div className="invk"><span className="invk__v">{t.instances}</span><span className="invk__k">Total Figures</span></div>
+            <div className="invk"><span className="invk__v">{t.complete}<small>/{t.inInventory}</small></span><span className="invk__k">Complete</span></div>
+            <button type="button" className="invk invk--master" title="Open the Master Collection" onClick={() => onNavigate('master-collection')}>
               <MasterBadge size={20} />
               <span className="invk__v">{mt.metSum}<small>/{mt.targetSum}</small></span>
               <span className="invk__k">Master Collection</span>
@@ -417,7 +401,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate, masterOnly = fa
                 More Filters{facetCount ? <span className="txtbtn__n">{facetCount}</span> : null}<span className="txtbtn__caret">{showMore ? "▴" : "▾"}</span>
               </button>
               <span className="invp-bar__spacer"></span>
-              <span className="invp-bar__count">{filtering ? `${shownCount} of ${masterOnly ? mt.figuresIn : t.inInventory}` : `${masterOnly ? mt.figuresIn : t.inInventory} figure${(masterOnly ? mt.figuresIn : t.inInventory) !== 1 ? "s" : ""}`}</span>
+              <span className="invp-bar__count">{filtering ? `${shownCount} of ${t.inInventory}` : `${t.inInventory} figure${t.inInventory !== 1 ? "s" : ""}`}</span>
               <button className="txtbtn" onClick={() => setYrAsc(v => !v)}>YEAR {yrAsc ? "↑" : "↓"}</button>
               {!q && <button className="txtbtn" onClick={open.size ? collapseAll : expandAll}>{open.size ? "Collapse All" : "Expand All"}</button>}
               <div className="inv-seg">

@@ -4,6 +4,7 @@ import { useTweaks, TweaksPanel, TweakSection, TweakRadio, TweakToggle, TweakCol
 import { InventoryView } from './app-inventory.jsx';
 import { AddFigureOverlay } from './app-add-figure.jsx';
 import { PartsBin } from './parts-bin.jsx';
+import { MasterCollectionView } from './master-collection.jsx';
 import { JoeStore } from './store.js';
 import './app.css';
 
@@ -58,7 +59,9 @@ function App() {
     <React.Fragment>
       {page === 'parts-bin'
         ? <PartsBin onNavigate={setPage} />
-        : <InventoryView onAddFigure={openAdd} onAddInstance={addInstance} onNavigate={setPage} masterOnly={page === 'master-collection'} />}
+        : page === 'master-collection'
+        ? <MasterCollectionView onNavigate={setPage} onAddInstance={addInstance} />
+        : <InventoryView onAddFigure={openAdd} onAddInstance={addInstance} onNavigate={setPage} />}
       {overlay && <AddFigureOverlay onClose={() => setOverlay(null)} presetCatalogId={overlay.presetId} presetVariant={overlay.presetVariant} presetAcc={overlay.presetAcc} />}
       <input ref={fileRef} type="file" accept="application/json" style={{ display: 'none' }} onChange={doImport} />
       <TweaksPanel title="Tweaks & Admin">

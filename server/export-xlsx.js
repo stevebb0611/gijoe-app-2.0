@@ -78,6 +78,7 @@ function buildFiguresSheet(wb, catalog, instancesByFigure) {
     { header: 'Country of Origin', key: 'coo', width: 20 },
     { header: 'Card On File', key: 'card', width: 28 },
     { header: 'Notes', key: 'notes', width: 44 },
+    { header: 'Master Collection Notes', key: 'masterNotes', width: 44 },
   ]);
 
   for (const fig of catalog) {
@@ -124,6 +125,7 @@ function buildFiguresSheet(wb, catalog, instancesByFigure) {
       coo: cooVals.join('; '),
       card: cardVals.join('; '),
       notes: noteVals.join('; '),
+      masterNotes: fig.masterNotes || '',
     });
     styleRow(row, status === 'complete' ? 'good' : status === 'incomplete' ? 'neutral' : 'gray');
   }

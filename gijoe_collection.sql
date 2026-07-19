@@ -105,6 +105,10 @@ CREATE TABLE IF NOT EXISTS figures (
                       -- this figure the owner wants as permanent keepers. Used only
                       -- for figures with NO variant_lookup rows — multi-variant
                       -- figures target per variant_lookup.master_target instead.
+    master_notes      TEXT,
+                      -- Master Collection note (migration 013): free-text note shown
+                      -- in the Master Collection card header (e.g. "yellowing, look
+                      -- for upgrade"). Distinct from the general `notes` column above.
     created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at        DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -255,7 +259,7 @@ CREATE TABLE IF NOT EXISTS figure_accessories (
     accessory_id      INTEGER NOT NULL REFERENCES accessories(id) ON DELETE CASCADE,
     group_id          INTEGER REFERENCES accessory_groups(group_id) ON DELETE SET NULL,
     release_context   TEXT    NOT NULL DEFAULT 'retail'
-                      CHECK(release_context IN ('retail', 'convention', 'mail_in', 'bonus')),
+                      CHECK(release_context IN ('retail', 'convention', 'mail_in', 'bonus', 'retailer_exclusive')),
     is_original       BOOLEAN DEFAULT 1,
     is_shared         BOOLEAN DEFAULT 0,
     quantity_required INTEGER DEFAULT 1,

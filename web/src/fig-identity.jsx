@@ -14,15 +14,30 @@ export function VersionChip({ version, lg }) {
 // a "N variants" count badge when browsing a catalog entry with none chosen
 // yet — these are mutually exclusive (see fig-identity.js's priority notes),
 // never both passed at once.
-export function VariantBadge({ letter, count, onClick, title }) {
+export function VariantBadge({ letter, count, onClick, title, lg }) {
   const label = letter || (count > 1 ? count + " variants" : null);
   if (!label) return null;
   const Tag = onClick ? 'button' : 'span';
   return (
-    <Tag type={onClick ? "button" : undefined} className="idvar" onClick={onClick}
+    <Tag type={onClick ? "button" : undefined} className={"idvar" + (lg ? " idvar--lg" : "")} onClick={onClick}
          title={title || (letter ? undefined : count + " production variants")}>
-      <span className="lyr"><b></b></span>{label}
+      <span className={"lyr" + (lg ? " lyr--lg" : "")}><b></b></span>{label}
     </Tag>
+  );
+}
+
+// Non-retail catalog rows (a convention/mail-in re-release sharing a
+// code_name + version with a retail edition — see VARIANTS.md §7.5.2) look
+// identical to the retail row everywhere else in the identity stack, so this
+// is the one thing that distinguishes them on screen.
+export function EditionTag({ context, lg }) {
+  if (!context || context === 'retail') return null;
+  const label = context === 'mail_in' ? 'MAIL-IN' : context.toUpperCase();
+  return (
+    <em className={"idedition" + (lg ? " idedition--lg" : "")}
+        title={"Release edition — " + label.toLowerCase() + ", not the standard retail release"}>
+      {label}
+    </em>
   );
 }
 

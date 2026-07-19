@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // server/set-accessory-context.mjs — owner CLI to reclassify a figure's
-// accessory pairing's release_context (retail / convention / mail_in / bonus).
+// accessory pairing's release_context (retail / convention / mail_in / bonus /
+// retailer_exclusive).
 // No source data exists yet for which accessories were convention/mail-in/
 // bonus-only — the owner is going figure-by-figure from memory/file cards, so
 // this is a small mutation helper, not a bulk importer. Look up accessory
@@ -33,15 +34,15 @@ if (args.help || Object.keys(args).length === 0) {
 
 --figure <F-code>              required — e.g. F007 (figures.figure_id)
 --accessory <A-code[,A-code…]> required — e.g. A0013,A0014 (accessories.accessory_code)
---context <ctx>                required — retail | convention | mail_in | bonus`);
+--context <ctx>                required — retail | convention | mail_in | bonus | retailer_exclusive`);
   process.exit(0);
 }
 
 if (!args.figure) fail('--figure is required');
 if (!args.accessory) fail('--accessory is required');
 if (!args.context) fail('--context is required');
-if (!['retail', 'convention', 'mail_in', 'bonus'].includes(args.context)) {
-  fail('--context must be one of: retail, convention, mail_in, bonus');
+if (!['retail', 'convention', 'mail_in', 'bonus', 'retailer_exclusive'].includes(args.context)) {
+  fail('--context must be one of: retail, convention, mail_in, bonus, retailer_exclusive');
 }
 
 const figure = db.prepare('SELECT id, code_name FROM figures WHERE figure_id = ?').get(args.figure);

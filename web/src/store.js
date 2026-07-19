@@ -190,6 +190,15 @@ export const JoeStore = {
       }
       emit();
     },
+    // Master Collection note (migration 013) — figure-level free text (e.g.
+    // "yellowing, look for upgrade"), shown in the Master Collection card
+    // header. Same fetch-once-catalog-cache patch as setFigureMasterTarget.
+    setFigureMasterNotes(id, notes) {
+      api('PATCH', '/api/figures/' + id, { masterNotes: notes });
+      const fig = CAT_BY_ID.get(id);
+      if (fig) fig.masterNotes = notes;
+      emit();
+    },
 
     // ---- Parts Bin: loose accessories (global stock — see server/instances.js) ----
     // entry: { id, catalogId, accessory, qty, notes, addedAt }

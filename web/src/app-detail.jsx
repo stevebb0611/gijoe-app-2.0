@@ -7,7 +7,7 @@ import { clusterBlueprint, matchedSetSatisfied, bpReq, bpForVariant } from '../.
 import { physicalGrade, paintGrade, dmEmpty, DamageMap, GradeBadge } from './damage-map.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
-import { VersionChip, VariantBadge, VehicleTag } from './fig-identity.jsx';
+import { VersionChip, VariantBadge, VehicleTag, EditionTag } from './fig-identity.jsx';
 import { formatYear } from './fig-identity.js';
 import { FileCardRow, FileCardTell } from './filecards.jsx';
 
@@ -30,11 +30,14 @@ function fvm(cf) {
   return {
     id: cf.id, name: cf.name, year: cf.year, faction: cf.faction,
     version: cf.ver ? 'v' + cf.ver : '',
+    fullName: cf.fullName || null,
     variants: (cf.variants || []).length,
     coo: cf.coo || [],
     fileCards: cf.fileCards || [],
     specialty: cf.role || '', variant: cf.role || '', vehicle: cf.vehicle || null,
     image: cf.image || null,
+    releaseContext: cf.releaseContext || 'retail',
+    masterNotes: cf.masterNotes || '',
     owned, acc, blueprint: bp,
     _cf: cf, _sum: sum,
   };
@@ -546,7 +549,8 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
             <PhotoSlot className="inv-modal__photo" src={fig.image} />
             <FactionTag faction={fig.faction} />
             <div className="inv-modal__id">
-              <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /></div>
+              <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /><EditionTag context={fig.releaseContext} lg /></div>
+              {fig.fullName && <div className="inv-modal__full">{fig.fullName}</div>}
               <div className="inv-modal__var">{fig.specialty} · {formatYear(fig.year)}</div>
               {fig.variants > 1 ? <div className="inv-modal__variants"><span className="lyr"><b></b></span>{fig.variants} variants</div> : null}
               <VehicleTag vehicle={fig.vehicle} modal />
@@ -645,22 +649,16 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                 <PhotoSlot className="inv-modal__photo" src={fig.image} />
                 <FactionTag faction={fig.faction} />
                 <div className="inv-modal__id">
-                  <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /></div>
-                  <div className="inv-modal__var">{cur.variant ? <React.Fragment><VariantBadge letter={cur.variant} /> · </React.Fragment> : null}{fig.specialty} · {formatYear(fig.year)}</div>
-                  <div className="inv-mc" title="Master Collection — how many keeper copies of this production variant you want">
-                    <span className="inv-mc__label">
-                      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.4l1.9 4.2 4.6.5-3.5 3.1 1 4.5L8 11.4l-4 2.3 1-4.5-3.5-3.1 4.6-.5z" /></svg>
-                      <span className={"inv-mc__count" + (mcCount >= mcTarget && mcTarget > 0 ? " is-met" : "")}>{mcCount}/{mcTarget}</span>
-                    </span>
-                    <button type="button" className="inv-mc__btn" title="Lower target" disabled={mcTarget <= 0} onClick={() => setMcTarget(mcTarget - 1)}>−</button>
-                    <button type="button" className="inv-mc__btn" title="Raise target" onClick={() => setMcTarget(mcTarget + 1)}>+</button>
+                  <div className="inv-modal__name">
+                    {fig.name}<VersionChip version={fig.version} lg /><EditionTag context={fig.releaseContext} lg />
+                    {(cur.variant || fig.variants > 1) ? (
+                      <VariantBadge letter={cur.variant} count={fig.variants} lg
+                                    onClick={fig.variants > 1 ? () => setVarEdit(v => !v) : undefined}
+                                    title={fig.variants > 1 ? "Change production variant" : undefined} />
+                    ) : null}
                   </div>
-                  {fig.variants > 1 ? (
-                    <button type="button" className="inv-modal__variants inv-modal__variants--btn" title="Change production variant"
-                            aria-expanded={varEdit} onClick={() => setVarEdit(v => !v)}>
-                      <span className="lyr"><b></b></span>{fig.variants} variants
-                    </button>
-                  ) : null}
+                  {fig.fullName && <div className="inv-modal__full">{fig.fullName}</div>}
+                  <div className="inv-modal__var">{fig.specialty} · {formatYear(fig.year)}</div>
                   {varEdit && (
                     <div className="inv-varpick">
                       {cf.variants.map(v => (
@@ -677,6 +675,14 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                 <CompRing pct={ringPct} size={84} neutral damagedPct={dmgShare} />
                 {!moc && !liveWhole && <div className="inv-modal__ringlab">COMPLETENESS</div>}
                 {moc && <div className="inv-modal__ringlab">MINT ON CARD</div>}
+                <div className="inv-mc" title="Master Collection — how many keeper copies of this production variant you want">
+                  <span className="inv-mc__label">
+                    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.4l1.9 4.2 4.6.5-3.5 3.1 1 4.5L8 11.4l-4 2.3 1-4.5-3.5-3.1 4.6-.5z" /></svg>
+                    <span className={"inv-mc__count" + (mcCount >= mcTarget && mcTarget > 0 ? " is-met" : "")}>{mcCount}/{mcTarget}</span>
+                  </span>
+                  <button type="button" className="inv-mc__btn" title="Lower target" disabled={mcTarget <= 0} onClick={() => setMcTarget(mcTarget - 1)}>−</button>
+                  <button type="button" className="inv-mc__btn" title="Raise target" onClick={() => setMcTarget(mcTarget + 1)}>+</button>
+                </div>
               </div>
 
               <div className="inv-modal__r">
