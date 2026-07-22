@@ -7,7 +7,7 @@ import { clusterBlueprint, matchedSetSatisfied, bpReq, bpForVariant } from '../.
 import { physicalGrade, paintGrade, dmEmpty, DamageMap, GradeBadge } from './damage-map.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
-import { VersionChip, VariantBadge, VehicleTag, EditionTag, SetTag } from './fig-identity.jsx';
+import { VersionChip, VariantBadge, VariantBracket, VehicleTag, EditionTag, SetTag } from './fig-identity.jsx';
 import { formatYear } from './fig-identity.js';
 import { FileCardRow, FileCardTell } from './filecards.jsx';
 
@@ -558,7 +558,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
               <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /><EditionTag context={fig.releaseContext} lg /><SetTag sets={fig.sets} lg /></div>
               {fig.fullName && <div className="inv-modal__full">{fig.fullName}</div>}
               <div className="inv-modal__var">{fig.specialty} · {formatYear(fig.year)}</div>
-              {fig.variants > 1 ? <div className="inv-modal__variants"><span className="lyr"><b></b></span>{fig.variants} variants</div> : null}
+              {fig.variants > 1 ? <div className="inv-modal__variants"><VariantBracket variants={cf.variants} owned={new Set()} lg /></div> : null}
               <VehicleTag vehicle={fig.vehicle} modal />
               {fig.coo.length > 0 && <div className="inv-modal__coo">Known origins: {fig.coo.join(', ')}</div>}
             </div>

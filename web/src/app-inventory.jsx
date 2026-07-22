@@ -13,7 +13,7 @@ import {
   FactionTag, CompRing, CompBar, PhotoSlot, StockBar, MasterBadge,
   InvDetailModal,
 } from './app-detail.jsx';
-import { VersionChip, VariantBadge, VehicleTag, EditionTag, SetTag } from './fig-identity.jsx';
+import { VersionChip, VariantBadge, VariantBracket, VehicleTag, EditionTag, SetTag } from './fig-identity.jsx';
 import { formatYear, SPECIAL_RELEASE_YEAR } from './fig-identity.js';
 
 function useStore() {
@@ -55,7 +55,7 @@ function Row({ fig, selId, openIds, onToggle, onOpen }) {
               onClick={() => ghost ? onOpen(fig.id, null) : onToggle(fig.id)}>
         <span className="inv-thumb" data-tag={ghost ? "—" : ""}></span>
         <span className="inv-name">
-          <b>{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><SetTag sets={fig.sets} /><VariantBadge count={fig.variants} /><VehicleTag vehicle={fig.vehicle} inline /></b>
+          <b>{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><SetTag sets={fig.sets} /><VariantBracket variants={fig._cf.variants} owned={ownedLetters} /><VehicleTag vehicle={fig.vehicle} inline /></b>
           <i>{fig.specialty}</i>
         </span>
         <FactionTag faction={fig.faction} mini />
@@ -118,11 +118,12 @@ function GalleryCard({ fig, onOpen }) {
   const multi = fig.owned > 1;
   const st = ghost ? null : figState(fig);
   const copies = fig._sum ? fig._sum.copies : [];
+  const ownedLetters = new Set(copies.map(c => c.variant).filter(Boolean));
   return (
     <button className={"card inv-card" + (ghost ? " is-ghostcard" : "")} onClick={() => ghost ? onOpen(fig.id, null) : onOpen(fig.id, copies[0].id)}>
       <div className="card__corner"><FactionTag faction={fig.faction} mini /></div>
       <PhotoSlot className="card__photo" src={fig.image} />
-      <div className="card__name">{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><SetTag sets={fig.sets} /><VariantBadge count={fig.variants} /></div>
+      <div className="card__name">{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><SetTag sets={fig.sets} /><VariantBracket variants={fig._cf.variants} owned={ownedLetters} /></div>
       <div className="card__var">{fig.specialty}</div>
       {!ghost && multi && st.moves.length > 0 && <div className="card__rebal">Rebalance</div>}
       <div className="card__foot">

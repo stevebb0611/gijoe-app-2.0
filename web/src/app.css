@@ -106,7 +106,7 @@
   .mc-list { display: flex; flex-direction: column; gap: 14px; padding-top: 18px; }
   .mc-card { border: 1.5px solid var(--ink); background: var(--card); }
   .mc-card__hd { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--ink); color: var(--paper); flex-wrap: wrap; }
-  .mc-card__name { font-family: var(--font-display); font-weight: 700; font-size: 15px; display: flex; align-items: baseline; gap: 8px; }
+  .mc-card__name { font-family: var(--font-display); font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; }
   .mc-card__year { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; opacity: .65; }
   .mc-card__targets { margin-left: auto; display: flex; gap: 8px; }
   .mc-target { font-family: var(--font-mono); font-size: 10px; letter-spacing: .5px; display: inline-flex; align-items: center; gap: 4px; color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.3); padding: 2px 6px; }
@@ -277,6 +277,20 @@
   .lyr--lg b { top: 0; left: 4px; }
   .lyr--lg::before { top: 2px; left: 2px; }
   .lyr--lg::after { top: 4px; left: 0; }
+  /* variant summary "[A|B|C]" — replaces the old "N variants" count text; a
+     single enclosed rectangle divided into per-letter cells. Owned cells
+     stamp in solid ink (like a punch/checklist mark); unowned cells stay
+     paper-blank. Darker than the accent-tinted first pass on purpose — reads
+     as "filled in" rather than "highlighted". Cell dividers match the outer
+     frame's weight/color (full var(--ink), not a soft var(--line)) so they
+     read the same regardless of which neighboring cells are filled — a ruled
+     ledger row, not a line that fades depending on what's next to it. */
+  .idvarbr { display: inline-flex; margin-left: 8px; vertical-align: 1px; border: 1.5px solid var(--ink); background: var(--paper); }
+  .idvarbr--lg { margin-left: 9px; vertical-align: 2px; }
+  .idvarbr__l { display: inline-flex; align-items: center; justify-content: center; min-width: 15px; font-style: normal; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .3px; color: var(--ink-soft); background: var(--paper); padding: 1px 5px; border-right: 1.5px solid var(--ink); }
+  .idvarbr--lg .idvarbr__l { min-width: 17px; font-size: 11px; padding: 2px 6px; }
+  .idvarbr__l:last-child { border-right: none; }
+  .idvarbr__l.is-owned { color: var(--paper); background: var(--ink); }
   .idfull { display: block; font-style: normal; font-family: var(--font-display); font-weight: 500; font-size: 11px; color: var(--ink-soft); line-height: 1.15; margin-top: 2px; }
   .idveh { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .3px; color: var(--ink); background: var(--paper); border: 1.5px solid var(--ink); padding: 2px 7px; box-shadow: 1.5px 1.5px 0 var(--line-soft); }
   span.idveh b { font-family: var(--font-display); font-weight: 700; font-size: 8px; letter-spacing: .6px; color: var(--ink-soft); }
@@ -475,6 +489,7 @@
   .inv-modal__full { font-family: var(--font-display); font-weight: 500; font-size: 12px; color: var(--ink-soft); text-align: center; }
   .inv-modal__var { font-size: 10px; color: var(--ink-soft); letter-spacing: 1px; text-align: center; }
   .inv-modal__variants { display: flex; justify-content: center; align-items: center; gap: 7px; font-family: var(--font-mono); font-size: 9px; letter-spacing: .5px; color: var(--accent); text-align: center; --lyrbg: var(--paper); }
+  .inv-modal__variants .idvarbr--lg { margin-left: 0; }
   .inv-modal__variants--btn { border: none; background: none; padding: 2px 4px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
   .inv-modal__variants--btn:hover { color: var(--ink); }
   .inv-modal__coo { font-family: var(--font-mono); font-size: 9px; letter-spacing: .5px; color: var(--ink-soft); text-align: center; }

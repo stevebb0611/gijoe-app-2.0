@@ -26,6 +26,23 @@ export function VariantBadge({ letter, count, onClick, title, lg }) {
   );
 }
 
+// Production-variant summary "[A|B|C]" — one letter per variant, solid-filled
+// when the collection owns a copy of that letter, outlined/dim when it
+// doesn't. Replaces the old "N variants" count text everywhere it appeared.
+// Static display only — VariantBadge's clickable single-letter mode (above)
+// remains the control for changing which variant a specific copy is pinned to.
+export function VariantBracket({ variants, owned, lg }) {
+  if (!variants || variants.length < 2) return null;
+  return (
+    <span className={"idvarbr" + (lg ? " idvarbr--lg" : "")}
+          title={variants.length + " production variants — filled = in your collection"}>
+      {variants.map((v, i) => (
+        <span key={v.letter || i} className={"idvarbr__l" + (owned && owned.has(v.letter) ? " is-owned" : "")}>{v.letter}</span>
+      ))}
+    </span>
+  );
+}
+
 // Non-retail catalog rows (a convention/mail-in re-release sharing a
 // code_name + version with a retail edition — see VARIANTS.md §7.5.2) look
 // identical to the retail row everywhere else in the identity stack, so this

@@ -10,7 +10,7 @@ import {
   FactionTag, StockBar, MasterBadge,
   InvDetailModal,
 } from './app-detail.jsx';
-import { VersionChip, VariantBadge, EditionTag, SetTag } from './fig-identity.jsx';
+import { VersionChip, VariantBadge, VariantBracket, EditionTag, SetTag } from './fig-identity.jsx';
 import { formatYear } from './fig-identity.js';
 
 function useStore() {
@@ -43,12 +43,16 @@ function MasterCollectionView({ onNavigate, onAddInstance }) {
       const allCopies = fig._sum ? fig._sum.copies : [];
       const starred = allCopies.filter((c) => c.masterCollection);
       if (!starred.length) return null;
+      // starred-only ownership — deliberately narrower than the Figures page's
+      // "any owned copy" bracket, since this page is specifically about what's
+      // been kept as a permanent copy, not just what's in the collection at all.
+      const starredLetters = new Set(starred.map((c) => c.variant).filter(Boolean));
       const targets = (fig._cf.variants || []).map((v) => {
         const letter = v.letter || '';
         const count = allCopies.filter((c) => (c.variant || '') === letter && c.masterCollection).length;
         return { letter, count, target: v.masterTarget || 0 };
       }).filter((v) => v.target > 0 || v.count > 0);
-      return { fig, starred, targets };
+      return { fig, starred, starredLetters, targets };
     })
     .filter(Boolean)
     .sort((a, b) => sortMode === 'az'
@@ -126,10 +130,10 @@ function MasterCollectionView({ onNavigate, onAddInstance }) {
           <div className="invp-empty">No figures match.</div>
         ) : (
           <div className="mc-list">
-            {entries.map(({ fig, starred, targets }) => (
+            {entries.map(({ fig, starred, starredLetters, targets }) => (
               <div className="mc-card" key={fig.id}>
                 <div className="mc-card__hd">
-                  <span className="mc-card__name"><b>{fig.name}</b><VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><SetTag sets={fig.sets} /></span>
+                  <span className="mc-card__name"><b>{fig.name}</b><VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><SetTag sets={fig.sets} /><VariantBracket variants={fig._cf.variants} owned={starredLetters} /></span>
                   <FactionTag faction={fig.faction} mini />
                   <span className="mc-card__year">{formatYear(fig.year)}</span>
                   {targets.length > 0 && (
