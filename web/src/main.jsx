@@ -29,8 +29,8 @@ function App() {
     document.body.classList.toggle('no-faction', !t.factionColors);
   }, [t]);
 
-  const openAdd = () => setOverlay({ presetId: null, presetVariant: null, presetAcc: null });
-  const addInstance = (catalogId, variant, presetAcc) => setOverlay({ presetId: catalogId, presetVariant: variant, presetAcc: presetAcc || null });
+  const openAdd = () => setOverlay({ presetId: null, presetVariant: null, presetAcc: null, presetSetId: null });
+  const addInstance = (catalogId, variant, presetAcc, presetSetId) => setOverlay({ presetId: catalogId, presetVariant: variant, presetAcc: presetAcc || null, presetSetId: presetSetId || null });
 
   const doExport = () => {
     const blob = new Blob([JoeStore.exportJSON()], { type: 'application/json' });
@@ -62,7 +62,7 @@ function App() {
         : page === 'master-collection'
         ? <MasterCollectionView onNavigate={setPage} onAddInstance={addInstance} />
         : <InventoryView onAddFigure={openAdd} onAddInstance={addInstance} onNavigate={setPage} />}
-      {overlay && <AddFigureOverlay onClose={() => setOverlay(null)} presetCatalogId={overlay.presetId} presetVariant={overlay.presetVariant} presetAcc={overlay.presetAcc} />}
+      {overlay && <AddFigureOverlay onClose={() => setOverlay(null)} presetCatalogId={overlay.presetId} presetVariant={overlay.presetVariant} presetAcc={overlay.presetAcc} presetSetId={overlay.presetSetId} />}
       <input ref={fileRef} type="file" accept="application/json" style={{ display: 'none' }} onChange={doImport} />
       <TweaksPanel title="Tweaks & Admin">
         <TweakSection label="Paper & ink" />

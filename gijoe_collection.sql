@@ -92,8 +92,8 @@ CREATE TABLE IF NOT EXISTS figures (
     year_released     INTEGER,
     year_discontinued INTEGER,
     release_context   TEXT    NOT NULL DEFAULT 'retail'
-                      CHECK(release_context IN ('retail', 'convention', 'mail_in')),
-    is_mail_away      BOOLEAN DEFAULT 0,
+                      CHECK(release_context IN ('retail', 'convention', 'mail_in', 'mail_order')),
+    is_mail_in        BOOLEAN DEFAULT 0,
     mail_in_notes     TEXT,
     is_vehicle_driver BOOLEAN DEFAULT 0,
     vehicle           TEXT,
@@ -211,6 +211,12 @@ CREATE TABLE IF NOT EXISTS instances (
                 -- Master Collection star (migration 009): this copy is a committed
                 -- permanent keeper, counted toward its figure/variant's master_target.
                 -- Free to set regardless of completeness/file-card status — not a gate.
+    set_id      INTEGER REFERENCES figure_sets(set_id) ON DELETE SET NULL,
+                -- Figure Sets v2 (migration 016): this specific physical copy is one of a
+                -- known multi-pack's slots (e.g. one of the 2 Cobra v1 in the 1982 JC
+                -- Penney 3-pack). Nullable — most instances aren't part of any set.
+                -- ON DELETE SET NULL (not CASCADE, unlike figure_set_members.set_id) —
+                -- deleting a set definition clears the tag, never deletes the owned copy.
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -376,6 +382,37 @@ CREATE TABLE IF NOT EXISTS figure_coo (
 );
 
 -- ─────────────────────────────────────────────
+--  FIGURE SETS — multi-pack grouping display (migration 015)
+-- ─────────────────────────────────────────────
+-- A fun bonus completionist display: some figures were originally sold
+-- bundled as a 2-pack/3-pack "set" rather than individually. Pure grouping/
+-- display layer over already-ownable catalog figures — no new ownable
+-- entries. A many-to-many junction (not a single figures.set_id column)
+-- since a figure could in principle belong to more than one set. See
+-- FIGURE_SETS.md for the per-set operational log — same as figure_coo just
+-- above, this schema-only block is NOT seeded with data here (a from-scratch
+-- reseed runs this before any figures rows exist from the CSVs, so an INSERT
+-- referencing a figure_id here would violate the FK) — confirmed sets are
+-- (re-)populated via server/add-figure-set.mjs after the fact, same
+-- reseed caveat figure_coo already has (also not auto-repopulated; see
+-- server/import-coo.mjs).
+
+CREATE TABLE IF NOT EXISTS figure_sets (
+    set_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+    name        TEXT NOT NULL,
+    year        INTEGER,
+    description TEXT
+);
+
+CREATE TABLE IF NOT EXISTS figure_set_members (
+    set_id             INTEGER NOT NULL REFERENCES figure_sets(set_id) ON DELETE CASCADE,
+    figure_id          INTEGER NOT NULL REFERENCES figures(id) ON DELETE CASCADE,
+    quantity_required  INTEGER NOT NULL DEFAULT 1,
+    PRIMARY KEY (set_id, figure_id)
+);
+CREATE INDEX IF NOT EXISTS idx_fsm_figure ON figure_set_members(figure_id);
+
+-- ─────────────────────────────────────────────
 --  WISHLIST
 -- ─────────────────────────────────────────────
 
@@ -432,6 +469,7 @@ CREATE INDEX IF NOT EXISTS idx_file_cards_code          ON file_cards(code_name)
 CREATE INDEX IF NOT EXISTS idx_file_cards_series        ON file_cards(series_id);
 CREATE INDEX IF NOT EXISTS idx_instances_figure         ON instances(figure_id);
 CREATE INDEX IF NOT EXISTS idx_instances_variant        ON instances(variant_id);
+CREATE INDEX IF NOT EXISTS idx_instances_set            ON instances(set_id);
 CREATE INDEX IF NOT EXISTS idx_inst_acc_instance        ON instance_accessories(instance_id);
 CREATE INDEX IF NOT EXISTS idx_inst_acc_accessory       ON instance_accessories(accessory_id);
 CREATE INDEX IF NOT EXISTS idx_variant_lookup_figure    ON variant_lookup(figure_id);
@@ -462,7 +500,7 @@ SELECT
     f.year_released,
     f.year_discontinued,
     f.release_context,
-    f.is_mail_away,
+    f.is_mail_in,
     f.is_vehicle_driver,
     f.vehicle,
     f.notes,

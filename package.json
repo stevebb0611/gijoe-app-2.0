@@ -7,6 +7,8 @@
     "start": "node server/index.js",
     "dev": "node server/index.js",
     "seed": "node server/seed.mjs",
+    "backup": "node server/backup-db.mjs",
+    "export-catalog": "node server/export-catalog-snapshot.mjs",
     "static": "serve ."
   },
   "type": "module",

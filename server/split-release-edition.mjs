@@ -56,6 +56,61 @@ const SPLITS = [
       { code: 'A0807', qty: 1 }, // Flare Gun — shared w/ Stretcher
     ],
   },
+  {
+    // Roadblock v2 — 1986 retail (F167) vs. 1992 Convention (F707).
+    // Previously logged in ACCESSORY_GROUPS.md/OPEN_QUESTIONS_Claude.md #18 as
+    // a "likely accidental duplicate" and given the release_context-on-one-row
+    // treatment instead (both source CSV rows shared the same "1992
+    // Convention" text). Owner instruction, 2026-07-21, reverses that call:
+    // the source gijoe_db_figures_accessories.csv already links F167 to only
+    // A0264/A0265 and F707 to only A0787/A0793 — a clean, disjoint split, not
+    // a leaked-accessory case like Flint's F701 — so this is a genuine second
+    // edition after all. F167's own release_context was mislabeled "1992
+    // Convention" despite being the real 1986 retail release (series_id 6) —
+    // corrected to retail, same bug shape as Flint's F125.
+    retailFigureId: 'F167',
+    newFigureId: 'F707',
+    codeName: 'Roadblock',
+    retailReleaseContext: 'retail',
+    newDisplayName: 'Roadblock (convention)',
+    newFullName: 'Hinton, Marvin F.',
+    newSpecialty: 'Infantry Heavy Weapons',
+    newFactionId: 1,
+    newSeriesId: 15,
+    newReleaseContext: 'convention',
+    newNotes: 'Convention',
+    accessories: [
+      { code: 'A0787', qty: 1 }, // Machine Gun — shared w/ S.A.W.-Viper, Snake Eyes (convention)
+      { code: 'A0793', qty: 1 }, // Mine Launcher — shared w/ Salvo, Tripwire (convention)
+    ],
+  },
+  {
+    // Snow Serpent v1 — 1985 retail (F137) vs. 1992 Convention (F710).
+    // Same shape as Roadblock v2 above, same owner instruction (2026-07-21):
+    // previously logged as a "likely accidental duplicate" and given the
+    // release_context-on-one-row treatment instead, but
+    // gijoe_db_figures_accessories.csv already links F137 to only
+    // A0206-A0211 and F710 to only A0701/A0702 — a clean, disjoint split, not
+    // a leaked-accessory case. F137's release_context was mislabeled "1992
+    // Convention" despite being the real 1985 retail release (series_id 5) —
+    // corrected to retail, same bug shape as Flint's F125/Roadblock's F167.
+    retailFigureId: 'F137',
+    newFigureId: 'F710',
+    codeName: 'Snow Serpent',
+    retailReleaseContext: 'retail',
+    newAltName: 'Cobra Snow Viper',
+    newDisplayName: 'Snow Serpent (convention)',
+    newFullName: 'Classified',
+    newSpecialty: 'Arctic Operations',
+    newFactionId: 2,
+    newSeriesId: 15,
+    newReleaseContext: 'convention',
+    newNotes: 'Convention',
+    accessories: [
+      { code: 'A0701', qty: 1 }, // Missile Launcher
+      { code: 'A0702', qty: 1 }, // Missile
+    ],
+  },
 ];
 
 function run() {
@@ -94,17 +149,18 @@ function run() {
 
       const info = db.prepare(`
         INSERT INTO figures (
-          figure_id, code_name, version, variant, variant_lookup,
+          figure_id, code_name, version, variant, variant_lookup, alt_name,
           display_name, full_name, specialty, faction_id, series_id,
-          release_context, is_mail_away, notes
+          release_context, is_mail_in, notes
         ) VALUES (
-          @figure_id, @code_name, NULL, NULL, NULL,
+          @figure_id, @code_name, NULL, NULL, NULL, @alt_name,
           @display_name, @full_name, @specialty, @faction_id, @series_id,
           @release_context, 0, @notes
         )
       `).run({
         figure_id: split.newFigureId,
         code_name: split.codeName,
+        alt_name: split.newAltName || null,
         display_name: split.newDisplayName,
         full_name: split.newFullName || null,
         specialty: split.newSpecialty || null,

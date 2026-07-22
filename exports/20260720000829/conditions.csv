@@ -1,0 +1,6 @@
+condition_id,label,description
+1,Mint,"Perfect, factory-fresh condition"
+2,Near Mint,"Tiny flaws, barely noticeable"
+3,Good,"Light wear, fully intact"
+4,Fair,Visible wear or minor damage
+5,Poor,"Heavy damage, missing parts"

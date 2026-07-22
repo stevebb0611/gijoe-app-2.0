@@ -141,6 +141,13 @@ const GROUPS = [
   // (raised peg on side / hole on side rather than button edges) but the
   // same interchangeable-backpack pattern — owner-confirmed same treatment.
   { extGroupId: null, fcode: 'F403', figure: 'Psyche-Out',  accessories: ['A0953', 'A0954'] }, // Sonic Backpack raised peg/hole on side
+  // Short-Fuze (1982, v1, F030 -> catalog id 12): 'Short-Fuze' also matches a
+  // later v1.5 (id 39, F073), but the lowest id (12, v1) is the one with
+  // these accessories, same pattern as Duke/Recondo/Spirit/… above. NOT a
+  // match_key case — a single slot, three interchangeable M-1 81mm Medium
+  // Mortar molds (closed handle / thin open handle / thick open handle); own
+  // any one for completion. Owner-confirmed 2026-07-21.
+  { extGroupId: null, figure: 'Short-Fuze', accessories: ['A0017', 'A0018', 'A0019'] }, // Medium Mortar closed/thin open/thick open handle
 ];
 
 // Same label rule as the locked reference (subgroup-wire-v2.jsx groupLabel):

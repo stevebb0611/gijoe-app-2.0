@@ -212,6 +212,30 @@
   .ysec__chev { font-size: 15px; text-align: center; }
   .ysec__body { padding: 12px 4px 18px; }
 
+  /* ===== multi-pack "set" card (migration 015/016) — Special Release section only ===== */
+  .setcard { border: 1.5px solid var(--ink); margin-bottom: 6px; box-shadow: var(--shadow); }
+  .setcard__hd { width: 100%; display: grid; grid-template-columns: 1fr auto 20px; gap: 14px; align-items: center;
+    text-align: left; font: inherit; color: inherit; cursor: pointer; padding: 10px 12px; background: var(--card); border: none; }
+  .setcard.is-open .setcard__hd { background: var(--ink); color: var(--paper); }
+  .setcard__hd:hover { background: var(--paper); }
+  .setcard.is-open .setcard__hd:hover { background: #2c2922; }
+  .setcard__name { font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: .5px; }
+  .setcard__prog { font-family: var(--font-mono); font-weight: 700; font-size: 11px; color: var(--gold); white-space: nowrap; }
+  .setcard__chev { font-size: 14px; text-align: center; }
+  .setcard__body { padding: 10px 12px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--paper); }
+  .setcard__desc { font-size: 11px; color: var(--ink-soft); margin: 0 0 4px; }
+  .setcard__slot { background: var(--card); border: 1.5px solid var(--line); padding: 8px 10px; }
+  .setcard__slot--ghost { width: 100%; display: flex; justify-content: space-between; align-items: center; text-align: left;
+    font: inherit; color: inherit; cursor: pointer; border-style: dashed; opacity: .8; }
+  .setcard__slot--ghost:hover { border-color: var(--ink); opacity: 1; }
+  .setcard__slotadd { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--accent); }
+  .setcard__slothd { width: 100%; display: flex; justify-content: space-between; align-items: center; text-align: left;
+    font: inherit; color: inherit; cursor: pointer; background: none; border: none; padding: 0; }
+  .setcard__slotname { font-family: var(--font-display); font-weight: 600; font-size: 12px; }
+  .setcard__slotname i { font-style: normal; color: var(--ink-soft); font-size: 10px; margin-left: 6px; }
+  .setcard__slotmoc { font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .5px; color: var(--gold); border: 1.5px solid var(--gold); padding: 1px 6px; }
+  .setcard__slotacc { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+
   /* ===== roster rows (list) ===== */
   .inv-cols, .inv-row { display: grid; grid-template-columns: 42px 1fr 88px 50px 1.5fr 92px 24px; gap: 12px; align-items: center; }
   .inv-cols { padding: 2px 12px 8px; font-size: 9px; letter-spacing: 1px; color: var(--ink-soft); }
@@ -233,6 +257,11 @@
      otherwise it reads identically to the retail row (VARIANTS.md §7.5.2) */
   .idedition { font-style: normal; display: inline-flex; align-items: center; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .3px; color: var(--accent); border: 1.5px solid var(--accent); padding: 1px 6px; margin-left: 8px; vertical-align: 1px; }
   .idedition--lg { font-size: 11px; padding: 2px 7px; margin-left: 9px; vertical-align: 2px; }
+  /* multi-pack "set" grouping (migration 015) — a fun bonus completionist badge,
+     gold like the Master Collection star so it reads as a bonus notation, not a
+     core classification like .idedition */
+  .idset { font-style: normal; display: inline-flex; align-items: center; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .3px; color: var(--gold); border: 1.5px solid var(--gold); padding: 1px 6px; margin-left: 8px; vertical-align: 1px; }
+  .idset--lg { font-size: 11px; padding: 2px 7px; margin-left: 9px; vertical-align: 2px; }
   /* variant indicator — "layers + count" pill (sits apart from the version chip) */
   .idvar { font-style: normal; display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-weight: 700; font-size: 9px; color: var(--accent); padding: 1px 6px; margin-left: 8px; vertical-align: 1px; --lyrbg: var(--card); }
   .idvar--lg { font-size: 11px; padding: 1px 5px; margin-left: 6px; vertical-align: 2px; gap: 4px; }
@@ -449,6 +478,11 @@
   .inv-modal__variants--btn { border: none; background: none; padding: 2px 4px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
   .inv-modal__variants--btn:hover { color: var(--ink); }
   .inv-modal__coo { font-family: var(--font-mono); font-size: 9px; letter-spacing: .5px; color: var(--ink-soft); text-align: center; }
+  /* multi-pack "set" tagging control, full modal (migration 016) — which of
+     this figure's known sets (if any) this specific copy belongs to; the
+     grouped progress/breakdown itself lives only in the Special Release
+     set card (set-card.jsx), not duplicated here */
+  .inv-modal__setpick { font-family: var(--font-mono); font-size: 9px; letter-spacing: .3px; color: var(--gold); background: var(--paper); border: 1.5px solid var(--gold); padding: 2px 6px; margin-top: 2px; }
   .inv-varpick { width: 100%; border: 1.5px dashed var(--accent); background: var(--paper); padding: 8px; display: flex; flex-direction: column; gap: 6px; }
   .inv-var { display: grid; grid-template-columns: 14px auto 1fr; gap: 8px; align-items: center; text-align: left; font: inherit; background: var(--card); border: 1.5px solid var(--line); padding: 6px 8px; cursor: pointer; color: var(--ink); }
   .inv-var:hover { border-color: var(--ink); }

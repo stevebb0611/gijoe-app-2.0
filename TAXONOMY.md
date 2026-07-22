@@ -17,7 +17,7 @@ The prototype currently hard-codes a **2-faction** binary (JOE / COBRA) and grou
 | **Sub-team** | `sub_group_id` | 23 (sparse — 71% blank) | Optional **tag** + **filter**; switchable grouping |
 | **Release context** | `release_context` | 12 | **Filter** (retail / exclusive / convention) |
 | **Vehicle driver** | `is_vehicle_driver` + `vehicle` | 139 figures | **Filter / flag** ("came with a vehicle") |
-| **Mail-away** | `is_mail_away` | 45 figures | **Filter** (overlaps release_context) |
+| **Mail-in** | `is_mail_in` | 45 figures | **Filter** (overlaps release_context) |
 | **Specialty** | `specialty` | 203 (freeform) | **Display only** — too granular to be a facet |
 
 ---
@@ -36,14 +36,18 @@ Tune the two new hues to match the field-manual palette's chroma/lightness; vary
 
 > **Gap (flagged July 2026): this recommendation was never implemented.** The live Inventory
 > (`web/src/app-inventory.jsx`) still groups strictly by calendar **year**, exactly as the
-> original prototype did — `series_id` only powers the Convention-block sentinel-year
-> formatting (`CONVENTION_YEAR` / `formatYear()` in `fig-identity.js`, so 1993 Jinx sorts
-> into "Convention" instead of literal year 9999) and is not yet a grouping axis, a group-by
+> original prototype did — `series_id` only powers the sentinel-year
+> formatting (`SPECIAL_RELEASE_YEAR` / `formatYear()` in `fig-identity.js`, so 1993 Jinx sorts
+> into "Special Release" instead of literal year 9999) and is not yet a grouping axis, a group-by
 > switch, a filter, or a tag anywhere in the app. Series 1 (1982) and Series 1.5/2 (both
 > 1983) are still merged under one "1983" year header today, which is exactly the case this
 > doc's "Series > Year" argument was written to fix. Treat "Default grouping = Series" (the
 > Open/recommended decisions bullet below) as **not started**, not done.
-Map id → `YEAR · label` (short code for dense UI). Sort chronological; **CONV (Convention) sorts last, regardless of numeric id** — it isn't a real chronological year, so nothing interpolates its sentinel year value (see below).
+Map id → `YEAR · label` (short code for dense UI). Sort chronological; **id 15 (the sentinel
+bucket, stored `label` "CONV") sorts last, regardless of numeric id** — it isn't a real
+chronological year, so nothing interpolates its sentinel year value (see below). The stored
+`description`/`label` text below is unchanged DB reference data — the *displayed* Inventory
+heading for this bucket is a separate UI string, see below.
 
 | id | Year | Label | Code |
 |----|------|-------|------|
@@ -63,7 +67,31 @@ Map id → `YEAR · label` (short code for dense UI). Sort chronological; **CONV
 | 14 | 1994 | Series 13 | S13 |
 | 15 | 9999 (sentinel) | Convention & Mail-In Block — 700-block + off-cycle reissues, not a real chronological year | CONV |
 
-Section header reads e.g. **"1988 · Series 7"**; the Convention section reads **"Convention"** (no year number — `year` 9999 is a sentinel, never displayed literally). Built (July 2026) as `CONVENTION_YEAR` / `formatYear()` in `web/src/fig-identity.js`, used everywhere a catalog figure's year is printed (Inventory year sections + search filter, Add Figure's year picker/search/summary, Parts Bin's figure search and rebalance rows) so no screen ever leaks a literal "9999". Confirmed live: 1993 Jinx v2 (both production variants) sits under this Convention section, not 1993's Series 12 — see `OPEN_QUESTIONS_ISSUES_FOUND.md` #21.
+Section header reads e.g. **"1988 · Series 7"**; the sentinel section reads **"Special
+Release"** (no year number — `year` 9999 is a sentinel, never displayed literally; renamed
+from the literal "Convention" 2026-07-20 since the same bucket also holds mail-in and
+mail-order figures — see `MAIL_RELEASES.md`). Built as `SPECIAL_RELEASE_YEAR` /
+`formatYear()` in `web/src/fig-identity.js`, used everywhere a catalog figure's year is
+printed (Inventory year sections + search filter, Add Figure's year picker/search/summary,
+Parts Bin's figure search and rebalance rows, Master Collection) so no screen ever leaks a
+literal "9999". Confirmed live: 1993 Jinx v2 (both production variants) sits under this
+section, not 1993's Series 12 — see `OPEN_QUESTIONS_ISSUES_FOUND.md` #21.
+
+> **Design history — why every convention/mail-in/mail-order figure buckets here instead of
+> its literal release year.** The owner initially organized convention releases under their
+> actual release year's section (a 1993 convention piece sitting in "1993 · Series 12" next
+> to that year's mainline retail figures) and didn't like the result in the live collection
+> view — convention pieces scattered thinly across many year sections instead of reading as
+> the distinct mini-collection they are. Current policy (in effect since the Jinx v2 fix,
+> 2026-07-10): **every** convention/mail-in/mail-order figure buckets under the single
+> `series_id 15` sentinel section regardless of its literal release year, disambiguated
+> per-figure by the `EditionTag` badge rather than by which section it's in. **This is not a
+> one-time migration** — the source CSV (`gijoe_db_figures_2.0.csv`) still has convention/
+> mail-in/mail-order figures mistagged with their mainline `series_id` (same root cause as
+> Jinx v2 and Snow Serpent v3, both now fixed — see `FIGURE_SPLITS.md`), and correcting the
+> rest is an ongoing, figure-by-figure process, not a finished pass. See `FIGURE_SPLITS.md`
+> for the per-figure `series_id` log and `MAIL_RELEASES.md` for the mail-in/mail-order
+> classification log — different mechanisms, both still open backlogs.
 
 ## Sub-team (`sub_group_id`) — optional tag, faction-scoped
 71% of figures have **no** sub-team, so this is never a required field and **not** the default grouping (would yield a huge "—none—" bucket). It is: a small **tag** on rows that have one, a **filter**, and an **optional** group-by mode. Each sub-team belongs to a faction:
@@ -72,33 +100,34 @@ Section header reads e.g. **"1988 · Series 7"**; the Convention section reads *
 - **Cobra (2):** Python Patrol, Crimson Guard, Iron Grenadiers, Cobra Ninja Force, Cobra Eco Warriors, Headhunters, Cobra Star Brigade, Mega Monsters, Cobra Street Fighter II
 - **Dreadnoks (4):** Dreadnoks *(redundant with faction 4 — ignore the sub-group row, classify via `faction_id`)*
 
-## Release context / vehicle / mail-away — filters
+## Release context / vehicle / mail-in — filters
 
 > **Naming collision (flagged July 2026, unresolved — same shape as the `variant` collision
 > `VARIANTS.md` §7.0 fixed): `release_context` is two different columns on two different
 > tables with two different value sets.** This section's `figures.release_context` is a
-> **per-figure release channel** (`retail` / `convention` / `mail_in`, CHECK-constrained in
-> `gijoe_collection.sql`) — e.g. "this whole figure was a 1992 convention exclusive." A
-> *separate* `figure_accessories.release_context` (`retail` / `convention` / `mail_in` /
-> `bonus`) is a **per-accessory-pairing completion flag** — "this one accessory in an
-> otherwise-retail figure's blueprint doesn't count toward Complete" — see `PARTS_BIN.md` →
-> *Accessory completeness model* and `ACCESSORY_GROUPS.md`. They are read by different code
-> (`server/catalog.js`'s `f.release_context` vs. `fa.release_context`), serve unrelated
-> purposes, and one is actively used (the accessory-level one, extensively) while the other
-> (the figure-level one below) still drives nothing but a disabled filter mock (see the
-> status note just below). Don't conflate the two when reading either doc; renaming one is
-> an open decision, same as `variant` was.
+> **per-figure release channel** (`retail` / `convention` / `mail_in` / `mail_order`,
+> CHECK-constrained in `gijoe_collection.sql` — the `mail_in`/`mail_order` split added
+> 2026-07-20, see `MAIL_RELEASES.md`) — e.g. "this whole figure was a 1992 convention
+> exclusive." A *separate* `figure_accessories.release_context` (`retail` / `convention` /
+> `mail_in` / `bonus` / `retailer_exclusive`) is a **per-accessory-pairing completion flag** —
+> "this one accessory in an otherwise-retail figure's blueprint doesn't count toward
+> Complete" — see `PARTS_BIN.md` → *Accessory completeness model* and `ACCESSORY_GROUPS.md`.
+> They are read by different code (`server/catalog.js`'s `f.release_context` vs.
+> `fa.release_context`), serve unrelated purposes, and one is actively used (the
+> accessory-level one, extensively) while the other (the figure-level one below) still
+> drives nothing but a disabled filter mock (see the status note just below). Don't conflate
+> the two when reading either doc; renaming one is an open decision, same as `variant` was.
 >
 > **Status of the filter described below: still a disabled mock.** `OPEN_QUESTIONS_Claude.md`
-> §7's "More Filters" panel confirms the **Release** facet (Retail · Mail-away · Convention ·
-> Store exclusive, i.e. `figures.release_context`) is rendered greyed-out with a "not tracked
-> yet" note (`web/src/app-inventory.jsx`, `NOT TRACKED YET` footer row) — even though the
-> column exists and is populated in the live schema. It hasn't been wired live; treat this
-> section as the target shape, not current behavior.
+> §7's "More Filters" panel confirms the **Release** facet (Retail · Mail-in · Mail-order ·
+> Convention · Store exclusive, i.e. `figures.release_context`) is rendered greyed-out with a
+> "not tracked yet" note (`web/src/app-inventory.jsx`, `NOT TRACKED YET` footer row) — even
+> though the column exists and is populated in the live schema. It hasn't been wired live;
+> treat this section as the target shape, not current behavior.
 
-- **Release context** (`release_context`): Retail (545), Mail order (42), 1992 Convention (35), Toys R Us (19), + small store-exclusive tail (Sears, Target, Kellogg's…). Collapse to a facet: **Retail · Mail-away · Convention · Store exclusive.**
+- **Release context** (`release_context`): Retail (545), Mail order (42, currently split between `mail_in`/`mail_order` per `MAIL_RELEASES.md`'s audit), 1992 Convention (35), Toys R Us (19), + small store-exclusive tail (Sears, Target, Kellogg's…). Collapse to a facet: **Retail · Mail-in · Mail-order · Convention · Store exclusive.**
 - **Vehicle driver** (`is_vehicle_driver` / `vehicle`): 139 figures shipped with a vehicle (Clutch→VAMP…). Filter "came with a vehicle"; show the vehicle name on the detail.
-- **Mail-away** (`is_mail_away`): 45 figures; folds into the release-context facet.
+- **Mail-in** (`is_mail_in`, renamed from `is_mail_away` 2026-07-20 — "mail-away" retired as a term, see `MAIL_RELEASES.md`): 45 figures; folds into the release-context facet.
 
 ## Specialty — display only
 203 distinct, freeform, 193 blank (Infantry 95, Artillery 15, …). Long tail → **never a filter**; show on the figure/instance detail as a descriptor.

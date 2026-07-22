@@ -1,0 +1,16 @@
+series_id,year,description,label
+1,1982,Series 1 — straight arm,S1
+2,1983,Series 1.5 — swivel arm,S1.5
+3,1983,Series 2,S2
+4,1984,Series 3,S3
+5,1985,Series 4,S4
+6,1986,Series 5,S5
+7,1987,Series 6,S6
+8,1988,Series 7,S7
+9,1989,Series 8,S8
+10,1990,Series 9,S9
+11,1991,Series 10,S10
+12,1992,Series 11,S11
+13,1993,Series 12,S12
+14,1994,Series 13,S13
+15,9999,"Convention & Mail-In Block — 700-block + off-cycle reissues, not a real chronological year",CONV

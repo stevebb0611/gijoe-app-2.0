@@ -36,7 +36,7 @@ const instanceRowsStmt = db.prepare(`
   SELECT i.id, i.figure_id AS catalogId, vl.letter AS variant, i.is_moc AS moc,
          i.damage AS marks, i.location AS loc, i.notes,
          i.filecard_on_file, i.filecard_id, i.country_of_origin AS coo,
-         i.is_master AS masterCollection,
+         i.is_master AS masterCollection, i.set_id AS setId,
          i.created_at
   FROM instances i
   LEFT JOIN variant_lookup vl ON vl.id = i.variant_id
@@ -65,6 +65,7 @@ function shapeInstance(row, accByInstance, damageByInstance, damageNotesByInstan
     filecard: { onFile: !!row.filecard_on_file, fileCardId: row.filecard_id || null },
     coo: row.coo || '',
     masterCollection: !!row.masterCollection,
+    setId: row.setId || null,
     addedAt: row.created_at,
   };
 }
@@ -114,8 +115,8 @@ function resolveVariantId(figureId, letter) {
 }
 
 const insertInstance = db.prepare(`
-  INSERT INTO instances (figure_id, variant_id, is_moc, damage, location, notes, filecard_on_file, filecard_id, country_of_origin)
-  VALUES (@figure_id, @variant_id, @is_moc, @damage, @location, @notes, @filecard_on_file, @filecard_id, @country_of_origin)
+  INSERT INTO instances (figure_id, variant_id, is_moc, damage, location, notes, filecard_on_file, filecard_id, country_of_origin, set_id)
+  VALUES (@figure_id, @variant_id, @is_moc, @damage, @location, @notes, @filecard_on_file, @filecard_id, @country_of_origin, @set_id)
 `);
 const upsertInstanceAcc = db.prepare(`
   INSERT INTO instance_accessories (instance_id, accessory_id, units_owned) VALUES (?, ?, ?)
@@ -123,7 +124,7 @@ const upsertInstanceAcc = db.prepare(`
 `);
 
 export const createInstance = db.transaction((payload) => {
-  const { catalogId, variant, moc, acc, accDamage, marks, loc, notes, filecard, coo } = payload;
+  const { catalogId, variant, moc, acc, accDamage, marks, loc, notes, filecard, coo, setId } = payload;
   const variantId = resolveVariantId(catalogId, variant);
   const id = insertInstance.run({
     figure_id: catalogId,
@@ -135,6 +136,7 @@ export const createInstance = db.transaction((payload) => {
     filecard_on_file: filecard && filecard.onFile ? 1 : 0,
     filecard_id: (filecard && filecard.fileCardId) || null,
     country_of_origin: coo || null,
+    set_id: setId || null,
   }).lastInsertRowid;
 
   for (const [name, units] of Object.entries(acc || {})) {
@@ -168,6 +170,7 @@ const getInstanceFigure = db.prepare('SELECT figure_id FROM instances WHERE id =
 
 const setInstanceVariant = db.prepare('UPDATE instances SET variant_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
 const setInstanceCoo = db.prepare('UPDATE instances SET country_of_origin = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
+const setInstanceSet = db.prepare('UPDATE instances SET set_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
 
 export const updateInstance = db.transaction((id, patch) => {
   if ('loc' in patch) patchFieldsStmt.loc.run((patch.loc || '').trim() || null, id);
@@ -180,6 +183,7 @@ export const updateInstance = db.transaction((id, patch) => {
     if (row) setInstanceVariant.run(resolveVariantId(row.figure_id, patch.variant), id);
   }
   if ('coo' in patch) setInstanceCoo.run(patch.coo || null, id);
+  if ('setId' in patch) setInstanceSet.run(patch.setId || null, id);
   if ('filecard' in patch) {
     db.prepare('UPDATE instances SET filecard_on_file = ?, filecard_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
       .run(patch.filecard.onFile ? 1 : 0, patch.filecard.fileCardId || null, id);

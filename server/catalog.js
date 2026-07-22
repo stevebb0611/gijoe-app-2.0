@@ -14,7 +14,7 @@ const FACTION_CODE = {
 const figuresStmt = db.prepare(`
   SELECT f.id, f.code_name, f.version, f.full_name, f.specialty, f.variant_lookup AS single_tell,
          f.is_vehicle_driver, f.vehicle,
-         f.is_mail_away, f.mail_in_notes, f.notes, f.release_context,
+         f.is_mail_in, f.mail_in_notes, f.notes, f.release_context,
          f.image_url_primary, f.master_target, f.master_notes,
          fac.name AS faction_name,
          COALESCE(s.year, f.year_released) AS year
@@ -40,6 +40,13 @@ const cooStmt = db.prepare(`
   SELECT figure_id, country FROM figure_coo ORDER BY figure_id, country
 `);
 
+const figureSetsStmt = db.prepare(`
+  SELECT fsm.figure_id, fsm.quantity_required, fs.set_id, fs.name, fs.year, fs.description
+  FROM figure_set_members fsm
+  JOIN figure_sets fs ON fs.set_id = fsm.set_id
+  ORDER BY fsm.figure_id, fs.set_id
+`);
+
 const blueprintStmt = db.prepare(`
   SELECT fa.figure_id, a.name, a.color, fa.quantity_required, a.id AS accessory_id,
          fa.group_id, fa.release_context, fa.match_key, vl.letter AS variant_letter
@@ -60,6 +67,15 @@ export function buildCatalog() {
   for (const c of cooStmt.all()) {
     if (!cooByFigure.has(c.figure_id)) cooByFigure.set(c.figure_id, []);
     cooByFigure.get(c.figure_id).push(c.country);
+  }
+
+  const setsByFigure = new Map();
+  for (const s of figureSetsStmt.all()) {
+    if (!setsByFigure.has(s.figure_id)) setsByFigure.set(s.figure_id, []);
+    setsByFigure.get(s.figure_id).push({
+      setId: s.set_id, name: s.name, year: s.year, description: s.description || null,
+      quantityRequired: s.quantity_required,
+    });
   }
 
   const fileCardsByFigure = new Map();
@@ -91,7 +107,7 @@ export function buildCatalog() {
     faction: FACTION_CODE[f.faction_name] || f.faction_name,
     role: f.specialty,
     vehicle: f.is_vehicle_driver && f.vehicle ? f.vehicle : null,
-    mailAway: !!f.is_mail_away,
+    mailIn: !!f.is_mail_in,
     mailInNotes: f.mail_in_notes || null,
     notes: f.notes || null,
     image: f.image_url_primary || null,
@@ -107,6 +123,7 @@ export function buildCatalog() {
     coo: cooByFigure.get(f.id) || [],
     fileCards: fileCardsByFigure.get(f.id) || [],
     blueprint: blueprintByFigure.get(f.id) || [],
+    sets: setsByFigure.get(f.id) || [],
   }));
 }
 

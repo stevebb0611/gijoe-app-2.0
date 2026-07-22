@@ -7,17 +7,17 @@ import { DamageMap, GradeBadge, physicalGrade, paintGrade, dmEmpty } from './dam
 import { DamageModePanel } from './app-detail.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
-import { VersionChip, VariantBadge, VehicleTag, EditionTag } from './fig-identity.jsx';
-import { formatYear, CONVENTION_YEAR } from './fig-identity.js';
+import { VersionChip, VariantBadge, VehicleTag, EditionTag, SetTag } from './fig-identity.jsx';
+import { formatYear, SPECIAL_RELEASE_YEAR } from './fig-identity.js';
 import { FileCardRow, FileCardTell } from './filecards.jsx';
 const AF_CATALOG = JoeData.CAT || [];
-// CONVENTION_YEAR sorts to the end regardless of numeric value — it's not a
+// SPECIAL_RELEASE_YEAR sorts to the end regardless of numeric value — it's not a
 // real year, so it doesn't belong interleaved by magnitude, but it does need
 // to be a pickable option here (unlike Inventory's min/max range facet,
 // this is a single-select filter, so one extra option is cheap and it was
 // previously only reachable via text search).
-const AF_YEARS = [...new Set(AF_CATALOG.map(f => f.year))].filter(y => y !== CONVENTION_YEAR).sort((a, b) => a - b);
-if (AF_CATALOG.some(f => f.year === CONVENTION_YEAR)) AF_YEARS.push(CONVENTION_YEAR);
+const AF_YEARS = [...new Set(AF_CATALOG.map(f => f.year))].filter(y => y !== SPECIAL_RELEASE_YEAR).sort((a, b) => a - b);
+if (AF_CATALOG.some(f => f.year === SPECIAL_RELEASE_YEAR)) AF_YEARS.push(SPECIAL_RELEASE_YEAR);
 
 const AF_STEPS = ["FIND", "DETAILS", "CONDITION", "FINALIZE"];
 
@@ -36,7 +36,7 @@ function AfStepper({ step, setStep, maxReached, lockFirst }) {
 
 function isSingle(fig) { return fig && fig.variants.length === 1 && !fig.variants[0].letter; }
 
-function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = null, presetAcc = null }) {
+function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = null, presetAcc = null, presetSetId = null }) {
   const preset = presetCatalogId != null;            // launched from a figure's + (add a copy) — lock to that figure, skip FIND
   const [step, setStep] = React.useState(preset ? 1 : 0);
   const [maxReached, setMax] = React.useState(preset ? 1 : 0);
@@ -50,6 +50,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const [moc, setMoc] = React.useState(false);       // Mint on Card (sealed) — counts 100% complete
   const [filecard, setFilecard] = React.useState({ onFile: false, fileCardId: null });
   const [coo, setCoo] = React.useState(''); // optional — country of origin, only offered when fig.coo has entries
+  const [setId, setSetId] = React.useState(presetSetId); // optional — which known set (if any) this copy belongs to
   // condition — single zone-map value; dmg.clean is the explicit "no damage found"
   // confirmation (vs. not yet mapped), and travels with marks into the stored instance
   const [dmg, setDmg] = React.useState(() => dmEmpty('male'));
@@ -71,18 +72,27 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
     setSelVar(isSingle(fig) ? '' : (presetVariant && fig.id === presetCatalogId ? presetVariant : null));
     setOwnedAcc(presetAcc && fig.id === presetCatalogId ? presetAcc : {});
     setMoc(false); setFilecard({ onFile: false, fileCardId: null }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male')); setCoo(''); setAccDamage({});
+    setSetId(presetSetId && fig.id === presetCatalogId ? presetSetId : null);
   }, [selId]);
 
   const q = query.trim().toLowerCase();
+  // Alphabetical, matching Inventory's per-year-group sort (app-inventory.jsx) —
+  // catalog order (AF_CATALOG/figures.id) has no relation to browsing order, and
+  // that's most visible in the Special Release filter, which otherwise pools every
+  // convention/mail-in figure across all real years in arbitrary id order.
   const allResults = AF_CATALOG.filter(f => (!yearF || f.year === +yearF) && (!q || [f.name, f.role, formatYear(f.year), f.faction]
-    .concat(f.variants.map(v => v.tell)).some(s => s && s.toLowerCase().includes(q))));
+    .concat(f.variants.map(v => v.tell)).some(s => s && s.toLowerCase().includes(q))))
+    .sort((a, b) => a.name.localeCompare(b.name));
   const hasFilter = !!q || !!yearF;
   const results = !hasFilter ? [] : yearF ? allResults : allResults.slice(0, 60);
 
   // Scoped to the variant picked in DETAILS (variantKey) — a variant-exclusive
   // accessory (e.g. Blocker's v1 B-only Visor) shouldn't be offered until that
   // variant is chosen. See bpForVariant + ACCESSORY_GROUPS.md "variant_id".
-  const blueprint = fig ? JoeData.bpForVariant(fig.blueprint, variantKey) : [];
+  const rawBlueprint = fig ? JoeData.bpForVariant(fig.blueprint, variantKey) : [];
+  // Retailer-exclusive accessories on a set-member figure are only editable via
+  // that set's Special Release card (set-card.jsx) — see app-detail.jsx's same filter.
+  const blueprint = fig && fig.sets.length > 0 ? rawBlueprint.filter((row) => row[4] !== 'retailer_exclusive') : rawBlueprint;
   const ordered = orderedBlueprint(blueprint);
   const unitsOf = (n) => owned[n] || 0;
   const bpReq = JoeData.bpReq(blueprint);
@@ -96,7 +106,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const setUnit = (n, idx) => setOwnedAcc(o => { const cur = o[n] || 0; return { ...o, [n]: cur > idx ? idx : idx + 1 }; });
   // color (blueprint tuple index 6, added 2026-07-03 — see acc-colors.jsx)
   // renders as an AccSwatch beside the name, decoration only. short=true is
-  // for variant-slot options: display the shortened option label (via
+  // for variant-slot options: display the full option label (via
   // JoeData.optLabel) plus its match_key tag badge, same row shape as a solo item.
   const afAccRow = (a, short) => {
     const [n, qreq, , , , tag, color] = a;
@@ -141,13 +151,14 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
       loc: loc.trim(), notes: notes.trim(),
       filecard: filecard.onFile ? { onFile: true, fileCardId: filecard.fileCardId } : { onFile: false, fileCardId: null },
       coo: coo || '',
+      setId,
     });
     setDone(true);
   };
 
   const resetAll = () => {
     setDone(false); setSelId(null); setQuery(""); setSelVar(null); setLoc(""); setNotes("");
-    setOwnedAcc({}); setMoc(false); setFilecard({ onFile: false, fileCardId: null }); setDmg(dmEmpty('male')); setAccDamage({}); setYearF(""); goto(0);
+    setOwnedAcc({}); setMoc(false); setFilecard({ onFile: false, fileCardId: null }); setDmg(dmEmpty('male')); setAccDamage({}); setYearF(""); setSetId(null); goto(0);
   };
 
   return (
@@ -190,7 +201,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                   <React.Fragment key={f.id}>
                   <button className={"af-res" + (f.id === selId ? " is-sel" : "")} onClick={() => setSelId(f.id)}>
                     <span className="af-res__thumb"></span>
-                    <span className="af-res__name"><b>{f.name}</b><i>{sub} · {formatYear(f.year)}</i><EditionTag context={f.releaseContext} />{f.vehicle && <span className="idveh" title={"Vehicle driver — packaged with the " + f.vehicle}><b>VEHICLE</b> {f.vehicle}</span>}</span>
+                    <span className="af-res__name"><b>{f.name}</b><i>{sub} · {formatYear(f.year)}</i><EditionTag context={f.releaseContext} /><SetTag sets={f.sets} />{f.vehicle && <span className="idveh" title={"Vehicle driver — packaged with the " + f.vehicle}><b>VEHICLE</b> {f.vehicle}</span>}</span>
                     <span className={"wf-fac wf-fac--" + f.faction.toLowerCase() + " wf-fac--mini"}>{f.faction}</span>
                     <span className="af-res__own">{own === 0 ? "not owned" : "owned ×" + own}</span>
                     <span className="af-res__pick">{f.id === selId ? (isSingle(f) ? "● selected" : "▾ pick variant") : "select ›"}</span>
@@ -223,7 +234,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                 <span className="af-fig__thumb"></span>
                 <div>
                   <div className="af-fig__name">
-                    {fig.name}<VersionChip version={fig.ver ? "v" + fig.ver : ""} /><EditionTag context={fig.releaseContext} />
+                    {fig.name}<VersionChip version={fig.ver ? "v" + fig.ver : ""} /><EditionTag context={fig.releaseContext} /><SetTag sets={fig.sets} />
                     <span className={"wf-fac wf-fac--" + fig.faction.toLowerCase() + " wf-fac--mini"}>{fig.faction}</span>
                     {multi && chosen ? <VariantBadge letter={chosen.letter} /> : null}
                   </div>
@@ -278,6 +289,24 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                                   onClick={() => setCoo(c => c === country ? '' : country)}
                                   title={coo === country ? "Clear country of origin" : "Set as country of origin"}>
                             {coo === country ? "✓" : ""}
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {fig.sets.length > 0 && (
+                  <div className="acc-list fc-list coo-list" style={{ marginTop: 18 }}>
+                    <div className="acc-list__cap"><span>PART OF A SET</span><span>{setId && <b>{fig.sets.find(s => s.setId === setId)?.name}</b>}</span></div>
+                    <div className="acc fc-coorow">
+                      {fig.sets.map(s => (
+                        <span key={s.setId} className="fc-coo__opt">
+                          <span className="acc__name">{s.name}</span>
+                          <button type="button" className={"acc__box fc-box" + (setId === s.setId ? " is-on" : "")}
+                                  onClick={() => setSetId(id => id === s.setId ? null : s.setId)}
+                                  title={setId === s.setId ? "Not part of a set" : "This copy is one of this set's slots — see Special Release"}>
+                            {setId === s.setId ? "✓" : ""}
                           </button>
                         </span>
                       ))}

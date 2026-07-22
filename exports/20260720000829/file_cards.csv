@@ -1,0 +1,3 @@
+file_card_id,file_card_code,code_name,series_id,release_type,card_back,card_color,logo_version,text_version,country,condition_id,notes,image_url_primary,image_url_detail,created_at,updated_at
+1,FC001,Breaker,,first print,tan,,,,,,Carded Tan,,,2026-07-10 23:05:54,2026-07-10 23:05:54
+2,FC002,Breaker,,mail-away,red,,,,,,"Mail-Away, Red Backed",,,2026-07-10 23:05:54,2026-07-10 23:05:54

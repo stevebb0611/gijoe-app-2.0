@@ -92,15 +92,25 @@ const insertFigure = db.prepare(`
   INSERT INTO figures (
     figure_id, code_name, character_key, alt_name, version, variant, variant_lookup,
     display_name, full_name, specialty, faction_id, sub_group_id, series_id,
-    year_released, release_context, is_mail_away, mail_in_notes, is_vehicle_driver,
+    year_released, release_context, is_mail_in, mail_in_notes, is_vehicle_driver,
     vehicle, notes
   ) VALUES (
     @figure_id, @code_name, @character_key, @alt_name, @version, @variant, @variant_lookup,
     @display_name, @full_name, @specialty, @faction_id, @sub_group_id, @series_id,
-    @year_released, @release_context, @is_mail_away, @mail_in_notes, @is_vehicle_driver,
+    @year_released, @release_context, @is_mail_in, @mail_in_notes, @is_vehicle_driver,
     @vehicle, @notes
   )
 `);
+
+// Figures confirmed as genuine mail-order (catalog/order-form) releases, distinct from
+// mail-in (clip-and-send-in proof-of-purchase premiums) — confirmed one at a time in
+// MAIL_RELEASES.md. Do NOT widen normalizeReleaseContext()'s "mail order" regex to bucket
+// straight to mail_order — the source CSV uses that same free text for every mail-in figure,
+// so that would silently reclassify ~25 other rows on the next reseed. Append here only
+// after a MAIL_RELEASES.md entry confirms it against a real reference or owned copy.
+const MAIL_ORDER_FIGURE_IDS = new Set([
+  'F566', // Snow Serpent v3 ("Arctic Commando Snow Serpent") — owner-confirmed, 2026-07-20
+]);
 const insertVariantLookup = db.prepare(`
   INSERT INTO variant_lookup (figure_id, letter, tell) VALUES (?, ?, ?)
 `);
@@ -120,7 +130,9 @@ const insertFiguresTxn = db.transaction(() => {
 
     const seriesId = asInt(canon.series_id);
     const seriesExists = seriesId != null && seriesIds.has(seriesId);
-    const { bucket, detail } = normalizeReleaseContext(canon.release_context);
+    let { bucket, detail } = normalizeReleaseContext(canon.release_context);
+    const isMailOrder = MAIL_ORDER_FIGURE_IDS.has(canon.figure_id);
+    if (isMailOrder) bucket = 'mail_order';
     const derivedYear = seriesExists ? null : yearFromText(canon.release_context || canon.mail_in_notes);
     const noteBits = [asText(canon.notes), detail].filter(Boolean);
 
@@ -140,7 +152,7 @@ const insertFiguresTxn = db.transaction(() => {
       series_id: seriesExists ? seriesId : null,
       year_released: derivedYear,
       release_context: bucket,
-      is_mail_away: asBool(canon.is_mail_away),
+      is_mail_in: isMailOrder ? 0 : asBool(canon.is_mail_away),
       mail_in_notes: asText(canon.mail_in_notes),
       is_vehicle_driver: asBool(canon.is_vehicle_driver),
       vehicle: asText(canon.vehicle),

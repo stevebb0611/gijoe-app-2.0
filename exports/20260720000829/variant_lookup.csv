@@ -1,0 +1,184 @@
+id,figure_id,letter,tell,notes,master_target
+1,1,A,"Straight-Arm, Thin Thumbs, Flat Paint Finish",,1
+2,1,B,"Straight-Arm, Thick Thumbs, Glossy Paint Finish",,1
+3,1,C,"Straight-Arm, Thick Thumbs, Reverse Rivits",,1
+4,2,A,"Straight-Arm, Thin Thumbs, Flat Paint Finish",,1
+5,2,B,"Straight-Arm, Thick Thumbs, Glossy Paint Finish",,1
+6,2,C,"Straight-Arm, Thick Thumbs, Reverse Rivits",,1
+7,3,A,"Straight-Arm, Thin Thumbs, Flat Paint Finish",,1
+8,3,B,"Straight-Arm, Thick Thumbs, Glossy Paint Finish",,1
+9,4,A,"Straight-Arm,""Mickey Mouse"" Cobra Logo",,1
+10,4,B,Straight-Arm,,1
+11,5,A,"Straight-Arm, Thin Thumbs, Flat Paint Finish",,1
+12,5,B,"Straight-Arm, Thick Thumbs, Glossy Paint Finish",,1
+13,6,A,"Straight-Arm, Thin Thumbs, Flat Paint Finish",,1
+14,6,B,"Straight-Arm, Thick Thumbs, Glossy Paint Finish",,1
+15,6,C,"Straight-Arm, Thick Thumbs, Reverse Rivits",,1
+16,7,A,"Straight-Arm, Thin Thumbs, Flat Paint Finish",,1
+17,7,B,"Straight-Arm, Thick Thumbs, Glossy Paint Finish",,1
+18,7,C,"Straight-Arm, Thick Thumbs, Reverse Rivits",,1
+19,8,A,"Straight-Arm, Thin Thumbs, Flat Paint Finish",,1
+20,8,B,"Straight-Arm, Thick Thumbs, Glossy Paint Finish",,1
+21,8,C,"Straight-Arm, Thick Thumbs, Reverse Rivits",,1
+22,9,A,"Straight-Arm, Thin Thumbs, Flat Paint Finish",,1
+23,9,B,"Straight-Arm, Thick Thumbs, Glossy Paint Finish",,1
+24,9,C,"Straight-Arm, Thick Thumbs, Reverse Rivits",,1
+25,10,A,"Straight-Arm, Thin Thumbs, Flat Paint Finish",,1
+26,10,B,"Straight-Arm, Thick Thumbs, Glossy Paint Finish",,1
+27,10,C,"Straight-Arm, Thick Thumbs, Reverse Rivits",,1
+28,11,A,"Straight-Arm, Thin Thumbs, Flat Paint Finish",,1
+29,11,B,"Straight-Arm, Thick Thumbs, Glossy Paint Finish",,1
+30,12,A,"Straight-Arm, Thin Thumbs, Flat Paint Finish",,1
+31,12,B,"Straight-Arm, Thick Thumbs, Glossy Paint Finish",,1
+32,12,C,"Straight-Arm, Thick Thumbs, Reverse Rivits",,1
+33,13,A,"Straight-Arm, Thin Thumbs, Flat Paint Finish",,1
+34,13,B,"Straight-Arm, Thick Thumbs, Glossy Paint Finish",,1
+35,13,C,"Straight-Arm, Thick Thumbs, Reverse Rivits",,1
+36,14,A,"Straight-Arm, Thin Thumbs, Flat Paint Finish",,1
+37,14,B,"Straight-Arm, Thick Thumbs, Glossy Paint Finish",,1
+38,14,C,"Straight-Arm, Thick Thumbs, Reverse Rivits",,1
+39,15,A,"Straight-Arm, Thin Thumbs, Flat Paint Finish",,1
+40,15,B,"Straight-Arm, Thick Thumbs, Glossy Paint Finish",,1
+41,16,A,"Straight-Arm, Thin Thumbs, Flat Paint Finish",,1
+42,16,B,"Straight-Arm, Thick Thumbs, Glossy Paint Finish",,1
+43,16,C,"Straight-Arm, Thick Thumbs, Reverse Rivits",,1
+44,18,A,Thin chevron stripes,,1
+45,18,B,Thick chevron stripes,,1
+46,24,A,"Dark eyebrows, lighter shirt, darker boots & belt",,1
+47,24,B,"Eyebrows match hair, darker shirt, lighter boots & belt",,1
+48,25,A,"""Hasbro 1983"" leg stamp",,1
+49,25,B,No leg stamp,,1
+50,27,A,"Rolled jacket sleeves, smooth hair, Doc v1 waist, American flag sticker on right arm",,1
+51,27,B,"Rolled jacket sleeves, smooth hair, Doc v1 waist, no sticker",,1
+52,27,C,"Rolled jacket sleeves, more detailed hair, Doc v1 waist, no sticker",,1
+53,27,D,"Grunt v1.5 arms with cuffed sleeves that end at wrists, detailed hair, Doc v1 waist, no sticker",,1
+54,27,E,"Grunt v1.5 arms with cuffed sleeves that end at wrists, detailed hair, Cobra v1 waist, no sticker",,1
+55,42,A,"Swivel-Arm, darker glossy green camo uniform",,1
+56,42,B,"Swivel-Arm, lighter flat green camo uniform",,1
+57,45,A,Thin chevron stripes,,1
+58,45,B,Thick chevron stripes,,1
+59,50,A,"Dark eyes and eyebrows, short neck",,1
+60,50,B,"Eyes and eybrows match hair color, short neck",,3
+61,50,C,"Eyes and eybrows match hair color, long neck",,1
+62,53,A,Light green gloves & helmet trim,,1
+63,53,B,Blue/green gloves & helmet trim,,1
+64,53,C,Dark green gloves & helmet trim,,1
+65,56,A,Black eyes,,1
+66,56,B,Brown eyes,,1
+67,58,A,"Tan uniform, green camo stripes on legs",,1
+68,58,B,"Tan uniform, dark olive camo stripes on legs",,1
+69,62,A,"Light blue shirt, tan pants, large emblem on right arm",,1
+70,62,B,"Light blue shirt, tan pants, small emblem on right arm",,1
+71,67,A,Map on right leg has grid pattern on right side,,1
+72,67,B,Map on right leg has grid pattern on left side,,1
+73,72,A,"Red football jersey, blue ""14"" with white outline",,1
+74,72,B,"Red football jersey, solid white ""14""",,1
+75,75,A,Lighter red uniform,,1
+76,75,B,Darker red uniform,,1
+77,77,A,Lighter red chest,,1
+78,77,B,"Darker red chest, no country stamp",,1
+79,80,A,"Darker gray fur, dark blue emblem",,1
+80,80,B,"Lighter gray fur, pale blue emblem",,1
+81,82,A,"Brown jacket, tan pants, patch on right arm, painted stars on collar",,1
+82,82,B,Unpainted stars on collar,,1
+85,90,A,"Recondo v1 torso, Recondo v1 waist, pale blue uniform",,1
+86,90,B,,,1
+87,90,C,"Duke v1 torso, Iceberg v1 waist, pale blue uniform",,1
+88,95,A,"Red sash over left shoulder, large Cobra emblem on right side, short pink scar on left side of face.",,1
+89,95,B,"Red sash over left shoulder, large Cobra emblem on right side, long red scar on left side of face.",,1
+90,97,A,Orange paint trim,,1
+91,97,B,Yellow paint trim,,1
+92,100,A,Feet molded in gray plastic,,1
+93,100,B,Feet molded in white plastic,,1
+94,114,A,"Light blue helmet, pale blue neck joint",,1
+95,114,B,"Dark blue helmet, two-tone neck joint",,1
+96,117,A,Flesh colored neck,,1
+97,117,B,Yellow colored neck,,1
+98,117,C,"Flesh colored neck, flat tails on chest",,1
+99,118,A,Thick red border around chevron on boots,,1
+100,118,B,Thin red border around chevron on boots,,1
+101,120,A,Teeth painted on face,,1
+102,120,B,No teeth painted on face.,,1
+103,127,A,"Earrings, darker red gloves & kneepads",,1
+104,127,B,"No earrings, lighter red gloves & kneepads",,1
+105,127,C,No earrings,,1
+106,128,A,Gray knife on leg,,1
+107,128,B,Silver knife on leg,,1
+108,132,A,"No visor, black inner arm",,1
+109,132,B,"With visor, red inner arm",,1
+110,134,A,Flesh tone neck ball-joint,,1
+111,134,B,Dark gray neck ball-joint,,1
+112,141,A,"Tail with small, tightly clustered scales",,1
+113,141,B,Tail with larger scales,,1
+114,161,A,Lighter brown pants,,1
+115,161,B,Darker brown pants,,1
+116,162,A,"Airborne v1 chest, Scrap Iron v1 legs, silver helmet",,1
+117,162,B,"Duke v1 chest, Scrap Iron v1 legs, silver helmet",,1
+118,162,C,"Duke v1 chest, Airborne v1 legs, Gung-Ho v1 waist, silver helmet",,1
+119,162,D.1,"Duke v1 chest, Airborne v1 legs, Cobra v1.5 waist, silver helmet",,1
+120,162,D.2,"Duke v1 chest, Airborne v1 legs, Cobra v1.5 waist, silver helmet",,1
+121,162,E,"Duke v1 chest, Scrap Iron v1 legs, Flash v1.5 arms, Cobra v1.5 waist, silver helmet",,1
+122,165,A,"Right wristband with blue-red-white pattern, left wristband with white-red-blue pattern",,1
+123,165,B,"Rght wristband with red-blue-white pattern, left wristband with white-blue-red pattern",,1
+124,165,C,Brown belt buckle,,1
+125,168,A,Short mustache,,1
+126,168,B,Long mustache,,1
+127,169,A,Brighter green boots,,1
+128,169,B,Darker green boots,,1
+129,172,A,Lighter brown gloves and boots,,1
+130,172,B,Darker brown gloves and boots,,1
+131,174,A,Orange eyes,,1
+132,174,B,Black eyes,,1
+133,181,A,Orange eyes,,1
+134,181,B,Black eyes,,1
+135,181,C,Dark red eyes,,1
+136,202,A,Map on right leg has grid pattern on right side,,1
+137,202,B,Map on right leg has grid pattern on left side,,1
+138,225,A,Flesh-tone hands,,1
+139,225,B,Yellow glove hands,,1
+140,262,A,Light brown stripes,,1
+141,262,B,Orange stripes,,1
+142,275,A,"Thin pegs on legs, small holes on missile pack",,1
+143,275,B,"Thick pegs on legs, large holes on missile pack",,1
+144,300,A,Eyebrows visible through red face shield,,1
+145,300,B,No eyebrows visible through red face shield,,1
+146,302,A,Hard plastic head & helmet,,1
+147,302,B,Vinyl rubber helmet,,1
+148,342,A,"""Lightning Strike"" action, notches on bottom of torso",,1
+149,342,B,"""Lightning Strike"" action, no notches on torso",,1
+150,354,A,Dark red Cobra sigil,,1
+151,354,B,Light red Cobra sigil,,1
+152,354,C,Bright red Cobra sigil,,1
+153,355,A,"""Samurai Smash"" action, notches on bottom of torso",,1
+154,355,B,"""Samurai Smash"" action, no notches on torso",,1
+155,360,A,"""Scorpion Slash"" action, notches on bottom of torso",,1
+156,360,B,"""Scorpion Slash"" action, no notches on torso",,1
+157,365,A,"""Screaming Whirlwind"" action, notches on bottom of torso",,1
+158,365,B,"""Screaming Whirlwind"" action, no notches on torso",,1
+159,377,A,Large logo on shirt,,1
+160,377,B,Small logo on shirt,,1
+161,394,A,Yellow upper arms with orange paint,,1
+162,394,B,Orange upper arms with yellow paint,,1
+163,428,A,Blue Cobra sigil,,1
+164,428,B,Black Cobra sigil,,1
+165,429,A,Large logo on back,,1
+166,429,B,Small logo on back,,1
+167,436,A,Shoulder pads,,1
+168,436,B,No shoulder pads,,1
+169,437,A,Shoulder pads,,1
+170,437,B,No shoulder pads,,1
+171,462,A,"""Kato Kick"" action, ball joint neck nods up and down",,1
+172,462,B,"""Kato Kick"" action, neck only turns side-to-side",,1
+173,501,A,Removable microphone,,1
+174,501,B,Microphone glued to helmet,,1
+175,501,C,"Red vest with red T-shirt, no stripe, white pants",,1
+176,512,A,Silver hand grenades on chest,,1
+177,512,B,Black hand grenades on chest,,1
+178,514,A,Black paint trim on upper arms,,1
+179,514,B,No black paint trim on upper arm,,1
+180,519,A,Yellow trim on shirt,,1
+181,519,B,All black shirt,,1
+182,521,A,Gold chest,,1
+183,521,B,Yellow chest,,1
+184,264,A,Soft helmet,,1
+185,264,B,Hard helmet,,1

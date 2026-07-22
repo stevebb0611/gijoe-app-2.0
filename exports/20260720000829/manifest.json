@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2026-07-20T00:08:29.067Z",
+  "sourceDb": "gijoe_collection.db",
+  "tables": {
+    "series": 15,
+    "conditions": 5,
+    "accessory_categories": 55,
+    "factions": 4,
+    "sub_groups": 23,
+    "figures": 525,
+    "accessories": 1804,
+    "variant_lookup": 183,
+    "accessory_groups": 34,
+    "figure_accessories": 2479,
+    "file_cards": 2,
+    "figure_file_cards": 2,
+    "figure_coo": 108
+  }
+}

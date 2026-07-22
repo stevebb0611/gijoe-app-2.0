@@ -22,6 +22,13 @@ const STYLE = {
   gray:    { fill: 'FFF2F2F2', font: 'FF808080' }, // unowned / non-retail, tracked only
 };
 
+const RELEASE_CONTEXT_LABEL = {
+  retail: 'Retail',
+  convention: 'Convention',
+  mail_in: 'Mail-in',
+  mail_order: 'Mail-order',
+};
+
 function styleRow(row, key) {
   const s = STYLE[key];
   if (!s) return;
@@ -107,8 +114,8 @@ function buildFiguresSheet(wb, catalog, instancesByFigure) {
       if (inst.notes) noteVals.push(insts.length > 1 ? `Copy ${idx + 1}: ${inst.notes}` : inst.notes);
     });
 
-    let context = fig.releaseContext === 'retail' ? 'Retail' : fig.releaseContext;
-    if (fig.mailAway) context += fig.mailInNotes ? ` — ${fig.mailInNotes}` : ' (mail-away)';
+    let context = RELEASE_CONTEXT_LABEL[fig.releaseContext] || fig.releaseContext;
+    if (fig.mailIn) context += fig.mailInNotes ? ` — ${fig.mailInNotes}` : ' (mail-in)';
 
     const row = ws.addRow({
       name: fig.name,

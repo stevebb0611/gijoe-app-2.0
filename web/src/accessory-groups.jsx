@@ -154,9 +154,9 @@ export function orderedBlueprint(bp) {
 // Renders an orderedBlueprint() list end to end.
 // renderSolo(item, key): draws one solo/context row using the item's full
 // name (e.g. "American Flag (decal)").
-// renderOption(item): draws one variant-slot option using its short label
-// (e.g. "no holes", via JoeData.optLabel) — its own shape (AccItem vs. the
-// Add Figure step's .af-acc__row) is the caller's call, same as
+// renderOption(item): draws one variant-slot option using its full label
+// (e.g. "Helmet, with holes", via JoeData.optLabel) — its own shape (AccItem
+// vs. the Add Figure step's .af-acc__row) is the caller's call, same as
 // ContextGroup's renderRow always was.
 export function AccessoryList({ ordered, renderSolo, renderOption }) {
   return ordered.map((u, i) => {

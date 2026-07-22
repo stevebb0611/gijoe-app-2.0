@@ -22,8 +22,8 @@
 //   --specialty <text>
 //   --code <F-code>                optional, defaults to F### from the new internal id
 //   --character-key <key>          only if --name collides with an existing different character
-//   --release-context <ctx>        retail (default) | convention | mail_in
-//   --mail-away                    sets is_mail_away
+//   --release-context <ctx>        retail (default) | convention | mail_in | mail_order
+//   --mail-in                      sets is_mail_in
 //   --variants "A:tell text;B:tell text"
 //   --accessories "accessoryId:qty,accessoryId:qty"   (look up ids via --search-accessories)
 import db from './db.js';
@@ -113,7 +113,7 @@ if (args.series) {
 }
 
 const releaseContext = args['release-context'] || 'retail';
-if (!['retail', 'convention', 'mail_in'].includes(releaseContext)) fail('--release-context must be retail, convention, or mail_in');
+if (!['retail', 'convention', 'mail_in', 'mail_order'].includes(releaseContext)) fail('--release-context must be retail, convention, mail_in, or mail_order');
 
 const existing = db.prepare('SELECT id FROM figures WHERE code_name = ?').all(args.name.toUpperCase());
 if (existing.length && !args['character-key']) {
@@ -122,8 +122,8 @@ if (existing.length && !args['character-key']) {
 }
 
 const insertFigure = db.prepare(`
-  INSERT INTO figures (figure_id, code_name, character_key, specialty, faction_id, series_id, release_context, is_mail_away)
-  VALUES (NULL, @code_name, @character_key, @specialty, @faction_id, @series_id, @release_context, @is_mail_away)
+  INSERT INTO figures (figure_id, code_name, character_key, specialty, faction_id, series_id, release_context, is_mail_in)
+  VALUES (NULL, @code_name, @character_key, @specialty, @faction_id, @series_id, @release_context, @is_mail_in)
 `);
 const insertVariant = db.prepare('INSERT INTO variant_lookup (figure_id, letter, tell) VALUES (?, ?, ?)');
 const insertBlueprint = db.prepare('INSERT INTO figure_accessories (figure_id, accessory_id, quantity_required, release_context) VALUES (?, ?, ?, ?)');
@@ -137,7 +137,7 @@ const run = db.transaction(() => {
     faction_id: faction.faction_id,
     series_id: seriesId,
     release_context: releaseContext,
-    is_mail_away: args['mail-away'] ? 1 : 0,
+    is_mail_in: args['mail-in'] ? 1 : 0,
   });
   const id = info.lastInsertRowid;
   // figure_id (the "F-code") isn't read by the app anywhere — it's cosmetic

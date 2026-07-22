@@ -7,7 +7,7 @@ import { clusterBlueprint, matchedSetSatisfied, bpReq, bpForVariant } from '../.
 import { physicalGrade, paintGrade, dmEmpty, DamageMap, GradeBadge } from './damage-map.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
-import { VersionChip, VariantBadge, VehicleTag, EditionTag } from './fig-identity.jsx';
+import { VersionChip, VariantBadge, VehicleTag, EditionTag, SetTag } from './fig-identity.jsx';
 import { formatYear } from './fig-identity.js';
 import { FileCardRow, FileCardTell } from './filecards.jsx';
 
@@ -34,6 +34,7 @@ function fvm(cf) {
     variants: (cf.variants || []).length,
     coo: cf.coo || [],
     fileCards: cf.fileCards || [],
+    sets: cf.sets || [],
     specialty: cf.role || '', variant: cf.role || '', vehicle: cf.vehicle || null,
     image: cf.image || null,
     releaseContext: cf.releaseContext || 'retail',
@@ -472,7 +473,11 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   // Scope the checklist to this copy's own production variant — a v1 A copy
   // shouldn't be asked (or able) to check off a v1 B-only accessory. See
   // bpForVariant (shared/completeness.js) + ACCESSORY_GROUPS.md "variant_id".
-  const bp = bpForVariant(fig.blueprint, cur ? cur.variant : null);
+  const rawBp = bpForVariant(fig.blueprint, cur ? cur.variant : null);
+  // Retailer-exclusive accessories on a figure that belongs to a known set move
+  // to being editable only inside that set's Special Release card (set-card.jsx)
+  // — showing them here too was the "too congested" complaint (migration 016).
+  const bp = fig.sets.length > 0 ? rawBp.filter((row) => row[4] !== 'retailer_exclusive') : rawBp;
   const ordered = orderedBlueprint(bp);
   const accDamage = raw.accDamage || {};
   const accDamageNotes = raw.accDamageNotes || {};
@@ -494,6 +499,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const setLoc = (v) => JoeStore.updateInstance(cur.id, { loc: v });
   const setVariant = (letter) => { JoeStore.updateInstance(cur.id, { variant: letter }); setVarEdit(false); };
   const setCoo = (country) => JoeStore.updateInstance(cur.id, { coo: country });
+  const setSetId = (setId) => JoeStore.updateInstance(cur.id, { setId });
   const setMarks = (val) => {
     const pg = physicalGrade(val), pt = paintGrade(val);
     JoeStore.updateInstance(cur.id, { marks: val, phys: pg.zones ? pg.grade : null, paint: pt.zones ? pt.grade : null });
@@ -549,7 +555,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
             <PhotoSlot className="inv-modal__photo" src={fig.image} />
             <FactionTag faction={fig.faction} />
             <div className="inv-modal__id">
-              <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /><EditionTag context={fig.releaseContext} lg /></div>
+              <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /><EditionTag context={fig.releaseContext} lg /><SetTag sets={fig.sets} lg /></div>
               {fig.fullName && <div className="inv-modal__full">{fig.fullName}</div>}
               <div className="inv-modal__var">{fig.specialty} · {formatYear(fig.year)}</div>
               {fig.variants > 1 ? <div className="inv-modal__variants"><span className="lyr"><b></b></span>{fig.variants} variants</div> : null}
@@ -650,7 +656,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                 <FactionTag faction={fig.faction} />
                 <div className="inv-modal__id">
                   <div className="inv-modal__name">
-                    {fig.name}<VersionChip version={fig.version} lg /><EditionTag context={fig.releaseContext} lg />
+                    {fig.name}<VersionChip version={fig.version} lg /><EditionTag context={fig.releaseContext} lg /><SetTag sets={fig.sets} lg />
                     {(cur.variant || fig.variants > 1) ? (
                       <VariantBadge letter={cur.variant} count={fig.variants} lg
                                     onClick={fig.variants > 1 ? () => setVarEdit(v => !v) : undefined}
@@ -671,6 +677,13 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                     </div>
                   )}
                   {fig.vehicle && <span className="idveh idveh--modal" title={"Vehicle driver — packaged with the " + fig.vehicle}><b>VEHICLE</b> {fig.vehicle}</span>}
+                  {fig.sets.length > 0 && (
+                    <select className="inv-modal__setpick" value={raw.setId || ''} onChange={(e) => setSetId(e.target.value ? +e.target.value : null)}
+                            title="Is this specific copy one of a known set's slots? See Special Release.">
+                      <option value="">Not part of a set</option>
+                      {fig.sets.map((s) => <option key={s.setId} value={s.setId}>{s.name}</option>)}
+                    </select>
+                  )}
                 </div>
                 <CompRing pct={ringPct} size={84} neutral damagedPct={dmgShare} />
                 {!moc && !liveWhole && <div className="inv-modal__ringlab">COMPLETENESS</div>}

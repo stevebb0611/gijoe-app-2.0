@@ -10,7 +10,7 @@ import {
   FactionTag, StockBar, MasterBadge,
   InvDetailModal,
 } from './app-detail.jsx';
-import { VersionChip, VariantBadge, EditionTag } from './fig-identity.jsx';
+import { VersionChip, VariantBadge, EditionTag, SetTag } from './fig-identity.jsx';
 import { formatYear } from './fig-identity.js';
 
 function useStore() {
@@ -29,7 +29,7 @@ function MasterCollectionView({ onNavigate, onAddInstance }) {
   const [query, setQuery] = React.useState('');
   const [sel, setSel] = React.useState(null); // {catalogId, instId}
   const [sortMode, setSortMode] = React.useState('year'); // 'year' | 'az'
-  const [yrAsc, setYrAsc] = React.useState(false); // year mode only — newest first by default
+  const [yrAsc, setYrAsc] = React.useState(true); // year mode only — oldest (1982) first by default
 
   const q = query.trim().toLowerCase();
   const matchQ = (fig) => !q || [fig.name, fig.specialty, fig.faction, formatYear(fig.year)].some(s => s && s.toLowerCase().includes(q));
@@ -129,7 +129,7 @@ function MasterCollectionView({ onNavigate, onAddInstance }) {
             {entries.map(({ fig, starred, targets }) => (
               <div className="mc-card" key={fig.id}>
                 <div className="mc-card__hd">
-                  <span className="mc-card__name"><b>{fig.name}</b><VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /></span>
+                  <span className="mc-card__name"><b>{fig.name}</b><VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><SetTag sets={fig.sets} /></span>
                   <FactionTag faction={fig.faction} mini />
                   <span className="mc-card__year">{formatYear(fig.year)}</span>
                   {targets.length > 0 && (

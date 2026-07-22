@@ -43,6 +43,21 @@ function api(method, url, body) {
 const CAT = api('GET', '/api/catalog') || [];
 const CAT_BY_ID = new Map(CAT.map(f => [f.id, f]));
 
+// Figure sets (migration 015) — a set's other members aren't on the current
+// figure's own catalog row, so this is a reverse index (setId -> members),
+// built once from every figure's own sets[] array, not a per-figure lookup
+// like variants/coo/fileCards.
+const SET_MEMBERS = new Map(); // setId -> [{figureId, quantityRequired}]
+// Global set metadata (name/year/description), deduped across every figure's own
+// sets[] entries — no separate API endpoint needed, every set has at least one
+// member figure carrying its own metadata already.
+const ALL_SETS = new Map(); // setId -> {setId, name, year, description}
+CAT.forEach(fig => (fig.sets || []).forEach(s => {
+  if (!SET_MEMBERS.has(s.setId)) SET_MEMBERS.set(s.setId, []);
+  SET_MEMBERS.get(s.setId).push({ figureId: fig.id, quantityRequired: s.quantityRequired });
+  if (!ALL_SETS.has(s.setId)) ALL_SETS.set(s.setId, { setId: s.setId, name: s.name, year: s.year, description: s.description });
+}));
+
 // ---- accessory catalog (Parts Bin: category + shared-vs-single-use + home figure) ----
 const ACC = api('GET', '/api/accessories') || [];
 const ACC_BY_ID = new Map(ACC.map(a => [a.id, a]));
@@ -130,6 +145,35 @@ function masterTotals() {
     });
   });
   return { figuresIn, starredCopies, targetSum, metSum };
+}
+// Per-set progress (migration 016) — same "cap each member's contribution at
+// its own required quantity" idiom as masterTotals(), but counts only
+// instances explicitly tagged to this set (instances.set_id), not just any
+// owned copy of the member figure — v1 used a blanket ownedCount() here,
+// which couldn't tell which specific copies actually came from the pack.
+function ownedCountInSet(figureId, setId) {
+  return state.instances.filter(i => i.catalogId === figureId && i.setId === setId).length;
+}
+function setProgress(setId) {
+  const members = SET_MEMBERS.get(setId) || [];
+  let required = 0, owned = 0;
+  members.forEach(m => { required += m.quantityRequired; owned += Math.min(ownedCountInSet(m.figureId, setId), m.quantityRequired); });
+  return { owned, required, complete: required > 0 && owned >= required };
+}
+// Per-member slot list for the Set Card — each member figure's slots array is
+// length quantityRequired, each entry either a real tagged instance or null
+// (empty slot, not yet owned/tagged). Sorted by instance id so over-tagging
+// (more instances tagged than required) is a deterministic "first-tagged
+// wins the slot" instead of reordering on every render.
+function setSlots(setId) {
+  const members = SET_MEMBERS.get(setId) || [];
+  return members.map(m => {
+    const fig = CAT_BY_ID.get(m.figureId);
+    const tagged = state.instances.filter(i => i.catalogId === m.figureId && i.setId === setId)
+      .sort((a, b) => a.id - b.id);
+    const slots = Array.from({ length: m.quantityRequired }, (_, i) => tagged[i] || null);
+    return { figureId: m.figureId, name: fig ? fig.name : '?', version: fig ? fig.ver : null, slots };
+  });
 }
 
 export const JoeStore = {
@@ -251,4 +295,4 @@ export const JoeStore = {
       return false;
     },
   };
-export const JoeData = { CAT, CAT_BY_ID, ACC, ACC_BY_ID, bpReq, instOwn, instPct, instWhole, accDamagePct, clusterBlueprint, bpForVariant, groupLabel, optLabel, instancesOf, ownedCount, figureSummary, totals, masterTotals };
+export const JoeData = { CAT, CAT_BY_ID, ACC, ACC_BY_ID, bpReq, instOwn, instPct, instWhole, accDamagePct, clusterBlueprint, bpForVariant, groupLabel, optLabel, instancesOf, ownedCount, figureSummary, totals, masterTotals, setProgress, setSlots, ALL_SETS };

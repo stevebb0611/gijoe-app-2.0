@@ -66,15 +66,23 @@ export function instWhole(bp, acc) {
     && matchedSetSatisfied(matched, acc);
 }
 // Shared label rule (matches the locked reference subgroup-wire-v2.jsx):
-// text before the first "(" is the slot label, text inside "(...)" is the option label.
-// disambiguateNames (blueprint-names.js) can append a second "(color)" paren on
-// top of an existing one (e.g. "Helmet (with holes)" -> "Helmet (with holes)
-// (bright green)") — join every paren so two options never collapse onto the
-// same displayed label.
+// text before the first "(" is the slot label; the option label is the FULL
+// name, comma-joined with whatever's inside "(...)" — e.g. "Submachine Gun
+// (light green)" -> "Submachine Gun, light green" — so an option always reads
+// the same as the original CSV/DB text instead of collapsing to just the
+// qualifier (2026-07-21: was dropping the base name entirely, so a group of
+// otherwise-identical options — Firefly's two "Submachine Gun"s — showed only
+// "light green"/"dull green" with no indication of what the item even was).
+// disambiguateNames (blueprint-names.js) can append a second "(color)" paren
+// on top of an existing one (e.g. "Helmet (with holes)" -> "Helmet (with
+// holes) (bright green)") — join every paren so two options never collapse
+// onto the same displayed label.
 export function groupLabel(items) { const m = items[0][0].match(/^(.*?)\s*\(/); return m ? m[1].trim() : items[0][0]; }
 export function optLabel(name) {
   const parts = [...name.matchAll(/\(([^)]+)\)/g)].map((m) => m[1]);
-  return parts.length ? parts.join(' · ') : name;
+  if (!parts.length) return name;
+  const base = name.slice(0, name.indexOf('(')).trim();
+  return [base, ...parts].join(', ');
 }
 // Damaged share across the FULL blueprint (retail + group + non-retail alike) —
 // condition is orthogonal to what counts toward Complete, so it isn't run

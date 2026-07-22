@@ -292,6 +292,42 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
   read (all four accessories: `convention` → `retailer_exclusive`), 2026-07-16. Not yet
   visually verified in-app.
 
+### 1982 — Cobra Officer (v1, figure catalog id 5 — source F-code F011)
+
+- **Mechanism:** `release_context` — accessories tagged `retailer_exclusive` sit in their
+  own group and never block Complete; no `group_id` on this figure.
+- **Variants:** F011 A / F012 B folded into one catalog row (id 5, `display_name` "Cobra
+  Officer v1 A"); v1.5 (F051, id 23, series_id 2) is a separate catalog row, unaffected by
+  this entry.
+- **Non-retail accessories:** M-1 81mm Medium Mortar (thin open handle, A0018) and Mortar
+  Bipod Stand (A0020) — `release_context: 'retailer_exclusive'`. Same JC Penney 3-pack as
+  the 1982 Cobra entry above (two Cobras + one Cobra Officer) — the Cobra Officer's third of
+  that pack was the mortar + stand, not gear unique to this figure's own retail card.
+- **Unaffected (plain retail, required):** AK-47 Assault Rifle (A0006) — the only accessory
+  required for Complete on the v1 row.
+- **Source:** owner, 2026-07-19 — same YoJoe.com 1982 Cobra 3-pack reference cited on the
+  Cobra entry above.
+- **Status:** ✅ reclassified live via `server/set-accessory-context.mjs --figure F011
+  --accessory A0018,A0020 --context retailer_exclusive`, backend restarted, verified via
+  `/api/catalog` (AK-47 `retail`; Mortar + Mortar Bipod Stand `retailer_exclusive`),
+  2026-07-19. CSV mirrors intentionally not touched — see [[project_csv_resync_deferred]].
+
+### 1982 — Short-Fuze (v1, figure catalog id 12 — source F-code F030)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below.
+- **Variants:** none on file — single catalog row. `code_name = 'Short-Fuze'` also matches a
+  later v1.5 (id 39, F073), but the lowest id (12, v1) is the one with these accessories,
+  same pattern as Duke/Recondo/Spirit/… below.
+- **Group_id slot:** M-1 81mm Medium Mortar (closed handle) / M-1 81mm Medium Mortar (thin
+  open handle) / M-1 81mm Medium Mortar (thick open handle) (`accessory_groups.id` 36) — a
+  pick-one-of-three interchangeable mortar mold, not a colorway match_key case.
+- **Unaffected (plain, independently required):** Helmet (with holes), Visor, Ammo Pack
+  Backpack, Mortar Bipod Stand.
+- **Source:** owner, 2026-07-21.
+- **Status:** ✅ group_id set in DB via `server/migrate-accessory-groups.mjs` and verified via
+  direct DB read (figure_id 12: A0017/A0018/A0019 all carry group_id 36, no match_key),
+  2026-07-21. Not yet visually verified in-app.
+
 ### 1983 — Duke (v1, figure catalog id 27 — source F-codes F057–F061)
 
 - **Mechanism:** `match_key` — tags `A`/`B` tie two `group_id` slots to the same colorway.
@@ -503,19 +539,20 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
 
 ### 1985 — Snow Serpent (v1, figure catalog id 89 — source F-code F137)
 
-- **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
-  group and never block Complete; no `group_id` on this figure.
-- **Variants:** none on file — single catalog row.
-- **Non-retail accessories:** Missile Launcher (A0701), Missile (A0702) —
-  reclassified `retail` → `convention` via `set-accessory-context.mjs`, 2026-07-10,
-  owner-confirmed.
-- **Unaffected (plain retail, required):** Survival Backpack (A0206), Parachute Pack
-  (A0207), AK-47 Assault Rifle (A0208), Snow Shoe (A0209), Anti-Tank EK99 Missile (A0210),
-  Missile Stand (A0211) — no `group_id` on any of these; the Anti-Tank EK99 Missile and
-  Missile Stand are separate items from the convention Missile Launcher/Missile pair
-  above, not the same accessories renamed.
-- **Status:** ✅ release_context set in DB via `set-accessory-context.mjs` and verified
-  via `/api/catalog`, 2026-07-10. Not yet visually verified in-app.
+- **⚠ SUPERSEDED 2026-07-21 — see `FIGURE_SPLITS.md`.** This entry originally documented
+  Missile Launcher (A0701)/Missile (A0702) as Snow Serpent v1's own `convention`-tagged
+  accessories, reclassified on this same row 2026-07-10 — same "likely accidental duplicate"
+  triage call as Roadblock v2 above, and it turned out wrong for the same reason: the source
+  `gijoe_db_figures_accessories.csv` already linked them cleanly to the 700-block F710 row,
+  disjoint from F137's own A0206–A0211, F710 had just never been restored as its own catalog
+  row. The real fix was a full release-edition split: F137 stays the 1985 retail row
+  (`series_id` 5, `release_context` corrected `convention` → `retail`), and F710 is now its
+  own catalog row under Convention (`series_id` 15) with Missile Launcher + Missile as its
+  own required blueprint. Full writeup: `FIGURE_SPLITS.md`, "1985 — Snow Serpent (v1)."
+- **Mechanism (current):** none — F137 is now a plain retail figure, no `group_id`/
+  `match_key`/`release_context` complexity. Its complete blueprint is just Survival Backpack
+  (A0206), Parachute Pack (A0207), AK-47 Assault Rifle (A0208), Snow Shoe (A0209, ×2),
+  Anti-Tank EK99 Missile (A0210), and Missile Stand (A0211).
 
 ### 1985 — Flint (v1, figure catalog id 78 — source F-code F125)
 
@@ -565,19 +602,21 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
 
 ### 1986 — Roadblock (v2, figure catalog id 115 — source F-code F167)
 
-- **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
-  group and never block Complete; no `group_id` on this figure.
-- **Variants:** none on file — single catalog row.
-- **Non-retail accessories:** Machine Gun (A0787), Mine Launcher (A0793) —
-  reclassified `retail` → `convention` via `set-accessory-context.mjs`, 2026-07-12,
-  owner-confirmed.
-- **Unaffected (plain retail, required):** L7A21 GPMG Heavy Machine Gun (A0264), Tripod
-  (A0265) — the actual belt-fed gun + tripod pairing this figure shipped with; distinct
-  items from the convention Machine Gun/Mine Launcher pair above, not the same
-  accessories renamed.
-- **Status:** ✅ release_context set in DB via `set-accessory-context.mjs` and verified
-  (`Machine Gun (A0787): retail → convention`, `Mine Launcher (A0793): retail →
-  convention`), 2026-07-12. Not yet visually verified in-app.
+- **⚠ SUPERSEDED 2026-07-21 — see `FIGURE_SPLITS.md`.** This entry originally documented
+  Machine Gun (A0787)/Mine Launcher (A0793) as Roadblock v2's own `convention`-tagged
+  accessories, reclassified on this same row 2026-07-12, based on an `OPEN_QUESTIONS_Claude.md`
+  #18 triage call ("likely accidental duplicate") that turned out to be wrong. Owner
+  instruction confirmed these are a genuine second edition, not bonus pack-ins on the retail
+  card: the source `gijoe_db_figures_accessories.csv` already linked them cleanly to the
+  700-block F707 row, disjoint from F167's own A0264/A0265 — unlike Flint's F701, nothing was
+  actually leaked or wrong, F707 had just never been restored as its own catalog row. The real
+  fix was a full release-edition split: F167 stays the 1986 retail row (`series_id` 6,
+  `release_context` corrected `convention` → `retail`), and F707 is now its own catalog row
+  under Convention (`series_id` 15) with Machine Gun + Mine Launcher as its own required
+  blueprint. Full writeup: `FIGURE_SPLITS.md`, "1986 — Roadblock."
+- **Mechanism (current):** none — F167 is now a plain retail figure, no `group_id`/
+  `match_key`/`release_context` complexity. Its complete blueprint is just L7A21 GPMG Heavy
+  Machine Gun (A0264) and Tripod (A0265).
 
 ### 1986 — Serpentor (v1, figure catalog id 117 — source F-code F169)
 
@@ -903,6 +942,36 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
 - **Source:** hand-built (`extGroupId: null`), owner-found 2026-07-15.
 - **Status:** ✅ group_id set in DB and verified via direct DB read (figure_id 273:
   A0740/A0741 both carry group_id 31), 2026-07-15. Not yet visually verified in-app.
+
+### 1990 — Metal-Head (v1, figure catalog id 275 — source F-code F356)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below. Same pattern as
+  Mutt/Rip Cord's Helmet slot, not `variant_id` — the hole size isn't tied to which
+  production variant (thin-peg A / thick-peg B) the instance is pinned to, it's just an
+  either/or on the pack itself.
+- **Variants:** A "Thin pegs on legs" / B "Thick pegs on legs" (`variant_lookup.id` 142 /
+  143) — folded into one catalog row (id 275) per the standard variant-collapse rule
+  (`VARIANTS.md`). Not used to gate either Missile Pack option.
+- **Group_id slot:** Missile Pack (small holes) / Missile Pack (large holes)
+  (`accessory_groups.group_id` 35).
+- **Unaffected (plain, independently required):** Helmet, Backpack Frame, Pistol, Missile
+  Launcher, Missiles, Hose 1 1/2" Long (short).
+- **Note on quantity:** both options carry `quantity_required = 2` (the figure ships with
+  2 physical packs). `clusterBlueprint`'s plain-group math only checks "is at least one
+  unit of either option owned" (`shared/completeness.js` `plainOwn`) — it doesn't sum
+  toward 2 the way a solo row would. Every other group_id slot in this doc happens to need
+  only 1, so this is the first case where that binary check under-counts against physical
+  reality; flagged, not fixed — would need the completeness engine's group math extended
+  to be quantity-aware.
+- **Source:** owner-corrected 2026-07-21 — a first pass wrongly modeled this as
+  `variant_id`-scoped (assuming hole size tracked the leg-peg variant); owner clarified it
+  should be a plain pick-one slot instead, same shape as the Helmet/Helmet-with-holes
+  cases.
+- **Status:** ✅ `group_id` 35 set on both rows, `variant_id` reverted to NULL, new
+  `accessory_groups` row (35, "Missile Pack") added for bookkeeping consistency with the
+  other slots in this doc, verified via direct DB read and visually in-app (instance 594
+  now shows a single "Missile Pack" slot on the Instance Detail checklist, satisfied by
+  the small-holes pack already owned), 2026-07-21.
 
 ### 1990 — Tunnel Rat (v3, figure catalog id 290 — source F-code F373)
 

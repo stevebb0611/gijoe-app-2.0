@@ -5,11 +5,14 @@ export function figIdentityText({ name, version } = {}) {
   return [name, version].filter(Boolean).join(' ');
 }
 
-// series_id 15's sentinel "year" (gijoe_collection.sql) — the Convention &
-// Mail-In Block, not a real chronological year. Every screen that prints a
+// series_id 15's sentinel "year" (gijoe_collection.sql) — the Special
+// Release bucket (convention exclusives, mail-in premiums, mail-order
+// releases), not a real chronological year. Every screen that prints a
 // catalog figure's year must go through this instead of interpolating the
-// raw number, or a Convention-block figure shows a literal "9999".
-export const CONVENTION_YEAR = 9999;
+// raw number, or a sentinel-block figure shows a literal "9999". The
+// heading is deliberately generic — the per-figure EditionTag badge
+// (CONVENTION / MAIL-IN / MAIL-ORDER) is what disambiguates within it.
+export const SPECIAL_RELEASE_YEAR = 9999;
 export function formatYear(year) {
-  return year === CONVENTION_YEAR ? 'Convention' : String(year);
+  return year === SPECIAL_RELEASE_YEAR ? 'Special Release' : String(year);
 }

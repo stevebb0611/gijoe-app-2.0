@@ -32,11 +32,27 @@ export function VariantBadge({ letter, count, onClick, title, lg }) {
 // is the one thing that distinguishes them on screen.
 export function EditionTag({ context, lg }) {
   if (!context || context === 'retail') return null;
-  const label = context === 'mail_in' ? 'MAIL-IN' : context.toUpperCase();
+  const label = context === 'mail_in' ? 'MAIL-IN' : context === 'mail_order' ? 'MAIL-ORDER' : context.toUpperCase();
   return (
     <em className={"idedition" + (lg ? " idedition--lg" : "")}
         title={"Release edition — " + label.toLowerCase() + ", not the standard retail release"}>
       {label}
+    </em>
+  );
+}
+
+// Multi-pack "set" grouping (migration 015/016) — a fun bonus completionist
+// display over already-owned figures, not a new ownable entity. Fixed "SET"
+// label (there will be dozens of different set names over time, so keeping
+// row chrome uniform matters more than showing the name inline). A static
+// pointer tooltip only — the live owned/required progress now lives solely
+// in the Special Release set card (set-card.jsx), not recomputed here too.
+export function SetTag({ sets, lg }) {
+  if (!sets || !sets.length) return null;
+  const title = "Part of " + sets.map((s) => s.name).join('; ') + " — see Special Release";
+  return (
+    <em className={"idset" + (lg ? " idset--lg" : "")} title={title}>
+      SET
     </em>
   );
 }

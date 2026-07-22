@@ -5,15 +5,16 @@
 // rich rows (version chip · variant pill · ghost catalog-gaps · rebalance),
 // two-meter year headers, list + gallery, and the flip-card detail modal.
 import React from 'react';
-import { JoeStore } from './store.js';
+import { JoeStore, JoeData } from './store.js';
+import { SetCard } from './set-card.jsx';
 import {
   INV_CAT, INV_ERAS, INV_CAT_BY_ID,
   fvm, figParts, figState, yearParts, invTotals, invMasterTotals,
   FactionTag, CompRing, CompBar, PhotoSlot, StockBar, MasterBadge,
   InvDetailModal,
 } from './app-detail.jsx';
-import { VersionChip, VariantBadge, VehicleTag, EditionTag } from './fig-identity.jsx';
-import { formatYear, CONVENTION_YEAR } from './fig-identity.js';
+import { VersionChip, VariantBadge, VehicleTag, EditionTag, SetTag } from './fig-identity.jsx';
+import { formatYear, SPECIAL_RELEASE_YEAR } from './fig-identity.js';
 
 function useStore() {
   const [, force] = React.useReducer(x => x + 1, 0);
@@ -54,7 +55,7 @@ function Row({ fig, selId, openIds, onToggle, onOpen }) {
               onClick={() => ghost ? onOpen(fig.id, null) : onToggle(fig.id)}>
         <span className="inv-thumb" data-tag={ghost ? "—" : ""}></span>
         <span className="inv-name">
-          <b>{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><VariantBadge count={fig.variants} /><VehicleTag vehicle={fig.vehicle} inline /></b>
+          <b>{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><SetTag sets={fig.sets} /><VariantBadge count={fig.variants} /><VehicleTag vehicle={fig.vehicle} inline /></b>
           <i>{fig.specialty}</i>
         </span>
         <FactionTag faction={fig.faction} mini />
@@ -121,7 +122,7 @@ function GalleryCard({ fig, onOpen }) {
     <button className={"card inv-card" + (ghost ? " is-ghostcard" : "")} onClick={() => ghost ? onOpen(fig.id, null) : onOpen(fig.id, copies[0].id)}>
       <div className="card__corner"><FactionTag faction={fig.faction} mini /></div>
       <PhotoSlot className="card__photo" src={fig.image} />
-      <div className="card__name">{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><VariantBadge count={fig.variants} /></div>
+      <div className="card__name">{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><SetTag sets={fig.sets} /><VariantBadge count={fig.variants} /></div>
       <div className="card__var">{fig.specialty}</div>
       {!ghost && multi && st.moves.length > 0 && <div className="card__rebal">Rebalance</div>}
       <div className="card__foot">
@@ -140,7 +141,7 @@ function GalleryCard({ fig, onOpen }) {
 // Collapsible year section (two meters: Figures + Complete, both denominated
 // against the full series roster — see yearParts() in app-detail.jsx)
 // ---------------------------------------------------------------------------
-function YearSection({ year, figs, view, open, onToggleYear, rowProps }) {
+function YearSection({ year, figs, view, open, onToggleYear, rowProps, sets = [], onOpen, onAddInstance }) {
   const yp = yearParts(year);
   return (
     <section className={"ysec" + (open ? " is-open" : "")}>
@@ -167,11 +168,13 @@ function YearSection({ year, figs, view, open, onToggleYear, rowProps }) {
       {open && (
         view === 'list' ? (
           <div className="ysec__body">
+            {sets.map(s => <SetCard key={'set-' + s.setId} set={s} onOpen={onOpen} onAddInstance={onAddInstance} />)}
             <div className="inv-cols"><span></span><span>Code Name</span><span>Faction</span><span>Owned</span><span>Stock</span><span>Missing</span><span></span></div>
             {figs.map(f => <Row key={f.id} fig={f} {...rowProps} />)}
           </div>
         ) : (
           <div className="ysec__body">
+            {sets.map(s => <SetCard key={'set-' + s.setId} set={s} onOpen={onOpen} onAddInstance={onAddInstance} />)}
             <div className="inv-galgrid">{figs.map(f => <GalleryCard key={f.id} fig={f} onOpen={rowProps.onOpen} />)}</div>
           </div>
         )
@@ -198,12 +201,12 @@ const COMPLETE_LABEL = Object.fromEntries(COMPLETE_OPTS.map(o => [o.key, o.label
 const DUPE_OPTS = [{ key: 'single', label: 'Single' }, { key: 'pair', label: '2 owned' }, { key: 'trio', label: '3+ owned' }];
 const DUPE_LABEL = Object.fromEntries(DUPE_OPTS.map(o => [o.key, o.label]));
 const CONDITION_OPTS = ['Loose', 'MOC', 'MISB', 'AFA Graded'];
-const RELEASE_OPTS = ['Retail', 'Mail-away', 'Convention', 'Store exclusive'];
-// CONVENTION_YEAR (series_id 15's sentinel) is excluded from the year-range
+const RELEASE_OPTS = ['Retail', 'Mail-in', 'Mail-order', 'Convention', 'Store exclusive'];
+// SPECIAL_RELEASE_YEAR (series_id 15's sentinel) is excluded from the year-range
 // facet (its two <select> dropdowns) so that control stays a real 1982–1994
 // range; the block still renders as its own YearSection below since that
 // grouping reads straight off INV_CAT, independent of ALL_YEARS.
-const ALL_YEARS = [...new Set(INV_CAT.map(y => y.year))].filter(y => y !== CONVENTION_YEAR).sort((a, b) => a - b);
+const ALL_YEARS = [...new Set(INV_CAT.map(y => y.year))].filter(y => y !== SPECIAL_RELEASE_YEAR).sort((a, b) => a - b);
 const YR_MIN = ALL_YEARS[0], YR_MAX = ALL_YEARS[ALL_YEARS.length - 1];
 
 // distinct production variants actually owned (>=1 copy of that letter)
@@ -478,7 +481,9 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
           <div className="invp-empty">No figures match.</div>
         ) : sections.map(s => (
           <YearSection key={s.year} year={s.year} figs={s.figs} view={view}
-                       open={filtering ? true : open.has(s.year)} onToggleYear={toggleYear} rowProps={rowProps} />
+                       open={filtering ? true : open.has(s.year)} onToggleYear={toggleYear} rowProps={rowProps}
+                       sets={s.year === SPECIAL_RELEASE_YEAR ? [...JoeData.ALL_SETS.values()] : []}
+                       onOpen={openFig} onAddInstance={onAddInstance} />
         ))}
       </main>
 
