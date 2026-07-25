@@ -211,7 +211,14 @@ An audit of `gijoe_db_figures_2.0.csv` for code names shared by multiple `full_n
 
 **Systemic mainline/convention version collision — mechanism fixed (July 2026), data backlog still parked.** Investigating Flint's F701 gap turned up the same `(code_name, version)` dedup collision across roughly 20+ other code names with a 700-block convention/mail-in row. Two things changed this pass:
 
-> **`FIGURE_SPLITS.md` is the per-figure log for this fix** — every figure actually split (Quick Kick, Flint) or resolved some other way (Jinx) lives there, along with the list of collision-list figures that got `ACCESSORY_GROUPS.md`'s different `release_context`-on-one-row treatment instead of a real split (Falcon, Gung-Ho v2, Outback v1, Python Officer, Python Tele-Viper, Roadblock v2, Snow Serpent, Zarana) — check it before assuming an un-audited name below is untouched.
+> **`FIGURE_SPLITS.md` is the per-figure log for this fix** — every figure actually split
+> (Quick Kick, Flint, Roadblock v2, Snow Serpent, Stalker v1.5) or resolved some other way
+> (Jinx) lives there, along with the list of collision-list figures that got
+> `ACCESSORY_GROUPS.md`'s different `release_context`-on-one-row treatment instead of a real
+> split (Falcon, Gung-Ho v2, Outback v1, Python Officer, Python Tele-Viper, Zarana) — check it
+> before assuming an un-audited name below is untouched. Roadblock v2 and Snow Serpent used to
+> be in that `release_context` list too but were later reversed into real splits, same as
+> Stalker v1.5 below — see `FIGURE_SPLITS.md`'s "superseded" notes.
 
 - **The silent-drop bug is fixed.** `server/seed.mjs`'s blank-variant collision path (Flint's case — both colliding rows have an empty `variant` letter) previously discarded the losing row with zero trace beyond an aggregate counter. It now logs the dropped `figure_id`/`code_name`/`version`/`release_context` explicitly on every reseed, matching the logging the dupe-letter path already had. This doesn't change what's kept vs. dropped (still lowest-CSV-id wins) — it just means nothing can silently vanish like F701 did again.
 - **A reusable split tool exists.** `server/split-release-edition.mjs` generalizes `server/split-quick-kick-convention.mjs` into a small array of confirmed split specs — applying a newly-verified split (once one of the rows below is confirmed against a real reference) means appending an entry, not writing a new script. See `VARIANTS.md` §7.5.2 for the full model/rationale.
@@ -239,7 +246,7 @@ An audit of `gijoe_db_figures_2.0.csv` for code names shared by multiple `full_n
 | Snake Eyes (convention pair) | both rows Convention, blank version, alt-name "Stalker" | **Likely accidental duplicate** | Distinct from Snake-Eyes's numbered v1–v4 retail lineage above, which is fine |
 | Roadblock (v2 pair) | mainline v2=Convention, 700-block v2=Convention | **✅ Resolved 2026-07-21 — was actually a genuine split, this triage call was wrong** | Roadblock's other 8 rows (v1, v3–v7) are unaffected. The accessories CSV already linked the two rows to disjoint gear (F167→L7A21 GPMG+Tripod, F707→Machine Gun+Mine Launcher) — owner confirmed real second edition, split applied via `server/split-release-edition.mjs`, superseding the 2026-07-12 `ACCESSORY_GROUPS.md` `release_context` entry. See `FIGURE_SPLITS.md`, "1986 — Roadblock." |
 | Gung-Ho (v2 pair) | mainline v2=Convention, 700-block v2=Convention | **Likely accidental duplicate** | Gung-Ho's other 4 rows are unaffected. Already has an `ACCESSORY_GROUPS.md` entry (2026-07-13, explicitly notes the deeper collision was left parked "per owner instruction") |
-| Stalker (v1.5 B pair) | mainline v1.5·B=Convention, 700-block v1.5·B=Convention | **Likely accidental duplicate** | Stalker's v1.5·A (retail) and other 8 rows are unaffected |
+| Stalker (v1.5 B pair) | mainline v1.5·B=Convention, 700-block v1.5·B=Convention | **✅ Resolved 2026-07-22 — was actually a genuine split, this triage call was wrong** | A 3-way tie, not a clean 2-way one — see `FIGURE_SPLITS.md`, "1983 — Stalker v1.5," for the mainline-B/700-block-B nuance. Owner confirmed real second edition (Pulverizer-only retail vs. Handgun+Machine Gun convention), split applied via `server/split-release-edition.mjs`. Stalker's other 8 rows are unaffected. |
 | Skystriker / Starduster | 3–4 rows per figure, all Convention/Mail-order, disambiguated by variant letter | **Likely accidental duplicates** (per-letter) | The "3–4 way" case referenced below — each variant letter's own pair looks like the same shape as the others above, not a 3-4-way genuine split |
 | Fighter Pilot | mainline="1994 G.I. Joe Convention", 700-block="1994 FX Convention" — different free text | **Ambiguous — needs real research** | Could be two real events or a mislabel; don't guess |
 

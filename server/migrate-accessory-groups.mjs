@@ -148,6 +148,14 @@ const GROUPS = [
   // Mortar molds (closed handle / thin open handle / thick open handle); own
   // any one for completion. Owner-confirmed 2026-07-21.
   { extGroupId: null, figure: 'Short-Fuze', accessories: ['A0017', 'A0018', 'A0019'] }, // Medium Mortar closed/thin open/thick open handle
+  // Zap (1982, v1, F041 -> catalog id 16): 'Zap' also matches a later v1.5
+  // (id 48, F084) and v2 (id 330, F416), but the lowest id (16, v1) is the
+  // one with these accessories, same pattern as Duke/Recondo/Spirit/…/
+  // Short-Fuze above. NOT a match_key case — a single slot, three
+  // interchangeable Bazooka molds (double handle / single thin handle /
+  // single thick handle); own any one for completion. Owner-confirmed
+  // 2026-07-22.
+  { extGroupId: null, figure: 'Zap', accessories: ['A0027', 'A0028', 'A0029'] }, // Bazooka double handle/single thin handle/single thick handle
 ];
 
 // Same label rule as the locked reference (subgroup-wire-v2.jsx groupLabel):

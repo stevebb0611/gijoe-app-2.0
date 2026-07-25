@@ -328,6 +328,23 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
   direct DB read (figure_id 12: A0017/A0018/A0019 all carry group_id 36, no match_key),
   2026-07-21. Not yet visually verified in-app.
 
+### 1982 — Zap (v1, figure catalog id 16 — source F-code F041)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below.
+- **Variants:** none on file — single catalog row. `code_name = 'Zap'` also matches a later
+  v1.5 (id 48, F084) and v2 (id 330, F416), but the lowest id (16, v1) is the one with
+  these accessories, same pattern as Short-Fuze above.
+- **Group_id slot:** Bazooka (double handle) / Bazooka (single thin handle) / Bazooka
+  (single thick handle) (`accessory_groups.id` 37) — a pick-one-of-three interchangeable
+  bazooka mold, not a colorway match_key case. (The single thin/thick handle molds also
+  turn up as the retailer-exclusive Cobra 3-pack gear cited in the Cobra v1 entry above —
+  that's a different figure's rows, unaffected by this slot.)
+- **Unaffected (plain, independently required):** Binocular Headset.
+- **Source:** owner, 2026-07-22.
+- **Status:** ✅ group_id set in DB via `server/migrate-accessory-groups.mjs` and verified via
+  direct DB read (figure_id 16: A0027/A0028/A0029 all carry group_id 37, no match_key),
+  2026-07-22. Not yet visually verified in-app.
+
 ### 1983 — Duke (v1, figure catalog id 27 — source F-codes F057–F061)
 
 - **Mechanism:** `match_key` — tags `A`/`B` tie two `group_id` slots to the same colorway.

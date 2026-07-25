@@ -121,6 +121,54 @@ doc.
 
 ## Figures (chronological by the retail figure's year, then catalog id)
 
+### 1983 — Stalker v1.5 (retail, figure catalog id 42 — source F-code F076; convention edition, id 528 — F711)
+
+- **Mechanism:** release-edition split — two independent `figures` rows.
+- **Collision:** a 3-way tie, not the usual clean 2-way one. `gijoe_db_figures_2.0.csv` has
+  F076 (mainline, letter A, "Swivel-Arm, darker glossy green camo uniform", `Retail`), F077
+  (mainline, letter B, "Swivel-Arm, lighter flat green camo uniform", mislabeled "1992
+  Convention" despite sitting under mainline `series_id` 2), and F711 (700-block, same letter
+  B and same tell text as F077, `series_id` 15, "1992 Convention") — all three share
+  `code_name`+`version`+blank `character_key`. `seed.mjs` kept F076 as canon, folded F077 in as
+  a "B" `variant_lookup` letter (harmless — F077's own `gijoe_db_figures_accessories.csv` row
+  only links to A0023, a duplicate of F076's own gear), and dropped F711 entirely via the
+  duplicate-letter path (`skippedDupeLetters`, since "B" was already claimed by F077) — but
+  F711's real accessories (A0533 Handgun, A0534 Machine Gun) still leaked onto the surviving
+  F076 row via the shared `csvFigureIdToDb` collision mapping, same leaked-accessory shape as
+  Flint's F701/F125 below, just reached via the "duplicate letter" path instead of the "blank
+  variant" one. Net effect before this fix: the live catalog showed one Stalker v1.5 entry
+  with an `[A|B]` bracket, requiring all three accessories (Pulverizer + Handgun + Machine
+  Gun) on both variants at once.
+- **New row (F711, id 528):** `series_id` 15, `release_context` convention, `version` NULL
+  (disambiguates the dedup key). `display_name` "Stalker v1.5 (convention)", `full_name`/
+  `specialty` carried over from retail Stalker ("Wilkinson, Lonzo R." / Infantry) —
+  owner-confirmed, same character.
+- **Retail row (F076, id 42) notation dropped:** unlike Flint/Roadblock/Snow Serpent below,
+  Stalker's retail row *did* carry a real `[A|B]` `variant_lookup` bracket pre-split (ids 55/56
+  — "darker glossy" / "lighter flat" camo tells). Since the two colors were actually the
+  retail-vs-convention tell, not a same-release production variant, both `variant_lookup` rows
+  were deleted and `display_name` corrected from "Stalker v1.5 A" to plain "Stalker v1.5" —
+  owner instruction: "once migrated drop the A and B notations." (`server/split-release-edition.mjs`
+  gained two new optional split-spec fields for this, `retailDisplayName` and
+  `clearRetailVariants` — Flint/Roadblock/Snow Serpent never needed them since none of those
+  retail rows had a pre-existing letter bracket.)
+- **Color-note discrepancy:** the owner's own description of the two releases (lighter green =
+  retail, darker green = convention) is the *opposite* of the CSV's `variant_lookup` tell text
+  (F076/retail = "darker glossy green", F077/F711/convention = "lighter flat green"). Not
+  resolved here — doesn't affect the split itself (accessories, not color, drove which row is
+  which), flagged in case the CSV tells need a color correction in a separate pass.
+- **Accessories:** retail (F076) keeps M-32 "Pulverizer" Submachine Gun (A0023) only. Convention
+  (F711) gets Handgun (A0533) and Machine Gun, attached (A0534) — moved off the collision-leaked
+  copies on F076.
+- **Source:** owner, 2026-07-22.
+- **Status:** ✅ split applied via `server/split-release-edition.mjs`, companion edits applied to
+  `gijoe_db_figures_2.0.csv` (F076/F077 `variant`+`variant_lookup` blanked, F076 `display_name`
+  dropped its "A", F711 given its own `display_name`/`full_name`/`specialty` and blanked
+  `variant`) — `gijoe_db_figures_accessories.csv`/`gijoe_db_figures_accessories_group_id.csv`
+  needed no change, already clean/disjoint (F076→A0023, F077→A0023 dup, F711→A0533+A0534).
+  Verified via `/api/catalog`. Also resolves `OPEN_QUESTIONS_Claude.md` #18's "Stalker (v1.5 B
+  pair)" row, previously triaged "likely accidental duplicate."
+
 ### 1985 — Flint (v1 retail, figure catalog id 78 — source F-code F125; convention edition, id 525 — F701)
 
 - **Mechanism:** release-edition split — two independent `figures` rows.

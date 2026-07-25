@@ -111,6 +111,43 @@ const SPLITS = [
       { code: 'A0702', qty: 1 }, // Missile
     ],
   },
+  {
+    // Stalker v1.5 — 1983 retail (F076) vs. 1992 Convention (F711).
+    // Owner-confirmed: two real releases, different gear (Pulverizer alone vs.
+    // Handgun + Machine Gun). Unlike Flint/Roadblock/Snow Serpent's clean
+    // 2-way collisions, the CSV has a 3-way tie here: F076 (mainline, letter
+    // A), F077 (mainline, letter B, same "lighter flat green camo" tell as
+    // F711, but its own accessories.csv row only lists A0023 — a dupe/leak of
+    // F076's own gear, not real data), and F711 (700-block, letter B, the
+    // real convention accessories). seed.mjs's dedup folded all three into
+    // one figures row (id 42): F076 as canon, F077 contributing a "B"
+    // variant_lookup letter (F711 lost the letter tie-break and was dropped
+    // entirely, per the skippedDupeLetters path), and F711's own accessories
+    // (A0533/A0534) still leaking onto figure 42 via the shared
+    // csvFigureIdToDb collision mapping — same leaked-accessory shape as
+    // Flint's F701/F125, just via the "duplicate letter" path instead of the
+    // "blank variant" path.
+    retailFigureId: 'F076',
+    newFigureId: 'F711',
+    codeName: 'Stalker',
+    newDisplayName: 'Stalker v1.5 (convention)',
+    newFullName: 'Wilkinson, Lonzo R.',
+    newSpecialty: 'Infantry',
+    newFactionId: 1,
+    newSeriesId: 15,
+    newReleaseContext: 'convention',
+    newNotes: 'Convention',
+    // Both variants were only ever a retail-vs-convention tell, not a real
+    // second production variant of the same release — once split into two
+    // rows there's nothing left to bracket. Drop the A/B lettering on the
+    // retail row entirely (owner instruction).
+    retailDisplayName: 'Stalker v1.5',
+    clearRetailVariants: true,
+    accessories: [
+      { code: 'A0533', qty: 1 }, // Handgun
+      { code: 'A0534', qty: 1 }, // Machine Gun (attached)
+    ],
+  },
 ];
 
 function run() {
@@ -129,6 +166,16 @@ function run() {
     const txn = db.transaction(() => {
       if (split.retailReleaseContext) {
         db.prepare('UPDATE figures SET release_context = ? WHERE id = ?').run(split.retailReleaseContext, retail.id);
+      }
+      if (split.retailDisplayName) {
+        db.prepare('UPDATE figures SET display_name = ? WHERE id = ?').run(split.retailDisplayName, retail.id);
+      }
+      // Drop an existing A/B variant_lookup bracket on the retail row when
+      // the split reveals it was never a same-release production variant —
+      // Flint/Roadblock/Snow Serpent never had letters on their retail row
+      // to begin with, so only Stalker needs this so far.
+      if (split.clearRetailVariants) {
+        db.prepare('DELETE FROM variant_lookup WHERE figure_id = ?').run(retail.id);
       }
 
       const getAccByCode = db.prepare('SELECT id FROM accessories WHERE accessory_code = ?');

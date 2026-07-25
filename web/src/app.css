@@ -107,6 +107,12 @@
   .mc-card { border: 1.5px solid var(--ink); background: var(--card); }
   .mc-card__hd { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--ink); color: var(--paper); flex-wrap: wrap; }
   .mc-card__name { font-family: var(--font-display); font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  /* the [A|B|C] bracket's default ink-fill (app.css .idvarbr__l.is-owned) reads
+     as near-black-on-black against this card header's own var(--ink)
+     background — swap owned cells to gold here, matching this page's existing
+     gold = "met/kept" language (.mc-target.is-met, MasterBadge star) instead
+     of the Figures page's ink-stamp treatment. */
+  .mc-card__name .idvarbr__l.is-owned { background: var(--gold); color: var(--ink); }
   .mc-card__year { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; opacity: .65; }
   .mc-card__targets { margin-left: auto; display: flex; gap: 8px; }
   .mc-target { font-family: var(--font-mono); font-size: 10px; letter-spacing: .5px; display: inline-flex; align-items: center; gap: 4px; color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.3); padding: 2px 6px; }
@@ -478,8 +484,9 @@
 
   /* ===== modal ===== */
   .inv-scrim { position: fixed; inset: 0; background: rgba(33,31,26,.55); z-index: 50; }
-  .inv-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 720px; max-width: calc(100vw - 40px); height: min(92vh, 620px); overflow: hidden; background: var(--paper); border: 2.5px solid var(--ink); box-shadow: 8px 8px 0 rgba(33,31,26,.5); display: grid; grid-template-columns: 230px 1fr; grid-template-rows: minmax(0, 1fr); z-index: 51; }
-  .inv-modal > * { min-height: 0; }
+  .inv-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 720px; max-width: calc(100vw - 40px); height: min(92vh, 620px); overflow: hidden; background: var(--paper); border: 2.5px solid var(--ink); box-shadow: 8px 8px 0 rgba(33,31,26,.5); display: flex; flex-direction: column; z-index: 51; }
+  .inv-modal__body { display: grid; grid-template-columns: 230px 1fr; flex: 1 1 auto; min-height: 0; }
+  .inv-modal__body > * { min-height: 0; }
   .inv-modal .inv-modal__r { overflow-y: auto; }
   .inv-modal__x { position: absolute; top: 8px; right: 8px; background: var(--ink); color: var(--paper); border: none; width: 30px; height: 30px; cursor: pointer; font-size: 14px; z-index: 2; display: inline-grid; place-items: center; padding: 0; }
   .inv-modal__l { border-right: 2px solid var(--ink); padding: 18px; display: flex; flex-direction: column; align-items: center; gap: 10px; background: var(--card); overflow-y: auto; }
@@ -878,7 +885,7 @@
     .inv-galgrid { grid-template-columns: repeat(2, 1fr); }
     .ysec__hd { grid-template-columns: minmax(64px, auto) 1fr 50px 26px; }
     .ysec__meters { display: none; }
-    .inv-modal { grid-template-columns: 1fr; }
+    .inv-modal__body { grid-template-columns: 1fr; }
     .inv-modal__l { flex-direction: row; flex-wrap: wrap; justify-content: center; }
     .af-acc { grid-template-columns: 1fr; }
     .af-cond { grid-template-columns: 1fr; }
