@@ -33,7 +33,7 @@
   .wf-fac--oktober { background: var(--oktober); }
   .wf-fac--dreadnok { background: var(--dreadnok); }
   body.no-faction .wf-fac--joe, body.no-faction .wf-fac--cobra, body.no-faction .wf-fac--oktober, body.no-faction .wf-fac--dreadnok { background: var(--ink-soft); }
-  .wf-fac--mini { font-size: 9px; padding: 1px 5px; min-width: 84px; letter-spacing: .5px; }
+  .wf-fac--mini { font-size: 8px; padding: 1px 5px; min-width: 96px; letter-spacing: .4px; }
 
   .wf-photo { background-color: var(--card);
     background-image: repeating-linear-gradient(45deg, transparent 0 7px, var(--line-soft) 7px 8px);
@@ -121,6 +121,22 @@
   .mc-card__note::placeholder { color: rgba(255,255,255,.45); }
   .mc-card__note:focus { border-color: var(--gold); }
   .mc-card__insts { display: flex; flex-direction: column; gap: 6px; padding: 10px; }
+
+  /* Master Collection year separator — a "thermometer" divider: a black bulb
+     (year) at 9 o'clock with a stem line running from its 3-o'clock edge to
+     the page's right side. Deliberately not the Figures page's boxed
+     two-meter .ysec header — this page groups a short, curated list, not a
+     filterable roster, so the divider stays a lightweight visual break. */
+  .mcyr-sec { margin-bottom: 4px; }
+  .mcyr { display: flex; align-items: center; width: 100%; gap: 14px; margin: 30px 0 6px; padding: 0; border: none; background: none; font: inherit; color: inherit; cursor: pointer; }
+  .mcyr-sec:first-child .mcyr { margin-top: 6px; }
+  .mcyr__dot { flex: 0 0 auto; min-width: 46px; height: 46px; padding: 0 12px; border-radius: 999px; display: flex; align-items: center; justify-content: center;
+    background: var(--ink); color: var(--paper); font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: .3px; white-space: nowrap;
+    box-shadow: 2px 2px 0 var(--line); }
+  .mcyr__line { position: relative; flex: 1; height: 5px; background: var(--ink); display: flex; align-items: center; justify-content: flex-end; padding-right: 24px; }
+  .mcyr__stat { background: var(--paper); padding: 0 10px; font-family: var(--font-mono); font-weight: 700; font-size: 10px; letter-spacing: .5px; color: var(--ink-soft); white-space: nowrap; }
+  .mcyr__chev { flex: 0 0 auto; font-size: 15px; }
+  .mcyr-sec .mc-list { padding-top: 0; }
 
   /* toolbar */
   .invp-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 9px 26px; background: var(--card); border-bottom: 2px solid var(--ink); }
@@ -243,7 +259,7 @@
   .setcard__slotacc { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
 
   /* ===== roster rows (list) ===== */
-  .inv-cols, .inv-row { display: grid; grid-template-columns: 42px 1fr 88px 50px 1.5fr 92px 24px; gap: 12px; align-items: center; }
+  .inv-cols, .inv-row { display: grid; grid-template-columns: 42px 1fr 100px 50px 1.5fr 92px 24px; gap: 12px; align-items: center; }
   .inv-cols { padding: 2px 12px 8px; font-size: 9px; letter-spacing: 1px; color: var(--ink-soft); }
   .inv-row { width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; background: var(--card); border: 1.5px solid var(--ink); padding: 8px 12px; margin-bottom: 6px; box-shadow: var(--shadow); }
   .inv-row:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--ink); }
@@ -444,6 +460,16 @@
   .inv-cardhd__id { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: .5px; display: flex; align-items: baseline; gap: 10px; }
   .inv-cardhd__id b { font-weight: 700; white-space: nowrap; }
   .inv-cardhd__no { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; opacity: .6; flex: none; }
+  .inv-cardhd__no.is-pickable { background: transparent; border: none; padding: 0; color: inherit; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px; }
+  .inv-cardhd__no.is-pickable:hover { opacity: 1; }
+  /* "Move to No. ___" popover — reorders a copy's display number (see
+     store.js figureSummary()'s pin merge); anchored under the persistent
+     header, same on both card faces since .inv-face is the positioned parent. */
+  .inv-reorder { position: absolute; top: 46px; left: 16px; z-index: 5; display: flex; align-items: center; gap: 6px; border: 1.5px dashed var(--accent); background: var(--paper); padding: 7px 9px; box-shadow: 3px 3px 0 rgba(33,31,26,.3); }
+  .inv-reorder__lab { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; color: var(--ink-soft); flex: none; }
+  .inv-reorder__opt { font-family: var(--font-display); font-weight: 700; font-size: 12px; width: 24px; height: 24px; display: inline-grid; place-items: center; background: var(--card); border: 1.5px solid var(--line); color: var(--ink); cursor: pointer; padding: 0; }
+  .inv-reorder__opt:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .inv-reorder__opt.is-current { background: var(--ink); border-color: var(--ink); color: var(--paper); cursor: default; }
   .inv-cardhd__seg { display: inline-flex; border: 1.5px solid rgba(255,255,255,.4); flex: none; }
   .inv-cardhd__seg button { font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: 1px; padding: 6px 14px; background: transparent; color: rgba(255,255,255,.62); border: none; cursor: pointer; transition: background .12s, color .12s; }
   .inv-cardhd__seg button + button { border-left: 1.5px solid rgba(255,255,255,.4); }
@@ -560,6 +586,28 @@
   .acc__box.is-spacer { border: none; background: none; visibility: hidden; cursor: default; }
   .acc__count { font-family: var(--font-mono); font-weight: 700; font-size: 12px; text-align: right; white-space: nowrap; min-width: 34px; color: var(--ink-soft); }
   .acc.is-done .acc__count { color: var(--ok); }
+
+  /* ===== move-to-another-copy — manual counterpart to the ⚖ rebalance engine,
+     same "MOVE TO No." visual language as .inv-reorder above ===== */
+  .acc.has-move { grid-template-columns: 1fr auto auto auto; }
+  .acc__move { position: relative; }
+  .acc__movebtn { width: 22px; height: 22px; display: grid; place-items: center; padding: 0;
+    border: 1.5px solid var(--line); background: var(--card); color: var(--ink-soft); cursor: pointer; font-size: 12px; line-height: 1; }
+  .acc__movebtn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .acc__movebtn:disabled { color: var(--line); cursor: default; }
+  .acc__movepop { position: absolute; top: calc(100% + 4px); right: 0; z-index: 6; display: flex; align-items: center; gap: 6px;
+    border: 1.5px dashed var(--accent); background: var(--paper); padding: 7px 9px; box-shadow: 3px 3px 0 rgba(33,31,26,.3); white-space: nowrap; }
+  .acc__movepop-lab { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; color: var(--ink-soft); flex: none; }
+  .acc__movepop-opt { font-family: var(--font-display); font-weight: 700; font-size: 12px; width: 24px; height: 24px;
+    display: inline-grid; place-items: center; background: var(--card); border: 1.5px solid var(--line); color: var(--ink); cursor: pointer; padding: 0; }
+  /* how many units this move takes — only shown when the row owns more than
+     one, same stepper shape as .inv-mc__btn (Master Collection target qty) */
+  .acc__movepop-qty { display: flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 12px; color: var(--ink); flex: none; }
+  .acc__movepop-step { width: 16px; height: 16px; border: 1.5px solid var(--line); background: var(--paper); color: var(--ink);
+    font-family: var(--font-mono); font-size: 11px; line-height: 1; display: inline-grid; place-items: center; cursor: pointer; padding: 0; }
+  .acc__movepop-step:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .acc__movepop-step:disabled { opacity: .35; cursor: default; }
+  .acc__movepop-opt:hover { border-color: var(--accent); color: var(--accent); }
 
   /* ===== damage notation — per-unit condition flag on owned accessories ===== */
   .acc-list__dmgflag { margin-left: 8px; color: var(--damage); font-weight: 700; }

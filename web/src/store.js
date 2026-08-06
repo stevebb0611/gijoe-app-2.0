@@ -111,13 +111,26 @@ function figureSummary(catalogId) {
       own: moc ? req : instOwn(bpv, acc), req,
       pct: moc ? 100 : instPct(bpv, acc), whole: moc ? true : instWhole(bpv, acc),
       missing: moc ? [] : missingList(bpv, acc),
+      pinnedNo: i.pinnedNo ?? null,
     };
   });
-  // best copy first
-  copies.sort((a, b) => (b.whole - a.whole) || (b.pct - a.pct));
-  copies.forEach((c, idx) => { c.no = idx + 1; });
-  const whole = copies.filter(c => c.whole).length;
-  return { fig, owned: copies.length, whole, copies, bestPct: copies.length ? copies[0].pct : 0, req: bpReq(bp) };
+  // Best copy first, EXCEPT a copy the owner has manually pinned (the "Move to
+  // No. ___" control in app-detail.jsx — e.g. lining copy numbers up with
+  // production-variant letters instead of leaving them to completeness). A
+  // pin is an insertion point, not a hard slot: unpinned copies keep sorting
+  // most-complete-first among themselves, then each pinned copy is spliced
+  // into that list at its pinned position (processed lowest pin first, so
+  // multiple pins compose left-to-right instead of colliding). This tolerates
+  // stale/duplicate/out-of-range pinnedNo values (e.g. after a copy is
+  // removed) by just clamping the insertion index — no renumbering needed
+  // elsewhere when a pin goes stale.
+  const pinned = copies.filter(c => c.pinnedNo != null).sort((a, b) => (a.pinnedNo - b.pinnedNo) || (a.id - b.id));
+  const ordered = copies.filter(c => c.pinnedNo == null).sort((a, b) => (b.whole - a.whole) || (b.pct - a.pct) || (a.id - b.id));
+  pinned.forEach(c => ordered.splice(Math.min(Math.max(c.pinnedNo - 1, 0), ordered.length), 0, c));
+  ordered.forEach((c, idx) => { c.no = idx + 1; });
+  const whole = ordered.filter(c => c.whole).length;
+  const bestPct = copies.length ? Math.max(...copies.map(c => c.pct)) : 0;
+  return { fig, owned: ordered.length, whole, copies: ordered, bestPct, req: bpReq(bp) };
 }
 function totals() {
   const owned = new Set(state.instances.map(i => i.catalogId));
@@ -202,6 +215,12 @@ export const JoeStore = {
     // trades a damaged unit on this instance for a clean one from the Parts Bin
     swapAccessoryForClean(id, name) {
       api('POST', '/api/instances/' + id + '/accessory/swap-clean', { name });
+      refresh(); emit();
+    },
+    // moves `count` units of an accessory from this instance to another owned
+    // copy of the same figure — manual counterpart to the ⚖ rebalance engine
+    moveAcc(fromId, toId, name, count = 1) {
+      api('POST', '/api/instances/' + fromId + '/accessory/move', { toInstanceId: toId, name, count });
       refresh(); emit();
     },
     removeInstance(id) {

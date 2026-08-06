@@ -18,10 +18,23 @@ Instance
                            //   figure is single-variant (nothing to pin). Multi-variant figures
                            //   require a variant at Add time — there is NO "unidentified" state
                            //   (dropped June 2026; unknown copies stay off-app for review). See VARIANTS.md.
-  // DISPLAY NUMBER ("No. 1", "No. 2" …) is NOT stored — it is derived at render
-  // time: copies are sorted most-complete-first and numbered contiguously, so
-  // No. 1 is always the most complete copy and removing a copy never leaves a gap
-  // (the remaining copies renumber). The old "instanceIndex" field is gone.
+  // DISPLAY NUMBER ("No. 1", "No. 2" …) is derived at render time: copies are
+  // sorted most-complete-first and numbered contiguously, so removing a copy
+  // never leaves a gap (the remaining copies renumber). The old
+  // "instanceIndex" field is gone.
+  pinnedNo: number|null   // manual override (migration 017) — a "Move to No. ___"
+                           // affordance in the detail modal header lets the owner
+                           // pin a copy to a specific slot (e.g. lining copy
+                           // numbers up with production-variant letters instead of
+                           // leaving them to completeness). NULL = unpinned
+                           // (the original fully-derived behavior). A pin is an
+                           // INSERTION POINT, not a hard slot: unpinned copies still
+                           // sort most-complete-first among themselves, then each
+                           // pinned copy is spliced into that order at its pinned
+                           // position (see figureSummary() in web/src/store.js).
+                           // Accessories never need to "move" as part of this —
+                           // they're already keyed to instance_accessories.instance_id,
+                           // the physical copy, not to a slot number.
   isPrimary: boolean       // optional manual pin; if unset, No. 1 (most complete) is the de-facto primary shown in list/gallery summaries
   bodyType: 'male'|'female'// which diagram template the damage map uses
 
@@ -136,7 +149,7 @@ A **dedicated full page** (not a modal — the damage map needs room). Two colum
 - **Left (sticky):** the **damage map** — Front/Back + Male/Female toggles, the schematic figure, clickable o-ring **nodes** (open a Log-Damage panel: pick type × severity) and clickable **paint regions** (cycle severity), plus a severity legend.
 - **Right:** `CONDITION` (Physical + Paint grade badges + derivation note) · a contextual `LOG DAMAGE` panel when a node is selected · the `DAMAGE LOG` table (every mark: side · location · category · severity; removable) · `ACCESSORIES` checklist with **pull-from-Parts-Bin** on missing parts · `PARTS BIN` strip · `LOCATION` field · **Remove** action.
 
-Header: breadcrumb back to Inventory · figure name + faction + variant/year · copy tabs (No. 1 / No. 2 / ＋) · **★ Primary** toggle. The breadcrumb's variant tag reads `v{ver} · {letter}`; the right column carries a **change ›** affordance to *correct* a mis-identified variant (a plain overwrite — not an identify-later flow; the unidentified state was dropped, see `VARIANTS.md` §3). The per-copy lifecycle action is **Remove** (asks the accessory-disposition question — see PARTS_BIN.md).
+Header: breadcrumb back to Inventory · figure name + faction + variant/year · copy tabs (No. 1 / No. 2 / ＋) · **★ Primary** toggle. The breadcrumb's variant tag reads `v{ver} · {letter}`; the right column carries a **change ›** affordance to *correct* a mis-identified variant (a plain overwrite — not an identify-later flow; the unidentified state was dropped, see `VARIANTS.md` §3). The per-copy lifecycle action is **Remove** (asks the accessory-disposition question — see PARTS_BIN.md). The **No. N** label itself is clickable when a figure has 2+ copies — opens a small "MOVE TO No." popover to pin the current copy to a different slot (see `pinnedNo` above).
 
 ### Production note on the figure diagram
 The prototype renders the figure as a **geometric schematic** (circle head, trapezoid torso, thick rounded-line limbs) — intentionally, to stay on-brand and avoid sloppy illustration. In production this can stay schematic, or be swapped for a normalized figure-outline template per body type; either way the **node/region coordinates are data** (percent positions) layered over the art, so the art can change without touching the logic.

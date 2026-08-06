@@ -36,7 +36,7 @@ const instanceRowsStmt = db.prepare(`
   SELECT i.id, i.figure_id AS catalogId, vl.letter AS variant, i.is_moc AS moc,
          i.damage AS marks, i.location AS loc, i.notes,
          i.filecard_on_file, i.filecard_id, i.country_of_origin AS coo,
-         i.is_master AS masterCollection, i.set_id AS setId,
+         i.is_master AS masterCollection, i.set_id AS setId, i.pinned_no AS pinnedNo,
          i.created_at
   FROM instances i
   LEFT JOIN variant_lookup vl ON vl.id = i.variant_id
@@ -66,6 +66,7 @@ function shapeInstance(row, accByInstance, damageByInstance, damageNotesByInstan
     coo: row.coo || '',
     masterCollection: !!row.masterCollection,
     setId: row.setId || null,
+    pinnedNo: row.pinnedNo ?? null,
     addedAt: row.created_at,
   };
 }
@@ -165,6 +166,7 @@ const patchFieldsStmt = {
   moc: db.prepare('UPDATE instances SET is_moc = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'),
   marks: db.prepare('UPDATE instances SET damage = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'),
   masterCollection: db.prepare('UPDATE instances SET is_master = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'),
+  pinnedNo: db.prepare('UPDATE instances SET pinned_no = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'),
 };
 const getInstanceFigure = db.prepare('SELECT figure_id FROM instances WHERE id = ?');
 
@@ -178,6 +180,7 @@ export const updateInstance = db.transaction((id, patch) => {
   if ('moc' in patch) patchFieldsStmt.moc.run(patch.moc ? 1 : 0, id);
   if ('marks' in patch) patchFieldsStmt.marks.run(patch.marks ? JSON.stringify(patch.marks) : null, id);
   if ('masterCollection' in patch) patchFieldsStmt.masterCollection.run(patch.masterCollection ? 1 : 0, id);
+  if ('pinnedNo' in patch) patchFieldsStmt.pinnedNo.run(patch.pinnedNo, id);
   if ('variant' in patch) {
     const row = getInstanceFigure.get(id);
     if (row) setInstanceVariant.run(resolveVariantId(row.figure_id, patch.variant), id);
@@ -368,6 +371,57 @@ export const swapAccessoryForClean = db.transaction((instanceId, name) => {
   setInstanceAccDamage.run(instDamagedNow, instanceId, accId);
   if (instDamagedNow === 0) setInstanceAccDamageNotes.run(null, instanceId, accId); // no damaged units left — stale description
   setBinDamaged.run(binRow.units_damaged + 1, accId);
+  return true;
+});
+
+const getInstanceFigureAndVariant = db.prepare('SELECT figure_id, variant_id FROM instances WHERE id = ?');
+const getFigureAccessoryVariant = db.prepare('SELECT variant_id FROM figure_accessories WHERE figure_id = ? AND accessory_id = ?');
+
+// Moves `count` units of an accessory from one owned copy to another (e.g.
+// give spare missiles from a beat-up copy to a mint one the owner wants
+// complete instead) — the manual counterpart to the ⚖ rebalance engine,
+// which only optimizes for whole-copy count and knows nothing about
+// condition. Prefers moving clean units first; only reaches into damaged
+// stock — carrying the damaged flag + notes over — once the source's clean
+// units run out. Rejects moves across different figures, moves for more
+// units than the source owns, or onto a copy of the wrong production
+// variant for a variant-scoped accessory (see ACCESSORY_GROUPS.md
+// "variant_id") — mirrors the bpForVariant() filter the UI already applies
+// so an illegal destination can never be picked, not just hidden.
+export const moveInstanceAccessory = db.transaction((fromInstanceId, toInstanceId, name, count = 1) => {
+  if (!(count >= 1)) return false;
+  const from = getInstanceFigureAndVariant.get(fromInstanceId);
+  const to = getInstanceFigureAndVariant.get(toInstanceId);
+  if (!from || !to || from.figure_id !== to.figure_id) return false;
+
+  const accId = accessoryIdForName(from.figure_id, name);
+  if (!accId) return false;
+
+  const scopedVariant = getFigureAccessoryVariant.get(from.figure_id, accId);
+  if (scopedVariant && scopedVariant.variant_id != null && scopedVariant.variant_id !== to.variant_id) return false;
+
+  const src = db.prepare('SELECT units_owned, units_damaged, damage_notes FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(fromInstanceId, accId);
+  if (!src || src.units_owned < count) return false;
+  const clean = src.units_owned - src.units_damaged;
+  const movingDamaged = Math.max(0, count - clean);
+
+  const srcDamagedNow = src.units_damaged - movingDamaged;
+  setInstanceAccDamage.run(srcDamagedNow, fromInstanceId, accId);
+  if (srcDamagedNow === 0) setInstanceAccDamageNotes.run(null, fromInstanceId, accId); // no damaged units left — stale description
+  upsertInstanceAcc.run(fromInstanceId, accId, src.units_owned - count);
+
+  const dst = db.prepare('SELECT units_owned, units_damaged, damage_notes FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(toInstanceId, accId);
+  const dstOwnedNow = dst ? dst.units_owned : 0;
+  upsertInstanceAcc.run(toInstanceId, accId, dstOwnedNow + count);
+  if (movingDamaged) {
+    const dstDamagedNow = (dst ? dst.units_damaged : 0) + movingDamaged;
+    setInstanceAccDamage.run(dstDamagedNow, toInstanceId, accId);
+    if (src.damage_notes) {
+      const existing = (dst && dst.damage_notes) || '';
+      const merged = existing && existing !== src.damage_notes ? existing + '; ' + src.damage_notes : (existing || src.damage_notes);
+      setInstanceAccDamageNotes.run(merged, toInstanceId, accId);
+    }
+  }
   return true;
 });
 

@@ -96,6 +96,13 @@ app.post('/api/instances/:id/accessory/swap-clean', (req, res) => {
   res.json({ ok: true });
 });
 
+app.post('/api/instances/:id/accessory/move', (req, res) => {
+  const count = req.body.count == null ? 1 : +req.body.count;
+  const ok = store.moveInstanceAccessory(+req.params.id, +req.body.toInstanceId, req.body.name, count);
+  if (!ok) return res.status(400).json({ error: 'not enough units to move, different figure, or wrong variant for this accessory' });
+  res.json({ ok: true });
+});
+
 app.delete('/api/instances/:id', (req, res) => {
   store.removeInstance(+req.params.id);
   res.status(204).end();

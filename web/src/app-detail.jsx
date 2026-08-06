@@ -302,8 +302,11 @@ function invMasterTotals() {
 // ---------------------------------------------------------------------------
 // Shared low-fi widgets
 // ---------------------------------------------------------------------------
+// Spelled-out labels for the two factions whose raw catalog code reads as an
+// abbreviation — COBRA/DREADNOK need no expansion, JOE and OKTOBER do.
+const FAC_TAG_LABEL = { JOE: 'G.I. JOE', OKTOBER: 'OKTOBER GUARD' };
 function FactionTag({ faction, mini }) {
-  return <span className={"wf-fac wf-fac--" + faction.toLowerCase() + (mini ? " wf-fac--mini" : "")}>{faction}</span>;
+  return <span className={"wf-fac wf-fac--" + faction.toLowerCase() + (mini ? " wf-fac--mini" : "")}>{FAC_TAG_LABEL[faction] || faction}</span>;
 }
 // Compact military-badge motif for the Master Collection nav chip — layered
 // gold/paper/ink rings + a single gold star, echoing the per-instance star
@@ -360,12 +363,23 @@ function boxLayout(req) {
 // color (added 2026-07-03, see acc-colors.jsx) renders as an AccSwatch beside
 // the name — decoration only, never gates the checkbox fill (see rule #5 in
 // acc-colors.jsx's header).
-function AccItem({ name, req, checked, onSet, tone, color, tag, damaged }) {
+// moveTargets is null when this list doesn't support moving at all (e.g. only
+// one owned copy exists) — the 4th grid column is omitted entirely in that
+// case. When it's an array (possibly empty, e.g. every other copy is the
+// wrong production variant for this accessory) the column is reserved so
+// rows in the same list stay aligned, same "reserved even when empty"
+// philosophy as .acc__box.is-spacer above — but the button itself is only
+// live when there's a spare unit on this copy AND an eligible destination.
+function AccItem({ name, req, checked, onSet, tone, color, tag, damaged, moveTargets, onMove }) {
   const { rows, cols, empty } = boxLayout(req);
   const own = checked.reduce((s, c) => s + (c ? 1 : 0), 0);
   const done = own >= req;
   const live = typeof onSet === 'function';
   const dmg = tone === 'damage';
+  const [moveOpen, setMoveOpen] = React.useState(false);
+  const [moveQty, setMoveQty] = React.useState(1);
+  const canMove = moveTargets != null && moveTargets.length > 0 && own > 0;
+  const openMove = () => { setMoveQty(1); setMoveOpen((v) => !v); };
   const cells = [];
   for (let i = 0; i < empty; i++) cells.push(<span key={"sp" + i} className="acc__box is-spacer" aria-hidden="true"></span>);
   for (let i = 0; i < req; i++) {
@@ -377,13 +391,39 @@ function AccItem({ name, req, checked, onSet, tone, color, tag, damaged }) {
     );
   }
   return (
-    <div className={"acc" + (rows === 2 ? " is-stack" : "") + (done ? " is-done" : "") + (dmg ? " is-damage-tone" : "")}>
+    <div className={"acc" + (rows === 2 ? " is-stack" : "") + (done ? " is-done" : "") + (dmg ? " is-damage-tone" : "") + (moveTargets != null ? " has-move" : "")}>
       <span className="acc__namewrap">
         <span className="acc__dmgflag" title={damaged ? name + " · has damaged units" : undefined} aria-hidden={!damaged}>{damaged ? "⚠" : ""}</span>
         {tag != null && <span className="acc__tag">{tag}</span>}{color && <AccSwatch color={color} />}<span className="acc__name">{name}</span>
       </span>
       <div className="acc__boxes" style={{ gridTemplateColumns: "repeat(" + cols + ", 22px)" }}>{cells}</div>
       <span className="acc__count">{own}/{req}</span>
+      {moveTargets != null && (
+        <span className="acc__move">
+          <button type="button" className="acc__movebtn" disabled={!canMove}
+                  title={canMove ? "Move a unit of " + name + " to another copy" : "No spare unit to move"}
+                  onClick={openMove}>⇄</button>
+          {moveOpen && canMove && (
+            <div className="acc__movepop">
+              <span className="acc__movepop-lab">MOVE</span>
+              {own > 1 && (
+                <span className="acc__movepop-qty">
+                  <button type="button" className="acc__movepop-step" disabled={moveQty <= 1}
+                          onClick={() => setMoveQty((q) => Math.max(1, q - 1))}>−</button>
+                  <b>{moveQty}</b>
+                  <button type="button" className="acc__movepop-step" disabled={moveQty >= own}
+                          onClick={() => setMoveQty((q) => Math.min(own, q + 1))}>+</button>
+                </span>
+              )}
+              <span className="acc__movepop-lab">TO No.</span>
+              {moveTargets.map((t) => (
+                <button key={t.id} type="button" className="acc__movepop-opt"
+                        onClick={() => { onMove(t.id, moveQty); setMoveOpen(false); }}>{t.no}</button>
+              ))}
+            </div>
+          )}
+        </span>
+      )}
     </div>
   );
 }
@@ -443,7 +483,8 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const cur = copies.find(c => c.id === curId) || copies[0] || null;
   const [flipped, setFlipped] = React.useState(false);
   const [varEdit, setVarEdit] = React.useState(false);
-  React.useEffect(() => setVarEdit(false), [curId]);
+  const [reorderOpen, setReorderOpen] = React.useState(false);
+  React.useEffect(() => { setVarEdit(false); setReorderOpen(false); }, [curId]);
   // ghost-only: accessories ticked before the figure is owned — carried into
   // the Add Figure flow's DETAILS step as a starting point, not persisted here.
   const [preAcc, setPreAcc] = React.useState({});
@@ -492,12 +533,22 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const setUnit = (name, n) => JoeStore.setAcc(cur.id, name, n);
   const setDamage = (name, n) => JoeStore.setAccDamage(cur.id, name, n);
   const swapForClean = (name) => JoeStore.swapAccessoryForClean(cur.id, name);
+  // Other copies this row's accessory could move to — null when there's only
+  // one owned copy (feature not applicable), else filtered to same-variant
+  // copies for variant-scoped rows (see ACCESSORY_GROUPS.md "variant_id").
+  const moveTargetsFor = (a) => copies.length > 1
+    ? copies.filter((c) => c.id !== cur.id && (!a[7] || a[7] === c.variant)).map((c) => ({ id: c.id, no: c.no }))
+    : null;
+  const moveUnit = (name, destId, qty) => JoeStore.moveAcc(cur.id, destId, name, qty);
   const setMoc = (v) => JoeStore.updateInstance(cur.id, { moc: v });
   const setMaster = (v) => JoeStore.updateInstance(cur.id, { masterCollection: v });
   const setCard = (patch) => JoeStore.updateInstance(cur.id, { filecard: { ...filecard, ...patch } });
   const setNotes = (v) => JoeStore.updateInstance(cur.id, { notes: v });
   const setLoc = (v) => JoeStore.updateInstance(cur.id, { loc: v });
   const setVariant = (letter) => { JoeStore.updateInstance(cur.id, { variant: letter }); setVarEdit(false); };
+  // Pins this copy to a display slot — see the merge algorithm in
+  // store.js figureSummary() for how it composes with completeness sort.
+  const moveTo = (no) => { JoeStore.updateInstance(cur.id, { pinnedNo: no }); setReorderOpen(false); };
   const setCoo = (country) => JoeStore.updateInstance(cur.id, { coo: country });
   const setSetId = (setId) => JoeStore.updateInstance(cur.id, { setId });
   const setMarks = (val) => {
@@ -609,9 +660,18 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   };
 
   const cardHeader = (
-    <div className="inv-cardhd">
-      <div className="inv-cardhd__id"><b>{fig.name}</b><span className="inv-cardhd__no">No. {cur.no}</span></div>
-      <div className="inv-cardhd__ctrls">
+    <React.Fragment>
+      <div className="inv-cardhd">
+        <div className="inv-cardhd__id">
+          <b>{fig.name}</b>
+          {copies.length > 1 ? (
+            <button type="button" className="inv-cardhd__no is-pickable" title="Move this copy to a different No."
+                    onClick={() => setReorderOpen(v => !v)}>No. {cur.no}</button>
+          ) : (
+            <span className="inv-cardhd__no">No. {cur.no}</span>
+          )}
+        </div>
+        <div className="inv-cardhd__ctrls">
         <button type="button" className={"inv-cardhd__master" + (raw.masterCollection ? " is-on" : "")}
                 title={raw.masterCollection ? "In the Master Collection — click to remove" : "Add to Master Collection"}
                 onClick={() => setMaster(!raw.masterCollection)}>
@@ -628,8 +688,18 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
           <button className={!flipped ? "is-on" : ""} onClick={() => flipTo(false)}>FIGURE</button>
           <button className={flipped ? "is-on" : ""} onClick={() => flipTo(true)}>CONDITION</button>
         </div>
+        </div>
       </div>
-    </div>
+      {reorderOpen && (
+        <div className="inv-reorder">
+          <span className="inv-reorder__lab">MOVE TO No.</span>
+          {copies.map((c, i) => (
+            <button key={c.id} type="button" className={"inv-reorder__opt" + (i + 1 === cur.no ? " is-current" : "")}
+                    disabled={i + 1 === cur.no} onClick={() => moveTo(i + 1)}>{i + 1}</button>
+          ))}
+        </div>
+      )}
+    </React.Fragment>
   );
 
   return (
@@ -732,12 +802,14 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                                    renderSolo={(a, key) => (
                                      <AccItem key={key} name={a[0]} req={a[1]} color={a[6]} damaged={(accDamage[a[0]] || 0) > 0}
                                               checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
-                                              onSet={(n) => setUnit(a[0], n)} />
+                                              onSet={(n) => setUnit(a[0], n)}
+                                              moveTargets={moveTargetsFor(a)} onMove={(destId, qty) => moveUnit(a[0], destId, qty)} />
                                    )}
                                    renderOption={(a) => (
                                      <AccItem key={a[0]} name={JoeData.optLabel(a[0])} req={a[1]} color={a[6]} tag={a[5]} damaged={(accDamage[a[0]] || 0) > 0}
                                               checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
-                                              onSet={(n) => setUnit(a[0], n)} />
+                                              onSet={(n) => setUnit(a[0], n)}
+                                              moveTargets={moveTargetsFor(a)} onMove={(destId, qty) => moveUnit(a[0], destId, qty)} />
                                    )} />
                     <DamageModePanel ownedAcc={ownedAcc} rawAcc={raw.acc || {}} accDamage={accDamage} onSetDamage={setDamage}
                       accDamageNotes={accDamageNotes} onSetDamageNotes={(name, v) => JoeStore.setAccDamageNotes(cur.id, name, v)}

@@ -23,6 +23,17 @@ function gradeText(c) {
   return c.loc || (c.phys ? c.phys + ' / ' + c.paint : 'ungraded');
 }
 
+// Per-year "kept/target" rollup for the year-separator's tick-mark label —
+// same capped-contribution idiom as invMasterTotals(), just scoped to the
+// figures grouped under one year instead of the whole collection.
+function yearTargetStats(ents) {
+  let met = 0, target = 0;
+  ents.forEach(({ targets }) => targets.forEach((tg) => { target += tg.target; met += Math.min(tg.count, tg.target); }));
+  return { met, target };
+}
+
+const YEAR_STATS_KEY = 'mc_year_stats_v1';
+
 function MasterCollectionView({ onNavigate, onAddInstance }) {
   useStore();
   const mt = invMasterTotals();
@@ -30,6 +41,12 @@ function MasterCollectionView({ onNavigate, onAddInstance }) {
   const [sel, setSel] = React.useState(null); // {catalogId, instId}
   const [sortMode, setSortMode] = React.useState('year'); // 'year' | 'az'
   const [yrAsc, setYrAsc] = React.useState(true); // year mode only — oldest (1982) first by default
+  const [openYears, setOpenYears] = React.useState(() => new Set()); // year sections start collapsed
+  const [yearStats, setYearStats] = React.useState(() => {
+    try { return localStorage.getItem(YEAR_STATS_KEY) !== '0'; } catch { return true; }
+  });
+  React.useEffect(() => { try { localStorage.setItem(YEAR_STATS_KEY, yearStats ? '1' : '0'); } catch {} }, [yearStats]);
+  const toggleYear = (y) => setOpenYears(s => { const n = new Set(s); n.has(y) ? n.delete(y) : n.add(y); return n; });
 
   const q = query.trim().toLowerCase();
   const matchQ = (fig) => !q || [fig.name, fig.specialty, fig.faction, formatYear(fig.year)].some(s => s && s.toLowerCase().includes(q));
@@ -60,6 +77,61 @@ function MasterCollectionView({ onNavigate, onAddInstance }) {
       : (yrAsc ? a.fig.year - b.fig.year : b.fig.year - a.fig.year) || a.fig.name.localeCompare(b.fig.name));
 
   const empty = mt.starredCopies === 0;
+  const filtering = !!q;
+
+  // Year grouping only applies in YEAR sort mode — A–Z mode stays a flat
+  // list, since interleaving years alphabetically would make headers
+  // meaningless. `entries` is already sorted by year, so a Map preserves
+  // the right group order for free.
+  let yearGroups = null;
+  if (sortMode === 'year') {
+    const byYear = new Map();
+    entries.forEach((e) => {
+      const y = e.fig.year;
+      if (!byYear.has(y)) byYear.set(y, []);
+      byYear.get(y).push(e);
+    });
+    yearGroups = [...byYear.entries()];
+  }
+  const anyYearOpen = yearGroups ? yearGroups.some(([y]) => openYears.has(y)) : false;
+  const expandAllYears = () => setOpenYears(new Set(yearGroups.map(([y]) => y)));
+  const collapseAllYears = () => setOpenYears(new Set());
+
+  const renderCard = ({ fig, starred, starredLetters, targets }, showYear) => (
+    <div className="mc-card" key={fig.id}>
+      <div className="mc-card__hd">
+        <span className="mc-card__name"><b>{fig.name}</b><VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><SetTag sets={fig.sets} /><VariantBracket variants={fig._cf.variants} owned={starredLetters} /></span>
+        <FactionTag faction={fig.faction} mini />
+        {showYear && <span className="mc-card__year">{formatYear(fig.year)}</span>}
+        {targets.length > 0 && (
+          <span className="mc-card__targets">
+            {targets.map((tg) => (
+              <span key={tg.letter} className={"mc-target" + (tg.target > 0 && tg.count >= tg.target ? " is-met" : "")}>
+                {tg.letter && <VariantBadge letter={tg.letter} />}{tg.count}/{tg.target}
+              </span>
+            ))}
+          </span>
+        )}
+        <input
+          className="mc-card__note"
+          defaultValue={fig.masterNotes}
+          placeholder="Add a note about this figure…"
+          onBlur={(e) => JoeStore.setFigureMasterNotes(fig.id, e.target.value)}
+        />
+      </div>
+      <div className="mc-card__insts">
+        {starred.map((c) => (
+          <button key={c.id} className="inv-inst" onClick={() => setSel({ catalogId: fig.id, instId: c.id })}>
+            <span className="inv-inst__tab">★</span>
+            <span className="inv-inst__id"><span>No. {c.no}<VariantBadge letter={c.variant} /></span><i>{gradeText(c)}</i></span>
+            <span className="inv-stock"><StockBar pct={c.pct} />{c.cardOnFile && <span className="inv-fc" title="File card on file">+ File card</span>}</span>
+            <span className={"inv-need" + (c.pct === 100 ? " is-zero" : "")}>{c.pct === 100 ? "✓ Complete" : "Missing " + (c.req - c.own)}</span>
+            <span className="inv-go">▸</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="invp">
@@ -119,6 +191,20 @@ function MasterCollectionView({ onNavigate, onAddInstance }) {
             >
               A–Z
             </button>
+            {yearGroups && (
+              <>
+                <button className="txtbtn" onClick={anyYearOpen ? collapseAllYears : expandAllYears}>
+                  {anyYearOpen ? "Collapse All" : "Expand All"}
+                </button>
+                <button
+                  className={"txtbtn" + (yearStats ? " is-on" : "")}
+                  onClick={() => setYearStats(v => !v)}
+                  title="Show kept/target count on each year separator"
+                >
+                  Stats
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -128,44 +214,25 @@ function MasterCollectionView({ onNavigate, onAddInstance }) {
           <div className="invp-empty">No figures starred yet — open a figure's detail modal and tap the star next to MOC to add a copy to your Master Collection.</div>
         ) : entries.length === 0 ? (
           <div className="invp-empty">No figures match.</div>
+        ) : yearGroups ? (
+          yearGroups.map(([year, ents]) => {
+            const isOpen = filtering || openYears.has(year);
+            const stats = yearTargetStats(ents);
+            return (
+              <section className={"mcyr-sec" + (isOpen ? " is-open" : "")} key={year}>
+                <button type="button" className="mcyr" onClick={() => toggleYear(year)}>
+                  <span className="mcyr__dot">{formatYear(year)}</span>
+                  <span className="mcyr__line">
+                    {yearStats && stats.target > 0 && <span className="mcyr__stat">{stats.met}/{stats.target} kept</span>}
+                  </span>
+                  <span className="mcyr__chev">{isOpen ? "▾" : "▸"}</span>
+                </button>
+                {isOpen && <div className="mc-list">{ents.map((e) => renderCard(e, false))}</div>}
+              </section>
+            );
+          })
         ) : (
-          <div className="mc-list">
-            {entries.map(({ fig, starred, starredLetters, targets }) => (
-              <div className="mc-card" key={fig.id}>
-                <div className="mc-card__hd">
-                  <span className="mc-card__name"><b>{fig.name}</b><VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><SetTag sets={fig.sets} /><VariantBracket variants={fig._cf.variants} owned={starredLetters} /></span>
-                  <FactionTag faction={fig.faction} mini />
-                  <span className="mc-card__year">{formatYear(fig.year)}</span>
-                  {targets.length > 0 && (
-                    <span className="mc-card__targets">
-                      {targets.map((tg) => (
-                        <span key={tg.letter} className={"mc-target" + (tg.target > 0 && tg.count >= tg.target ? " is-met" : "")}>
-                          {tg.letter && <VariantBadge letter={tg.letter} />}{tg.count}/{tg.target}
-                        </span>
-                      ))}
-                    </span>
-                  )}
-                  <input
-                    className="mc-card__note"
-                    defaultValue={fig.masterNotes}
-                    placeholder="Add a note about this figure…"
-                    onBlur={(e) => JoeStore.setFigureMasterNotes(fig.id, e.target.value)}
-                  />
-                </div>
-                <div className="mc-card__insts">
-                  {starred.map((c) => (
-                    <button key={c.id} className="inv-inst" onClick={() => setSel({ catalogId: fig.id, instId: c.id })}>
-                      <span className="inv-inst__tab">★</span>
-                      <span className="inv-inst__id"><span>No. {c.no}<VariantBadge letter={c.variant} /></span><i>{gradeText(c)}</i></span>
-                      <span className="inv-stock"><StockBar pct={c.pct} />{c.cardOnFile && <span className="inv-fc" title="File card on file">+ File card</span>}</span>
-                      <span className={"inv-need" + (c.pct === 100 ? " is-zero" : "")}>{c.pct === 100 ? "✓ Complete" : "Missing " + (c.req - c.own)}</span>
-                      <span className="inv-go">▸</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+          <div className="mc-list">{entries.map((e) => renderCard(e, true))}</div>
         )}
       </main>
 
