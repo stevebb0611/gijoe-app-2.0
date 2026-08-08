@@ -38,6 +38,7 @@ function fvm(cf) {
     specialty: cf.role || '', variant: cf.role || '', vehicle: cf.vehicle || null,
     image: cf.image || null,
     releaseContext: cf.releaseContext || 'retail',
+    conventionKind: cf.conventionKind || null,
     masterNotes: cf.masterNotes || '',
     owned, acc, blueprint: bp,
     _cf: cf, _sum: sum,
@@ -608,7 +609,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
               <PhotoSlot className="inv-modal__photo" src={fig.image} />
               <FactionTag faction={fig.faction} />
               <div className="inv-modal__id">
-                <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /><EditionTag context={fig.releaseContext} lg /><SetTag sets={fig.sets} lg /></div>
+                <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /><EditionTag context={fig.releaseContext} conventionKind={fig.conventionKind} lg /><SetTag sets={fig.sets} lg /></div>
                 {fig.fullName && <div className="inv-modal__full">{fig.fullName}</div>}
                 <div className="inv-modal__var">{fig.specialty} · {formatYear(fig.year)}</div>
                 {fig.variants > 1 ? <div className="inv-modal__variants"><VariantBracket variants={cf.variants} owned={new Set()} lg /></div> : null}
@@ -729,7 +730,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                 <FactionTag faction={fig.faction} />
                 <div className="inv-modal__id">
                   <div className="inv-modal__name">
-                    {fig.name}<VersionChip version={fig.version} lg /><EditionTag context={fig.releaseContext} lg /><SetTag sets={fig.sets} lg />
+                    {fig.name}<VersionChip version={fig.version} lg /><EditionTag context={fig.releaseContext} conventionKind={fig.conventionKind} lg /><SetTag sets={fig.sets} lg />
                     {(cur.variant || fig.variants > 1) ? (
                       <VariantBadge letter={cur.variant} count={fig.variants} lg
                                     onClick={fig.variants > 1 ? () => setVarEdit(v => !v) : undefined}

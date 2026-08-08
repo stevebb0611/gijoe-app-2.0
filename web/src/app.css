@@ -279,6 +279,14 @@
      otherwise it reads identically to the retail row (VARIANTS.md §7.5.2) */
   .idedition { font-style: normal; display: inline-flex; align-items: center; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .3px; color: var(--accent); border: 1.5px solid var(--accent); padding: 1px 6px; margin-left: 8px; vertical-align: 1px; }
   .idedition--lg { font-size: 11px; padding: 2px 7px; margin-left: 9px; vertical-align: 2px; }
+  /* quiet sub-badge — convention_kind='accessories' (migration 018): a
+     retail figure re-released at a convention with different bundled
+     accessories, not a genuinely convention-only figure. Same slot/inline
+     position as .idedition so roster-row layout doesn't shift, but
+     recolored/unbordered like .idver's quiet mono caption instead of the
+     bold accent pill, since this is a lower-priority notation than a true
+     convention exclusive. */
+  .idedition--quiet { border: none; color: var(--ink-soft); padding: 1px 2px; }
   /* multi-pack "set" grouping (migration 015) — a fun bonus completionist badge,
      gold like the Master Collection star so it reads as a bonus notation, not a
      core classification like .idedition */
@@ -517,7 +525,7 @@
   .inv-modal__x { position: absolute; top: 8px; right: 8px; background: var(--ink); color: var(--paper); border: none; width: 30px; height: 30px; cursor: pointer; font-size: 14px; z-index: 2; display: inline-grid; place-items: center; padding: 0; }
   .inv-modal__l { border-right: 2px solid var(--ink); padding: 18px; display: flex; flex-direction: column; align-items: center; gap: 10px; background: var(--card); overflow-y: auto; }
   .inv-modal__photo { width: 100%; height: 165px; }
-  .inv-modal__name { font-family: var(--font-display); font-weight: 700; font-size: 24px; line-height: 1; text-align: center; }
+  .inv-modal__name { font-family: var(--font-display); font-weight: 700; font-size: 24px; line-height: 1; text-align: center; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; row-gap: 6px; }
   .inv-modal__id { display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .inv-modal__full { font-family: var(--font-display); font-weight: 500; font-size: 12px; color: var(--ink-soft); text-align: center; }
   .inv-modal__var { font-size: 10px; color: var(--ink-soft); letter-spacing: 1px; text-align: center; }

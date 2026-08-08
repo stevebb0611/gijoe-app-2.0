@@ -55,7 +55,7 @@ function Row({ fig, selId, openIds, onToggle, onOpen }) {
               onClick={() => ghost ? onOpen(fig.id, null) : onToggle(fig.id)}>
         <span className="inv-thumb" data-tag={ghost ? "—" : ""}></span>
         <span className="inv-name">
-          <b>{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><SetTag sets={fig.sets} /><VariantBracket variants={fig._cf.variants} owned={ownedLetters} /><VehicleTag vehicle={fig.vehicle} inline /></b>
+          <b>{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} conventionKind={fig.conventionKind} /><SetTag sets={fig.sets} /><VariantBracket variants={fig._cf.variants} owned={ownedLetters} /><VehicleTag vehicle={fig.vehicle} inline /></b>
           <i>{fig.specialty}</i>
         </span>
         <FactionTag faction={fig.faction} mini />
@@ -123,7 +123,7 @@ function GalleryCard({ fig, onOpen }) {
     <button className={"card inv-card" + (ghost ? " is-ghostcard" : "")} onClick={() => ghost ? onOpen(fig.id, null) : onOpen(fig.id, copies[0].id)}>
       <div className="card__corner"><FactionTag faction={fig.faction} mini /></div>
       <PhotoSlot className="card__photo" src={fig.image} />
-      <div className="card__name">{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><SetTag sets={fig.sets} /><VariantBracket variants={fig._cf.variants} owned={ownedLetters} /></div>
+      <div className="card__name">{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} conventionKind={fig.conventionKind} /><SetTag sets={fig.sets} /><VariantBracket variants={fig._cf.variants} owned={ownedLetters} /></div>
       <div className="card__var">{fig.specialty}</div>
       {!ghost && multi && st.moves.length > 0 && <div className="card__rebal">Rebalance</div>}
       <div className="card__foot">
@@ -170,7 +170,7 @@ function YearSection({ year, figs, view, open, onToggleYear, rowProps, sets = []
         view === 'list' ? (
           <div className="ysec__body">
             {sets.map(s => <SetCard key={'set-' + s.setId} set={s} onOpen={onOpen} onAddInstance={onAddInstance} />)}
-            <div className="inv-cols"><span></span><span>Code Name</span><span>Faction</span><span>Owned</span><span>Stock</span><span>Missing</span><span></span></div>
+            {figs.length > 0 && <div className="inv-cols"><span></span><span>Code Name</span><span>Faction</span><span>Owned</span><span>Stock</span><span>Missing</span><span></span></div>}
             {figs.map(f => <Row key={f.id} fig={f} {...rowProps} />)}
           </div>
         ) : (
@@ -209,6 +209,11 @@ const RELEASE_OPTS = ['Retail', 'Mail-in', 'Mail-order', 'Convention', 'Store ex
 // grouping reads straight off INV_CAT, independent of ALL_YEARS.
 const ALL_YEARS = [...new Set(INV_CAT.map(y => y.year))].filter(y => y !== SPECIAL_RELEASE_YEAR).sort((a, b) => a - b);
 const YR_MIN = ALL_YEARS[0], YR_MAX = ALL_YEARS[ALL_YEARS.length - 1];
+
+// Special Release set cards, ordered by real-world release year (undated/custom
+// groupings — e.g. Rapid Deployment Force — sort last since they have no release
+// order to place them by).
+const SPECIAL_RELEASE_SETS = [...JoeData.ALL_SETS.values()].sort((a, b) => (a.year ?? Infinity) - (b.year ?? Infinity));
 
 // distinct production variants actually owned (>=1 copy of that letter)
 function ownedVariantCount(fig) {
@@ -324,7 +329,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
   const sections = years.map(y => {
     const figs = byYear[y].map(fvm).filter(f => matchQ(f) && passStatus(f) && passFacets(f)).sort((a, b) => a.name.localeCompare(b.name));
     return { year: y, figs };
-  }).filter(s => s.figs.length > 0);
+  }).filter(s => s.figs.length > 0 || (s.year === SPECIAL_RELEASE_YEAR && JoeData.ALL_SETS.size > 0));
 
   const shownCount = sections.reduce((n, s) => n + s.figs.length, 0);
   const expandAll = () => setOpen(new Set(years));
@@ -483,7 +488,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
         ) : sections.map(s => (
           <YearSection key={s.year} year={s.year} figs={s.figs} view={view}
                        open={filtering ? true : open.has(s.year)} onToggleYear={toggleYear} rowProps={rowProps}
-                       sets={s.year === SPECIAL_RELEASE_YEAR ? [...JoeData.ALL_SETS.values()] : []}
+                       sets={s.year === SPECIAL_RELEASE_YEAR ? SPECIAL_RELEASE_SETS : []}
                        onOpen={openFig} onAddInstance={onAddInstance} />
         ))}
       </main>

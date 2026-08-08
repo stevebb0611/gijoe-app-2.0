@@ -79,9 +79,12 @@ same as every other per-copy field) and would need re-tagging via the Detail mod
 ## UI surface
 
 - **Special Release set card** (`web/src/set-card.jsx`, rendered only inside
-  `app-inventory.jsx`'s `SPECIAL_RELEASE_YEAR` section) — one card per confirmed set, a black
-  header (name + live `owned/required`) that expands to one row per slot
-  (`JoeData.setSlots(setId)`): a tagged instance shows its own retailer-exclusive accessory
+  `app-inventory.jsx`'s `SPECIAL_RELEASE_YEAR` section, that section itself kept visible
+  whenever any sets exist even with zero owned Special-Release-year figures) — one card per
+  confirmed set, ordered by real-world release year ascending (`SPECIAL_RELEASE_SETS`,
+  undated/custom groupings sort last), a black header (name + live `owned/required`) that
+  expands to one row per slot (`JoeData.setSlots(setId)`): a tagged instance shows its own
+  retailer-exclusive accessory
   checklist (editable inline) or a MOC badge if sealed; an empty slot is a ghost "+ Add" row
   that opens the normal Add Figure flow for that member figure with the set pre-selected.
 - **Tagging a copy**: a "Part of set" field in Add Figure's DETAILS step (shown only when the
@@ -142,6 +145,167 @@ logging unless it's a genuine completionist unit (see above).
 - **Status:** ✅ seeded directly via `migrations/015_figure_sets.sql` (schema + this one
   entry, applied straight to the live DB rather than via the CLI since it was the first
   entry and the tooling didn't exist yet), verified via `/api/catalog`.
+
+### Undated — Rapid Deployment Force
+
+- **Members:** Fast Draw v1 (figure id 140) ×1, Repeater v2 (figure id 246) ×1, Shockwave v2
+  (figure id 250) ×1 — each with their own standard (retail-context) accessory loadout, no
+  swapped/exclusive gear.
+- **Source:** Owner's own custom completionist grouping, not a factory-sold multi-pack — the
+  three figures aren't a real retail 3-pack (Fast Draw is a 1987 Series 6 release, Repeater
+  v2/Shockwave v2 are 1989 Series 8; none share `sub_group_id` — confirmed none are Night
+  Force sub-team figures either). No year set for this reason.
+- **Reconstruction record:**
+  ```
+  node server/add-figure-set.mjs --name "Rapid Deployment Force" \
+    --description "Custom completionist grouping: Fast Draw v1, Repeater v2, Shockwave v2, each with their standard accessories." \
+    --members "140:1,246:1,250:1"
+  ```
+  ```sql
+  INSERT OR IGNORE INTO figure_sets (set_id, name, year, description) VALUES
+      (2, 'Rapid Deployment Force', NULL, 'Custom completionist grouping: Fast Draw v1, Repeater v2, Shockwave v2, each with their standard accessories.');
+  INSERT OR IGNORE INTO figure_set_members (set_id, figure_id, quantity_required) VALUES
+      (2, 140, 1), (2, 246, 1), (2, 250, 1);
+  ```
+- **Status:** ✅ added via `server/add-figure-set.mjs`, 2026-08-06. Appears as a Special
+  Release set card once the app tab is reloaded (catalog loads once per page load).
+
+### 1987 — Cobra-La
+
+- **Members:** Golobulus v1 (figure id 141) ×1, Nemesis Enforcer v1 (figure id 151) ×1,
+  Royal Guard v1 (figure id 157) ×1 — each with their own standard (retail-context)
+  accessory loadout, no swapped/exclusive gear.
+- **Source:** Owner's own physically-owned pack — retail 3-pack from the Cobra-La sub-line
+  (1987 Series 6, tied to *G.I. Joe: The Movie*).
+- **Reconstruction record:**
+  ```
+  node server/add-figure-set.mjs --name "Cobra-La" --year 1987 \
+    --description "Retail 3-pack from the Cobra-La sub-line (G.I. Joe: The Movie tie-in): Golobulus v1, Nemesis Enforcer v1, Royal Guard v1, each with their standard accessories." \
+    --members "141:1,151:1,157:1"
+  ```
+  ```sql
+  INSERT OR IGNORE INTO figure_sets (set_id, name, year, description) VALUES
+      (3, 'Cobra-La', 1987, 'Retail 3-pack from the Cobra-La sub-line (G.I. Joe: The Movie tie-in): Golobulus v1, Nemesis Enforcer v1, Royal Guard v1, each with their standard accessories.');
+  INSERT OR IGNORE INTO figure_set_members (set_id, figure_id, quantity_required) VALUES
+      (3, 141, 1), (3, 151, 1), (3, 157, 1);
+  ```
+- **Status:** ✅ added via `server/add-figure-set.mjs`, 2026-08-06; renamed from "Cobra-La
+  3-Pack" to "Cobra-La" 2026-08-06. Appears as a Special Release set card once the app tab
+  is reloaded (catalog loads once per page load).
+
+### 1987 — Sgt. Slaughter's Renegades
+
+- **Members:** Mercer v1 (figure id 150) ×1, Red Dog v1 (figure id 156) ×1, Taurus v1
+  (figure id 163) ×1 — each with their own standard (retail-context) accessory loadout, no
+  swapped/exclusive gear.
+- **Note:** Mercer has two catalog versions; v1 (1987 Series 6) was used since it matches
+  Red Dog v1/Taurus v1's release year, unlike Mercer v2 (1991 Series 10).
+- **Source:** Owner's own physically-owned pack.
+- **Reconstruction record:**
+  ```
+  node server/add-figure-set.mjs --name "Sgt. Slaughter's Renegades" --year 1987 \
+    --description "Retail 3-pack: Mercer v1, Red Dog v1, Taurus v1, each with their standard accessories." \
+    --members "150:1,156:1,163:1"
+  ```
+  ```sql
+  INSERT OR IGNORE INTO figure_sets (set_id, name, year, description) VALUES
+      (4, 'Sgt. Slaughter''s Renegades', 1987, 'Retail 3-pack: Mercer v1, Red Dog v1, Taurus v1, each with their standard accessories.');
+  INSERT OR IGNORE INTO figure_set_members (set_id, figure_id, quantity_required) VALUES
+      (4, 150, 1), (4, 156, 1), (4, 163, 1);
+  ```
+- **Status:** ✅ added via `server/add-figure-set.mjs`, 2026-08-06. Appears as a Special
+  Release set card once the app tab is reloaded (catalog loads once per page load).
+
+### 1985 — Crimson Guard Commanders
+
+- **Members:** Tomax v1 (figure id 92) ×1, Xamot v1 (figure id 95) ×1 — each with their own
+  standard (retail-context) accessory loadout, no swapped/exclusive gear.
+- **Source:** Owner's own physically-owned pack — retail 2-pack (1985 Series 4).
+- **Reconstruction record:**
+  ```
+  node server/add-figure-set.mjs --name "Crimson Guard Commanders" --year 1985 \
+    --description "Retail 2-pack: Tomax v1, Xamot v1, each with their standard accessories." \
+    --members "92:1,95:1"
+  ```
+  ```sql
+  INSERT OR IGNORE INTO figure_sets (set_id, name, year, description) VALUES
+      (5, 'Crimson Guard Commanders', 1985, 'Retail 2-pack: Tomax v1, Xamot v1, each with their standard accessories.');
+  INSERT OR IGNORE INTO figure_set_members (set_id, figure_id, quantity_required) VALUES
+      (5, 92, 1), (5, 95, 1);
+  ```
+- **Status:** ✅ added via `server/add-figure-set.mjs`, 2026-08-06. Appears as a Special
+  Release set card once the app tab is reloaded (catalog loads once per page load) —
+  2nd in display order, since Special Release set cards are now sorted by release year
+  (`SPECIAL_RELEASE_SETS` in `web/src/app-inventory.jsx`; undated sets like Rapid
+  Deployment Force sort last).
+
+### 1987 — Battle Force 2000: Avalanche & Blaster
+
+- **Members:** Avalanche v1 (figure id 128) ×1, Blaster v1 (figure id 131) ×1 — each with
+  their own standard (retail-context) accessory loadout, no swapped/exclusive gear.
+- **Source:** Owner's own physically-owned pack — retail 2-pack from the Battle Force 2000
+  sub-team (1987 Series 6).
+- **Reconstruction record:**
+  ```
+  node server/add-figure-set.mjs --name "Battle Force 2000: Avalanche & Blaster" --year 1987 \
+    --description "Retail 2-pack from the Battle Force 2000 sub-team: Avalanche v1, Blaster v1, each with their standard accessories." \
+    --members "128:1,131:1"
+  ```
+  ```sql
+  INSERT OR IGNORE INTO figure_sets (set_id, name, year, description) VALUES
+      (6, 'Battle Force 2000: Avalanche & Blaster', 1987, 'Retail 2-pack from the Battle Force 2000 sub-team: Avalanche v1, Blaster v1, each with their standard accessories.');
+  INSERT OR IGNORE INTO figure_set_members (set_id, figure_id, quantity_required) VALUES
+      (6, 128, 1), (6, 131, 1);
+  ```
+- **Status:** ✅ added via `server/add-figure-set.mjs`, 2026-08-06. Appears as a Special
+  Release set card once the app tab is reloaded (catalog loads once per page load).
+
+### 1987 — Battle Force 2000: Maverick & Blocker
+
+- **Members:** Maverick v1 (figure id 149) ×1, Blocker v1 (figure id 132) ×1 — each with
+  their own standard (retail-context) accessory loadout, no swapped/exclusive gear. Blocker's
+  Visor accessory is separately variant-scoped to letter B in `figure_accessories`
+  (`variant_id`, [[project_variant_scoped_accessories]]'s confirmed case) — unrelated to this
+  set grouping, noted for context only.
+- **Source:** Owner's own physically-owned pack — retail 2-pack from the Battle Force 2000
+  sub-team (1987 Series 6).
+- **Reconstruction record:**
+  ```
+  node server/add-figure-set.mjs --name "Battle Force 2000: Maverick & Blocker" --year 1987 \
+    --description "Retail 2-pack from the Battle Force 2000 sub-team: Maverick v1, Blocker v1, each with their standard accessories." \
+    --members "149:1,132:1"
+  ```
+  ```sql
+  INSERT OR IGNORE INTO figure_sets (set_id, name, year, description) VALUES
+      (7, 'Battle Force 2000: Maverick & Blocker', 1987, 'Retail 2-pack from the Battle Force 2000 sub-team: Maverick v1, Blocker v1, each with their standard accessories.');
+  INSERT OR IGNORE INTO figure_set_members (set_id, figure_id, quantity_required) VALUES
+      (7, 149, 1), (7, 132, 1);
+  ```
+- **Status:** ✅ added via `server/add-figure-set.mjs`, 2026-08-06. Appears as a Special
+  Release set card once the app tab is reloaded (catalog loads once per page load).
+
+### 1987 — Battle Force 2000: Knockdown & Dodger
+
+- **Members:** Knockdown v1 (figure id 147) ×1, Dodger v1 (figure id 138) ×1 — each with
+  their own standard (retail-context) accessory loadout, no swapped/exclusive gear. Dodger
+  has two catalog versions; v1 (1987 Series 6, Battle Force 2000 `sub_group_id`) was used
+  since Dodger v2 is an unrelated 1990 release with no sub-team tag.
+- **Source:** Owner's own physically-owned pack — retail 2-pack from the Battle Force 2000
+  sub-team (1987 Series 6).
+- **Reconstruction record:**
+  ```
+  node server/add-figure-set.mjs --name "Battle Force 2000: Knockdown & Dodger" --year 1987 \
+    --description "Retail 2-pack from the Battle Force 2000 sub-team: Knockdown v1, Dodger v1, each with their standard accessories." \
+    --members "147:1,138:1"
+  ```
+  ```sql
+  INSERT OR IGNORE INTO figure_sets (set_id, name, year, description) VALUES
+      (8, 'Battle Force 2000: Knockdown & Dodger', 1987, 'Retail 2-pack from the Battle Force 2000 sub-team: Knockdown v1, Dodger v1, each with their standard accessories.');
+  INSERT OR IGNORE INTO figure_set_members (set_id, figure_id, quantity_required) VALUES
+      (8, 147, 1), (8, 138, 1);
+  ```
+- **Status:** ✅ added via `server/add-figure-set.mjs`, 2026-08-06. Appears as a Special
+  Release set card once the app tab is reloaded (catalog loads once per page load).
 
 Future sets get appended here one at a time as the owner identifies/confirms them — this
 doc is explicitly not meant to be exhaustive at launch; dozens more are expected over time.

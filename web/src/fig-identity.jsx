@@ -47,12 +47,26 @@ export function VariantBracket({ variants, owned, lg }) {
 // code_name + version with a retail edition — see VARIANTS.md §7.5.2) look
 // identical to the retail row everywhere else in the identity stack, so this
 // is the one thing that distinguishes them on screen.
-export function EditionTag({ context, lg }) {
+//
+// Within 'convention', a second owner-confirmed split (migration 018)
+// further distinguishes a genuinely convention-only figure (conventionKind
+// 'figure', or unset/NULL — the default bucket for unreviewed rows) from a
+// retail figure re-released at a convention with different bundled
+// accessories only (conventionKind 'accessories') — the latter gets a
+// quieter sub-badge since it isn't a standalone new figure.
+export function EditionTag({ context, conventionKind, lg }) {
   if (!context || context === 'retail') return null;
-  const label = context === 'mail_in' ? 'MAIL-IN' : context === 'mail_order' ? 'MAIL-ORDER' : context.toUpperCase();
+  const quiet = context === 'convention' && conventionKind === 'accessories';
+  const label = context === 'mail_in' ? 'MAIL-IN'
+    : context === 'mail_order' ? 'MAIL-ORDER'
+    : quiet ? 'CONV. ACCESSORIES'
+    : context.toUpperCase();
+  const title = quiet
+    ? "Convention release — same figure as retail, bundled with different/exclusive accessories"
+    : "Release edition — " + label.toLowerCase() + ", not the standard retail release";
   return (
-    <em className={"idedition" + (lg ? " idedition--lg" : "")}
-        title={"Release edition — " + label.toLowerCase() + ", not the standard retail release"}>
+    <em className={"idedition" + (quiet ? " idedition--quiet" : "") + (lg ? " idedition--lg" : "")}
+        title={title}>
       {label}
     </em>
   );

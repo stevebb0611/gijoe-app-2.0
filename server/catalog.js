@@ -14,7 +14,7 @@ const FACTION_CODE = {
 const figuresStmt = db.prepare(`
   SELECT f.id, f.code_name, f.version, f.full_name, f.specialty, f.variant_lookup AS single_tell,
          f.is_vehicle_driver, f.vehicle,
-         f.is_mail_in, f.mail_in_notes, f.notes, f.release_context,
+         f.is_mail_in, f.mail_in_notes, f.notes, f.release_context, f.convention_kind,
          f.image_url_primary, f.master_target, f.master_notes,
          fac.name AS faction_name,
          COALESCE(s.year, f.year_released) AS year
@@ -112,6 +112,7 @@ export function buildCatalog() {
     notes: f.notes || null,
     image: f.image_url_primary || null,
     releaseContext: f.release_context || 'retail',
+    conventionKind: f.convention_kind || null,
     masterTarget: f.master_target,
     masterNotes: f.master_notes || '',
     // Every figure has at least one variants[] entry — single-variant figures

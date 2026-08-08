@@ -93,6 +93,12 @@ CREATE TABLE IF NOT EXISTS figures (
     year_discontinued INTEGER,
     release_context   TEXT    NOT NULL DEFAULT 'retail'
                       CHECK(release_context IN ('retail', 'convention', 'mail_in', 'mail_order')),
+    convention_kind   TEXT
+                      CHECK(convention_kind IN ('figure', 'accessories')),
+                      -- Sub-classification when release_context='convention' (migration 018):
+                      -- 'figure' = genuinely new to the lineup, convention-only (default when
+                      -- NULL); 'accessories' = a retail figure re-released at a convention with
+                      -- different bundled gear only. Manually tagged, not derived.
     is_mail_in        BOOLEAN DEFAULT 0,
     mail_in_notes     TEXT,
     is_vehicle_driver BOOLEAN DEFAULT 0,
@@ -457,6 +463,7 @@ CREATE INDEX IF NOT EXISTS idx_figures_sub_group        ON figures(sub_group_id)
 CREATE INDEX IF NOT EXISTS idx_figures_series           ON figures(series_id);
 CREATE INDEX IF NOT EXISTS idx_figures_code             ON figures(figure_id);
 CREATE INDEX IF NOT EXISTS idx_figures_release_context  ON figures(release_context);
+CREATE INDEX IF NOT EXISTS idx_figures_convention_kind  ON figures(convention_kind);
 CREATE INDEX IF NOT EXISTS idx_acc_category             ON accessories(category_id);
 CREATE INDEX IF NOT EXISTS idx_acc_release_context      ON accessories(release_context);
 CREATE INDEX IF NOT EXISTS idx_fa_accessory             ON figure_accessories(accessory_id);

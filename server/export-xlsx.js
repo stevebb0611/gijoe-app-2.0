@@ -115,6 +115,7 @@ function buildFiguresSheet(wb, catalog, instancesByFigure) {
     });
 
     let context = RELEASE_CONTEXT_LABEL[fig.releaseContext] || fig.releaseContext;
+    if (fig.releaseContext === 'convention' && fig.conventionKind === 'accessories') context = 'Convention (accessories)';
     if (fig.mailIn) context += fig.mailInNotes ? ` — ${fig.mailInNotes}` : ' (mail-in)';
 
     const row = ws.addRow({

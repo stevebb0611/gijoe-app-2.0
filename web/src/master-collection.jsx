@@ -100,7 +100,7 @@ function MasterCollectionView({ onNavigate, onAddInstance }) {
   const renderCard = ({ fig, starred, starredLetters, targets }, showYear) => (
     <div className="mc-card" key={fig.id}>
       <div className="mc-card__hd">
-        <span className="mc-card__name"><b>{fig.name}</b><VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} /><SetTag sets={fig.sets} /><VariantBracket variants={fig._cf.variants} owned={starredLetters} /></span>
+        <span className="mc-card__name"><b>{fig.name}</b><VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} conventionKind={fig.conventionKind} /><SetTag sets={fig.sets} /><VariantBracket variants={fig._cf.variants} owned={starredLetters} /></span>
         <FactionTag faction={fig.faction} mini />
         {showYear && <span className="mc-card__year">{formatYear(fig.year)}</span>}
         {targets.length > 0 && (
