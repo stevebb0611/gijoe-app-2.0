@@ -136,7 +136,10 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const marksCount = phys.zones + paint.zones;
   const clean = !!dmg.clean;
   const ungraded = marksCount === 0 && !clean;
-  const canNext = step === 0 ? (!!fig && (single || selVar !== null)) : true;
+  // Preset ("add a copy") mode locks step 0 (FIND) out entirely, so a multi-variant
+  // figure's only chance to pick a variant is the picker relocated into step 1 below —
+  // gate advancing on it the same way step 0 gates non-preset figures.
+  const canNext = (step === 0 || (preset && step === 1)) ? (!!fig && (single || selVar !== null)) : true;
 
   const commit = () => {
     if (!fig) return;
@@ -242,6 +245,22 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                   <VehicleTag vehicle={fig.vehicle} />
                 </div>
               </div>
+
+              {preset && multi && (
+                <div className="af-block">
+                  <p className="af-seclab"><b>Figure variant</b></p>
+                  <div className="af-varpick">
+                    {fig.variants.map(v => (
+                      <button key={v.letter} className={"af-var" + (selVar === v.letter ? " is-sel" : "")} onClick={() => setSelVar(v.letter)}>
+                        <span className="af-var__radio"></span>
+                        <span className="af-var__lab">v{fig.ver} · {v.letter || "—"}</span>
+                        <span className="af-var__tell">{v.tell || "no distinguishing notes"}</span>
+                        <span className="af-var__own">{JoeData.ownedCount(fig.id, v.letter) === 0 ? "not owned" : "×" + JoeData.ownedCount(fig.id, v.letter)}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="af-block af-block--last">
                 <label className={"inv-moc" + (moc ? " is-on" : "")}>
