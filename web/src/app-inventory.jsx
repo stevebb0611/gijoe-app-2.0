@@ -13,7 +13,7 @@ import {
   FactionTag, CompRing, CompBar, PhotoSlot, StockBar, MasterBadge,
   InvDetailModal,
 } from './app-detail.jsx';
-import { VersionChip, VariantBadge, VariantBracket, VehicleTag, EditionTag, SetTag } from './fig-identity.jsx';
+import { VersionChip, VariantBadge, VariantBracket, VehicleTag, EditionTag, SetTag, SubGroupTag } from './fig-identity.jsx';
 import { formatYear, SPECIAL_RELEASE_YEAR } from './fig-identity.js';
 
 function useStore() {
@@ -55,7 +55,7 @@ function Row({ fig, selId, openIds, onToggle, onOpen }) {
               onClick={() => ghost ? onOpen(fig.id, null) : onToggle(fig.id)}>
         <span className="inv-thumb" data-tag={ghost ? "—" : ""}></span>
         <span className="inv-name">
-          <b>{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} conventionKind={fig.conventionKind} /><SetTag sets={fig.sets} /><VariantBracket variants={fig._cf.variants} owned={ownedLetters} /><VehicleTag vehicle={fig.vehicle} inline /></b>
+          <b>{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} conventionKind={fig.conventionKind} /><SetTag sets={fig.sets} /><SubGroupTag subGroup={fig.subGroup} /><VariantBracket variants={fig._cf.variants} owned={ownedLetters} /><VehicleTag vehicle={fig.vehicle} inline /></b>
           <i>{fig.specialty}</i>
         </span>
         <FactionTag faction={fig.faction} mini />
@@ -123,7 +123,7 @@ function GalleryCard({ fig, onOpen }) {
     <button className={"card inv-card" + (ghost ? " is-ghostcard" : "")} onClick={() => ghost ? onOpen(fig.id, null) : onOpen(fig.id, copies[0].id)}>
       <div className="card__corner"><FactionTag faction={fig.faction} mini /></div>
       <PhotoSlot className="card__photo" src={fig.image} />
-      <div className="card__name">{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} conventionKind={fig.conventionKind} /><SetTag sets={fig.sets} /><VariantBracket variants={fig._cf.variants} owned={ownedLetters} /></div>
+      <div className="card__name">{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} conventionKind={fig.conventionKind} /><SetTag sets={fig.sets} /><SubGroupTag subGroup={fig.subGroup} /><VariantBracket variants={fig._cf.variants} owned={ownedLetters} /></div>
       <div className="card__var">{fig.specialty}</div>
       {!ghost && multi && st.moves.length > 0 && <div className="card__rebal">Rebalance</div>}
       <div className="card__foot">
@@ -193,6 +193,11 @@ const FILTER_GROUPS = [
 ];
 const FAC_LABELS = { JOE: 'G.I. Joe', COBRA: 'Cobra', OKTOBER: 'Oktober Guard', DREADNOK: 'Dreadnoks' };
 const FACTION_OPTS = [...new Set(INV_CAT.map(f => f.faction))].map(k => ({ key: k, label: FAC_LABELS[k] || k }));
+// Derived from the data (TAXONOMY.md's "Sub-team" — sub_group_id, ~31% of
+// figures) so it only ever offers sub-teams that actually have a tagged
+// figure — several lookup rows (Crimson Guard, Iron Grenadiers, …) aren't
+// assigned to any figure yet and correctly never appear here.
+const SUBGROUP_OPTS = [...new Set(INV_CAT.map(f => f.subGroup).filter(Boolean))].sort();
 const STATUS_LABEL = { complete: 'Complete', incomplete: 'Incomplete', dupes: 'Duplicates', gaps: 'Collection gaps' };
 const COMPLETE_OPTS = [
   { key: 'complete', label: 'Complete' }, { key: 'oneaway', label: '1 part away' },
@@ -273,6 +278,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
   const [yrAsc, setYrAsc] = React.useState(true);
   const [showMore, setShowMore] = React.useState(false);
   const [facFactions, setFacFactions] = React.useState(() => new Set());
+  const [facSubGroups, setFacSubGroups] = React.useState(() => new Set());
   const [facComplete, setFacComplete] = React.useState(() => new Set());
   const [facDupes, setFacDupes] = React.useState(() => new Set());
   const [facYrMin, setFacYrMin] = React.useState(YR_MIN);
@@ -291,7 +297,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
   const empty = t.instances === 0;
   const q = query.trim().toLowerCase();
   const yrNarrowed = facYrMin > YR_MIN || facYrMax < YR_MAX;
-  const facetCount = facFactions.size + facComplete.size + facDupes.size + (yrNarrowed ? 1 : 0);
+  const facetCount = facFactions.size + facSubGroups.size + facComplete.size + facDupes.size + (yrNarrowed ? 1 : 0);
   const filtering = !!q || status !== 'all' || facetCount > 0;
 
   const toggleYear = (y) => setOpen(s => { const n = new Set(s); n.has(y) ? n.delete(y) : n.add(y); return n; });
@@ -299,9 +305,9 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
   const openFig = (catalogId, instId) => setSel({ catalogId, instId });
   const setChip = (k) => setStatus(cur => cur === k ? 'all' : k);
   const toggleSet = (setter) => (key) => setter(s => { const n = new Set(s); n.has(key) ? n.delete(key) : n.add(key); return n; });
-  const clearFacets = () => { setStatus('all'); setFacFactions(new Set()); setFacComplete(new Set()); setFacDupes(new Set()); setFacYrMin(YR_MIN); setFacYrMax(YR_MAX); };
+  const clearFacets = () => { setStatus('all'); setFacFactions(new Set()); setFacSubGroups(new Set()); setFacComplete(new Set()); setFacDupes(new Set()); setFacYrMin(YR_MIN); setFacYrMax(YR_MAX); };
 
-  const matchQ = (fig) => !q || [fig.name, fig.variant, fig.specialty, fig.version, fig.faction, formatYear(fig.year)].some(s => s && s.toLowerCase().includes(q)) || fig.acc.some(a => a[0].toLowerCase().includes(q));
+  const matchQ = (fig) => !q || [fig.name, fig.variant, fig.specialty, fig.version, fig.faction, fig.subGroup, formatYear(fig.year)].some(s => s && s.toLowerCase().includes(q)) || fig.acc.some(a => a[0].toLowerCase().includes(q));
   const passStatus = (fig) => {
     if (status === 'gaps') return isGap(fig);
     if (status === 'dupes') return fig.owned > 1;
@@ -313,6 +319,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
   };
   const passFacets = (fig) => {
     if (facFactions.size && !facFactions.has(fig.faction)) return false;
+    if (facSubGroups.size && !facSubGroups.has(fig.subGroup)) return false;
     if (yrNarrowed && (fig.year < facYrMin || fig.year > facYrMax)) return false;
     if (facComplete.size) { const b = compBand(fig); if (!b || !facComplete.has(b)) return false; }
     if (facDupes.size) {
@@ -340,6 +347,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
   const tokens = [];
   if (status !== 'all') tokens.push({ cat: 'Status', label: STATUS_LABEL[status], onClear: () => setStatus('all') });
   facFactions.forEach(k => tokens.push({ cat: 'Faction', label: FAC_LABELS[k] || k, onClear: () => toggleSet(setFacFactions)(k) }));
+  facSubGroups.forEach(k => tokens.push({ cat: 'Sub-Team', label: k, onClear: () => toggleSet(setFacSubGroups)(k) }));
   facComplete.forEach(k => tokens.push({ cat: 'Completeness', label: COMPLETE_LABEL[k], onClear: () => toggleSet(setFacComplete)(k) }));
   facDupes.forEach(k => tokens.push({ cat: 'Copies', label: DUPE_LABEL[k], onClear: () => toggleSet(setFacDupes)(k) }));
   if (yrNarrowed) tokens.push({ cat: 'Years', label: facYrMin + '–' + facYrMax, onClear: () => { setFacYrMin(YR_MIN); setFacYrMax(YR_MAX); } });
@@ -428,6 +436,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
             {showMore && (
               <div className="invp-facets">
                 <FacetRow label="FACTION" options={FACTION_OPTS} selected={facFactions} onToggle={toggleSet(setFacFactions)} facColors />
+                <FacetRow label="SUB-TEAM" sub="optional" options={SUBGROUP_OPTS} selected={facSubGroups} onToggle={toggleSet(setFacSubGroups)} />
                 <FacetRow label="COMPLETENESS" options={COMPLETE_OPTS} selected={facComplete} onToggle={toggleSet(setFacComplete)} />
                 <FacetRow label="COPIES OWNED" options={DUPE_OPTS} selected={facDupes} onToggle={toggleSet(setFacDupes)} />
                 <div className="facet">

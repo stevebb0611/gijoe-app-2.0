@@ -7,7 +7,7 @@ import { clusterBlueprint, matchedSetSatisfied, bpReq, bpForVariant } from '../.
 import { physicalGrade, paintGrade, dmEmpty, DamageMap, GradeBadge } from './damage-map.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
-import { VersionChip, VariantBadge, VariantBracket, VehicleTag, EditionTag, SetTag } from './fig-identity.jsx';
+import { VersionChip, VariantBadge, VariantBracket, VehicleTag, EditionTag, SetTag, SubGroupTag } from './fig-identity.jsx';
 import { formatYear } from './fig-identity.js';
 import { FileCardRow, FileCardTell } from './filecards.jsx';
 
@@ -28,7 +28,7 @@ function fvm(cf) {
   // acc = [name, required, owned-capped-at-required] (the best achievable copy)
   const acc = bp.map(([n, q]) => [n, q, Math.min(agg[n] || 0, q)]);
   return {
-    id: cf.id, name: cf.name, year: cf.year, faction: cf.faction,
+    id: cf.id, name: cf.name, year: cf.year, faction: cf.faction, subGroup: cf.subGroup || null,
     version: cf.ver ? 'v' + cf.ver : '',
     fullName: cf.fullName || null,
     variants: (cf.variants || []).length,
@@ -536,9 +536,13 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const swapForClean = (name) => JoeStore.swapAccessoryForClean(cur.id, name);
   // Other copies this row's accessory could move to — null when there's only
   // one owned copy (feature not applicable), else filtered to same-variant
-  // copies for variant-scoped rows (see ACCESSORY_GROUPS.md "variant_id").
+  // copies for variant-scoped rows (see ACCESSORY_GROUPS.md "variant_id") AND
+  // to copies that don't already hold their full blueprint quantity of this
+  // accessory — a copy already at req (e.g. 1/1) isn't a legal destination,
+  // or moving a unit onto it would silently over-fill it (2/1) while the
+  // source goes short. Mirrored server-side in moveInstanceAccessory.
   const moveTargetsFor = (a) => copies.length > 1
-    ? copies.filter((c) => c.id !== cur.id && (!a[7] || a[7] === c.variant)).map((c) => ({ id: c.id, no: c.no }))
+    ? copies.filter((c) => c.id !== cur.id && (!a[7] || a[7] === c.variant) && ((c.acc && c.acc[a[0]]) || 0) < a[1]).map((c) => ({ id: c.id, no: c.no }))
     : null;
   const moveUnit = (name, destId, qty) => JoeStore.moveAcc(cur.id, destId, name, qty);
   const setMoc = (v) => JoeStore.updateInstance(cur.id, { moc: v });
@@ -609,7 +613,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
               <PhotoSlot className="inv-modal__photo" src={fig.image} />
               <FactionTag faction={fig.faction} />
               <div className="inv-modal__id">
-                <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /><EditionTag context={fig.releaseContext} conventionKind={fig.conventionKind} lg /><SetTag sets={fig.sets} lg /></div>
+                <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /><EditionTag context={fig.releaseContext} conventionKind={fig.conventionKind} lg /><SetTag sets={fig.sets} lg /><SubGroupTag subGroup={fig.subGroup} lg /></div>
                 {fig.fullName && <div className="inv-modal__full">{fig.fullName}</div>}
                 <div className="inv-modal__var">{fig.specialty} · {formatYear(fig.year)}</div>
                 {fig.variants > 1 ? <div className="inv-modal__variants"><VariantBracket variants={cf.variants} owned={new Set()} lg /></div> : null}
@@ -730,7 +734,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                 <FactionTag faction={fig.faction} />
                 <div className="inv-modal__id">
                   <div className="inv-modal__name">
-                    {fig.name}<VersionChip version={fig.version} lg /><EditionTag context={fig.releaseContext} conventionKind={fig.conventionKind} lg /><SetTag sets={fig.sets} lg />
+                    {fig.name}<VersionChip version={fig.version} lg /><EditionTag context={fig.releaseContext} conventionKind={fig.conventionKind} lg /><SetTag sets={fig.sets} lg /><SubGroupTag subGroup={fig.subGroup} lg />
                     {(cur.variant || fig.variants > 1) ? (
                       <VariantBadge letter={cur.variant} count={fig.variants} lg
                                     onClick={fig.variants > 1 ? () => setVarEdit(v => !v) : undefined}

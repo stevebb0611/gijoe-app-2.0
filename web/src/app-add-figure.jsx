@@ -80,9 +80,12 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   // catalog order (AF_CATALOG/figures.id) has no relation to browsing order, and
   // that's most visible in the Special Release filter, which otherwise pools every
   // convention/mail-in figure across all real years in arbitrary id order.
+  // Same-name ties (any figure with 2+ catalog rows — v1/v2/v3, convention re-runs,
+  // etc.; ~120 code names have this) fall back to year (SPECIAL_RELEASE_YEAR=9999
+  // already sorts convention/mail-in last) then ver, instead of arbitrary catalog id.
   const allResults = AF_CATALOG.filter(f => (!yearF || f.year === +yearF) && (!q || [f.name, f.role, formatYear(f.year), f.faction]
     .concat(f.variants.map(v => v.tell)).some(s => s && s.toLowerCase().includes(q))))
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort((a, b) => a.name.localeCompare(b.name) || a.year - b.year || (parseFloat(a.ver) || 0) - (parseFloat(b.ver) || 0));
   const hasFilter = !!q || !!yearF;
   const results = !hasFilter ? [] : yearF ? allResults : allResults.slice(0, 60);
 

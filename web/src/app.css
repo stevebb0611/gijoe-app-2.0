@@ -321,6 +321,11 @@
   .idvarbr--lg .idvarbr__l { min-width: 17px; font-size: 11px; padding: 2px 6px; }
   .idvarbr__l:last-child { border-right: none; }
   .idvarbr__l.is-owned { color: var(--paper); background: var(--ink); }
+  /* sub-team tag (TAXONOMY.md) — sparse/optional (~31% of figures), so a
+     quieter dashed-outline mono chip rather than a bold accent pill; 23
+     possible values rules out a per-team color scheme like Faction's. */
+  .idsubteam { font-style: normal; display: inline-flex; align-items: center; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .3px; color: var(--ink-soft); border: 1.5px dashed var(--ink-soft); padding: 1px 6px; margin-left: 8px; vertical-align: 1px; }
+  .idsubteam--lg { font-size: 11px; padding: 2px 7px; margin-left: 9px; vertical-align: 2px; }
   .idfull { display: block; font-style: normal; font-family: var(--font-display); font-weight: 500; font-size: 11px; color: var(--ink-soft); line-height: 1.15; margin-top: 2px; }
   .idveh { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .3px; color: var(--ink); background: var(--paper); border: 1.5px solid var(--ink); padding: 2px 7px; box-shadow: 1.5px 1.5px 0 var(--line-soft); }
   span.idveh b { font-family: var(--font-display); font-weight: 700; font-size: 8px; letter-spacing: .6px; color: var(--ink-soft); }
@@ -510,10 +515,10 @@
   .inv-flipback:hover { background: rgba(255,255,255,.1); }
   .inv-cardback__title { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: .5px; display: flex; align-items: baseline; gap: 10px; }
   .inv-cardback__title em { font-style: normal; font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; opacity: .6; }
-  .inv-cardback__body { flex: 1; min-height: 0; display: grid; grid-template-columns: 296px 1fr; }
-  .inv-cardback__map { padding: 16px 14px; border-right: 2px solid var(--ink); display: flex; min-height: 0; overflow: hidden; }
-  .inv-cardback__map .dm { width: 100%; height: 100%; }
-  .inv-cardback__map .dm-stage { height: auto; flex: 1 1 auto; min-height: 0; }
+  .inv-cardback__body { flex: 1; min-height: 0; display: grid; grid-template-columns: 330px 1fr; }
+  .inv-cardback__map { padding: 16px 14px; border-right: 2px solid var(--ink); display: flex; min-height: 0; overflow-y: auto; overflow-x: hidden; }
+  .inv-cardback__map .dmx { width: 100%; }
+  .inv-cardback__map .dmx__stage { flex: 0 0 auto; width: 85%; margin: 0 auto; }
   .inv-cardback__side { padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
 
   /* ===== modal ===== */
@@ -1118,6 +1123,7 @@
   .pb-accopt.is-sel { border: 2px solid var(--accent); background: var(--paper); }
   .pb-accopt__radio { width: 14px; height: 14px; border: 1.5px solid var(--ink); border-radius: 50%; flex: none; }
   .pb-accopt.is-sel .pb-accopt__radio { background: var(--accent); box-shadow: inset 0 0 0 2.5px var(--paper); border-color: var(--accent); }
+  .pb-accopt__namewrap { display: flex; align-items: center; gap: 6px; min-width: 0; }
   .pb-accopt__n { font-family: var(--font-display); font-weight: 600; font-size: 13px; }
   .pb-accopt__cat { font-family: var(--font-mono); font-size: 9px; letter-spacing: .5px; color: var(--ink-soft); }
 

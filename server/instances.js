@@ -375,7 +375,7 @@ export const swapAccessoryForClean = db.transaction((instanceId, name) => {
 });
 
 const getInstanceFigureAndVariant = db.prepare('SELECT figure_id, variant_id FROM instances WHERE id = ?');
-const getFigureAccessoryVariant = db.prepare('SELECT variant_id FROM figure_accessories WHERE figure_id = ? AND accessory_id = ?');
+const getFigureAccessoryVariant = db.prepare('SELECT variant_id, quantity_required FROM figure_accessories WHERE figure_id = ? AND accessory_id = ?');
 
 // Moves `count` units of an accessory from one owned copy to another (e.g.
 // give spare missiles from a beat-up copy to a mint one the owner wants
@@ -384,10 +384,12 @@ const getFigureAccessoryVariant = db.prepare('SELECT variant_id FROM figure_acce
 // condition. Prefers moving clean units first; only reaches into damaged
 // stock — carrying the damaged flag + notes over — once the source's clean
 // units run out. Rejects moves across different figures, moves for more
-// units than the source owns, or onto a copy of the wrong production
-// variant for a variant-scoped accessory (see ACCESSORY_GROUPS.md
-// "variant_id") — mirrors the bpForVariant() filter the UI already applies
-// so an illegal destination can never be picked, not just hidden.
+// units than the source owns, onto a copy of the wrong production variant
+// for a variant-scoped accessory (see ACCESSORY_GROUPS.md "variant_id"), or
+// onto a destination that already holds its full blueprint quantity for this
+// accessory — the UI's moveTargetsFor() already hides a full destination as
+// a target, this is the belt-and-suspenders check so the API can't be used
+// to silently over-fill one copy (e.g. 2/1) while starving another (0/1).
 export const moveInstanceAccessory = db.transaction((fromInstanceId, toInstanceId, name, count = 1) => {
   if (!(count >= 1)) return false;
   const from = getInstanceFigureAndVariant.get(fromInstanceId);
@@ -397,11 +399,15 @@ export const moveInstanceAccessory = db.transaction((fromInstanceId, toInstanceI
   const accId = accessoryIdForName(from.figure_id, name);
   if (!accId) return false;
 
-  const scopedVariant = getFigureAccessoryVariant.get(from.figure_id, accId);
-  if (scopedVariant && scopedVariant.variant_id != null && scopedVariant.variant_id !== to.variant_id) return false;
+  const scoped = getFigureAccessoryVariant.get(from.figure_id, accId);
+  if (scoped && scoped.variant_id != null && scoped.variant_id !== to.variant_id) return false;
 
   const src = db.prepare('SELECT units_owned, units_damaged, damage_notes FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(fromInstanceId, accId);
   if (!src || src.units_owned < count) return false;
+
+  const req = (scoped && scoped.quantity_required) || 1;
+  const dstBefore = db.prepare('SELECT units_owned FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(toInstanceId, accId);
+  if (((dstBefore && dstBefore.units_owned) || 0) + count > req) return false;
   const clean = src.units_owned - src.units_damaged;
   const movingDamaged = Math.max(0, count - clean);
 

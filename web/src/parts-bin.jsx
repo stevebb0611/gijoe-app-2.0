@@ -78,8 +78,8 @@ const FILTERS = [
   { key: 'single', label: 'Single-use' },
 ];
 const GROUPBYS = [
-  { key: 'group',  label: 'CATEGORY' },
   { key: 'home',   label: 'FIGURE' },
+  { key: 'group',  label: 'CATEGORY' },
   { key: 'status', label: 'STATUS' },
 ];
 
@@ -213,14 +213,17 @@ function AddPartModal({ onClose }) {
                 {bp.length === 0
                   ? <div className="fld__note">No accessories on file for this figure.</div>
                   : <div className="pb-acclist">
-                      {bp.map(([name, qreq, accessoryId]) => {
+                      {bp.map(([name, qreq, accessoryId, , , , color]) => {
                         const meta = JoeData.ACC_BY_ID.get(accessoryId);
                         const on = !!sel[name];
                         return (
                           <div key={name} className={"pb-accopt" + (on ? " is-sel" : "")}>
                             <button type="button" className="pb-accopt__hit" onClick={() => toggleAcc(name)}>
                               <span className="pb-accopt__radio"></span>
-                              <span className="pb-accopt__n">{name}{qreq > 1 ? " ×" + qreq : ""}</span>
+                              <span className="pb-accopt__namewrap">
+                                {color && <AccSwatch color={color} />}
+                                <span className="pb-accopt__n">{name}{qreq > 1 ? " ×" + qreq : ""}</span>
+                              </span>
                               <span className="pb-accopt__cat">{(meta && meta.categoryLabel) || "—"}</span>
                             </button>
                             {on && (
@@ -370,7 +373,7 @@ function PartsBin({ onNavigate }) {
   const store = useStore();
   const [query, setQuery] = React.useState('');
   const [filter, setFilter] = React.useState('all');
-  const [groupBy, setGroupBy] = React.useState('group');
+  const [groupBy, setGroupBy] = React.useState('home');
   const [openId, setOpenId] = React.useState(null);
   const [collapsed, setCollapsed] = React.useState(() => new Set());
   const [addOpen, setAddOpen] = React.useState(false);

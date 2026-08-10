@@ -17,9 +17,11 @@ const figuresStmt = db.prepare(`
          f.is_mail_in, f.mail_in_notes, f.notes, f.release_context, f.convention_kind,
          f.image_url_primary, f.master_target, f.master_notes,
          fac.name AS faction_name,
+         sg.name AS sub_group_name,
          COALESCE(s.year, f.year_released) AS year
   FROM figures f
   LEFT JOIN factions fac ON fac.faction_id = f.faction_id
+  LEFT JOIN sub_groups sg ON sg.sub_group_id = f.sub_group_id
   LEFT JOIN series s ON s.series_id = f.series_id
   ORDER BY f.id
 `);
@@ -105,6 +107,7 @@ export function buildCatalog() {
     fullName: f.full_name || null,
     year: f.year,
     faction: FACTION_CODE[f.faction_name] || f.faction_name,
+    subGroup: f.sub_group_name || null,
     role: f.specialty,
     vehicle: f.is_vehicle_driver && f.vehicle ? f.vehicle : null,
     mailIn: !!f.is_mail_in,

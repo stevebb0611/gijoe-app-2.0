@@ -119,7 +119,7 @@ checked. Two rows have a more specific sub-channel hint worth checking first.
 | Big Ben | v2 | F477 | 384 | Mail order | 13 | unconfirmed — mail_in (default) |
 | Budo | v2 | F482 | 389 | Mail order | 13 | unconfirmed — mail_in (default) |
 | Cobra Commander | v2 | F090 | 52 | Mail order | 4 | unconfirmed — mail_in (default) |
-| Dee-Jay | v2 | F496 | 402 | Mail order | 13 | unconfirmed — mail_in (default) |
+| Dee-Jay | v2 | F496 | 402 | Mail order | 13 | confirmed mail_in — Arctic Commandos 1993 set, see `FIGURE_SETS.md` |
 | Deep Six | v4 | F497 | 403 | Mail order | 13 | unconfirmed — mail_in (default) |
 | Duke | v1 A | F057 | 27 | Mail order | 3 | unconfirmed — mail_in (default) |
 | G.I. Joe | v1 | F598 | 498 | Mail order | 14 | unconfirmed — mail_in (default) |
@@ -132,11 +132,11 @@ checked. Two rows have a more specific sub-channel hint worth checking first.
 | Rampage | v1 | F320 | 244 | Mail order | 9 | unconfirmed — mail_in (default) |
 | Sgt. Slaughter | v1 A | F171 | 118 | Mail order | 6 | unconfirmed — mail_in (default) |
 | Spirit | v4 | F569 | 469 | Mail order | 13 | unconfirmed — mail_in (default) |
-| Stalker | v4 | F570 | 470 | Mail order | 13 | unconfirmed — mail_in (default) |
+| Stalker | v4 | F570 | 470 | Mail order | 13 | confirmed mail_in — Arctic Commandos 1993 set, see `FIGURE_SETS.md` |
 | Starduster | v1 A | F138 | 90 | Mail order | 5 | unconfirmed — mail_in (default) |
 | Steel Brigade | v1 A | F224 | 162 | Mail order | 7 | unconfirmed — mail_in (default) |
 | Steel Brigade | v2 | F455 | 364 | Mail order | 12 | unconfirmed — mail_in (default) |
-| Sub-Zero | v2 | F571 | 471 | Mail order | 13 | unconfirmed — mail_in (default) |
+| Sub-Zero | v2 | F571 | 471 | Mail order | 13 | confirmed mail_in — Arctic Commandos 1993 set, see `FIGURE_SETS.md` |
 | Super Trooper | v1 | F281 | 207 | Mail order | 8 | unconfirmed — mail_in (default) |
 | The Fridge | v1 A | F227 | 165 | Mail order | 7 | unconfirmed — mail_in (default) |
 

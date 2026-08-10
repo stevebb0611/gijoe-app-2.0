@@ -88,6 +88,19 @@ export function SetTag({ sets, lg }) {
   );
 }
 
+// Sub-team tag (TAXONOMY.md "Sub-team" — sub_group_id, ~31% of figures).
+// Sparse and optional by design, so styled as a quieter mono outline rather
+// than a bold accent pill like EditionTag/SetTag — it's a bonus classification,
+// not core identity. 23 possible values means no per-team color scheme.
+export function SubGroupTag({ subGroup, lg }) {
+  if (!subGroup) return null;
+  return (
+    <em className={"idsubteam" + (lg ? " idsubteam--lg" : "")} title={subGroup + " — sub-team"}>
+      {subGroup.toUpperCase()}
+    </em>
+  );
+}
+
 export function VehicleTag({ vehicle, modal, inline }) {
   if (!vehicle) return null;
   return (

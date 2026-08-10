@@ -307,5 +307,36 @@ logging unless it's a genuine completionist unit (see above).
 - **Status:** ✅ added via `server/add-figure-set.mjs`, 2026-08-06. Appears as a Special
   Release set card once the app tab is reloaded (catalog loads once per page load).
 
+### 1993 — Arctic Commandos
+
+- **Members:** Dee-Jay v2 (figure id 402) ×1, Snow Serpent v3 (figure id 466) ×1, Stalker v4
+  (figure id 470) ×1, Sub-Zero v2 (figure id 471) ×1 — each with their own standard
+  accessory loadout, no swapped/exclusive gear.
+- **Source:** Owner-confirmed 2026-08-09 as a real 1993 mail-in offer, not a factory retail
+  pack. Corroborated by `MAIL_RELEASES.md`, which already independently records Snow Serpent
+  v3's real nickname as "Arctic Commando Snow Serpent" and lists Dee-Jay v2/Stalker v4/
+  Sub-Zero v2 in its mail-in audit backlog — all four are the same real-world promotion.
+- **Note:** unlike this doc's other confirmed sets, the four members don't share a
+  `release_context` — Dee-Jay v2/Stalker v4/Sub-Zero v2 are `mail_in`, Snow Serpent v3 was
+  previously reclassified to `mail_order` (owner's own copy, catalog purchase rather than a
+  clip-and-send premium — see `MAIL_RELEASES.md`). Left as-is here; worth a follow-up with
+  the owner if that mail_in/mail_order split across one confirmed set turns out to be wrong
+  rather than a real quirk of how the offer was fulfilled.
+- **Reconstruction record:**
+  ```
+  node server/add-figure-set.mjs --name "Arctic Commandos" --year 1993 \
+    --description "1993 mail-in offer: Dee-Jay v2, Snow Serpent v3 (\"Arctic Commando Snow Serpent\"), Stalker v4, Sub-Zero v2, each with their standard accessories. See MAIL_RELEASES.md." \
+    --members "402:1,466:1,470:1,471:1"
+  ```
+  ```sql
+  INSERT OR IGNORE INTO figure_sets (set_id, name, year, description) VALUES
+      (9, 'Arctic Commandos', 1993, '1993 mail-in offer: Dee-Jay v2, Snow Serpent v3 ("Arctic Commando Snow Serpent"), Stalker v4, Sub-Zero v2, each with their standard accessories. See MAIL_RELEASES.md.');
+  INSERT OR IGNORE INTO figure_set_members (set_id, figure_id, quantity_required) VALUES
+      (9, 402, 1), (9, 466, 1), (9, 470, 1), (9, 471, 1);
+  ```
+- **Status:** ✅ added via `server/add-figure-set.mjs`, 2026-08-09. Appears as a Special
+  Release set card once the app tab is reloaded and the backend restarted (catalog loads
+  once per page load; `server/*.js` has no hot-reload).
+
 Future sets get appended here one at a time as the owner identifies/confirms them — this
 doc is explicitly not meant to be exhaustive at launch; dozens more are expected over time.
