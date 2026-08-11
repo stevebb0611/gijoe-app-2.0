@@ -264,12 +264,28 @@ const upsertBin = db.prepare(`
     notes = COALESCE(excluded.notes, accessory_inventory.notes)
 `);
 
-export function addPart({ catalogId, accessory, qty = 1, notes = '' }) {
+// damaged/damageNotes let a part be logged as already-damaged at import time
+// (e.g. sorting a parts lot) instead of requiring a second trip to find the
+// row again in the bin list and mark it via setPartDamage/setPartDamageNotes.
+export const addPart = db.transaction(({ catalogId, accessory, qty = 1, notes = '', damaged = 0, damageNotes = '' }) => {
   const accId = accessoryIdForName(catalogId, accessory);
   if (!accId) return false;
+  const before = getBinRow.get(accId);
   upsertBin.run(accId, qty, notes || null);
+  const dmg = Math.max(0, Math.min(damaged, qty));
+  if (dmg > 0) {
+    const priorDamaged = before ? before.units_damaged : 0;
+    const totalQty = (before ? before.quantity_owned : 0) + qty;
+    setBinDamaged.run(Math.min(priorDamaged + dmg, totalQty), accId);
+    const notesV = (damageNotes || '').trim();
+    if (notesV) {
+      const existing = (before && before.damage_notes) || '';
+      const merged = existing && existing !== notesV ? existing + '; ' + notesV : (existing || notesV);
+      setBinDamageNotes.run(merged, accId);
+    }
+  }
   return true;
-}
+});
 
 export function depositParts(catalogId, parts) {
   for (const { accessory, qty } of parts) {

@@ -10,6 +10,7 @@
 import ExcelJS from 'exceljs';
 import { buildCatalog } from './catalog.js';
 import { getState } from './instances.js';
+import { buildAccessoryCatalog } from './accessories.js';
 import { instWhole, bpForVariant } from '../shared/completeness.js';
 
 // Excel's own built-in "Good"/"Neutral"/"Bad" conditional-format colors, plus a
@@ -224,9 +225,49 @@ function buildFileCardsSheet(wb, catalog, instancesByFigure) {
   }
 }
 
+// Mirrors web/src/parts-bin.jsx's fitsLabel() — name list capped so a part
+// shared by dozens of figures doesn't blow out the cell.
+const FITS_CAP = 8;
+function fitsLabel(entry) {
+  if (!entry.shared) return entry.homeFigureName || '—';
+  const names = entry.homeFigureNames || [];
+  if (!names.length) return `shared by ${entry.figureCount || '?'}`;
+  const shown = names.slice(0, FITS_CAP).join(' / ');
+  const extra = names.length - FITS_CAP;
+  return `shared by ${entry.figureCount || names.length} · fits ${shown}${extra > 0 ? ` +${extra} more` : ''}`;
+}
+
+function buildPartsBinSheet(wb, bin, accById) {
+  const ws = wb.addWorksheet('Parts Bin');
+  setupSheet(ws, [
+    { header: 'Accessory', key: 'accessory', width: 34 },
+    { header: 'Category', key: 'category', width: 18 },
+    { header: 'Qty', key: 'qty', width: 8 },
+    { header: 'Damaged', key: 'damaged', width: 10 },
+    { header: 'Damage Notes', key: 'damageNotes', width: 34 },
+    { header: 'Fits', key: 'fits', width: 44 },
+    { header: 'Notes', key: 'notes', width: 34 },
+  ]);
+
+  for (const entry of bin) {
+    const meta = accById.get(entry.id);
+    const row = ws.addRow({
+      accessory: entry.accessory,
+      category: (meta && meta.categoryLabel) || '',
+      qty: entry.qty,
+      damaged: entry.damaged || 0,
+      damageNotes: entry.damageNotes || '',
+      fits: meta ? fitsLabel(meta) : '—',
+      notes: entry.notes || '',
+    });
+    if (entry.damaged > 0) styleRow(row, 'bad');
+  }
+}
+
 export function buildWorkbook() {
   const catalog = buildCatalog();
-  const { instances } = getState();
+  const { instances, bin } = getState();
+  const accById = new Map(buildAccessoryCatalog().map((a) => [a.id, a]));
 
   const instancesByFigure = new Map();
   for (const inst of instances) {
@@ -241,6 +282,7 @@ export function buildWorkbook() {
   buildFiguresSheet(wb, catalog, instancesByFigure);
   buildAccessoriesSheet(wb, catalog, instancesByFigure);
   buildFileCardsSheet(wb, catalog, instancesByFigure);
+  buildPartsBinSheet(wb, bin, accById);
 
   return wb;
 }

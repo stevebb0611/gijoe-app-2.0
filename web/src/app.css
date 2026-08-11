@@ -996,7 +996,7 @@
 
   /* bin intake (two-way) */
   .intake { display: flex; flex-direction: column; gap: 14px; }
-  .intake__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .intake__head { display: flex; align-items: baseline; gap: 9px; width: 100%; text-align: left; font: inherit; background: transparent; border: none; padding: 0; cursor: pointer; }
   .intake__title { font-family: var(--font-display); font-weight: 700; font-size: 13px; letter-spacing: 1.5px; color: var(--ink); }
   .intake__title em { font-style: normal; font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft); margin-left: 8px; letter-spacing: 0; }
   .intake__group { display: flex; flex-direction: column; gap: 9px; }
@@ -1117,7 +1117,7 @@
   .pb-pickfig__x { font-family: var(--font-mono); font-size: 10px; letter-spacing: .5px; color: var(--accent); background: transparent; border: none; cursor: pointer; }
   .pb-pickfig__x:hover { text-decoration: underline; }
   .pb-acclist { display: flex; flex-direction: column; gap: 6px; max-height: 240px; overflow: auto; }
-  .pb-accopt { display: flex; align-items: center; gap: 6px; background: var(--card); border: 1.5px solid var(--line); padding: 0 8px 0 0; color: var(--ink); }
+  .pb-accopt { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; background: var(--card); border: 1.5px solid var(--line); padding: 0 8px 0 0; color: var(--ink); }
   .pb-accopt__hit { flex: 1; min-width: 0; display: grid; grid-template-columns: 16px 1fr auto; gap: 10px; align-items: center; text-align: left; font: inherit; background: transparent; border: none; cursor: pointer; color: inherit; padding: 8px 11px; }
   .pb-accopt:hover { border-color: var(--ink); }
   .pb-accopt.is-sel { border: 2px solid var(--accent); background: var(--paper); }
@@ -1126,6 +1126,7 @@
   .pb-accopt__namewrap { display: flex; align-items: center; gap: 6px; min-width: 0; }
   .pb-accopt__n { font-family: var(--font-display); font-weight: 600; font-size: 13px; }
   .pb-accopt__cat { font-family: var(--font-mono); font-size: 9px; letter-spacing: .5px; color: var(--ink-soft); }
+  .pb-accopt__dmgpanel { flex: 1 0 100%; margin-top: 4px; padding: 8px 11px 10px; border-top: 1px dashed var(--line-soft); }
 
   /* zero state */
   .pbp-empty--zero { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 70px 24px; }

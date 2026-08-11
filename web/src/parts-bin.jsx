@@ -147,7 +147,8 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
 function AddPartModal({ onClose }) {
   const [q, setQ] = React.useState('');
   const [figId, setFigId] = React.useState(null);
-  const [sel, setSel] = React.useState({}); // { accessoryName: qty }
+  const [sel, setSel] = React.useState({}); // { accessoryName: { qty, damaged, damageNotes } }
+  const [dmgOpen, setDmgOpen] = React.useState(() => new Set()); // accessory names with their damage panel open
   const [notes, setNotes] = React.useState('');
 
   const query = q.trim().toLowerCase();
@@ -157,15 +158,31 @@ function AddPartModal({ onClose }) {
   const fig = figId != null ? JoeData.CAT_BY_ID.get(figId) : null;
   const bp = fig ? (fig.blueprint || []) : [];
   const selNames = Object.keys(sel);
-  const totalPieces = selNames.reduce((s, n) => s + sel[n], 0);
+  const totalPieces = selNames.reduce((s, n) => s + sel[n].qty, 0);
   const canAdd = fig && selNames.length > 0;
 
-  const choose = (f) => { setFigId(f.id); setSel({}); };
-  const toggleAcc = (name) => setSel(s => { const n = { ...s }; if (n[name]) delete n[name]; else n[name] = 1; return n; });
-  const bumpAcc = (name, d) => setSel(s => ({ ...s, [name]: Math.max(1, (s[name] || 1) + d) }));
+  const choose = (f) => { setFigId(f.id); setSel({}); setDmgOpen(new Set()); };
+  const toggleAcc = (name) => setSel(s => { const n = { ...s }; if (n[name]) delete n[name]; else n[name] = { qty: 1, damaged: 0, damageNotes: '' }; return n; });
+  const bumpAcc = (name, d) => setSel(s => {
+    const cur = s[name]; if (!cur) return s;
+    const qty = Math.max(1, cur.qty + d);
+    return { ...s, [name]: { ...cur, qty, damaged: Math.min(cur.damaged, qty) } };
+  });
+  const toggleDmg = (name) => setDmgOpen(s => { const n = new Set(s); n.has(name) ? n.delete(name) : n.add(name); return n; });
+  const setDamaged = (name, units) => setSel(s => {
+    const cur = s[name]; if (!cur) return s;
+    return { ...s, [name]: { ...cur, damaged: Math.max(0, Math.min(units, cur.qty)) } };
+  });
+  const setDamageNotes = (name, text) => setSel(s => {
+    const cur = s[name]; if (!cur) return s;
+    return { ...s, [name]: { ...cur, damageNotes: text } };
+  });
   const submit = () => {
     const notesV = notes.trim();
-    selNames.forEach(name => JoeStore.addPart({ catalogId: figId, accessory: name, qty: sel[name], notes: notesV }));
+    selNames.forEach(name => {
+      const it = sel[name];
+      JoeStore.addPart({ catalogId: figId, accessory: name, qty: it.qty, notes: notesV, damaged: it.damaged, damageNotes: it.damageNotes.trim() });
+    });
     onClose();
   };
 
@@ -205,7 +222,7 @@ function AddPartModal({ onClose }) {
                 <label className="fld__lab">FIGURE</label>
                 <div className="pb-pickfig">
                   <span><b>{fig.name}</b><VersionChip version={fig.ver ? "v" + fig.ver : ""} /> <em>{formatYear(fig.year)} · {fig.role || fig.faction}</em></span>
-                  <button className="pb-pickfig__x" onClick={() => { setFigId(null); setSel({}); }}>change</button>
+                  <button className="pb-pickfig__x" onClick={() => { setFigId(null); setSel({}); setDmgOpen(new Set()); }}>change</button>
                 </div>
               </div>
               <div className="fld">
@@ -215,7 +232,9 @@ function AddPartModal({ onClose }) {
                   : <div className="pb-acclist">
                       {bp.map(([name, qreq, accessoryId, , , , color]) => {
                         const meta = JoeData.ACC_BY_ID.get(accessoryId);
-                        const on = !!sel[name];
+                        const item = sel[name];
+                        const on = !!item;
+                        const dOpen = on && dmgOpen.has(name);
                         return (
                           <div key={name} className={"pb-accopt" + (on ? " is-sel" : "")}>
                             <button type="button" className="pb-accopt__hit" onClick={() => toggleAcc(name)}>
@@ -229,8 +248,25 @@ function AddPartModal({ onClose }) {
                             {on && (
                               <div className="qstep qstep--sm">
                                 <button type="button" onClick={() => bumpAcc(name, -1)}>－</button>
-                                <span className="qstep__n">{sel[name]}</span>
+                                <span className="qstep__n">{item.qty}</span>
                                 <button type="button" onClick={() => bumpAcc(name, +1)}>＋</button>
+                              </div>
+                            )}
+                            {on && (
+                              <button type="button"
+                                      className={"pb-btn pb-btn--ghost pb-btn--dmg" + (dOpen ? " is-on" : "") + (item.damaged > 0 ? " has-damage" : "")}
+                                      title="Mark units of this part as damaged" onClick={() => toggleDmg(name)}>⚠</button>
+                            )}
+                            {dOpen && (
+                              <div className="pb-accopt__dmgpanel">
+                                <AccItem name={name} req={item.qty} tone="damage"
+                                         checked={Array.from({ length: item.qty }, (_, k) => k < item.damaged)}
+                                         onSet={(k) => setDamaged(name, k)} />
+                                {item.damaged > 0 && (
+                                  <textarea className="pb-dmgnotes" value={item.damageNotes}
+                                            placeholder="what's damaged — e.g. cracked strap, faded paint…"
+                                            onChange={e => setDamageNotes(name, e.target.value)}></textarea>
+                                )}
                               </div>
                             )}
                           </div>
@@ -378,6 +414,7 @@ function PartsBin({ onNavigate }) {
   const [collapsed, setCollapsed] = React.useState(() => new Set());
   const [addOpen, setAddOpen] = React.useState(false);
   const [rebalOpen, setRebalOpen] = React.useState(false);
+  const [intakeOpen, setIntakeOpen] = React.useState(false); // Ready to Complete starts collapsed every visit
 
   // bin entries decorated with real accessory metadata
   const bin = store.bin.map(e => {
@@ -500,12 +537,13 @@ function PartsBin({ onNavigate }) {
           <React.Fragment>
             {/* ===== READY TO PULL (live two-way A) ===== */}
             <section className="intake">
-              <div className="intake__head">
+              <button type="button" className="intake__head" onClick={() => setIntakeOpen(v => !v)}>
+                <span className={"grp__chev" + (intakeOpen ? "" : " is-closed")}>▾</span>
                 <span className="intake__title">READY TO COMPLETE
-                  {suggestions.length ? null : <em>nothing to pull</em>}
+                  {suggestions.length ? <em>{suggestions.length} ready to pull</em> : <em>nothing to pull</em>}
                 </span>
-              </div>
-              {suggestions.length === 0 ? (
+              </button>
+              {intakeOpen && (suggestions.length === 0 ? (
                 <div className="intake__empty">
                   No loose part currently fills a gap. When a bin part matches an owned copy that's missing it, a one-tap <b>pull to complete</b> shows up here.
                 </div>
@@ -526,7 +564,7 @@ function PartsBin({ onNavigate }) {
                   ))}
                   {suggestions.length > 8 && <div className="intake__more">+{suggestions.length - 8} more — pull from the part rows below.</div>}
                 </div>
-              )}
+              ))}
             </section>
 
             {/* ===== PARTS LIST ===== */}

@@ -266,8 +266,8 @@ export const JoeStore = {
     // ---- Parts Bin: loose accessories (global stock — see server/instances.js) ----
     // entry: { id, catalogId, accessory, qty, notes, addedAt }
     binEntries() { return state.bin; },
-    addPart({ catalogId, accessory, qty = 1, notes = '' }) {
-      api('POST', '/api/parts-bin', { catalogId, accessory, qty, notes });
+    addPart({ catalogId, accessory, qty = 1, notes = '', damaged = 0, damageNotes = '' }) {
+      api('POST', '/api/parts-bin', { catalogId, accessory, qty, notes, damaged, damageNotes });
       refresh(); emit();
     },
     adjustPart(id, delta) {
