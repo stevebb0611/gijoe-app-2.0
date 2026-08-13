@@ -35,7 +35,7 @@ function accessoryIdForName(figureId, name) {
 const instanceRowsStmt = db.prepare(`
   SELECT i.id, i.figure_id AS catalogId, vl.letter AS variant, i.is_moc AS moc,
          i.damage AS marks, i.location AS loc, i.notes,
-         i.filecard_on_file, i.filecard_id, i.country_of_origin AS coo,
+         i.filecard_on_file, i.filecard_id, i.filecard_color, i.filecard_grade, i.country_of_origin AS coo,
          i.is_master AS masterCollection, i.set_id AS setId, i.pinned_no AS pinnedNo,
          i.created_at
   FROM instances i

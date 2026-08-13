@@ -132,5 +132,20 @@
       "Bash(sqlite3 gijoe_collection.db \"SELECT count\\(*\\) FROM instances WHERE figure_id=26;\")",
       "Bash(sqlite3 gijoe_collection.db \"SELECT count\\(*\\) FROM instances;\")"
     ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR:-/Users/steveblumrick/gijoe-app-2.0}/.claude/hooks/git-auto-push.sh\"",
+            "timeout": 30,
+            "statusMessage": "Checking dirty file count for auto-push..."
+          }
+        ]
+      }
+    ]
   }
 }

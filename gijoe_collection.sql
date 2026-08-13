@@ -210,6 +210,10 @@ CREATE TABLE IF NOT EXISTS instances (
     filecard_id INTEGER REFERENCES file_cards(file_card_id) ON DELETE SET NULL,
                 -- which real printing (FILE_CARDS.md) this copy's card is. Nullable — NULL is
                 -- a legitimate "not identified yet" state, not a data gap.
+    filecard_color TEXT,  -- hand-typed color note for this copy's physical card, e.g. "Peach"/"Gray"
+    filecard_grade TEXT CHECK(filecard_grade IN ('Poor', 'Good', 'Mint')),
+                -- coarse grade for this copy's physical card, independent of file_cards.condition_id
+                -- (which describes a printing, not this owner's copy)
     country_of_origin TEXT CHECK (country_of_origin IN ('China', 'Hong Kong', 'Indonesia')),
                 -- which of the figure's known origins (figure_coo) this physical copy is.
                 -- A notation, like filecard_printing — optional, doesn't affect completeness.
