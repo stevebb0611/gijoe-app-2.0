@@ -66,14 +66,14 @@ function Row({ fig, selId, openIds, onToggle, onOpen }) {
             : multi
               ? <span className="inv-stock__multi">
                   {fig.owned} Figures · {whole} Complete
-                  {cardCount > 0 && <span className="inv-fc" title={cardCount + " cop" + (cardCount > 1 ? "ies" : "y") + " with file card on file"}>+ {cardCount} &nbsp;File card{cardCount > 1 ? "s" : ""}</span>}
+                  {cardCount > 0 && <span className="inv-fc" title={cardCount + " cop" + (cardCount > 1 ? "ies" : "y") + " with file card on file"}>+ {cardCount} &nbsp;File Card{cardCount > 1 ? "s" : ""}</span>}
                   {canRebalance && <span className="inv-rebal" title={"Parts owned could complete a copy — " + st.moves.length + " move" + (st.moves.length > 1 ? "s" : "")}>Rebalance</span>}
                 </span>
               : <React.Fragment>
                   <StockBar pct={single.pct} />
                   <span className="inv-stock__n">{single.own}/{single.req}</span>
                   {single.pct !== 100 && <span className="inv-stock__miss" title={single.missing.join(', ')}>{single.missing.join(', ') || "—"}</span>}
-                  {single.cardOnFile && <span className="inv-fc" title="File card on file">+ File card</span>}
+                  {single.cardOnFile && <span className="inv-fc" title="File card on file">+ File Card</span>}
                 </React.Fragment>}
         </span>
         <span className={"inv-need" + ((multi ? whole > 0 : need === 0) ? " is-zero" : "") + (ghost ? " is-ghost" : "") + (!ghost && !multi && canRebalance ? " is-rebal" : "")}>
@@ -96,7 +96,7 @@ function Row({ fig, selId, openIds, onToggle, onOpen }) {
             <button key={c.id} className={"inv-inst" + (active && selId === fig.id ? "" : "")} onClick={() => onOpen(fig.id, c.id)}>
               <span className="inv-inst__tab">↳</span>
               <span className="inv-inst__id"><span>{titleCase(fig.name)}<VariantBadge letter={c.variant} /> No. {c.no}</span><i>{c.loc || (c.phys ? c.phys + " / " + c.paint : "ungraded")}</i></span>
-              <span className="inv-stock"><StockBar pct={c.pct} />{c.cardOnFile && <span className="inv-fc" title="File card on file">+ File card</span>}</span>
+              <span className="inv-stock"><StockBar pct={c.pct} />{c.cardOnFile && <span className="inv-fc" title="File card on file">+ File Card</span>}</span>
               <span className={"inv-need" + (c.pct === 100 ? " is-zero" : "")}>{c.pct === 100 ? "✓ Complete" : "Missing " + (c.req - c.own)}</span>
               <span className="inv-go">▸</span>
             </button>

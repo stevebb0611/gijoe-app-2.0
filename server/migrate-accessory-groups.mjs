@@ -148,6 +148,12 @@ const GROUPS = [
   // Mortar molds (closed handle / thin open handle / thick open handle); own
   // any one for completion. Owner-confirmed 2026-07-21.
   { extGroupId: null, figure: 'Short-Fuze', accessories: ['A0017', 'A0018', 'A0019'] }, // Medium Mortar closed/thin open/thick open handle
+  // Short-Fuze v1.5 (1983, F073 -> catalog id 39): same three interchangeable
+  // M-1 81mm Medium Mortar molds as v1 above, own any one. Disambiguated via
+  // `fcode` since the plain code_name lookup resolves to v1 (id 12) first,
+  // same as the Sonic Backpack cases above. Owner-confirmed 2026-08-13 —
+  // "v1 accessories are correct, copy the pick-one behavior over to v1.5".
+  { extGroupId: null, fcode: 'F073', figure: 'Short-Fuze', accessories: ['A0017', 'A0018', 'A0019'] }, // Medium Mortar closed/thin open/thick open handle
   // Zap (1982, v1, F041 -> catalog id 16): 'Zap' also matches a later v1.5
   // (id 48, F084) and v2 (id 330, F416), but the lowest id (16, v1) is the
   // one with these accessories, same pattern as Duke/Recondo/Spirit/…/

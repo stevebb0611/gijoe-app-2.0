@@ -4,6 +4,15 @@ Companion to the file-card notation on `instances` (`filecard_on_file` + `fileca
 see `INSTANCE_MODEL.md`). File card (on-file/not, and which printing) is tracked per
 copy as a notation — it does **not** feed the completeness percentage.
 
+**This catalog is a slow, figure-by-figure effort (one figure below as of writing) —
+ownership tracking does not wait on it.** `instances.filecard_color`/`filecard_grade`
+(migration 019) are a lightweight, always-available pair of fields for what the owner
+actually has in hand: a hand-typed color note (e.g. "Peach", "Gray") and a coarse
+`Poor`/`Good`/`Mint` grade for the physical card. Both are independent of `filecard_id`
+and of this catalog being populated — set from the FILE CARD box in the detail modal /
+Add Figure CONDITION step (`web/src/filecards.jsx`'s `FileCardColorInput`/`FileCardGrade`)
+any time a copy is marked on file, whether or not its printing has been identified below.
+
 ## The problem this replaces
 
 The original prototype (and the first live port) hard-coded one **generic** 3-entry

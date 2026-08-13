@@ -6,7 +6,9 @@
 //
 // Deliberately excludes condition/paint grades and the exact damage map
 // (owner-confirmed scope, 2026-07-11) — this is a completeness + notation
-// roster, not a condition report.
+// roster, not a condition report. File card color/grade (Card Color/Card
+// Grade columns below) is a narrow, deliberate carve-out to that rule — it's
+// ownership notation for the card itself, not the figure's condition.
 import ExcelJS from 'exceljs';
 import { buildCatalog } from './catalog.js';
 import { getState } from './instances.js';
@@ -85,6 +87,8 @@ function buildFiguresSheet(wb, catalog, instancesByFigure) {
     { header: 'Status', key: 'status', width: 12 },
     { header: 'Country of Origin', key: 'coo', width: 20 },
     { header: 'Card On File', key: 'card', width: 28 },
+    { header: 'Card Color', key: 'cardColor', width: 14 },
+    { header: 'Card Grade', key: 'cardGrade', width: 12 },
     { header: 'Notes', key: 'notes', width: 44 },
     { header: 'Master Collection Notes', key: 'masterNotes', width: 44 },
   ]);
@@ -107,6 +111,18 @@ function buildFiguresSheet(wb, catalog, instancesByFigure) {
         : null;
       const label = insts.length > 1 ? `Copy ${idx + 1}: ` : '';
       return `${label}${match ? match.file_card_code : 'on file, unidentified'}`;
+    }).filter(Boolean);
+
+    const cardColorVals = insts.map((inst, idx) => {
+      if (!inst.filecard || !inst.filecard.onFile || !inst.filecard.color) return null;
+      const label = insts.length > 1 ? `Copy ${idx + 1}: ` : '';
+      return `${label}${inst.filecard.color}`;
+    }).filter(Boolean);
+
+    const cardGradeVals = insts.map((inst, idx) => {
+      if (!inst.filecard || !inst.filecard.onFile || !inst.filecard.grade) return null;
+      const label = insts.length > 1 ? `Copy ${idx + 1}: ` : '';
+      return `${label}${inst.filecard.grade}`;
     }).filter(Boolean);
 
     const noteVals = [];
@@ -133,6 +149,8 @@ function buildFiguresSheet(wb, catalog, instancesByFigure) {
       status,
       coo: cooVals.join('; '),
       card: cardVals.join('; '),
+      cardColor: cardColorVals.join('; '),
+      cardGrade: cardGradeVals.join('; '),
       notes: noteVals.join('; '),
       masterNotes: fig.masterNotes || '',
     });
