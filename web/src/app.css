@@ -682,6 +682,22 @@
   /* empty state — figure has no rows in figure_file_cards yet (most figures, until
      FILE_CARDS.md grows); sits inline where the select+swatch would otherwise render */
   .fc-empty { font-family: var(--font-mono); font-size: 10px; font-style: italic; color: var(--ink-soft); }
+  /* hand-typed card color — fills the fc-row's label slot; box-styled like .fc-sel
+     so it reads as an input, not plain text; grayed/disabled until FILE CARD is on */
+  .fc-color { width: 100%; box-sizing: border-box; background: var(--card); border: 1.5px solid var(--ink);
+    padding: 5px 9px; font: inherit; font-family: var(--font-display); font-weight: 600; font-size: 12px;
+    letter-spacing: .2px; color: var(--ink); border-radius: 0; }
+  .fc-color::placeholder { color: var(--ink-soft); font-weight: 400; }
+  .fc-color:focus { outline: none; border-color: var(--accent); }
+  .fc-color:disabled { background: var(--paper); border-color: var(--line-soft); color: var(--ink-soft); cursor: default; }
+  /* Poor/Good/Mint grade bracket — same adjoining-border language as .idvarbr */
+  .fc-grade { display: flex; padding: 9px 12px; border-top: 1px solid var(--line-soft); }
+  .fc-grade__l { flex: 1; text-align: center; padding: 5px 0; font: inherit; font-family: var(--font-mono);
+    font-weight: 700; font-size: 10px; letter-spacing: .4px; text-transform: uppercase; background: var(--paper);
+    color: var(--ink-soft); border: 1.5px solid var(--ink); border-left-width: 0; cursor: pointer; }
+  .fc-grade__l:first-child { border-left-width: 1.5px; }
+  .fc-grade__l.is-on { background: var(--ink); color: var(--paper); }
+  .fc-grade__l:hover:not(.is-on) { border-color: var(--accent); color: var(--ink); }
   .inv-modal__btns { display: flex; gap: 8px; flex-wrap: wrap; }
   /* right column is a flex stack so the remove control can pin to the bottom-right */
   .inv-front-body .inv-modal__r { display: flex; flex-direction: column; }

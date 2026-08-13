@@ -9,7 +9,7 @@ import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip, VariantBadge, VehicleTag, EditionTag, SetTag } from './fig-identity.jsx';
 import { formatYear, SPECIAL_RELEASE_YEAR } from './fig-identity.js';
-import { FileCardRow, FileCardTell } from './filecards.jsx';
+import { FileCardRow, FileCardTell, FileCardColorInput, FileCardGrade } from './filecards.jsx';
 const AF_CATALOG = JoeData.CAT || [];
 // SPECIAL_RELEASE_YEAR sorts to the end regardless of numeric value — it's not a
 // real year, so it doesn't belong interleaved by magnitude, but it does need
@@ -48,7 +48,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const [notes, setNotes] = React.useState("");
   const [owned, setOwnedAcc] = React.useState(() => presetAcc || {});   // accName -> units owned
   const [moc, setMoc] = React.useState(false);       // Mint on Card (sealed) — counts 100% complete
-  const [filecard, setFilecard] = React.useState({ onFile: false, fileCardId: null });
+  const [filecard, setFilecard] = React.useState({ onFile: false, fileCardId: null, color: '', grade: null });
   const [coo, setCoo] = React.useState(''); // optional — country of origin, only offered when fig.coo has entries
   const [setId, setSetId] = React.useState(presetSetId); // optional — which known set (if any) this copy belongs to
   // condition — single zone-map value; dmg.clean is the explicit "no damage found"
@@ -71,7 +71,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
     if (!fig) return;
     setSelVar(isSingle(fig) ? '' : (presetVariant && fig.id === presetCatalogId ? presetVariant : null));
     setOwnedAcc(presetAcc && fig.id === presetCatalogId ? presetAcc : {});
-    setMoc(false); setFilecard({ onFile: false, fileCardId: null }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male')); setCoo(''); setAccDamage({});
+    setMoc(false); setFilecard({ onFile: false, fileCardId: null, color: '', grade: null }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male')); setCoo(''); setAccDamage({});
     setSetId(presetSetId && fig.id === presetCatalogId ? presetSetId : null);
   }, [selId]);
 
@@ -155,7 +155,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
       paint: moc ? null : (ungraded ? null : paint.grade),
       marks: moc ? null : dmg,
       loc: loc.trim(), notes: notes.trim(),
-      filecard: filecard.onFile ? { onFile: true, fileCardId: filecard.fileCardId } : { onFile: false, fileCardId: null },
+      filecard: filecard.onFile ? { onFile: true, fileCardId: filecard.fileCardId, color: filecard.color, grade: filecard.grade } : { onFile: false, fileCardId: null, color: '', grade: null },
       coo: coo || '',
       setId,
     });
@@ -164,7 +164,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
 
   const resetAll = () => {
     setDone(false); setSelId(null); setQuery(""); setSelVar(null); setLoc(""); setNotes("");
-    setOwnedAcc({}); setMoc(false); setFilecard({ onFile: false, fileCardId: null }); setDmg(dmEmpty('male')); setAccDamage({}); setYearF(""); setSetId(null); goto(0);
+    setOwnedAcc({}); setMoc(false); setFilecard({ onFile: false, fileCardId: null, color: '', grade: null }); setDmg(dmEmpty('male')); setAccDamage({}); setYearF(""); setSetId(null); goto(0);
   };
 
   return (
@@ -290,10 +290,11 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                 <div className="acc-list fc-list" style={{ marginTop: 18 }}>
                   <div className="acc-list__cap"><span>FILE CARD</span><span>{filecard.onFile && <b>ON FILE</b>}</span></div>
                   <div className="acc fc-row">
-                    <span className="acc__name">Card on file</span>
+                    <FileCardColorInput value={filecard.color} disabled={!filecard.onFile} onChange={color => setFilecard(s => ({ ...s, color }))} />
                     {filecard.onFile && <FileCardRow fig={fig} printing={filecard.fileCardId} onChange={fileCardId => setFilecard(s => ({ ...s, fileCardId }))} />}
                     <button type="button" className={"acc__box fc-box" + (filecard.onFile ? " is-on" : "")} onClick={() => setFilecard(s => ({ ...s, onFile: !s.onFile }))} title={filecard.onFile ? "Mark card not on file" : "Mark file card on file"}>{filecard.onFile ? "✓" : ""}</button>
                   </div>
+                  {filecard.onFile && <FileCardGrade grade={filecard.grade} onChange={grade => setFilecard(s => ({ ...s, grade }))} />}
                   {filecard.onFile && <FileCardTell fig={fig} printing={filecard.fileCardId} />}
                 </div>
 

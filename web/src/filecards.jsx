@@ -66,3 +66,42 @@ export function FileCardTell({ fig, printing }) {
   ].filter(Boolean);
   return <div className="fc-tellrow"><span>{parts.join(" · ")}</span><span className="fc-cat">{cards.length} on record</span></div>;
 }
+
+// Hand-typed color note for THIS owner's physical card (e.g. "Peach", "Gray") —
+// independent of the catalog printing above, since most figures have no printings
+// catalogued yet. Fills the fc-row's label slot, replacing what used to be a static
+// "Card on file" caption; stays visible (disabled) even when the card isn't marked
+// on file so the row isn't empty.
+export function FileCardColorInput({ value, onChange, disabled }) {
+  return (
+    <input
+      type="text"
+      className="acc__name fc-color"
+      placeholder="Card color (e.g. Peach, Gray)"
+      value={value || ""}
+      disabled={disabled}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  );
+}
+
+// Coarse 3-point grade for THIS owner's physical card. Deliberately not the generic
+// 5-point `conditions` lookup (Mint/Near Mint/Good/Fair/Poor) or file_cards.condition_id —
+// both describe a printing, not what condition this copy's card is actually in.
+const GRADES = ["Poor", "Good", "Mint"];
+export function FileCardGrade({ grade, onChange }) {
+  return (
+    <div className="fc-grade">
+      {GRADES.map((g) => (
+        <button
+          key={g}
+          type="button"
+          className={"fc-grade__l" + (grade === g ? " is-on" : "")}
+          onClick={() => onChange(grade === g ? null : g)}
+        >
+          {g}
+        </button>
+      ))}
+    </div>
+  );
+}

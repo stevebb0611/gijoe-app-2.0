@@ -9,7 +9,7 @@ import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip, VariantBadge, VariantBracket, VehicleTag, EditionTag, SetTag, SubGroupTag } from './fig-identity.jsx';
 import { formatYear } from './fig-identity.js';
-import { FileCardRow, FileCardTell } from './filecards.jsx';
+import { FileCardRow, FileCardTell, FileCardColorInput, FileCardGrade } from './filecards.jsx';
 
 const INV_CAT = JoeData.CAT || [];
 const INV_ERAS = {}; // was window.JOE_ERAS from the retired catalog-data.js — always {}
@@ -510,7 +510,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   // ---- live per-copy reads + writes ----
   const raw = cur ? (JoeStore.get().instances.find(i => i.id === cur.id) || {}) : {};
   const moc = !!raw.moc;
-  const filecard = raw.filecard || { onFile: false, fileCardId: null };
+  const filecard = raw.filecard || { onFile: false, fileCardId: null, color: '', grade: null };
   const marks = (raw.marks && raw.marks.condition) ? raw.marks : dmEmpty(fig.body || 'male');
   // Scope the checklist to this copy's own production variant — a v1 A copy
   // shouldn't be asked (or able) to check off a v1 B-only accessory. See
@@ -834,10 +834,11 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                 <div className="acc-list fc-list">
                   <div className="acc-list__cap"><span>FILE CARD</span><span>{filecard.onFile && <b>ON FILE</b>}</span></div>
                   <div className="acc fc-row">
-                    <span className="acc__name">Card on file</span>
+                    <FileCardColorInput value={filecard.color} disabled={!filecard.onFile} onChange={color => setCard({ color })} />
                     {filecard.onFile && <FileCardRow fig={fig} printing={filecard.fileCardId} onChange={fileCardId => setCard({ fileCardId })} />}
                     <button className={"acc__box fc-box" + (filecard.onFile ? " is-on" : "")} onClick={() => setCard({ onFile: !filecard.onFile })} title={filecard.onFile ? "Mark card not on file" : "Mark file card on file"}>{filecard.onFile ? "✓" : ""}</button>
                   </div>
+                  {filecard.onFile && <FileCardGrade grade={filecard.grade} onChange={grade => setCard({ grade })} />}
                   {filecard.onFile && <FileCardTell fig={fig} printing={filecard.fileCardId} />}
                 </div>
 
