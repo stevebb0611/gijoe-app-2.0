@@ -67,7 +67,7 @@ export function VariantGroup({ items, renderOption }) {
   const matched = items.some((it) => it[5] != null);
   return (
     <div className="sgw-group">
-      <div className="sgw-label"><span className="sgw-label__name">{label}</span> <em>{matched ? '· match a colorway' : '· pick one'}</em></div>
+      <div className="sgw-label"><span className="sgw-label__name">{label}</span> <em>{matched ? '· match a colorway' : '· choose variant'}</em></div>
       {items.map((it) => renderOption(it))}
     </div>
   );

@@ -370,6 +370,30 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
   Toggling a tag-A option on each slot correctly resolved the bucket and pushed the copy
   to 100%; net toggling left the real instance's owned accessories unchanged.
 
+### 1983 — Short-Fuze (v1.5, figure catalog id 39 — source F-code F073)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below. Same slot as
+  Short-Fuze v1 above, copied over per owner instruction — not a `match_key` case.
+- **Variants:** none on file — single catalog row. `code_name = 'Short-Fuze'` also matches
+  the earlier v1 (id 12, F030) above; disambiguated via `fcode: 'F073'` in
+  `migrate-accessory-groups.mjs` since the plain code_name lookup resolves to the lower id
+  (12, v1) first — same disambiguation shape as the Sonic Backpack cases (Dial-Tone/Dodger/
+  Lampreys/Law/Tunnel Rat/Viper/Psyche-Out) below, not the "lowest id happens to be
+  correct" shape used elsewhere in this doc.
+- **Group_id slot:** M-1 81mm Medium Mortar (closed handle) / M-1 81mm Medium Mortar (thin
+  open handle) / M-1 81mm Medium Mortar (thick open handle) (`accessory_groups.id` 38) — its
+  own figure_id 39 group row, separate from v1's `accessory_groups.id` 36 (`accessory_groups`
+  is per-figure, not shared across catalog rows even for the same mold).
+- **Unaffected (plain, independently required):** Helmet (with holes), Visor, Ammo Pack
+  Backpack, Mortar Bipod Stand.
+- **Source:** owner, 2026-08-13 — "Short-Fuze v1 1982 accessories are correct, copy the
+  pick-one behavior over to v1.5 in 1983."
+- **Status:** ✅ group_id set in DB via `server/migrate-accessory-groups.mjs` (new entry added
+  to the `GROUPS` array) and verified via direct DB read + `/api/catalog` round-trip
+  (figure_id 39: A0017/A0018/A0019 all carry group_id 38, no match_key; v1's group_id 36
+  unchanged), 2026-08-13. Backend restarted to pick up the change. Not yet visually verified
+  in-app.
+
 ### 1984 — Blowtorch (v1, figure catalog id 50 — source F-codes F086/F087/F088, variants A/B/C)
 
 - **Mechanism:** plain `group_id` — own any one member of each slot below (no `match_key`

@@ -679,9 +679,6 @@
   .fc-box { color: transparent; }
   .fc-tellrow { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 12px; border-top: 1px solid var(--line-soft); font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft); line-height: 1.4; }
   .fc-cat { color: var(--accent); white-space: nowrap; }
-  /* empty state — figure has no rows in figure_file_cards yet (most figures, until
-     FILE_CARDS.md grows); sits inline where the select+swatch would otherwise render */
-  .fc-empty { font-family: var(--font-mono); font-size: 10px; font-style: italic; color: var(--ink-soft); }
   /* hand-typed card color — fills the fc-row's label slot; box-styled like .fc-sel
      so it reads as an input, not plain text; grayed/disabled until FILE CARD is on */
   .fc-color { width: 100%; box-sizing: border-box; background: var(--card); border: 1.5px solid var(--ink);

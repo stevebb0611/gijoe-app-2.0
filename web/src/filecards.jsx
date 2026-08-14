@@ -26,7 +26,7 @@ export function filecardById(fig, id) {
 export function FileCardRow({ fig, printing, onChange }) {
   const cards = filecardsFor(fig);
   if (cards.length === 0) {
-    return <span className="fc-empty">No printings catalogued for this figure yet</span>;
+    return null;
   }
   const sel = filecardById(fig, printing);
   return (

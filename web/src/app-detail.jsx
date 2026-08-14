@@ -371,34 +371,61 @@ function boxLayout(req) {
 // rows in the same list stay aligned, same "reserved even when empty"
 // philosophy as .acc__box.is-spacer above — but the button itself is only
 // live when there's a spare unit on this copy AND an eligible destination.
-function AccItem({ name, req, checked, onSet, tone, color, tag, damaged, moveTargets, onMove }) {
+// dmgChecked follows the same "presence signals the column" convention —
+// pass it (even as an all-false array) to show the ⚠ column, omit it where
+// damage-marking doesn't apply (e.g. set-card.jsx's retailer-exclusive rows).
+function boxCells(name, req, checked, onSet, dmgTitles) {
   const { rows, cols, empty } = boxLayout(req);
-  const own = checked.reduce((s, c) => s + (c ? 1 : 0), 0);
-  const done = own >= req;
   const live = typeof onSet === 'function';
-  const dmg = tone === 'damage';
-  const [moveOpen, setMoveOpen] = React.useState(false);
-  const [moveQty, setMoveQty] = React.useState(1);
-  const canMove = moveTargets != null && moveTargets.length > 0 && own > 0;
-  const openMove = () => { setMoveQty(1); setMoveOpen((v) => !v); };
+  const own = checked.reduce((s, c) => s + (c ? 1 : 0), 0);
   const cells = [];
   for (let i = 0; i < empty; i++) cells.push(<span key={"sp" + i} className="acc__box is-spacer" aria-hidden="true"></span>);
   for (let i = 0; i < req; i++) {
     const on = i < own;
     cells.push(
       <button key={i} type="button" className={"acc__box" + (on ? " is-on" : "")} disabled={!live}
-              title={dmg ? name + " · unit " + (i + 1) + (on ? " · damaged" : " · not damaged") : (req > 1 ? name + " · unit " + (i + 1) + " of " + req : name)}
+              title={dmgTitles ? name + " · unit " + (i + 1) + (on ? " · damaged" : " · not damaged") : (req > 1 ? name + " · unit " + (i + 1) + " of " + req : name)}
               onClick={live ? () => onSet(i + 1 === own ? i : i + 1) : undefined}>✓</button>
     );
   }
+  return { cells, cols, rows, own };
+}
+
+function AccItem({ name, req, checked, onSet, tone, color, tag, moveTargets, onMove,
+                    dmgChecked, dmgOnSet, dmgNotes, dmgOnSetNotes, dmgExtra }) {
+  const dmg = tone === 'damage';
+  const { cells, cols, rows, own } = boxCells(name, req, checked, onSet, dmg);
+  const done = own >= req;
+  const hasDmg = dmgChecked != null;
+  const dmgCount = hasDmg ? dmgChecked.reduce((s, c) => s + (c ? 1 : 0), 0) : 0;
+  const canDmg = hasDmg && own > 0;
+  const canMove = moveTargets != null && moveTargets.length > 0 && own > 0;
+  const [moveOpen, setMoveOpen] = React.useState(false);
+  const [moveQty, setMoveQty] = React.useState(1);
+  const [dmgOpen, setDmgOpen] = React.useState(false);
+  // Close both popovers once the row runs out of owned units — covers a unit
+  // being un-owned (or moved away) while its popover is still open.
+  React.useEffect(() => { if (own === 0) { setMoveOpen(false); setDmgOpen(false); } }, [own]);
+  const openMove = () => { setDmgOpen(false); setMoveQty(1); setMoveOpen((v) => !v); };
+  const openDmg = () => { setMoveOpen(false); setDmgOpen((v) => !v); };
   return (
-    <div className={"acc" + (rows === 2 ? " is-stack" : "") + (done ? " is-done" : "") + (dmg ? " is-damage-tone" : "") + (moveTargets != null ? " has-move" : "")}>
+    <div className={"acc" + (rows === 2 ? " is-stack" : "") + (done ? " is-done" : "") + (dmg ? " is-damage-tone" : "") + (hasDmg ? " has-dmg" : "") + (moveTargets != null ? " has-move" : "")}>
       <span className="acc__namewrap">
-        <span className="acc__dmgflag" title={damaged ? name + " · has damaged units" : undefined} aria-hidden={!damaged}>{damaged ? "⚠" : ""}</span>
         {tag != null && <span className="acc__tag">{tag}</span>}{color && <AccSwatch color={color} />}<span className="acc__name">{name}</span>
       </span>
       <div className="acc__boxes" style={{ gridTemplateColumns: "repeat(" + cols + ", 22px)" }}>{cells}</div>
       <span className="acc__count">{own}/{req}</span>
+      {hasDmg && (
+        <span className="acc__dmg">
+          <button type="button" className={"acc__dmgbtn" + (dmgOpen ? " is-on" : "") + (dmgCount > 0 ? " has-damage" : "")} disabled={!canDmg}
+                  title={canDmg ? "Mark units of " + name + " as damaged" : "No owned units to mark damaged"}
+                  onClick={openDmg}>⚠</button>
+          {dmgOpen && canDmg && (
+            <DmgPopover name={name} count={own} checked={dmgChecked} onSet={dmgOnSet}
+                        notes={dmgNotes} onSetNotes={dmgOnSetNotes} extra={dmgExtra} />
+          )}
+        </span>
+      )}
       {moveTargets != null && (
         <span className="acc__move">
           <button type="button" className="acc__movebtn" disabled={!canMove}
@@ -429,43 +456,29 @@ function AccItem({ name, req, checked, onSet, tone, color, tag, damaged, moveTar
   );
 }
 
-// Per-accessory damage marking — toggle + checklist, shared between the
-// Detail modal (live PATCH per click, via onSetDamage) and Add Figure's
-// CONDITION step (local state accumulated into the create payload). `extra`
-// is an optional per-row render prop for damaged-row-only actions (Detail
-// uses it for "swap for clean"; Add Figure omits it — nothing to swap into
-// yet on a copy that doesn't exist).
-function DamageModePanel({ ownedAcc, rawAcc, accDamage, onSetDamage, extra, accDamageNotes, onSetDamageNotes }) {
-  const [damageMode, setDamageMode] = React.useState(false);
-  const owned = ownedAcc.reduce((s, [n]) => s + (rawAcc[n] || 0), 0);
-  const damaged = ownedAcc.reduce((s, [n]) => s + (accDamage[n] || 0), 0);
+// Inline damage-marking popover, anchored to a row's ⚠ trigger — mirrors
+// AccItem's own move popover (acc__movepop above) rather than a full-width
+// panel, so damage marking happens next to the accessory it affects instead
+// of in a separate section. Shared by every accessory row in the app (Detail
+// modal, Add Figure, Parts Bin) via AccItem's dmg* props, and also mounted
+// directly by Parts Bin's non-blueprint rows, which don't have a req/owned
+// pair to wrap in a full AccItem. `extra` is an optional per-row render prop
+// for damaged-only actions (Detail modal uses it for "swap for clean";
+// nobody else passes it).
+function DmgPopover({ name, count, checked, onSet, notes, onSetNotes, extra }) {
+  const { cells, cols } = boxCells(name, count, checked, onSet, true);
+  const dmgCount = checked.reduce((s, c) => s + (c ? 1 : 0), 0);
   return (
-    <React.Fragment>
-      <button type="button" className={"acc-dmgtoggle" + (damageMode ? " is-on" : "") + (damaged > 0 ? " has-damage" : "")}
-              onClick={() => setDamageMode(v => !v)}>
-        {damageMode ? "✕ done marking damage" : "⚠ mark as damaged"}
-      </button>
-      {damageMode && (
-        <div className="acc-list acc-list--dmg">
-          <div className="acc-list__cap"><span>DAMAGED ACCESSORIES</span><span><b>{damaged}</b>/{owned}</span></div>
-          {ownedAcc.length === 0
-            ? <div className="acc acc--note">No accessories owned yet on this copy.</div>
-            : ownedAcc.map((a) => (
-                <div key={a[0]} className="acc-dmgrow">
-                  <AccItem name={a[0]} req={rawAcc[a[0]] || 0} tone="damage" color={a[6]}
-                           checked={Array.from({ length: rawAcc[a[0]] || 0 }, (_, k) => k < (accDamage[a[0]] || 0))}
-                           onSet={(k) => onSetDamage(a[0], k)} />
-                  {onSetDamageNotes && (accDamage[a[0]] || 0) > 0 && (
-                    <textarea className="pb-dmgnotes" key={a[0]} defaultValue={(accDamageNotes || {})[a[0]] || ''}
-                              placeholder="what's damaged — e.g. cracked strap, faded paint…"
-                              onBlur={e => onSetDamageNotes(a[0], e.target.value)}></textarea>
-                  )}
-                  {extra && (accDamage[a[0]] || 0) > 0 && extra(a[0])}
-                </div>
-              ))}
-        </div>
+    <div className="acc__dmgpop">
+      <span className="acc__dmgpop-lab">DAMAGED <b>{dmgCount}</b>/{count}</span>
+      <div className="acc__dmgpop-boxes" style={{ gridTemplateColumns: "repeat(" + cols + ", 22px)" }}>{cells}</div>
+      {onSetNotes && dmgCount > 0 && (
+        <textarea className="pb-dmgnotes" key={name} defaultValue={notes || ''}
+                  placeholder="what's damaged — e.g. cracked strap, faded paint…"
+                  onBlur={(e) => onSetNotes(e.target.value)}></textarea>
       )}
-    </React.Fragment>
+      {extra && dmgCount > 0 && extra()}
+    </div>
   );
 }
 
