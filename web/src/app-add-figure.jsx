@@ -4,9 +4,8 @@
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
 import { DamageMap, GradeBadge, physicalGrade, paintGrade, dmEmpty } from './damage-map.jsx';
-import { DamageModePanel } from './app-detail.jsx';
+import { AccItem } from './app-detail.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
-import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip, VariantBadge, VehicleTag, EditionTag, SetTag } from './fig-identity.jsx';
 import { formatYear, SPECIAL_RELEASE_YEAR } from './fig-identity.js';
 import { FileCardRow, FileCardTell, FileCardColorInput, FileCardGrade } from './filecards.jsx';
@@ -97,41 +96,23 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   // that set's Special Release card (set-card.jsx) — see app-detail.jsx's same filter.
   const blueprint = fig && fig.sets.length > 0 ? rawBlueprint.filter((row) => row[4] !== 'retailer_exclusive') : rawBlueprint;
   const ordered = orderedBlueprint(blueprint);
-  const unitsOf = (n) => owned[n] || 0;
   const bpReq = JoeData.bpReq(blueprint);
   const fullDone = JoeData.instOwn(blueprint, owned);
-  const ownedAcc = blueprint.filter(([n]) => (owned[n] || 0) > 0);
 
   const goto = (i) => { setStep(i); setMax(m => Math.max(m, i)); };
   const next = () => goto(Math.min(step + 1, AF_STEPS.length - 1));
   const back = () => goto(Math.max(step - 1, 0));
 
   const setUnit = (n, idx) => setOwnedAcc(o => { const cur = o[n] || 0; return { ...o, [n]: cur > idx ? idx : idx + 1 }; });
-  // color (blueprint tuple index 6, added 2026-07-03 — see acc-colors.jsx)
-  // renders as an AccSwatch beside the name, decoration only. short=true is
-  // for variant-slot options: display the full option label (via
-  // JoeData.optLabel) plus its match_key tag badge, same row shape as a solo item.
-  const afAccRow = (a, short) => {
-    const [n, qreq, , , , tag, color] = a;
-    const u = unitsOf(n); const isDone = u >= qreq;
-    return (
-      <div key={n} className={"af-acc__row" + (isDone ? " is-done" : "")}>
-        <div className="af-acc__left">
-          {short && tag != null && <span className="af-acc__tag">{tag}</span>}
-          {color && <AccSwatch color={color} />}<span className="af-acc__n">{short ? JoeData.optLabel(n) : n}</span>
-        </div>
-        <div className="af-acc__right">
-          <div className="af-acc__boxes">
-            {Array.from({ length: qreq }).map((_, i) => (
-              <button key={i} className={"af-unit" + (i < u ? " is-on" : "")} title={`unit ${i + 1} of ${qreq}`} onClick={() => setUnit(n, i)}>✓</button>
-            ))}
-          </div>
-          <span className={"af-acc__count" + (isDone ? " is-done" : "")}>{u}/{qreq}</span>
-        </div>
-      </div>
-    );
-  };
-  const markAllAcc = () => setOwnedAcc(() => { const o = {}; blueprint.forEach(([n, qr]) => o[n] = qr); return o; });
+  // Damage marking is local wizard state here (accDamage), not yet persisted
+  // — the instance doesn't exist until commit() writes it. No notes/extra:
+  // there's no per-copy notes storage at creation time yet (server/instances.js
+  // doesn't accept accDamageNotes on create), and nothing to swap-for-clean
+  // into on a copy that doesn't exist yet.
+  const dmgPropsFor = (n) => ({
+    dmgChecked: Array.from({ length: owned[n] || 0 }, (_, k) => k < (accDamage[n] || 0)),
+    dmgOnSet: (k) => setAccDamage(d => ({ ...d, [n]: k })),
+  });
 
   // condition handlers
   const phys = physicalGrade(dmg);
@@ -281,7 +262,19 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                     <p className="af-seclab"><b>Accessories</b> · {fullDone}/{bpReq} complete{blueprint.length ? "" : " — no blueprint on file for this figure"}</p>
                     {blueprint.length > 0 && (
                       <div className="af-acc">
-                        <AccessoryList ordered={ordered} renderSolo={(a) => afAccRow(a)} renderOption={(a) => afAccRow(a, true)} />
+                        <AccessoryList ordered={ordered}
+                                       renderSolo={(a, key) => (
+                                         <AccItem key={key} name={a[0]} req={a[1]} color={a[6]}
+                                                  checked={Array.from({ length: a[1] }, (_, k) => k < (owned[a[0]] || 0))}
+                                                  onSet={(n) => setUnit(a[0], n)}
+                                                  {...dmgPropsFor(a[0])} />
+                                       )}
+                                       renderOption={(a) => (
+                                         <AccItem key={a[0]} name={JoeData.optLabel(a[0])} req={a[1]} color={a[6]} tag={a[5]}
+                                                  checked={Array.from({ length: a[1] }, (_, k) => k < (owned[a[0]] || 0))}
+                                                  onSet={(n) => setUnit(a[0], n)}
+                                                  {...dmgPropsFor(a[0])} />
+                                       )} />
                       </div>
                     )}
                   </React.Fragment>
@@ -378,13 +371,6 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                     </React.Fragment>
                   )}
                 </section>
-                {!moc && blueprint.length > 0 && (
-                  <section className="panel">
-                    <div className="panel__hd">ACCESSORY DAMAGE <em>· optional</em></div>
-                    <DamageModePanel ownedAcc={ownedAcc} rawAcc={owned} accDamage={accDamage}
-                      onSetDamage={(name, k) => setAccDamage(d => ({ ...d, [name]: k }))} />
-                  </section>
-                )}
                 <section className="panel">
                   <div className="panel__hd">NOTES <em>· this copy only</em></div>
                   <textarea className="af-notes" value={notes} onChange={e => setNotes(e.target.value)}

@@ -7,7 +7,7 @@
 // against the real collection in the store.
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
-import { figState, applyRebalance, AccItem } from './app-detail.jsx';
+import { figState, applyRebalance, DmgPopover } from './app-detail.jsx';
 import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip } from './fig-identity.jsx';
 import { figIdentityText, formatYear } from './fig-identity.js';
@@ -118,26 +118,21 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
             ))}
           </div>
         )}
-        {dmgOpen && (
-          <div className="acc-list acc-list--dmg pb-dmgpanel">
-            <div className="acc-list__cap"><span>DAMAGED UNITS</span><span><b>{entry.damaged}</b>/{entry.qty}</span></div>
-            <AccItem name={entry.accessory} req={entry.qty} tone="damage"
-                     checked={Array.from({ length: entry.qty }, (_, k) => k < entry.damaged)}
-                     onSet={(k) => JoeStore.setPartDamage(entry.id, k)} />
-            {entry.damaged > 0 && (
-              <textarea className="pb-dmgnotes" key={entry.id} defaultValue={entry.damageNotes}
-                        placeholder="what's damaged — e.g. cracked strap, faded paint…"
-                        onBlur={e => JoeStore.setPartDamageNotes(entry.id, e.target.value)}></textarea>
-            )}
-          </div>
-        )}
         {entry.notes && <div className="pb-noteline">✎ <span>{entry.notes}</span></div>}
       </div>
       <div className="pb-actions">
         <button className="pb-btn pb-btn--ghost" onClick={() => JoeStore.adjustPart(entry.id, +1)}>＋</button>
         <button className="pb-btn pb-btn--ghost" onClick={() => JoeStore.adjustPart(entry.id, -1)}>－</button>
-        <button className={"pb-btn pb-btn--ghost pb-btn--dmg" + (dmgOpen ? " is-on" : "") + (entry.damaged > 0 ? " has-damage" : "")}
-                title="Mark units of this loose part as damaged" onClick={() => setDmgOpen(v => !v)}>⚠</button>
+        <span className="pb-dmg">
+          <button className={"pb-btn pb-btn--ghost pb-btn--dmg" + (dmgOpen ? " is-on" : "") + (entry.damaged > 0 ? " has-damage" : "")}
+                  title="Mark units of this loose part as damaged" onClick={() => setDmgOpen(v => !v)}>⚠</button>
+          {dmgOpen && (
+            <DmgPopover name={entry.accessory} count={entry.qty}
+                        checked={Array.from({ length: entry.qty }, (_, k) => k < entry.damaged)}
+                        onSet={(k) => JoeStore.setPartDamage(entry.id, k)}
+                        notes={entry.damageNotes} onSetNotes={(v) => JoeStore.setPartDamageNotes(entry.id, v)} />
+          )}
+        </span>
       </div>
     </div>
   );
@@ -253,21 +248,17 @@ function AddPartModal({ onClose }) {
                               </div>
                             )}
                             {on && (
-                              <button type="button"
-                                      className={"pb-btn pb-btn--ghost pb-btn--dmg" + (dOpen ? " is-on" : "") + (item.damaged > 0 ? " has-damage" : "")}
-                                      title="Mark units of this part as damaged" onClick={() => toggleDmg(name)}>⚠</button>
-                            )}
-                            {dOpen && (
-                              <div className="pb-accopt__dmgpanel">
-                                <AccItem name={name} req={item.qty} tone="damage"
-                                         checked={Array.from({ length: item.qty }, (_, k) => k < item.damaged)}
-                                         onSet={(k) => setDamaged(name, k)} />
-                                {item.damaged > 0 && (
-                                  <textarea className="pb-dmgnotes" value={item.damageNotes}
-                                            placeholder="what's damaged — e.g. cracked strap, faded paint…"
-                                            onChange={e => setDamageNotes(name, e.target.value)}></textarea>
+                              <span className="pb-dmg">
+                                <button type="button"
+                                        className={"pb-btn pb-btn--ghost pb-btn--dmg" + (dOpen ? " is-on" : "") + (item.damaged > 0 ? " has-damage" : "")}
+                                        title="Mark units of this part as damaged" onClick={() => toggleDmg(name)}>⚠</button>
+                                {dOpen && (
+                                  <DmgPopover name={name} count={item.qty}
+                                              checked={Array.from({ length: item.qty }, (_, k) => k < item.damaged)}
+                                              onSet={(k) => setDamaged(name, k)}
+                                              notes={item.damageNotes} onSetNotes={(v) => setDamageNotes(name, v)} />
                                 )}
-                              </div>
+                              </span>
                             )}
                           </div>
                         );

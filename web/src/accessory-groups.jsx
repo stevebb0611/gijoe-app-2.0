@@ -40,9 +40,8 @@
 // checkboxes landed at a different x per option instead of lining up with
 // every other row's checkbox column. Options are no longer a bespoke pill —
 // each renders through the same per-row renderer (renderOption) the caller
-// already uses for solo items (AccItem in app-detail.jsx, .af-acc__row in
-// app-add-figure.jsx), so the checkbox sits in the exact same right-hand
-// column as everywhere else in the list.
+// already uses for solo items (AccItem, app-detail.jsx), so the checkbox
+// sits in the exact same right-hand column as everywhere else in the list.
 //
 // 2026-07-07: a group_id slot can itself be non-retail (Zartan's single-/
 // double-sided heat stickers are both 'bonus', tied by match_key — see

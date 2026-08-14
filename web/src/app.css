@@ -585,10 +585,6 @@
   .acc__namewrap { display: flex; align-items: center; gap: 7px; min-width: 0; }
   .acc__name { font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .2px; line-height: 1.15; }
   .acc__tag { font-family: var(--font-mono); font-weight: 700; font-size: 9px; color: var(--accent); border: 1px solid var(--accent); padding: 0 4px; line-height: 1.6; flex: none; }
-  /* reserved even when empty (like .acc__box.is-spacer) so the checkbox column
-     never shifts between damaged and undamaged rows — lives ahead of acc__tag
-     inside acc__namewrap so the damage flag reads before the match_key badge */
-  .acc__dmgflag { width: 14px; text-align: center; color: var(--damage); font-size: 12px; flex: none; }
   .acc__boxes { display: grid; gap: 5px; justify-content: end; }
   .acc__box { width: 22px; height: 22px; border: 1.5px solid var(--ink); background: var(--paper);
     display: grid; place-items: center; padding: 0; cursor: pointer; line-height: 1;
@@ -622,23 +618,32 @@
   .acc__movepop-step:disabled { opacity: .35; cursor: default; }
   .acc__movepop-opt:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* ===== damage notation — per-unit condition flag on owned accessories ===== */
+  /* ===== inline damage popover — same anchored-popover mechanics as
+     .acc__move above, but its own column layout since it holds a box grid +
+     notes + an optional extra action, not one flex row. Shared by every
+     accessory row via AccItem's dmg* props, and mounted directly by Parts
+     Bin's non-blueprint rows (.pb-dmg wrapper, below) which have no req/owned
+     pair to wrap in a full AccItem. ===== */
   .acc-list__dmgflag { margin-left: 8px; color: var(--damage); font-weight: 700; }
-  .acc.is-damage-tone .acc__box.is-on { background: var(--damage);
+  .acc.has-dmg { grid-template-columns: 1fr auto auto auto; }
+  .acc.has-dmg.has-move { grid-template-columns: 1fr auto auto auto auto; }
+  .acc__dmg, .pb-dmg { position: relative; }
+  .acc__dmgbtn { width: 22px; height: 22px; display: grid; place-items: center; padding: 0;
+    border: 1.5px solid var(--line); background: var(--card); color: var(--ink-soft); cursor: pointer; font-size: 12px; line-height: 1; }
+  .acc__dmgbtn:hover:not(:disabled) { border-color: var(--damage); color: var(--damage); }
+  .acc__dmgbtn:disabled { color: var(--line); cursor: default; }
+  .acc__dmgbtn.has-damage { color: var(--damage); border-color: var(--damage); }
+  .acc__dmgbtn.is-on { background: var(--damage); color: #fff; border-color: var(--damage); }
+  .acc__dmgpop { position: absolute; top: calc(100% + 4px); right: 0; z-index: 6; display: flex; flex-direction: column; gap: 7px;
+    width: 190px; border: 1.5px dashed var(--damage); background: var(--paper); padding: 9px 10px; box-shadow: 3px 3px 0 rgba(33,31,26,.3); }
+  .acc__dmgpop-lab { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; color: var(--ink-soft); }
+  .acc__dmgpop-lab b { color: var(--damage); }
+  .acc__dmgpop-boxes { display: grid; gap: 5px; }
+  .acc__dmgpop .acc__box.is-on { background: var(--damage);
     background-image: repeating-linear-gradient(45deg, rgba(0,0,0,.3) 0 4px, transparent 4px 8px); color: #fff; }
-  .acc.is-damage-tone.is-done .acc__count { color: var(--damage); }
-  .acc-dmgtoggle { display: block; width: 100%; margin-top: 2px; padding: 9px 12px; border: none; border-top: 1px solid var(--line-soft);
-    background: var(--card); color: var(--ink-soft); font-family: var(--font-mono); font-weight: 700; font-size: 10px; letter-spacing: .6px;
-    text-align: left; cursor: pointer; }
-  .acc-dmgtoggle:hover { color: var(--damage); }
-  .acc-dmgtoggle.is-on { background: var(--ink); color: var(--paper); }
-  .acc-dmgtoggle.has-damage:not(.is-on) { color: var(--damage); }
-  .acc-list--dmg { border: 1.5px solid var(--damage); margin-top: -1.5px; margin-bottom: 16px; }
-  .acc-list--dmg .acc-list__cap { border-bottom-color: var(--damage); }
-  .acc-dmgrow { border-bottom: 1px solid var(--line-soft); }
-  .acc-dmgrow:last-child { border-bottom: none; }
-  .acc-swap { display: block; width: 100%; padding: 0 12px 8px; margin-top: -4px; border: none; background: var(--card);
-    font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .3px; text-align: right;
+  .acc__dmgpop .pb-dmgnotes { margin-top: 0; }
+  .acc-swap { display: block; width: 100%; padding: 0; border: none; background: transparent;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .3px; text-align: left;
     color: var(--accent); cursor: pointer; }
   .acc-swap:hover:not(:disabled) { text-decoration: underline; }
   .acc-swap:disabled { color: var(--ink-soft); cursor: default; }
@@ -647,8 +652,8 @@
      rows. Flush with the plain checklist rhythm (Option 2, 2026-07-05 redesign
      of the old boxed sgw-pillset card — see accessory-groups.jsx header). ===== */
   /* the group only contributes the micro-label — every option/context item
-     below it renders as a real row (AccItem or .af-acc__row) with its own
-     padding and checkbox column, so the wrapper itself carries no padding. */
+     below it renders as a real AccItem row with its own padding and checkbox
+     column, so the wrapper itself carries no padding. */
   .sgw-group { padding: 0; }
   /* group boundaries (group-to-group, group-to-solo) read as a stronger break
      than the hairline between two options inside one group — otherwise a
@@ -875,18 +880,6 @@
   .af-acc { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 22px; }
   .af-acc .sgw-group { grid-column: 1 / -1; padding: 0; border-top: none; }
   .af-acc .sgw-group .sgw-label { padding: 7px 0 5px; }
-  .af-acc__row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; padding: 7px 0; border-bottom: 1px dashed var(--line-soft); min-height: 38px; }
-  .af-acc__n { font-size: 12px; line-height: 1.2; }
-  .af-acc__tag { font-family: var(--font-mono); font-weight: 700; font-size: 9px; color: var(--accent); border: 1px solid var(--accent); padding: 0 4px; line-height: 1.6; flex: none; }
-  .af-acc__left { display: flex; align-items: center; gap: 8px; min-width: 0; }
-  .af-acc__row.is-done .af-acc__n { color: var(--ink-soft); }
-  .af-acc__right { display: flex; align-items: center; gap: 9px; }
-  .af-acc__boxes { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; max-width: 82px; }
-  .af-unit { width: 22px; height: 22px; flex: none; border: 1.5px solid var(--ink); background: var(--paper); cursor: pointer; display: grid; place-items: center; font-family: var(--font-mono); font-weight: 700; font-size: 11px; color: transparent; padding: 0; }
-  .af-unit.is-on { background: var(--ok); color: #fff; }
-  .af-unit:hover { border-color: var(--accent); }
-  .af-acc__count { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--ink-soft); min-width: 30px; text-align: right; }
-  .af-acc__count.is-done { color: var(--ok); }
   .af-cond { display: grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: start; }
   .af-cond__side { display: flex; flex-direction: column; gap: 12px; }
   .dm { display: flex; flex-direction: column; gap: 10px; }

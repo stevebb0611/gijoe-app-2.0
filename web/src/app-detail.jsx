@@ -391,10 +391,9 @@ function boxCells(name, req, checked, onSet, dmgTitles) {
   return { cells, cols, rows, own };
 }
 
-function AccItem({ name, req, checked, onSet, tone, color, tag, moveTargets, onMove,
+function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove,
                     dmgChecked, dmgOnSet, dmgNotes, dmgOnSetNotes, dmgExtra }) {
-  const dmg = tone === 'damage';
-  const { cells, cols, rows, own } = boxCells(name, req, checked, onSet, dmg);
+  const { cells, cols, rows, own } = boxCells(name, req, checked, onSet, false);
   const done = own >= req;
   const hasDmg = dmgChecked != null;
   const dmgCount = hasDmg ? dmgChecked.reduce((s, c) => s + (c ? 1 : 0), 0) : 0;
@@ -409,7 +408,7 @@ function AccItem({ name, req, checked, onSet, tone, color, tag, moveTargets, onM
   const openMove = () => { setDmgOpen(false); setMoveQty(1); setMoveOpen((v) => !v); };
   const openDmg = () => { setMoveOpen(false); setDmgOpen((v) => !v); };
   return (
-    <div className={"acc" + (rows === 2 ? " is-stack" : "") + (done ? " is-done" : "") + (dmg ? " is-damage-tone" : "") + (hasDmg ? " has-dmg" : "") + (moveTargets != null ? " has-move" : "")}>
+    <div className={"acc" + (rows === 2 ? " is-stack" : "") + (done ? " is-done" : "") + (hasDmg ? " has-dmg" : "") + (moveTargets != null ? " has-move" : "")}>
       <span className="acc__namewrap">
         {tag != null && <span className="acc__tag">{tag}</span>}{color && <AccSwatch color={color} />}<span className="acc__name">{name}</span>
       </span>
@@ -547,6 +546,25 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const setUnit = (name, n) => JoeStore.setAcc(cur.id, name, n);
   const setDamage = (name, n) => JoeStore.setAccDamage(cur.id, name, n);
   const swapForClean = (name) => JoeStore.swapAccessoryForClean(cur.id, name);
+  // "swap for clean" only exists here — no other surface has other saved
+  // copies (or a Parts Bin) to trade a damaged unit against.
+  const dmgExtraFor = (name) => {
+    const canSwap = cleanInBin(name) > 0;
+    return (
+      <button type="button" className="acc-swap" disabled={!canSwap}
+              title={canSwap ? "Trade this damaged unit for a clean one from the Parts Bin" : "No clean units of this accessory in the Parts Bin"}
+              onClick={() => swapForClean(name)}>
+        {canSwap ? "swap for clean ›" : "no clean stock in bin"}
+      </button>
+    );
+  };
+  const dmgPropsFor = (name) => ({
+    dmgChecked: Array.from({ length: (raw.acc && raw.acc[name]) || 0 }, (_, k) => k < (accDamage[name] || 0)),
+    dmgOnSet: (n) => setDamage(name, n),
+    dmgNotes: accDamageNotes[name],
+    dmgOnSetNotes: (v) => JoeStore.setAccDamageNotes(cur.id, name, v),
+    dmgExtra: () => dmgExtraFor(name),
+  });
   // Other copies this row's accessory could move to — null when there's only
   // one owned copy (feature not applicable), else filtered to same-variant
   // copies for variant-scoped rows (see ACCESSORY_GROUPS.md "variant_id") AND
@@ -818,29 +836,19 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                     </div>
                     <AccessoryList ordered={ordered}
                                    renderSolo={(a, key) => (
-                                     <AccItem key={key} name={a[0]} req={a[1]} color={a[6]} damaged={(accDamage[a[0]] || 0) > 0}
+                                     <AccItem key={key} name={a[0]} req={a[1]} color={a[6]}
                                               checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
                                               onSet={(n) => setUnit(a[0], n)}
+                                              {...dmgPropsFor(a[0])}
                                               moveTargets={moveTargetsFor(a)} onMove={(destId, qty) => moveUnit(a[0], destId, qty)} />
                                    )}
                                    renderOption={(a) => (
-                                     <AccItem key={a[0]} name={JoeData.optLabel(a[0])} req={a[1]} color={a[6]} tag={a[5]} damaged={(accDamage[a[0]] || 0) > 0}
+                                     <AccItem key={a[0]} name={JoeData.optLabel(a[0])} req={a[1]} color={a[6]} tag={a[5]}
                                               checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
                                               onSet={(n) => setUnit(a[0], n)}
+                                              {...dmgPropsFor(a[0])}
                                               moveTargets={moveTargetsFor(a)} onMove={(destId, qty) => moveUnit(a[0], destId, qty)} />
                                    )} />
-                    <DamageModePanel ownedAcc={ownedAcc} rawAcc={raw.acc || {}} accDamage={accDamage} onSetDamage={setDamage}
-                      accDamageNotes={accDamageNotes} onSetDamageNotes={(name, v) => JoeStore.setAccDamageNotes(cur.id, name, v)}
-                      extra={(name) => {
-                        const canSwap = cleanInBin(name) > 0;
-                        return (
-                          <button type="button" className="acc-swap" disabled={!canSwap}
-                                  title={canSwap ? "Trade this damaged unit for a clean one from the Parts Bin" : "No clean units of this accessory in the Parts Bin"}
-                                  onClick={() => swapForClean(name)}>
-                            {canSwap ? "swap for clean ›" : "no clean stock in bin"}
-                          </button>
-                        );
-                      }} />
                   </div>
                 )}
 
@@ -1001,7 +1009,6 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
 export {
   INV_CAT, INV_ERAS, INV_CAT_BY_ID,
   fvm, figParts, figState, applyRebalance, yearParts, invTotals, invMasterTotals,
-  FactionTag, CompRing, CompBar, PhotoSlot, StockBar, AccItem, boxLayout, MasterBadge,
-  DamageModePanel,
+  FactionTag, CompRing, CompBar, PhotoSlot, StockBar, AccItem, DmgPopover, boxLayout, MasterBadge,
   InvDetailModal,
 };
