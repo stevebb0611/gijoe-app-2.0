@@ -17,9 +17,9 @@ Recreate as a clean component tree (names map to the prototype):
 - `YearSection` (sticky `YearHeader` + collapsible body)
 - `FigureRow` (+ `InstanceRow` accordion) for List
 - `FigureCard` for Gallery
-- `FigureModal` (with `InstanceTabs`, `AccessoryChecklist`, `AcquirePanel`)
-- `AddFigureModal` (pop-out launched from the header ＋; steps **FIND → DETAILS → CONDITION**, ＋ADD on the last step). FIND has two independent inputs: a fuzzy catalog **search** + a **Year→Figure** dropdown. Reuses the shared `DamageMap` for the condition step. Catalog + fuzzy matcher come from a data module (`add-figure-catalog.js` in the prototype — in production this is a server query against the `figures` catalog).
-- Shared primitives: `FactionTag`, `CompletenessBar`, `CompletenessRing`, `StockCell`, `PhotoSlot`, `Chip`, `SegmentedToggle`, `DamageMap`.
+- `FigureModal` (with `InstanceTabs`, `AccessoryChecklist`). No separate "acquire"/preview component for a not-yet-owned figure — clicking one opens `AddFigureModal` directly (see the **Figure input** and **Accessory input** rules below).
+- `AddFigureModal` (pop-out launched from the header ＋, or from a Figure modal's ＋ "add a copy," or an unowned figure's row/card click; steps **FIND → DETAILS → CONDITION**, ＋ADD on the last step). FIND has two independent inputs: a fuzzy catalog **search** + a **Year→Figure** dropdown. Production/variant selection lives on DETAILS, not FIND (see below). Reuses the shared `DamageMap` for the condition step. Catalog + fuzzy matcher come from a data module (`add-figure-catalog.js` in the prototype — in production this is a server query against the `figures` catalog).
+- Shared primitives: `FactionTag`, `CompletenessBar`, `CompletenessRing`, `StockCell`, `PhotoSlot`, `Chip`, `SegmentedToggle`, `DamageMap`, and one shared accessory-row component (`AccessoryChecklist`'s row) reused by every accessory-owning list — see **Accessory input** below.
 Keep the completeness math (`figParts`/`yearParts`/`totals`) as **pure, tested functions** decoupled from rendering.
 
 ## Styling & design tokens

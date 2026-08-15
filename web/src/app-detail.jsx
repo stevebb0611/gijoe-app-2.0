@@ -392,14 +392,21 @@ function boxCells(name, req, checked, onSet, dmgTitles) {
   return { cells, cols, rows, own };
 }
 
-function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove,
+function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove, onSwapToBin,
                     dmgChecked, dmgOnSet, dmgNotes, dmgOnSetNotes, dmgExtra }) {
   const { cells, cols, rows, own } = boxCells(name, req, checked, onSet, false);
   const done = own >= req;
   const hasDmg = dmgChecked != null;
   const dmgCount = hasDmg ? dmgChecked.reduce((s, c) => s + (c ? 1 : 0), 0) : 0;
   const canDmg = hasDmg && own > 0;
+  // moveTargets is the "TO No." options (needs 2+ owned copies); onSwapToBin
+  // needs neither — a single-copy figure can still swap a unit to the bin —
+  // so the ⇄ column shows whenever either affordance applies, and both live
+  // in the same popover, swap-to-bin listed last (see acc__movepop-bin below).
   const canMove = moveTargets != null && moveTargets.length > 0 && own > 0;
+  const canSwapBin = typeof onSwapToBin === 'function' && own > 0;
+  const canMoveCol = moveTargets != null || canSwapBin;
+  const moveOrSwap = canMove || canSwapBin;
   const [moveOpen, setMoveOpen] = React.useState(false);
   const [moveQty, setMoveQty] = React.useState(1);
   const [dmgOpen, setDmgOpen] = React.useState(false);
@@ -410,7 +417,7 @@ function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove,
   const openMove = () => { setDmgOpen(false); setMoveQty(1); setMoveOpen((v) => !v); };
   const openDmg = () => { setMoveOpen(false); setDmgOpen((v) => !v); };
   return (
-    <div className={"acc" + (rows === 2 ? " is-stack" : "") + (done ? " is-done" : "") + (hasDmg ? " has-dmg" : "") + (moveTargets != null ? " has-move" : "")}>
+    <div className={"acc" + (rows === 2 ? " is-stack" : "") + (done ? " is-done" : "") + (hasDmg ? " has-dmg" : "") + (canMoveCol ? " has-move" : "")}>
       <span className="acc__namewrap">
         {tag != null && <span className="acc__tag">{tag}</span>}{color && <AccSwatch color={color} />}<span className="acc__name">{name}</span>
       </span>
@@ -428,28 +435,38 @@ function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove,
           )}
         </span>
       )}
-      {moveTargets != null && (
+      {canMoveCol && (
         <span className="acc__move">
-          <button type="button" className="acc__movebtn" disabled={!canMove}
-                  title={canMove ? "Move a unit of " + name + " to another copy" : "No spare unit to move"}
+          <button type="button" className="acc__movebtn" disabled={!moveOrSwap}
+                  title={moveOrSwap ? "Move or swap a unit of " + name : "No spare unit to move or swap"}
                   onClick={openMove}>⇄</button>
-          {moveOpen && canMove && (
+          {moveOpen && moveOrSwap && (
             <div className="acc__movepop">
-              <span className="acc__movepop-lab">MOVE</span>
-              {own > 1 && (
-                <span className="acc__movepop-qty">
-                  <button type="button" className="acc__movepop-step" disabled={moveQty <= 1}
-                          onClick={() => setMoveQty((q) => Math.max(1, q - 1))}>−</button>
-                  <b>{moveQty}</b>
-                  <button type="button" className="acc__movepop-step" disabled={moveQty >= own}
-                          onClick={() => setMoveQty((q) => Math.min(own, q + 1))}>+</button>
+              {canMove && (
+                <span className="acc__movepop-row">
+                  <span className="acc__movepop-lab">MOVE</span>
+                  {own > 1 && (
+                    <span className="acc__movepop-qty">
+                      <button type="button" className="acc__movepop-step" disabled={moveQty <= 1}
+                              onClick={() => setMoveQty((q) => Math.max(1, q - 1))}>−</button>
+                      <b>{moveQty}</b>
+                      <button type="button" className="acc__movepop-step" disabled={moveQty >= own}
+                              onClick={() => setMoveQty((q) => Math.min(own, q + 1))}>+</button>
+                    </span>
+                  )}
+                  <span className="acc__movepop-lab">TO No.</span>
+                  {moveTargets.map((t) => (
+                    <button key={t.id} type="button" className="acc__movepop-opt"
+                            onClick={() => { onMove(t.id, moveQty); setMoveOpen(false); }}>{t.no}</button>
+                  ))}
                 </span>
               )}
-              <span className="acc__movepop-lab">TO No.</span>
-              {moveTargets.map((t) => (
-                <button key={t.id} type="button" className="acc__movepop-opt"
-                        onClick={() => { onMove(t.id, moveQty); setMoveOpen(false); }}>{t.no}</button>
-              ))}
+              {canSwapBin && (
+                <button type="button" className="acc__movepop-bin"
+                        onClick={() => { onSwapToBin(); setMoveOpen(false); }}>
+                  swap to parts bin ›
+                </button>
+              )}
             </div>
           )}
         </span>
@@ -598,6 +615,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
     ? copies.filter((c) => c.id !== cur.id && (!a[7] || a[7] === c.variant) && ((c.acc && c.acc[a[0]]) || 0) < a[1]).map((c) => ({ id: c.id, no: c.no }))
     : null;
   const moveUnit = (name, destId, qty) => JoeStore.moveAcc(cur.id, destId, name, qty);
+  const swapUnitToBin = (name) => JoeStore.swapAccessoryToBin(cur.id, name);
   const setMoc = (v) => JoeStore.updateInstance(cur.id, { moc: v });
   const setMaster = (v) => JoeStore.updateInstance(cur.id, { masterCollection: v });
   const setCard = (patch) => JoeStore.updateInstance(cur.id, { filecard: { ...filecard, ...patch } });
@@ -819,14 +837,16 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                                               checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
                                               onSet={(n) => setUnit(a[0], n)}
                                               {...dmgPropsFor(a[0])}
-                                              moveTargets={moveTargetsFor(a)} onMove={(destId, qty) => moveUnit(a[0], destId, qty)} />
+                                              moveTargets={moveTargetsFor(a)} onMove={(destId, qty) => moveUnit(a[0], destId, qty)}
+                                              onSwapToBin={() => swapUnitToBin(a[0])} />
                                    )}
                                    renderOption={(a) => (
                                      <AccItem key={a[0]} name={JoeData.optLabel(a[0])} req={a[1]} color={a[6]} tag={a[5]}
                                               checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
                                               onSet={(n) => setUnit(a[0], n)}
                                               {...dmgPropsFor(a[0])}
-                                              moveTargets={moveTargetsFor(a)} onMove={(destId, qty) => moveUnit(a[0], destId, qty)} />
+                                              moveTargets={moveTargetsFor(a)} onMove={(destId, qty) => moveUnit(a[0], destId, qty)}
+                                              onSwapToBin={() => swapUnitToBin(a[0])} />
                                    )} />
                   </div>
                 )}

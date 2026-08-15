@@ -223,6 +223,12 @@ export const JoeStore = {
       api('POST', '/api/instances/' + fromId + '/accessory/move', { toInstanceId: toId, name, count });
       refresh(); emit();
     },
+    // moves 1 unit of an accessory off this instance and into the Parts Bin —
+    // prefers a damaged unit when one exists (see server/instances.js)
+    swapAccessoryToBin(id, name) {
+      api('POST', '/api/instances/' + id + '/accessory/swap-to-bin', { name });
+      refresh(); emit();
+    },
     removeInstance(id) {
       api('DELETE', '/api/instances/' + id);
       refresh(); emit();
