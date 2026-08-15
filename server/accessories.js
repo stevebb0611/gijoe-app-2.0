@@ -37,8 +37,6 @@ const figureRowsStmt = db.prepare(`
   WHERE fa.release_context = 'retail'
 `);
 
-const figureNameStmt = db.prepare('SELECT code_name FROM figures WHERE id = ?');
-
 function nameYearLabels(rows) {
   const byName = new Map();
   rows.forEach(({ code_name, year }) => {
@@ -63,7 +61,13 @@ export function buildAccessoryCatalog() {
 
   return accessoriesStmt.all().map((r) => {
     const shared = r.figure_count > 1;
-    const soloFigure = !shared ? figureNameStmt.get(r.solo_figure_id) : null;
+    // Solo figure's own row (same source as the shared-case labels below).
+    // homeFigureGroup stays a bare name so same-named figures still share one
+    // group header ("BAZOOKA"); homeFigureName appends the release year so
+    // the per-row "figure:" line can still tell '85 apart from '88 — see
+    // PARTS_BIN.md confusion 2026-08-15.
+    const soloRow = !shared ? (rowsByAccessory.get(r.id) || [])[0] : null;
+    const homeFigureGroup = soloRow ? (soloRow.code_name || '').toUpperCase() : null;
     const homeFigureNames = shared ? nameYearLabels(rowsByAccessory.get(r.id) || []) : null;
     return {
       id: r.id,
@@ -74,7 +78,10 @@ export function buildAccessoryCatalog() {
       shared,
       figureCount: r.figure_count,
       homeFigureId: shared ? null : r.solo_figure_id,
-      homeFigureName: soloFigure ? (soloFigure.code_name || '').toUpperCase() : null,
+      homeFigureGroup,
+      homeFigureName: soloRow
+        ? homeFigureGroup + (soloRow.year ? ' (' + formatYear(soloRow.year) + ')' : '')
+        : null,
       homeFigureNames,
     };
   });

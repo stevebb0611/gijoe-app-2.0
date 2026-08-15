@@ -375,6 +375,12 @@ function GroupSection({ sec, sep, collapsed, toggle, NEEDS, openId, setOpenId })
   );
 }
 
+// Within a "GROUP BY FIGURE" header, several release years can share one
+// bare-name heading (e.g. Bazooka '85 + '88) — sort by the year-qualified
+// label first so same-year accessories cluster instead of interleaving by
+// accessory name alone.
+const byFigureThenNeed = (a, b) => (a.e.homeFigureName || '').localeCompare(b.e.homeFigureName || '') || (b.ev.needed - a.ev.needed) || a.e.accessory.localeCompare(b.e.accessory);
+
 function buildSections(items, mode) {
   const byNeed = (a, b) => (b.ev.needed - a.ev.needed) || a.e.accessory.localeCompare(b.e.accessory);
   let keyOf, labelOf, order = null, sortByCatId = false;
@@ -383,7 +389,7 @@ function buildSections(items, mode) {
     labelOf = (k) => k.toUpperCase();
     sortByCatId = true;
   } else if (mode === 'home') {
-    keyOf = ({ e }) => e.shared ? 'Shared' : (e.homeFigureName || '—');
+    keyOf = ({ e }) => e.shared ? 'Shared' : (e.homeFigureGroup || '—');
     labelOf = (k) => k === 'Shared' ? 'SHARED · FITS MULTIPLE FIGURES' : k;
   } else {
     keyOf = ({ ev }) => ev.needed ? 'gap' : 'none'; order = ['gap', 'none'];
@@ -407,7 +413,8 @@ function buildSections(items, mode) {
   } else {
     keys.sort((a, b) => order ? order.indexOf(a) - order.indexOf(b) : String(a).localeCompare(String(b)));
   }
-  return keys.map(k => ({ key: k, label: labelOf(k), rows: map.get(k).sort(byNeed), sep: mode === 'home' && k === 'Shared' }));
+  const rowSort = mode === 'home' ? byFigureThenNeed : byNeed;
+  return keys.map(k => ({ key: k, label: labelOf(k), rows: map.get(k).sort(rowSort), sep: mode === 'home' && k === 'Shared' }));
 }
 
 // ============================================================ app
@@ -425,7 +432,7 @@ function PartsBin({ onNavigate }) {
   // bin entries decorated with real accessory metadata
   const bin = store.bin.map(e => {
     const meta = JoeData.ACC_BY_ID.get(e.id) || {};
-    return { ...e, categoryId: meta.categoryId != null ? meta.categoryId : null, categoryLabel: meta.categoryLabel || null, color: meta.color || null, shared: !!meta.shared, figureCount: meta.figureCount || null, homeFigureName: meta.homeFigureName || null, homeFigureNames: meta.homeFigureNames || null };
+    return { ...e, categoryId: meta.categoryId != null ? meta.categoryId : null, categoryLabel: meta.categoryLabel || null, color: meta.color || null, shared: !!meta.shared, figureCount: meta.figureCount || null, homeFigureGroup: meta.homeFigureGroup || null, homeFigureName: meta.homeFigureName || null, homeFigureNames: meta.homeFigureNames || null };
   });
   const NEEDS = React.useMemo(buildNeeds, [store]);
   const suggestions = buildSuggestions(bin, NEEDS);

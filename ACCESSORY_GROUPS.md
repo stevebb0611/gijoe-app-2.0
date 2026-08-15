@@ -451,7 +451,10 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
   A/B in that order. Also verified live that the damaged-flag toggle now renders before the
   match_key tag badge on a matched-slot row (`.acc__dmgflag` moved inside `.acc__namewrap`,
   ahead of `.acc__tag`, in `web/src/app-detail.jsx`'s `AccItem` — this is a global layout
-  change, not scoped to Recondo).
+  change, not scoped to Recondo). *(Erratum, August 2026: `.acc__dmgflag` itself is gone —
+  superseded by the per-row ⚠ popover unification, `OPEN_QUESTIONS_ISSUES_FOUND.md` #24. The
+  match_key tag badge's own position relative to the rest of the row is unaffected; only the
+  now-removed damage-flag element this note describes changed.)*
 
 ### 1984 — Rip Cord (v1, figure catalog id 59 — source F-code F101)
 
