@@ -52,7 +52,7 @@ function Row({ fig, selId, openIds, onToggle, onOpen, onAddInstance }) {
   return (
     <React.Fragment>
       <button className={"inv-row" + (ghost ? " is-ghost" : "") + (active && !expandable ? " is-active" : "") + (expandable && isOpen ? " is-open" : "")}
-              onClick={() => ghost ? onOpen(fig.id, null) : onToggle(fig.id)}>
+              onClick={() => ghost ? onAddInstance(fig.id, null) : onToggle(fig.id)}>
         <span className="inv-thumb" data-tag={ghost ? "—" : ""}></span>
         <span className="inv-name">
           <b>{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} conventionKind={fig.conventionKind} /><SetTag sets={fig.sets} /><SubGroupTag subGroup={fig.subGroup} /><VariantBracket variants={fig._cf.variants} owned={ownedLetters} /><VehicleTag vehicle={fig.vehicle} inline /></b>
@@ -112,7 +112,7 @@ function Row({ fig, selId, openIds, onToggle, onOpen, onAddInstance }) {
   );
 }
 
-function GalleryCard({ fig, onOpen }) {
+function GalleryCard({ fig, onOpen, onAddInstance }) {
   const p = figParts(fig);
   const ghost = fig.owned === 0;
   const multi = fig.owned > 1;
@@ -120,7 +120,7 @@ function GalleryCard({ fig, onOpen }) {
   const copies = fig._sum ? fig._sum.copies : [];
   const ownedLetters = new Set(copies.map(c => c.variant).filter(Boolean));
   return (
-    <button className={"card inv-card" + (ghost ? " is-ghostcard" : "")} onClick={() => ghost ? onOpen(fig.id, null) : onOpen(fig.id, copies[0].id)}>
+    <button className={"card inv-card" + (ghost ? " is-ghostcard" : "")} onClick={() => ghost ? onAddInstance(fig.id, null) : onOpen(fig.id, copies[0].id)}>
       <div className="card__corner"><FactionTag faction={fig.faction} mini /></div>
       <PhotoSlot className="card__photo" src={fig.image} />
       <div className="card__name">{fig.name}<VersionChip version={fig.version} /><EditionTag context={fig.releaseContext} conventionKind={fig.conventionKind} /><SetTag sets={fig.sets} /><SubGroupTag subGroup={fig.subGroup} /><VariantBracket variants={fig._cf.variants} owned={ownedLetters} /></div>
@@ -176,7 +176,7 @@ function YearSection({ year, figs, view, open, onToggleYear, rowProps, sets = []
         ) : (
           <div className="ysec__body">
             {sets.map(s => <SetCard key={'set-' + s.setId} set={s} onOpen={onOpen} onAddInstance={onAddInstance} />)}
-            <div className="inv-galgrid">{figs.map(f => <GalleryCard key={f.id} fig={f} onOpen={rowProps.onOpen} />)}</div>
+            <div className="inv-galgrid">{figs.map(f => <GalleryCard key={f.id} fig={f} onOpen={rowProps.onOpen} onAddInstance={onAddInstance} />)}</div>
           </div>
         )
       )}
@@ -341,7 +341,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
   const shownCount = sections.reduce((n, s) => n + s.figs.length, 0);
   const expandAll = () => setOpen(new Set(years));
   const collapseAll = () => setOpen(new Set());
-  const rowProps = { selId: sel ? sel.catalogId : null, openIds, onToggle: toggleFig, onOpen: openFig };
+  const rowProps = { selId: sel ? sel.catalogId : null, openIds, onToggle: toggleFig, onOpen: openFig, onAddInstance };
 
   // active-filter tokens
   const tokens = [];

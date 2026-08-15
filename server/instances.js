@@ -392,6 +392,41 @@ export const swapAccessoryForClean = db.transaction((instanceId, name) => {
   return true;
 });
 
+// Moves 1 unit of an accessory off an instance and into the Parts Bin —
+// the "nowhere left to move it to" complement to moveInstanceAccessory
+// (copy → copy). Prefers taking a damaged unit (and carrying its
+// damage_notes into the bin entry) over a clean one — the opposite
+// preference from moveInstanceAccessory/pullPart — because the primary
+// reason to swap an accessory out this way is that it's damaged.
+export const swapAccessoryToBin = db.transaction((instanceId, name) => {
+  const row = getInstanceFigure.get(instanceId);
+  if (!row) return false;
+  const accId = accessoryIdForName(row.figure_id, name);
+  if (!accId) return false;
+
+  const src = db.prepare('SELECT units_owned, units_damaged, damage_notes FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(instanceId, accId);
+  if (!src || src.units_owned <= 0) return false;
+
+  const movingDamaged = src.units_damaged > 0;
+  const srcDamagedNow = movingDamaged ? src.units_damaged - 1 : src.units_damaged;
+  setInstanceAccDamage.run(srcDamagedNow, instanceId, accId);
+  if (srcDamagedNow === 0) setInstanceAccDamageNotes.run(null, instanceId, accId); // no damaged units left — stale description
+  upsertInstanceAcc.run(instanceId, accId, src.units_owned - 1);
+
+  const before = getBinRow.get(accId);
+  upsertBin.run(accId, 1, null);
+  if (movingDamaged) {
+    const priorDamaged = before ? before.units_damaged : 0;
+    setBinDamaged.run(priorDamaged + 1, accId);
+    if (src.damage_notes) {
+      const existing = (before && before.damage_notes) || '';
+      const merged = existing && existing !== src.damage_notes ? existing + '; ' + src.damage_notes : (existing || src.damage_notes);
+      setBinDamageNotes.run(merged, accId);
+    }
+  }
+  return true;
+});
+
 const getInstanceFigureAndVariant = db.prepare('SELECT figure_id, variant_id FROM instances WHERE id = ?');
 const getFigureAccessoryVariant = db.prepare('SELECT variant_id, quantity_required FROM figure_accessories WHERE figure_id = ? AND accessory_id = ?');
 

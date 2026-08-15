@@ -8,7 +8,7 @@ import { clusterBlueprint, matchedSetSatisfied, bpReq, bpForVariant } from '../.
 import { physicalGrade, paintGrade, dmEmpty, DamageMap, GradeBadge } from './damage-map.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
-import { VersionChip, VariantBadge, VehicleTag, EditionTag, SetTag, SubGroupTag } from './fig-identity.jsx';
+import { VersionChip, VariantBadge, EditionTag, SetTag, SubGroupTag } from './fig-identity.jsx';
 import { formatYear } from './fig-identity.js';
 import { FileCardRow, FileCardTell, FileCardColorInput, FileCardGrade } from './filecards.jsx';
 

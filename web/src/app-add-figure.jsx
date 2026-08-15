@@ -156,7 +156,11 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
     <div className="af af--overlay">
       <div className="af-card">
         <header className="af-top">
-          <div className="af-title">{preset ? "ADD COPY" : "ADD FIGURE"}</div>
+          {/* "ADD COPY" only once a figure is actually chosen AND already owned —
+              a preset entry (ghost click, Figure Sets slot) is just as often a
+              first-time add as a genuine extra copy, so preset alone doesn't
+              decide this; ownedHere does, same signal isNew already uses below. */}
+          <div className="af-title">{fig && ownedHere > 0 ? "ADD COPY" : "ADD FIGURE"}</div>
           <button className="af-x" onClick={onClose} aria-label="Close">✕</button>
         </header>
 

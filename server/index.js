@@ -103,6 +103,12 @@ app.post('/api/instances/:id/accessory/move', (req, res) => {
   res.json({ ok: true });
 });
 
+app.post('/api/instances/:id/accessory/swap-to-bin', (req, res) => {
+  const ok = store.swapAccessoryToBin(+req.params.id, req.body.name);
+  if (!ok) return res.status(400).json({ error: 'no unit of this accessory owned on this copy' });
+  res.json({ ok: true });
+});
+
 app.delete('/api/instances/:id', (req, res) => {
   store.removeInstance(+req.params.id);
   res.status(204).end();
