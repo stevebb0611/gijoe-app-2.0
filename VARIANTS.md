@@ -59,7 +59,10 @@ ProductionVariant            // source: variant_lookup, FK → figureId
 
 > **Decided June 2026 — the UNIDENTIFIED lifecycle is dropped entirely.** Earlier drafts made "I'm not sure yet" a first-class state you could log and pin later. The owner's rule overrides that: **if you can't identify the figure/variant in hand, it does not go into the collection** — it stays on the physical desk for review and is added only once identified. The app therefore **only ever contains identified copies.** There is no `null`-means-unknown, no defer, no "identify later," and no review queue inside the app (the review pile is physical and never touches the application).
 
-Consequences:
+> **Update (August 2026) — picker moved to DETAILS, and now defaults instead of gating.** The bullet directly below described the picker as living on FIND with an explicit-pick hard gate; that's since changed (see `OPEN_QUESTIONS_ISSUES_FOUND.md` #25). It's kept here, marked, rather than rewritten, since the *reasoning* — every entry point used to look different — is still useful context for why the change happened:
+> - The picker now lives on the **DETAILS** step for every entry point, not FIND — including the ones that skip FIND entirely (Figure modal's "add a copy," an unowned figure's row/card click, an empty Figure Sets slot), which previously had to relocate the same picker into DETAILS on their own, producing a second layout for the same decision.
+> - Selecting a figure now **defaults** the variant to the figure's first letter ("A") instead of leaving it unset — except "add a copy," which defaults to the source copy's own variant. `NEXT`/advancing is no longer blocked on an explicit pick.
+> - **The core rule below is otherwise unchanged and still enforced**: an instance is never saved with a null/unidentified variant. Defaulting to "A" is a pre-filled, changeable answer — not a return of the dropped UNIDENTIFIED state. The owner can (and is expected to) change the pre-selection before Finalize if the physical copy isn't actually variant A.
 
 - **Add Figure, FIND step.** Selecting a **multi-variant** catalog row expands a **WHICH VARIANT?** picker. Each option is a radio: `v{ver} · {letter}` · the tell · owned count. **A specific variant must be chosen to advance** — `NEXT` stays disabled until one is picked. There is **no "? UNIDENTIFIED" option.** (Single-variant figures skip the picker entirely.)
 - **Carry-through.** The chosen variant threads through Details, Confirm, and the success toast — always a concrete `v{ver} · {letter}` + tell, never a flag.
@@ -87,7 +90,7 @@ Add Figure computes ownership **at the variant level**, which changes the langua
 
 | Screen | Treatment | Status |
 |---|---|---|
-| **Add Figure** (`add-figure.jsx`) | The variant **picker** (tell-matching radios, **required** pick — no UNIDENTIFIED option), the NEW VARIANT/FIGURE labels, variant in Confirm + success. Search matches tells. | ✅ built — required pick, no UNIDENTIFIED option |
+| **Add Figure** (`add-figure.jsx`) | The variant **picker** (tell-matching radios, no UNIDENTIFIED option), the NEW VARIANT/FIGURE labels, variant in Confirm + success. Search matches tells. | ✅ built — lives on DETAILS, defaults instead of requiring a pick (Aug 2026, see §3 update note above) |
 | **Instance Detail** (`instance-detail.jsx`) | Variant tag + tell subtitle + a **change ›** affordance to *correct* the pinned variant. | ✅ built — correction only, no identify-later state |
 | **Inventory** (`inventory-app.jsx` / `wf-data.jsx`) | **Variant-aware:** per-variant **pips** on rows + gallery cards (owned / whole / gap), a `v{ver}·{letter}` **grouped accordion** with per-variant tells + rebalance, and a full **variant rail** in the modal. | ✅ built (never surfaced unidentified — nothing to strip) |
 | **Parts Bin** | Variant-agnostic (accessories attach to the Figure blueprint, not the variant). | n/a |

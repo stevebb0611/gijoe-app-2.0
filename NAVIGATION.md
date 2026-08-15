@@ -58,17 +58,25 @@ This makes the relationship genuinely bidirectional: the figure flows feed and d
 ## Flow summary
 ```
 Inventory (All, by year)
-  └─ figure row / card ──▶ Quick-look modal (figure level)
+  └─ figure row / card, OWNED ──▶ Quick-look modal (figure level)
         └─ instance tab "open" ──▶ Instance Detail (copy level)
+        └─ ＋ "add a copy" ──▶ Add Figure (below), locked to this figure, straight to DETAILS
+  └─ figure row / card, NOT YET OWNED ──▶ Add Figure (below), locked to this figure, straight to DETAILS
+        (August 2026 — no separate preview/acquire modal; see OPEN_QUESTIONS_ISSUES_FOUND.md #26)
   └─ List accordion ▸ instance sub-row ──▶ Instance Detail
         ├─ pull-from-Parts-Bin  ◀─▶  Parts Bin
+        ├─ swap a unit to Parts Bin (per-accessory ⇄ popover, Aug 2026, #24.b)  ──▶  Parts Bin
         └─ Remove ──▶ "accessories → Parts Bin?" prompt ──▶ Parts Bin
 
 Parts Bin (loose accessories)
   └─ entry ▸ "needed by …" ──▶ Instance Detail (jump to complete)
 
-Add Figure (pop-out modal, launched from Figures header ＋)
-  └─ FIND (search ‖ Year→Figure) → DETAILS (accessories + bin pull + location) → CONDITION (damage map + ＋ADD)
+Add Figure (pop-out modal — launched from Figures header ＋, a figure modal's ＋ "add a copy,"
+            a not-yet-owned figure's row/card, or an empty Figure Sets slot)
+  └─ FIND (search ‖ Year→Figure) → DETAILS (variant picker + accessories + bin pull + location) → CONDITION (damage map + ＋ADD)
+        (FIND is skipped, landing straight on DETAILS, for every entry point except the header ＋.
+         The variant picker — when the figure has more than one — always lives on DETAILS now,
+         never on FIND, and always has a default; see VARIANTS.md §3's Aug 2026 update note.)
         └─ on create ──▶ "these parts are in your Parts Bin — add them?" ──▶ pulls from Parts Bin
 ```
 

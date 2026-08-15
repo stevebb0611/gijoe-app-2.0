@@ -34,7 +34,10 @@ Instance
                            // position (see figureSummary() in web/src/store.js).
                            // Accessories never need to "move" as part of this —
                            // they're already keyed to instance_accessories.instance_id,
-                           // the physical copy, not to a slot number.
+                           // the physical copy, not to a slot number. Don't confuse this
+                           // "Move to No. ___" (whole-copy reorder) with the accessory
+                           // row's own ⇄ "move/swap" popover a few paragraphs up — same
+                           // "TO No." label language, unrelated features.
   isPrimary: boolean       // optional manual pin; if unset, No. 1 (most complete) is the de-facto primary shown in list/gallery summaries
   bodyType: 'male'|'female'// which diagram template the damage map uses
 
@@ -45,10 +48,21 @@ Instance
                                             // "damaged" (July 2026) is a condition notation on a
                                             // HAD unit — never affects complete. Real schema:
                                             // instance_accessories.units_damaged, clamped <=
-                                            // units_owned (migration 004). Surfaced as a
-                                            // "mark as damaged" toggle in the accessories panel
-                                            // and a hashed wedge on the completeness ring sized
-                                            // to the damaged share of owned accessories.
+                                            // units_owned (migration 004), plus a free-text
+                                            // damage_notes column (migration 008). Surfaced as a
+                                            // hashed wedge on the completeness ring sized to the
+                                            // damaged share of owned accessories, and — since
+                                            // August 2026 (see OPEN_QUESTIONS_ISSUES_FOUND.md
+                                            // #24) — a small ⚠ popover anchored to each accessory
+                                            // row's own trigger button, not a global toggle that
+                                            // opens a separate list. Every accessory-owning
+                                            // screen (Add Figure's DETAILS step, the Parts Bin)
+                                            // shares this same row + popover, not a per-screen
+                                            // mechanism. The row's ⇄ button (same anchored-popover
+                                            // mechanic) also covers moving a unit to another owned
+                                            // copy, and — new in August 2026 — swapping a unit
+                                            // (preferring a damaged one, carrying its damage_notes)
+                                            // out to the Parts Bin as the popover's last option.
 
   damage: {
     physical: [{ id, side:'front'|'back', point, type, severity }]
