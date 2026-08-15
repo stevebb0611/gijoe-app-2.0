@@ -30,7 +30,7 @@ function titleCase(s) { return (s || '').toLowerCase().replace(/(^|[\s\-'.])\S/g
 // ---------------------------------------------------------------------------
 // Roster row (list) + its inline instance accordion
 // ---------------------------------------------------------------------------
-function Row({ fig, selId, openIds, onToggle, onOpen }) {
+function Row({ fig, selId, openIds, onToggle, onOpen, onAddInstance }) {
   const p = figParts(fig);
   const ghost = fig.owned === 0;
   const multi = fig.owned > 1;       // aggregate vs per-copy stock-summary rendering

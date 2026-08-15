@@ -8,7 +8,7 @@ import { clusterBlueprint, matchedSetSatisfied, bpReq, bpForVariant } from '../.
 import { physicalGrade, paintGrade, dmEmpty, DamageMap, GradeBadge } from './damage-map.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
-import { VersionChip, VariantBadge, VariantBracket, VehicleTag, EditionTag, SetTag, SubGroupTag } from './fig-identity.jsx';
+import { VersionChip, VariantBadge, VehicleTag, EditionTag, SetTag, SubGroupTag } from './fig-identity.jsx';
 import { formatYear } from './fig-identity.js';
 import { FileCardRow, FileCardTell, FileCardColorInput, FileCardGrade } from './filecards.jsx';
 
@@ -515,9 +515,8 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const cf = INV_CAT_BY_ID.get(catalogId);
   const fig = fvm(cf);
   const sum = fig._sum;
-  const ghost = !sum || sum.owned === 0;
   const copies = sum ? sum.copies : [];
-  const st = ghost ? null : figState(fig);
+  const st = figState(fig);
 
   const [curId, setCurId] = React.useState(instId || (copies[0] && copies[0].id));
   const cur = copies.find(c => c.id === curId) || copies[0] || null;
@@ -525,10 +524,6 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const [varEdit, setVarEdit] = React.useState(false);
   const [reorderOpen, setReorderOpen] = React.useState(false);
   React.useEffect(() => { setVarEdit(false); setReorderOpen(false); }, [curId]);
-  // ghost-only: accessories ticked before the figure is owned — carried into
-  // the Add Figure flow's DETAILS step as a starting point, not persisted here.
-  const [preAcc, setPreAcc] = React.useState({});
-  const setPreUnit = (name, n) => setPreAcc(o => ({ ...o, [name]: n }));
   // binder tabs retract while the card flips, then spring back once it lands
   const [tucked, setTucked] = React.useState(false);
   const tuckTimer = React.useRef(null);
@@ -646,8 +641,8 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const toggleKeep = (n) => setKeepSel(s => ({ ...s, [n]: !s[n] }));
 
   const DMap = DamageMap, DGrade = GradeBadge;
-  const dmgPhys = !ghost && !moc ? physicalGrade(marks) : null;
-  const dmgPaint = !ghost && !moc ? paintGrade(marks) : null;
+  const dmgPhys = !moc ? physicalGrade(marks) : null;
+  const dmgPaint = !moc ? paintGrade(marks) : null;
   // Zero zones marked reads as "ungraded" (not yet mapped) on the dashboard
   // (see gradeOf, store.js) unless this copy carries an explicit marks.clean
   // confirmation — mirrors the Add Figure CONDITION step's "mark clean" flow.
@@ -655,55 +650,8 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const clean = !!marks.clean;
   const ungraded = marksCount === 0 && !clean;
   const setClean = (v) => setMarks({ ...marks, clean: v });
-  const ringPct = ghost ? 0 : moc ? 100 : cur.pct;
+  const ringPct = moc ? 100 : cur.pct;
 
-  // ---- ghost / catalog-gap acquire modal (simple, non-flip) ----
-  if (ghost) {
-    const p = figParts(fig);
-    return (
-      <React.Fragment>
-        <div className="inv-scrim" onClick={onClose}></div>
-        <div className="inv-modal">
-          <button className="inv-modal__x" onClick={onClose}>✕</button>
-          <div className="inv-cardhd"><div className="inv-cardhd__id"><b>{fig.name}</b></div></div>
-          <div className="inv-modal__body">
-            <div className="inv-modal__l">
-              <PhotoSlot className="inv-modal__photo" src={fig.image} />
-              <FactionTag faction={fig.faction} />
-              <div className="inv-modal__id">
-                <div className="inv-modal__name">{fig.name}<VersionChip version={fig.version} lg /><EditionTag context={fig.releaseContext} conventionKind={fig.conventionKind} lg /><SetTag sets={fig.sets} lg /><SubGroupTag subGroup={fig.subGroup} lg /></div>
-                {fig.fullName && <div className="inv-modal__full">{fig.fullName}</div>}
-                <div className="inv-modal__var">{fig.specialty} · {formatYear(fig.year)}</div>
-                {fig.variants > 1 ? <div className="inv-modal__variants"><VariantBracket variants={cf.variants} owned={new Set()} lg /></div> : null}
-                <VehicleTag vehicle={fig.vehicle} modal />
-                {fig.coo.length > 0 && <div className="inv-modal__coo">Known origins: {fig.coo.join(', ')}</div>}
-              </div>
-              <div className="inv-modal__notin">NOT IN<br/>INVENTORY</div>
-            </div>
-            <div className="inv-modal__r">
-              {bp.length === 0
-                ? <p className="inv-modal__blurb">No accessory blueprint on file for this figure.</p>
-                : <div className="acc-list">
-                    <div className="acc-list__cap"><span>ACCESSORIES</span><span><b>{JoeData.instOwn(bp, preAcc)}</b>/{JoeData.bpReq(bp)}</span></div>
-                    <AccessoryList ordered={ordered}
-                                   renderSolo={(a, key) => (
-                                     <AccItem key={key} name={a[0]} req={a[1]} color={a[6]}
-                                              checked={Array.from({ length: a[1] }, (_, k) => k < (preAcc[a[0]] || 0))}
-                                              onSet={(n) => setPreUnit(a[0], n)} />
-                                   )}
-                                   renderOption={(a) => (
-                                     <AccItem key={a[0]} name={JoeData.optLabel(a[0])} req={a[1]} color={a[6]} tag={a[5]}
-                                              checked={Array.from({ length: a[1] }, (_, k) => k < (preAcc[a[0]] || 0))}
-                                              onSet={(n) => setPreUnit(a[0], n)} />
-                                   )} />
-                  </div>}
-              <div className="inv-modal__btns"><button className="invbtn invbtn--go" onClick={() => { onAddInstance(fig.id, null, preAcc); onClose(); }}>＋ ADD TO INVENTORY</button></div>
-            </div>
-          </div>
-        </div>
-      </React.Fragment>
-    );
-  }
 
   const liveOwn = cur.own;
   const liveWhole = cur.whole;
@@ -780,7 +728,11 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
           {copies.map((c) => (
             <button key={c.id} className={"inv-tab" + (cur.id === c.id ? " is-active" : "") + (c.masterCollection ? " is-master" : "")} onClick={() => setCurId(c.id)}>No. {c.no}{c.whole ? " ✓" : ""}</button>
           ))}
-          <button className="inv-tab inv-tab--add" title="Add a copy" onClick={() => { onAddInstance(fig.id, cur.variant); onClose(); }}>＋</button>
+          {/* Defaults to the LAST copy's variant (copies is already ordered by
+              .no — see figState above), not whichever tab happens to be open
+              right now — e.g. No.1=A, No.2=A, No.3=C means + starts at C,
+              regardless of which tab you were viewing when you clicked it. */}
+          <button className="inv-tab inv-tab--add" title="Add a copy" onClick={() => { onAddInstance(fig.id, copies[copies.length - 1].variant); onClose(); }}>＋</button>
         </div>
 
         <div className="inv-flip">

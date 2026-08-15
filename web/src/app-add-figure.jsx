@@ -65,10 +65,13 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const isNew = !!fig && ownedHere === 0;
   const varTell = chosen ? chosen.tell : null;
 
-  // selecting a figure clears variant + parts + condition; auto-pick for single-variant
+  // selecting a figure clears variant + parts + condition; auto-pick for single-variant.
+  // Multi-variant figures default to their first (alphabetically earliest,
+  // i.e. "A") variant rather than leaving the choice unmade — the DETAILS
+  // step's variant picker (below) still lets you change it before Finalize.
   React.useEffect(() => {
     if (!fig) return;
-    setSelVar(isSingle(fig) ? '' : (presetVariant && fig.id === presetCatalogId ? presetVariant : null));
+    setSelVar(isSingle(fig) ? '' : (presetVariant && fig.id === presetCatalogId ? presetVariant : fig.variants[0].letter));
     setOwnedAcc(presetAcc && fig.id === presetCatalogId ? presetAcc : {});
     setMoc(false); setFilecard({ onFile: false, fileCardId: null, color: '', grade: null }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male')); setCoo(''); setAccDamage({});
     setSetId(presetSetId && fig.id === presetCatalogId ? presetSetId : null);
@@ -120,10 +123,10 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const marksCount = phys.zones + paint.zones;
   const clean = !!dmg.clean;
   const ungraded = marksCount === 0 && !clean;
-  // Preset ("add a copy") mode locks step 0 (FIND) out entirely, so a multi-variant
-  // figure's only chance to pick a variant is the picker relocated into step 1 below —
-  // gate advancing on it the same way step 0 gates non-preset figures.
-  const canNext = (step === 0 || (preset && step === 1)) ? (!!fig && (single || selVar !== null)) : true;
+  // Variant is always picked on DETAILS (below), and always has a default
+  // (the effect above never leaves selVar unset) — so the only thing left to
+  // gate is FIND actually having a figure selected before advancing past it.
+  const canNext = step === 0 ? !!fig : true;
 
   const commit = () => {
     if (!fig) return;
@@ -191,20 +194,8 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                     <span className="af-res__name"><b>{f.name}</b><i>{sub} · {formatYear(f.year)}</i><EditionTag context={f.releaseContext} /><SetTag sets={f.sets} />{f.vehicle && <span className="idveh" title={"Vehicle driver — packaged with the " + f.vehicle}><b>VEHICLE</b> {f.vehicle}</span>}</span>
                     <span className={"wf-fac wf-fac--" + f.faction.toLowerCase() + " wf-fac--mini"}>{f.faction}</span>
                     <span className="af-res__own">{own === 0 ? "not owned" : "owned ×" + own}</span>
-                    <span className="af-res__pick">{f.id === selId ? (isSingle(f) ? "● selected" : "▾ pick variant") : "select ›"}</span>
+                    <span className="af-res__pick">{f.id === selId ? "● selected" : "select ›"}</span>
                   </button>
-                  {f.id === selId && !isSingle(f) && (
-                    <div className="af-varpick">
-                      {f.variants.map(v => (
-                        <button key={v.letter} className={"af-var" + (selVar === v.letter ? " is-sel" : "")} onClick={() => setSelVar(v.letter)}>
-                          <span className="af-var__radio"></span>
-                          <span className="af-var__lab">v{f.ver} · {v.letter || "—"}</span>
-                          <span className="af-var__tell">{v.tell || "no distinguishing notes"}</span>
-                          <span className="af-var__own">{JoeData.ownedCount(f.id, v.letter) === 0 ? "not owned" : "×" + JoeData.ownedCount(f.id, v.letter)}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
                   </React.Fragment>
                   );
                 })}
@@ -230,7 +221,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                 </div>
               </div>
 
-              {preset && multi && (
+              {multi && (
                 <div className="af-block">
                   <p className="af-seclab"><b>Figure variant</b></p>
                   <div className="af-varpick">

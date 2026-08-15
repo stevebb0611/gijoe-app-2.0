@@ -534,11 +534,6 @@
   .inv-modal__id { display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .inv-modal__full { font-family: var(--font-display); font-weight: 500; font-size: 12px; color: var(--ink-soft); text-align: center; }
   .inv-modal__var { font-size: 10px; color: var(--ink-soft); letter-spacing: 1px; text-align: center; }
-  .inv-modal__variants { display: flex; justify-content: center; align-items: center; gap: 7px; font-family: var(--font-mono); font-size: 9px; letter-spacing: .5px; color: var(--accent); text-align: center; --lyrbg: var(--paper); }
-  .inv-modal__variants .idvarbr--lg { margin-left: 0; }
-  .inv-modal__variants--btn { border: none; background: none; padding: 2px 4px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
-  .inv-modal__variants--btn:hover { color: var(--ink); }
-  .inv-modal__coo { font-family: var(--font-mono); font-size: 9px; letter-spacing: .5px; color: var(--ink-soft); text-align: center; }
   /* multi-pack "set" tagging control, full modal (migration 016) — which of
      this figure's known sets (if any) this specific copy belongs to; the
      grouped progress/breakdown itself lives only in the Special Release
@@ -553,7 +548,6 @@
   .inv-var__lab { font-family: var(--font-display); font-weight: 700; font-size: 12px; }
   .inv-var__tell { font-family: var(--font-mono); font-size: 9px; color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .acc--note { display: block; padding: 11px 12px; font-size: 11px; font-style: italic; color: var(--ink-soft); }
-  .inv-modal__notin { font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: 1px; text-align: center; color: var(--ink-soft); border: 1.5px dashed var(--line); padding: 8px 14px; line-height: 1.2; }
   .inv-modal__r { padding: 18px 20px; }
   .inv-modal__tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--ink); margin-bottom: 12px; flex-wrap: wrap; }
   .inv-modal__tabs span { font-family: var(--font-display); font-weight: 600; font-size: 12.5px; letter-spacing: .3px; padding: 6px 12px; color: var(--ink-soft); cursor: pointer; white-space: nowrap; }
@@ -562,7 +556,6 @@
   .inv-modal__row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; gap: 10px; }
   .inv-modal__sec { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; color: var(--ink-soft); }
   .inv-modal__note { font-size: 11px; font-style: italic; color: var(--ink-soft); }
-  .inv-modal__blurb { font-size: 12px; line-height: 1.5; color: var(--ink-soft); margin: 8px 0 14px; }
   .inv-bprint { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; color: var(--ink-soft); margin-bottom: 8px; }
   .inv-accgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
   .invchip { display: flex; align-items: center; gap: 8px; border: 1.5px solid var(--ink); padding: 7px 10px; background: var(--card); }
@@ -634,8 +627,12 @@
   .acc__dmgbtn:disabled { color: var(--line); cursor: default; }
   .acc__dmgbtn.has-damage { color: var(--damage); border-color: var(--damage); }
   .acc__dmgbtn.is-on { background: var(--damage); color: #fff; border-color: var(--damage); }
-  .acc__dmgpop { position: absolute; top: calc(100% + 4px); right: 0; z-index: 6; display: flex; flex-direction: column; gap: 7px;
-    width: 190px; border: 1.5px dashed var(--damage); background: var(--paper); padding: 9px 10px; box-shadow: 3px 3px 0 rgba(33,31,26,.3); }
+  /* position/top/right are set inline (DmgPopover computes them from the
+     trigger button's getBoundingClientRect() — it's portaled to document.body
+     so it can't be clipped by a scrolling ancestor like .pb-acclist or
+     .inv-cardback__side); this rule only carries the popover's own chrome. */
+  .acc__dmgpop { z-index: 100; display: flex; flex-direction: column; gap: 7px;
+    width: 190px; border: 1.5px solid var(--damage); background: var(--paper); padding: 9px 10px; box-shadow: 3px 3px 0 rgba(33,31,26,.3); }
   .acc__dmgpop-lab { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; color: var(--ink-soft); }
   .acc__dmgpop-lab b { color: var(--damage); }
   .acc__dmgpop-boxes { display: grid; gap: 5px; }
@@ -755,7 +752,6 @@
   .inv-confirm__foot { display: flex; justify-content: space-between; gap: 8px; }
   .invbtn { font-family: var(--font-display); font-weight: 600; letter-spacing: 1px; font-size: 12px; padding: 9px 14px; background: var(--ink); color: var(--paper); border: none; cursor: pointer; }
   .invbtn--ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
-  .invbtn--go { background: var(--accent); color: #fff; }
   .inv-opendetail { display: inline-flex; align-items: center; gap: 7px; text-decoration: none; margin-right: auto; white-space: nowrap; }
   .inv-opendetail__chev { font-weight: 700; }
   .invbtn--rebal { background: var(--accent); color: #fff; align-self: flex-start; margin-top: 8px; font-size: 11px; padding: 7px 12px; }
@@ -855,7 +851,7 @@
   .af-res__own { font-size: 10px; color: var(--ink-soft); }
   .af-res__pick { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--accent); white-space: nowrap; }
   .af-nores { padding: 30px; text-align: center; color: var(--ink-soft); font-family: var(--font-display); letter-spacing: 1px; }
-  .af-varpick { border: 1.5px dashed var(--accent); background: var(--paper); padding: 10px 12px; margin: -2px 0 6px 52px; display: flex; flex-direction: column; gap: 6px; }
+  .af-varpick { border: 1.5px solid var(--accent); background: var(--paper); padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
   .af-var { display: grid; grid-template-columns: 16px auto 1fr auto; gap: 10px; align-items: center; text-align: left; font: inherit; background: var(--card); border: 1.5px solid var(--line); padding: 7px 10px; cursor: pointer; color: var(--ink); }
   .af-var:hover { border-color: var(--ink); }
   .af-var.is-sel { border: 2px solid var(--accent); background: var(--paper); }

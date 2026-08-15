@@ -125,16 +125,58 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
         <button className="pb-btn pb-btn--ghost" onClick={() => JoeStore.adjustPart(entry.id, +1)}>＋</button>
         <button className="pb-btn pb-btn--ghost" onClick={() => JoeStore.adjustPart(entry.id, -1)}>－</button>
         <span className="pb-dmg">
-          <button className={"pb-btn pb-btn--ghost pb-btn--dmg" + (dmgOpen ? " is-on" : "") + (entry.damaged > 0 ? " has-damage" : "")}
+          <button ref={dmgBtnRef} className={"pb-btn pb-btn--ghost pb-btn--dmg" + (dmgOpen ? " is-on" : "") + (entry.damaged > 0 ? " has-damage" : "")}
                   title="Mark units of this loose part as damaged" onClick={() => setDmgOpen(v => !v)}>⚠</button>
           {dmgOpen && (
-            <DmgPopover name={entry.accessory} count={entry.qty}
+            <DmgPopover anchorRef={dmgBtnRef} onRequestClose={() => setDmgOpen(false)}
+                        name={entry.accessory} count={entry.qty}
                         checked={Array.from({ length: entry.qty }, (_, k) => k < entry.damaged)}
                         onSet={(k) => JoeStore.setPartDamage(entry.id, k)}
                         notes={entry.damageNotes} onSetNotes={(v) => JoeStore.setPartDamageNotes(entry.id, v)} />
           )}
         </span>
       </div>
+    </div>
+  );
+}
+
+// One accessory option row inside AddPartModal's list — its own component
+// (rather than inline in the .map() below) so it can hold its own ⚠ trigger
+// ref for DmgPopover's portal to anchor against.
+function PbAccOpt({ name, qreq, color, meta, item, dOpen, onToggleAcc, onBump, onToggleDmg, onSetDamaged, onSetDamageNotes }) {
+  const dmgBtnRef = React.useRef(null);
+  const on = !!item;
+  return (
+    <div className={"pb-accopt" + (on ? " is-sel" : "")}>
+      <button type="button" className="pb-accopt__hit" onClick={onToggleAcc}>
+        <span className="pb-accopt__radio"></span>
+        <span className="pb-accopt__namewrap">
+          {color && <AccSwatch color={color} />}
+          <span className="pb-accopt__n">{name}{qreq > 1 ? " ×" + qreq : ""}</span>
+        </span>
+        <span className="pb-accopt__cat">{(meta && meta.categoryLabel) || "—"}</span>
+      </button>
+      {on && (
+        <div className="qstep qstep--sm">
+          <button type="button" onClick={() => onBump(-1)}>－</button>
+          <span className="qstep__n">{item.qty}</span>
+          <button type="button" onClick={() => onBump(+1)}>＋</button>
+        </div>
+      )}
+      {on && (
+        <span className="pb-dmg">
+          <button ref={dmgBtnRef} type="button"
+                  className={"pb-btn pb-btn--ghost pb-btn--dmg" + (dOpen ? " is-on" : "") + (item.damaged > 0 ? " has-damage" : "")}
+                  title="Mark units of this part as damaged" onClick={onToggleDmg}>⚠</button>
+          {dOpen && (
+            <DmgPopover anchorRef={dmgBtnRef} onRequestClose={onToggleDmg}
+                        name={name} count={item.qty}
+                        checked={Array.from({ length: item.qty }, (_, k) => k < item.damaged)}
+                        onSet={onSetDamaged}
+                        notes={item.damageNotes} onSetNotes={onSetDamageNotes} />
+          )}
+        </span>
+      )}
     </div>
   );
 }
@@ -226,44 +268,16 @@ function AddPartModal({ onClose }) {
                 {bp.length === 0
                   ? <div className="fld__note">No accessories on file for this figure.</div>
                   : <div className="pb-acclist">
-                      {bp.map(([name, qreq, accessoryId, , , , color]) => {
-                        const meta = JoeData.ACC_BY_ID.get(accessoryId);
-                        const item = sel[name];
-                        const on = !!item;
-                        const dOpen = on && dmgOpen.has(name);
-                        return (
-                          <div key={name} className={"pb-accopt" + (on ? " is-sel" : "")}>
-                            <button type="button" className="pb-accopt__hit" onClick={() => toggleAcc(name)}>
-                              <span className="pb-accopt__radio"></span>
-                              <span className="pb-accopt__namewrap">
-                                {color && <AccSwatch color={color} />}
-                                <span className="pb-accopt__n">{name}{qreq > 1 ? " ×" + qreq : ""}</span>
-                              </span>
-                              <span className="pb-accopt__cat">{(meta && meta.categoryLabel) || "—"}</span>
-                            </button>
-                            {on && (
-                              <div className="qstep qstep--sm">
-                                <button type="button" onClick={() => bumpAcc(name, -1)}>－</button>
-                                <span className="qstep__n">{item.qty}</span>
-                                <button type="button" onClick={() => bumpAcc(name, +1)}>＋</button>
-                              </div>
-                            )}
-                            {on && (
-                              <span className="pb-dmg">
-                                <button type="button"
-                                        className={"pb-btn pb-btn--ghost pb-btn--dmg" + (dOpen ? " is-on" : "") + (item.damaged > 0 ? " has-damage" : "")}
-                                        title="Mark units of this part as damaged" onClick={() => toggleDmg(name)}>⚠</button>
-                                {dOpen && (
-                                  <DmgPopover name={name} count={item.qty}
-                                              checked={Array.from({ length: item.qty }, (_, k) => k < item.damaged)}
-                                              onSet={(k) => setDamaged(name, k)}
-                                              notes={item.damageNotes} onSetNotes={(v) => setDamageNotes(name, v)} />
-                                )}
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })}
+                      {bp.map(([name, qreq, accessoryId, , , , color]) => (
+                        <PbAccOpt key={name} name={name} qreq={qreq} color={color}
+                                  meta={JoeData.ACC_BY_ID.get(accessoryId)} item={sel[name]}
+                                  dOpen={!!sel[name] && dmgOpen.has(name)}
+                                  onToggleAcc={() => toggleAcc(name)}
+                                  onBump={(d) => bumpAcc(name, d)}
+                                  onToggleDmg={() => toggleDmg(name)}
+                                  onSetDamaged={(k) => setDamaged(name, k)}
+                                  onSetDamageNotes={(v) => setDamageNotes(name, v)} />
+                      ))}
                     </div>}
               </div>
               <div className="fld">
