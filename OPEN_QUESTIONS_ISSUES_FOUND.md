@@ -1,6 +1,6 @@
 Questions Generated while waiting on Claude to reset 
 
-# 1 Figure misData 
+# 1 Figure misData ✅
 ✅ *Airborne* F045 and F046 pulling from F339
 Issue Found: Airborne and Airborne [2] were breaking the logic. 
 ✅ *Grunt v1.5* and * Grunt v2* not showing pilot details 
@@ -107,8 +107,9 @@ Built (July 2026): root cause was Safari/WebKit not depth-sorting the two `prese
 Issue Found (July 2026): the same figure identity (code name, version, production variant, year, faction, specialty, vehicle-driver, copy ordinal) was formatted differently on almost every screen — Inventory read "Pathfinder˅v1 / Jungle Assault Specialist" while Add Figure read "Pathfinder / v1 Jungle Assault Specialist 1990"; Parts Bin had two more formats in the same file (`"NAME (v1)"` vs `"NAME · v1"`); Add Figure's DETAILS step silently dropped the version number entirely. Root cause: no shared formatter existed — 15 render sites across 4 files each hand-rolled their own JSX.
 Built: a confirmed priority ranking for the 8 identifiers — name → version → variant (resolved letter, or a "N variants" count badge when unresolved) → year → faction (handled by the existing separate `FactionTag` chip) → specialty → vehicle-driver tag → copy ordinal — with name+version+variant always forming the non-negotiable "core identity," never dropped or reordered. Two new shared files carry this everywhere: `web/src/fig-identity.jsx` (`VersionChip`, `VariantBadge`, `VehicleTag` — presentational, reuse the existing `.idver`/`.idvar`+`.lyr`/`.idveh` CSS as-is, no new classes) and `web/src/fig-identity.js` (`figIdentityText()`, the plain-string form used by Parts Bin's `figLabel()`). Applied across `app-inventory.jsx` (list row, gallery card, per-copy accordion row), `app-detail.jsx` (ghost modal header, owned modal front panel), `app-add-figure.jsx` (FIND/DETAILS/FINALIZE/success — fixes the dropped-version bug), and `parts-bin.jsx` (search dropdown, selected-figure row, rebalance row — converges the two formats, and stops mislabeling a specialty/version fallback as `variant` in the rebalance data-prep). One intentional behavior change: the per-copy accordion row (issue #7.b's "Breaker No. 1 · B") now reads "Breaker B No. 1" — variant ahead of copy ordinal, per the confirmed priority order, superseding #7.b. Verified live against the real DB (Breaker, Clutch) across Inventory list/gallery/modal, Add Figure's FIND/DETAILS/FINALIZE, and Parts Bin's dropdown/pickfig/rebalance — read the flow through to FINALIZE without committing, since the dev server turned out to be a long-running process against the real collection DB, not a disposable copy.
 
-# 20 Save to MASTER/ Personal Collection
+# 20 Save to MASTER/ Personal Collection ✅
 possible design tool set Master or Primary Collection - everything outside would be available to sell off. 
+Built (July 2026, `MASTER_COLLECTION.md`, migration 009): a per-instance star (`instances.is_master`) marks a copy as a permanent keeper, plus a target quantity tracked per production variant (`variant_lookup.master_target` / `figures.master_target` for single-variant figures). UI lives in the Figure Detail modal (`web/src/app-detail.jsx`) — gold-outlined starred instance tab, a star toggle next to MOC, and a `{starred}/{target}` stepper under the variant line. No disposition/sale tracking in-app by design — this flags what's core-collection vs. sellable surplus, it doesn't manage the sale itself.
 
 # 21 1993 Jinx — wrong series (Convention, not mainline S12) ✅
 move the 1993 Jinx (both variants) into Convention series.
