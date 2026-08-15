@@ -1083,7 +1083,6 @@
   .pb-noteline { font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft); margin-top: 8px; display: flex; gap: 7px; align-items: baseline; line-height: 1.4; }
   .pb-noteline span { color: var(--ink); }
 
-  .pb-dmgpanel { margin-top: 10px; }
   .pb-dmgnotes { width: 100%; min-height: 44px; resize: vertical; background: var(--paper); border: 1px solid var(--line); margin-top: 8px; padding: 7px 9px; font-family: var(--font-mono); font-size: 11px; color: var(--ink); }
   .pb-dmgnotes:focus { outline: 2px solid var(--damage); outline-offset: -2px; }
 
@@ -1132,7 +1131,6 @@
   .pb-accopt__namewrap { display: flex; align-items: center; gap: 6px; min-width: 0; }
   .pb-accopt__n { font-family: var(--font-display); font-weight: 600; font-size: 13px; }
   .pb-accopt__cat { font-family: var(--font-mono); font-size: 9px; letter-spacing: .5px; color: var(--ink-soft); }
-  .pb-accopt__dmgpanel { flex: 1 0 100%; margin-top: 4px; padding: 8px 11px 10px; border-top: 1px dashed var(--line-soft); }
 
   /* zero state */
   .pbp-empty--zero { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 70px 24px; }

@@ -88,6 +88,7 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
   const ev = evaluate(entry, NEEDS);
   const open = openId === entry.id;
   const [dmgOpen, setDmgOpen] = React.useState(false);
+  const dmgBtnRef = React.useRef(null);
   const home = entry.shared ? fitsLabel(entry.homeFigureNames, entry.figureCount) : (entry.homeFigureName || "—");
   return (
     <div className={"pb-row" + (ev.needed ? " is-needed" : "")}>

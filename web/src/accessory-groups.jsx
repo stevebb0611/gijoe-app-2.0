@@ -78,8 +78,8 @@ export function VariantGroup({ items, renderOption }) {
 // single-/double-sided stickers, both 'bonus') renders as its own nested
 // VariantGroup with an A/B tag, same as a retail matched set; an ungrouped
 // context item still renders via renderRow.
-// renderRow(item): caller-supplied single-row renderer, so the row matches
-// whichever screen it's used from (app-detail.jsx's AccItem vs. app-add-figure.jsx's row).
+// renderRow(item): caller-supplied single-row renderer — every current
+// caller renders it as an AccItem (app-detail.jsx) row.
 export function ContextGroup({ context, units, renderRow, renderOption }) {
   return (
     <div className="sgw-group">
@@ -154,8 +154,8 @@ export function orderedBlueprint(bp) {
 // renderSolo(item, key): draws one solo/context row using the item's full
 // name (e.g. "American Flag (decal)").
 // renderOption(item): draws one variant-slot option using its full label
-// (e.g. "Helmet, with holes", via JoeData.optLabel) — its own shape (AccItem
-// vs. the Add Figure step's .af-acc__row) is the caller's call, same as
+// (e.g. "Helmet, with holes", via JoeData.optLabel) — the caller decides its
+// shape (every current caller renders it as an AccItem row), same as
 // ContextGroup's renderRow always was.
 export function AccessoryList({ ordered, renderSolo, renderOption }) {
   return ordered.map((u, i) => {

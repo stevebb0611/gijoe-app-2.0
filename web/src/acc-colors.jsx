@@ -10,9 +10,10 @@
 // (owner's Downloads folder — archived post-merge, see _archive/ for the
 // original file and design commentary/rationale it carried).
 // Consumed by accessory-groups.jsx (VariantGroup, MatchedGroup, ContextGroup
-// rows), app-detail.jsx (AccItem), and app-add-figure.jsx (afAccRow) — every
-// place a blueprint row renders gets the swatch via its `color` tuple field
-// (server/catalog.js blueprint tuple index 6).
+// rows) and app-detail.jsx (AccItem, the one accessory row component every
+// screen renders through) — every place a blueprint row renders gets the
+// swatch via its `color` tuple field (server/catalog.js blueprint tuple
+// index 6).
 // Tuned warm to sit on the blueprint paper (#f3eee2) without vibrating.
 import React from 'react';
 

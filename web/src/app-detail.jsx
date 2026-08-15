@@ -2,6 +2,7 @@
 // flip-card detail modal (FIGURE front / CONDITION back), all wired to JoeStore
 // so every tick, grade, MOC flag, note, file-card and rebalance PERSISTS.
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { JoeStore, JoeData } from './store.js';
 import { clusterBlueprint, matchedSetSatisfied, bpReq, bpForVariant } from '../../shared/completeness.js';
 import { physicalGrade, paintGrade, dmEmpty, DamageMap, GradeBadge } from './damage-map.jsx';
@@ -402,6 +403,7 @@ function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove,
   const [moveOpen, setMoveOpen] = React.useState(false);
   const [moveQty, setMoveQty] = React.useState(1);
   const [dmgOpen, setDmgOpen] = React.useState(false);
+  const dmgBtnRef = React.useRef(null);
   // Close both popovers once the row runs out of owned units — covers a unit
   // being un-owned (or moved away) while its popover is still open.
   React.useEffect(() => { if (own === 0) { setMoveOpen(false); setDmgOpen(false); } }, [own]);
@@ -416,11 +418,12 @@ function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove,
       <span className="acc__count">{own}/{req}</span>
       {hasDmg && (
         <span className="acc__dmg">
-          <button type="button" className={"acc__dmgbtn" + (dmgOpen ? " is-on" : "") + (dmgCount > 0 ? " has-damage" : "")} disabled={!canDmg}
+          <button ref={dmgBtnRef} type="button" className={"acc__dmgbtn" + (dmgOpen ? " is-on" : "") + (dmgCount > 0 ? " has-damage" : "")} disabled={!canDmg}
                   title={canDmg ? "Mark units of " + name + " as damaged" : "No owned units to mark damaged"}
                   onClick={openDmg}>⚠</button>
           {dmgOpen && canDmg && (
-            <DmgPopover name={name} count={own} checked={dmgChecked} onSet={dmgOnSet}
+            <DmgPopover anchorRef={dmgBtnRef} onRequestClose={() => setDmgOpen(false)}
+                        name={name} count={own} checked={dmgChecked} onSet={dmgOnSet}
                         notes={dmgNotes} onSetNotes={dmgOnSetNotes} extra={dmgExtra} />
           )}
         </span>
@@ -464,11 +467,34 @@ function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove,
 // pair to wrap in a full AccItem. `extra` is an optional per-row render prop
 // for damaged-only actions (Detail modal uses it for "swap for clean";
 // nobody else passes it).
-function DmgPopover({ name, count, checked, onSet, notes, onSetNotes, extra }) {
+//
+// Portaled to document.body and positioned from the anchor button's own
+// getBoundingClientRect(), instead of the plain CSS-absolute anchoring
+// .acc__movepop uses — several of this popover's homes (the Detail modal's
+// card-back side panel, the Add Parts modal's accessory list) are themselves
+// scrolling (overflow:auto) boxes, which would otherwise clip it whenever it
+// needs more room than the little space left in that box. Closes on scroll
+// or resize rather than trying to continuously re-anchor, same tradeoff
+// most popovers make once they're no longer a plain in-flow child.
+function DmgPopover({ anchorRef, onRequestClose, name, count, checked, onSet, notes, onSetNotes, extra }) {
+  const [pos, setPos] = React.useState(null);
+  React.useLayoutEffect(() => {
+    const el = anchorRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setPos({ top: r.bottom + 4, right: window.innerWidth - r.right });
+  }, [anchorRef]);
+  React.useEffect(() => {
+    const close = () => onRequestClose();
+    window.addEventListener('scroll', close, true);
+    window.addEventListener('resize', close);
+    return () => { window.removeEventListener('scroll', close, true); window.removeEventListener('resize', close); };
+  }, [onRequestClose]);
+  if (!pos) return null;
   const { cells, cols } = boxCells(name, count, checked, onSet, true);
   const dmgCount = checked.reduce((s, c) => s + (c ? 1 : 0), 0);
-  return (
-    <div className="acc__dmgpop">
+  return createPortal(
+    <div className="acc__dmgpop" style={{ position: 'fixed', top: pos.top, right: pos.right }}>
       <span className="acc__dmgpop-lab">DAMAGED <b>{dmgCount}</b>/{count}</span>
       <div className="acc__dmgpop-boxes" style={{ gridTemplateColumns: "repeat(" + cols + ", 22px)" }}>{cells}</div>
       {onSetNotes && dmgCount > 0 && (
@@ -477,7 +503,8 @@ function DmgPopover({ name, count, checked, onSet, notes, onSetNotes, extra }) {
                   onBlur={(e) => onSetNotes(e.target.value)}></textarea>
       )}
       {extra && dmgCount > 0 && extra()}
-    </div>
+    </div>,
+    document.body
   );
 }
 
