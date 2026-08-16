@@ -52,7 +52,7 @@ Instance
                                             // damage_notes column (migration 008). Surfaced as a
                                             // hashed wedge on the completeness ring sized to the
                                             // damaged share of owned accessories, and — since
-                                            // August 2026 (see OPEN_QUESTIONS_ISSUES_FOUND.md
+                                            // August 2026 (see OPEN_QUESTIONS.md
                                             // #24) — a small ⚠ popover anchored to each accessory
                                             // row's own trigger button, not a global toggle that
                                             // opens a separate list. Every accessory-owning

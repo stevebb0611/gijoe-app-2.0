@@ -222,8 +222,8 @@ doc.
 - **Collision:** F137 (retail, id 89) and F710 (700-block) shared `code_name`+`version` in
   the CSV with a blank `variant` on both, so `seed.mjs` silently kept F137 and dropped F710 on
   every rebuild — F710 didn't exist in the live DB at all until this fix.
-- **Reopened call:** same shape as Roadblock v2 immediately below — `OPEN_QUESTIONS_Claude.md`
-  #18's July 2026 triage read this pair as a "likely accidental duplicate" (both CSV rows
+- **Reopened call:** same shape as Roadblock v2 immediately below — `OPEN_QUESTIONS.md`
+  Q18's July 2026 triage read this pair as a "likely accidental duplicate" (both CSV rows
   tagged the same "1992 Convention" text) and it got `ACCESSORY_GROUPS.md`'s `release_context`
   treatment instead — Missile Launcher/Missile reclassified `convention` on F137's own
   blueprint, 2026-07-10. Owner instruction, 2026-07-21, overturned that call: unlike a true
@@ -304,10 +304,10 @@ doc.
   `instances`/`instance_accessories` and was, separately, missing several DB fixes that had
   only ever been applied ad hoc to the live DB — 231 owned instances had to be recovered live
   from the still-running old server process. Unrelated to the split-vs-not question itself,
-  but see `OPEN_QUESTIONS_ISSUES_FOUND.md` #21 for the full incident — `server/seed.mjs` now
+  but see `OPEN_QUESTIONS.md` F21 for the full incident — `server/seed.mjs` now
   refuses to run against a DB with owned instances without `--force`, and always writes a
   timestamped `.bak` first.
-- **Source:** owner-confirmed, 2026-07-10 (`ee42034`; see `OPEN_QUESTIONS_ISSUES_FOUND.md` #21).
+- **Source:** owner-confirmed, 2026-07-10 (`ee42034`; see `OPEN_QUESTIONS.md` F21).
 - **Status:** ✅ `series_id` corrected directly in the root CSV + live DB, verified — Jinx v2
   (both variants) now joins to `series_id` 15 / "Convention & Mail-In Block".
 
