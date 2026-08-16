@@ -1,3 +1,5 @@
+// ⚠️ frozen prototype mirror — the live app reads accessories from gijoe_collection.db via
+// server/accessories.js, do not edit here.
 // parts-catalog.js — accessory catalog generated from gijoe_db_accessories.csv
 // 803 unique accessories · 52 categories rolled into 9 groups.
 // Loaded before parts-bin.jsx; powers add-flow autocomplete + bin organization.

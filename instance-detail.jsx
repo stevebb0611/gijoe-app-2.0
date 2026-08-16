@@ -1,3 +1,5 @@
+// ⚠️ frozen prototype mirror — superseded by the live detail modal in web/src/app-detail.jsx,
+// do not edit here.
 // instance-detail.jsx — single-copy detail with the interactive damage map.
 // Condition is DERIVED: you tag physical damage on o-ring points and paint wear
 // on regions (front/back, 3 severities); a default rules engine produces

@@ -1,3 +1,5 @@
+// ⚠️ frozen prototype mirror — the live app replaced this in-UI flow with a CLI script,
+// server/add-figure.mjs (see web/src/main.jsx), do not edit here.
 // add-missing-figure.jsx — Add Figure ▸ "not in catalog" (OPEN_QUESTIONS #8 · VARIANTS §7.6)
 // SINGLE PURPOSE (June 2026): append a REAL figure missing from the catalog — a genuine
 // mail-away / convention / exclusive that figures_2.0 doesn't list yet. Creates a normal

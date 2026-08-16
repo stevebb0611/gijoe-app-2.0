@@ -1,3 +1,5 @@
+// ⚠️ frozen prototype mirror — the live app reads the catalog from gijoe_collection.db via
+// server/catalog.js, do not edit here.
 // catalog-data.js — GENERATED from gijoe_db_figures_2.0.csv + accessories join.
 // 520 catalog entries (grouped by code name + version), 498 with accessory blueprints.
 // Each entry: { id, name, ver, year, faction(JOE|COBRA), role, variants:[{letter,tell,figureId}], blueprint:[[name,qtyRequired]] }

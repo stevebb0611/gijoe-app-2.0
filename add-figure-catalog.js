@@ -1,3 +1,5 @@
+// ⚠️ frozen prototype mirror — the live app reads the catalog from gijoe_collection.db via
+// server/catalog.js, do not edit here.
 // add-figure-catalog.js — catalog search source for the Add Figure modal.
 // GENERATED from gijoe_db_figures_2.0.csv (canonical, 654 rows) — sample span 1982–1986,
 // grouped to version level (code_name + version). Each entry mirrors the route.js shape:
