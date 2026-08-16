@@ -1,3 +1,4 @@
+// ⚠️ frozen prototype mirror — live code is web/src/store.js, do not edit here.
 // store.js — REAL data layer for the working app. Plain JS (loads before Babel).
 // Backed by the local Express/SQLite API (server/) instead of localStorage or the
 // static catalog-data.js (17a). Deliberately uses SYNCHRONOUS XHR: this is a
