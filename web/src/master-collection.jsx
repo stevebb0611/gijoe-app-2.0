@@ -121,7 +121,7 @@ function MasterCollectionView({ onNavigate, onAddInstance }) {
       </div>
       <div className="mc-card__insts">
         {starred.map((c) => (
-          <button key={c.id} className="inv-inst" onClick={() => setSel({ catalogId: fig.id, instId: c.id })}>
+          <button key={c.id} className="mc-inst" onClick={() => setSel({ catalogId: fig.id, instId: c.id })}>
             <span className="inv-inst__tab">★</span>
             <span className="inv-inst__id"><span>No. {c.no}<VariantBadge letter={c.variant} /></span><i>{gradeText(c)}</i></span>
             <span className="inv-stock"><StockBar pct={c.pct} />{c.cardOnFile && <span className="inv-fc" title="File card on file">+ File Card</span>}</span>
