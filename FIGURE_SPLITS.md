@@ -21,7 +21,7 @@ CSV's own **700-block** (`figure_id` 700–724) is the dedicated mail-in/convent
 expansion zone (`VARIANTS.md` §7.5.1) — the collision is almost always a mainline-id row vs.
 its 700-block sibling.
 
-`OPEN_QUESTIONS_Claude.md` #18 has the full audit of every code name currently showing this
+`OPEN_QUESTIONS.md` Q18 has the full audit of every code name currently showing this
 collision pattern in the CSV, sorted into a starting triage (likely genuine split / likely
 accidental CSV duplicate / ambiguous). **Read that table before adding a new entry here** —
 it's the backlog this doc's entries are worked off of.
@@ -53,7 +53,7 @@ Two different fixes exist for what looks like the same real-world problem, and t
   convention one" at the catalog level, you just have one figure whose blueprint happens to
   list some optional/bonus pieces alongside the required ones.
 
-**Several figures on `OPEN_QUESTIONS_Claude.md` #18's collision list already got the second
+**Several figures on `OPEN_QUESTIONS.md` Q18's collision list already got the second
 treatment, not a split** — logged in `ACCESSORY_GROUPS.md` under **Mechanism: `release_context`**:
 Falcon (1987, id 139), Gung-Ho v2 (1987, id 142), Outback v1 (1987, id 152), Python Officer
 (1989, id 240), Python Tele-Viper (1989, id 241), Zarana (1986, id 127). Two of those entries
@@ -69,7 +69,7 @@ Flint itself used to be in that list (`ACCESSORY_GROUPS.md`'s old 1985 Flint ent
 points here instead of describing stale data. Roadblock v2 and Snow Serpent v1 were also in
 that list (`ACCESSORY_GROUPS.md`'s old 1986 Roadblock and 1985 Snow Serpent entries,
 2026-07-12 and 2026-07-10) — both **superseded 2026-07-21** by the real splits below, same
-reason: the "likely accidental duplicate" call in `OPEN_QUESTIONS_Claude.md` #18's triage
+reason: the "likely accidental duplicate" call in `OPEN_QUESTIONS.md` Q18's triage
 turned out to be wrong once the owner confirmed both against the source data.
 
 ## Data model
@@ -115,7 +115,7 @@ colliding pairs are genuine second editions and some are accidental CSV duplicat
 tagged the same non-retail context with near-identical data) — splitting a duplicate would
 manufacture a second ownable catalog entry for something that was only ever sold once. Every
 entry below was confirmed against a real reference or, ideally, the owner's own physically-
-owned copy before being split. `OPEN_QUESTIONS_Claude.md` #18's triage table flags which
+owned copy before being split. `OPEN_QUESTIONS.md` Q18's triage table flags which
 un-audited figures currently look like which case — verify before promoting one into this
 doc.
 
@@ -166,7 +166,7 @@ doc.
   dropped its "A", F711 given its own `display_name`/`full_name`/`specialty` and blanked
   `variant`) — `gijoe_db_figures_accessories.csv`/`gijoe_db_figures_accessories_group_id.csv`
   needed no change, already clean/disjoint (F076→A0023, F077→A0023 dup, F711→A0533+A0534).
-  Verified via `/api/catalog`. Also resolves `OPEN_QUESTIONS_Claude.md` #18's "Stalker (v1.5 B
+  Verified via `/api/catalog`. Also resolves `OPEN_QUESTIONS.md` Q18's "Stalker (v1.5 B
   pair)" row, previously triaged "likely accidental duplicate."
 
 ### 1985 — Flint (v1 retail, figure catalog id 78 — source F-code F125; convention edition, id 525 — F701)
@@ -256,7 +256,7 @@ doc.
 - **Collision:** F167 (retail, id 115) and F707 (700-block) shared `code_name`+`version` in
   the CSV with a blank `variant` on both, so `seed.mjs` silently kept F167 and dropped F707 on
   every rebuild — F707 didn't exist in the live DB at all until this fix.
-- **Reopened call:** `OPEN_QUESTIONS_Claude.md` #18's July 2026 triage read this pair as a
+- **Reopened call:** `OPEN_QUESTIONS.md` Q18's July 2026 triage read this pair as a
   "likely accidental duplicate" (both CSV rows tagged the same "1992 Convention" text) and it
   got `ACCESSORY_GROUPS.md`'s `release_context` treatment instead — Machine Gun/Mine Launcher
   reclassified `convention` on F167's own blueprint, 2026-07-12. Owner instruction, 2026-07-21,

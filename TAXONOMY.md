@@ -75,7 +75,7 @@ mail-order figures — see `MAIL_RELEASES.md`). Built as `SPECIAL_RELEASE_YEAR` 
 printed (Inventory year sections + search filter, Add Figure's year picker/search/summary,
 Parts Bin's figure search and rebalance rows, Master Collection) so no screen ever leaks a
 literal "9999". Confirmed live: 1993 Jinx v2 (both production variants) sits under this
-section, not 1993's Series 12 — see `OPEN_QUESTIONS_ISSUES_FOUND.md` #21.
+section, not 1993's Series 12 — see `OPEN_QUESTIONS.md` F21.
 
 > **Design history — why every convention/mail-in/mail-order figure buckets here instead of
 > its literal release year.** The owner initially organized convention releases under their
@@ -118,8 +118,8 @@ section, not 1993's Series 12 — see `OPEN_QUESTIONS_ISSUES_FOUND.md` #21.
 > drives nothing but a disabled filter mock (see the status note just below). Don't conflate
 > the two when reading either doc; renaming one is an open decision, same as `variant` was.
 >
-> **Status of the filter described below: still a disabled mock.** `OPEN_QUESTIONS_Claude.md`
-> §7's "More Filters" panel confirms the **Release** facet (Retail · Mail-in · Mail-order ·
+> **Status of the filter described below: still a disabled mock.** `OPEN_QUESTIONS.md`'s
+> Q7 "More Filters" panel confirms the **Release** facet (Retail · Mail-in · Mail-order ·
 > Convention · Store exclusive, i.e. `figures.release_context`) is rendered greyed-out with a
 > "not tracked yet" note (`web/src/app-inventory.jsx`, `NOT TRACKED YET` footer row) — even
 > though the column exists and is populated in the live schema. It hasn't been wired live;
