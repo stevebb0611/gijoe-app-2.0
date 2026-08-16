@@ -9,7 +9,7 @@ The app has a small set of peer destinations, surfaced in the dark header (left 
 
 1. **Figures** *(home / default, was “Inventory”)* — the “All” collection grouped by year. The spine of the app.
 2. **Parts Bin** — the loose-accessory inventory (see `PARTS_BIN.md`). Header nav item (the **count badge was removed** in the June 2026 header pass — it read as clutter). Its own page: searchable, groupable by accessory type, with quantities and reverse-lookup to the instances that need each part.
-3. *(future)* **Vehicles (+ Playsets)** — planned major expansion; a non-functional **[Vehicles] “In Dev”** placeholder chip (dashed/striped) already sits between Figures and Parts Bin as a visual reminder. Direction set in `OPEN_QUESTIONS_Claude.md` §15.
+3. *(future)* **Vehicles (+ Playsets)** — planned major expansion; a non-functional **[Vehicles] “In Dev”** placeholder chip (dashed/striped) already sits between Figures and Parts Bin as a visual reminder. Direction set in `OPEN_QUESTIONS.md` Q15.
 4. *(future)* **Wanted list** — the figures and loose parts you still need to complete the collection (graduates from the existing “needs” / catalog-gap data). Optional.
 
 Header nav (June 2026): `G.I. Joe Collection` · `[ Figures ] [ Vehicles · In Dev ] [ Parts Bin ]` · centered search + **＋ Add Figure** · three KPI stat boxes (Unique / Total / Complete). All nav/chip labels are Title case (no ALL CAPS) — see `FRONTEND_STANDARDS.md`. Keep nav to a few items; this is a focused tool, not a portal.
@@ -22,7 +22,7 @@ Header nav (June 2026): `G.I. Joe Collection` · `[ Figures ] [ Vehicles · In D
 > a separate Instance Detail **page**. Instead, `web/src/app-detail.jsx` implements a single
 > **flip-card detail modal** — the same modal, front face **FIGURE** / back face
 > **CONDITION** — that flips in place (`.inv-cardwrap.is-flipped`, see
-> `OPEN_QUESTIONS_ISSUES_FOUND.md` #18 for the Safari flip-rendering bug fix, which confirms
+> `OPEN_QUESTIONS.md` F18 for the Safari flip-rendering bug fix, which confirms
 > this is how it actually renders). The damage map, grade badges, per-copy accessories,
 > location, notes, and Remove all live on that back face — there is no dedicated route, no
 > breadcrumb, and no `instance-detail.jsx` counterpart under `web/src/`. The **"modal =
@@ -62,7 +62,7 @@ Inventory (All, by year)
         └─ instance tab "open" ──▶ Instance Detail (copy level)
         └─ ＋ "add a copy" ──▶ Add Figure (below), locked to this figure, straight to DETAILS
   └─ figure row / card, NOT YET OWNED ──▶ Add Figure (below), locked to this figure, straight to DETAILS
-        (August 2026 — no separate preview/acquire modal; see OPEN_QUESTIONS_ISSUES_FOUND.md #26)
+        (August 2026 — no separate preview/acquire modal; see OPEN_QUESTIONS.md F26)
   └─ List accordion ▸ instance sub-row ──▶ Instance Detail
         ├─ pull-from-Parts-Bin  ◀─▶  Parts Bin
         ├─ swap a unit to Parts Bin (per-accessory ⇄ popover, Aug 2026, #24.b)  ──▶  Parts Bin
@@ -82,8 +82,8 @@ Add Figure (pop-out modal — launched from Figures header ＋, a figure modal's
 
 ---
 
-## Undesigned but referenced here (see OPEN_QUESTIONS_Claude.md)
-- **Add Figure** — ✅ built, and **reworked June 2026 into a pop-out modal** launched from the header **＋ Add Figure** button (no longer a full-page navigation — it opens over the Inventory; Esc / ✕ / backdrop closes). Three steps: **FIND → DETAILS → CONDITION** (the old FINALIZE step was dropped; ＋ ADD lives on Condition). FIND offers two **independent** paths — a fuzzy catalog **search** (matches `alt_name`, so “Snake-Eyes”≈“Snake Eyes”, “Rock & Roll”≈“Rock 'N Roll”) and a **Year → Figure** dropdown that resolves to a single figure (no long scrollable year list). The standalone `GI Joe Tracker - Add Figure.html` remains as a thin host that renders the same modal and returns to Figures on close. The **custom / not-in-catalog** path is ✅ **built** as *append a real missing figure* (`GI Joe Tracker - Add Missing Figure.html` / `add-missing-figure.jsx`) — a single owner-as-admin form for genuine mail-away/convention/exclusive figures the catalog doesn't list yet. The separate **homemade/kitbash** custom-figure path was **dropped** (per owner, June 2026 — no "complete" state to chase). See `OPEN_QUESTIONS_Claude.md` #8. *(August 2026 — same overlay, more entry points: a figure modal's ＋ "add a copy," a not-yet-owned figure's row/card click, and an empty Figure Sets slot all open this identical modal now too, pre-locked to that figure and skipping FIND straight to DETAILS — there is no separate preview modal for any of them. See `OPEN_QUESTIONS_ISSUES_FOUND.md` #25–#26 and `FRONTEND_STANDARDS.md`'s "Figure input is one flow" rule.)*
+## Undesigned but referenced here (see OPEN_QUESTIONS.md)
+- **Add Figure** — ✅ built, and **reworked June 2026 into a pop-out modal** launched from the header **＋ Add Figure** button (no longer a full-page navigation — it opens over the Inventory; Esc / ✕ / backdrop closes). Three steps: **FIND → DETAILS → CONDITION** (the old FINALIZE step was dropped; ＋ ADD lives on Condition). FIND offers two **independent** paths — a fuzzy catalog **search** (matches `alt_name`, so “Snake-Eyes”≈“Snake Eyes”, “Rock & Roll”≈“Rock 'N Roll”) and a **Year → Figure** dropdown that resolves to a single figure (no long scrollable year list). The standalone `GI Joe Tracker - Add Figure.html` remains as a thin host that renders the same modal and returns to Figures on close. The **custom / not-in-catalog** path is ✅ **built** as *append a real missing figure* (`GI Joe Tracker - Add Missing Figure.html` / `add-missing-figure.jsx`) — a single owner-as-admin form for genuine mail-away/convention/exclusive figures the catalog doesn't list yet. The separate **homemade/kitbash** custom-figure path was **dropped** (per owner, June 2026 — no "complete" state to chase). See `OPEN_QUESTIONS.md` Q8. *(August 2026 — same overlay, more entry points: a figure modal's ＋ "add a copy," a not-yet-owned figure's row/card click, and an empty Figure Sets slot all open this identical modal now too, pre-locked to that figure and skipping FIND straight to DETAILS — there is no separate preview modal for any of them. See `OPEN_QUESTIONS.md` F25–F26 and `FRONTEND_STANDARDS.md`'s "Figure input is one flow" rule.)*
 - **Add Instance** — ✅ built (`GI Joe Tracker - Add Instance.html`): the lighter two-step copy-adder (This copy → Condition) launched from a figure you already own; bin matches appear as a quiet hint.
-- **Remove** flow confirmation (the deposit-to-bin branch) — ✅ built: an in-card confirm step with four options — **Remove Figure Only** (all accessories → Parts Bin), **Remove Figure and Selected Accessories** (per-accessory discard checklist), **Remove Figure and All Accessories** (everything discarded), or Cancel. See `OPEN_QUESTIONS_ISSUES_FOUND.md` #10.
+- **Remove** flow confirmation (the deposit-to-bin branch) — ✅ built: an in-card confirm step with four options — **Remove Figure Only** (all accessories → Parts Bin), **Remove Figure and Selected Accessories** (per-accessory discard checklist), **Remove Figure and All Accessories** (everything discarded), or Cancel. See `OPEN_QUESTIONS.md` F10.
 - The **Parts Bin** page — ✅ built (`GI Joe Tracker - Parts Bin.html`); see `PARTS_BIN.md`.

@@ -2,7 +2,7 @@
 
 > ✅ **STATUS UPDATE (July 2026): the port already happened.** Everything below this line
 > describes the original design-handoff bundle and the porting job as a task still to do.
-> That job (`OPEN_QUESTIONS_Claude.md` #17a/#17b) is **done** — there is now a real,
+> That job (`OPEN_QUESTIONS.md` Q17a/Q17b) is **done** — there is now a real,
 > running app: a Vite build in **`web/`** (`web/src/*.jsx`, built to `web/dist`) served by a
 > local **Express + `better-sqlite3`** server (**`server/`**), reading/writing the live
 > `gijoe_collection.db`. **Run it with `npm start`**, not `npx serve .` — that serves the
@@ -10,7 +10,7 @@
 > remain reachable only as reference mockups the server also serves statically. Dozens of
 > real features (variants, damage tracking, Parts Bin, file cards, country-of-origin, the
 > rebalance engine, accessory groups) have shipped into `web/`/`server/` since the port —
-> see the git log and `OPEN_QUESTIONS_ISSUES_FOUND.md` for what's actually built. Treat this
+> see the git log and `OPEN_QUESTIONS.md` for what's actually built. Treat this
 > file's framing ("design handoff, not production," "your job: port it") as historical
 > context for the prototype files, not as the current task — **the current task is
 > extending the live app in `web/`/`server/`, following the design rules below.**
@@ -19,7 +19,7 @@
 > instruction. The root-level `.jsx`/`.js` prototype files still carry a header comment
 > pointing at their live `web/src` counterpart — don't edit the root copies.
 
-You are working inside a **design handoff bundle**, not a production codebase. Read this first, then `README.md`, then `OPEN_QUESTIONS_Claude.md`.
+You are working inside a **design handoff bundle**, not a production codebase. Read this first, then `README.md`, then `OPEN_QUESTIONS.md`.
 
 ## What this bundle is
 
@@ -46,7 +46,7 @@ A personal **inventory + condition tracker** for a large vintage G.I. Joe collec
 
 - Treat the **HTML/JSX as the source of truth for visual design and behavior.**
 - Treat **`FRONTEND_STANDARDS.md` as the source of truth for how to build it properly.**
-- Treat **`OPEN_QUESTIONS_Claude.md` as a blocker list** — several modeling decisions (notably the per-instance data model) must be resolved before or early in implementation. Surface these to the user rather than guessing.
+- Treat **`OPEN_QUESTIONS.md`'s Open section as a blocker list** — several modeling decisions (notably the per-instance data model) must be resolved before or early in implementation. Surface these to the user rather than guessing.
 
 ## Fidelity
 
@@ -95,11 +95,11 @@ npx serve .          # then open the printed URL (e.g. http://localhost:3000)
 | `tweaks-panel.jsx` | Theme panel (paper/accent/faction/wobble) — informs a real theme config, not shipped as-is |
 
 ### Specs
-`README.md` (start here) · `OPEN_QUESTIONS_Claude.md` + `OPEN_QUESTIONS_ISSUES_FOUND.md` (decisions/issues — read second) · `FRONTEND_STANDARDS.md` · `INSTANCE_MODEL.md` · `VARIANTS.md` · `PARTS_BIN.md` · `ACCESSORY_GROUPS.md` · `FIGURE_SPLITS.md` · `FILE_CARDS.md` · `MASTER_COLLECTION.md` · `TAXONOMY.md` · `MAIL_RELEASES.md` · `FIGURE_SETS.md` · `NAVIGATION.md` · `BACKEND_AND_SCALE.md`.
+`README.md` (start here) · `OPEN_QUESTIONS.md` (open items + resolved-decision log — read second) · `FRONTEND_STANDARDS.md` · `INSTANCE_MODEL.md` · `VARIANTS.md` · `PARTS_BIN.md` · `ACCESSORY_GROUPS.md` · `FIGURE_SPLITS.md` · `FILE_CARDS.md` · `MASTER_COLLECTION.md` · `TAXONOMY.md` · `MAIL_RELEASES.md` · `FIGURE_SETS.md` · `NAVIGATION.md` · `BACKEND_AND_SCALE.md`.
 
 ## Known prototype shortcuts to NOT carry over
 
-- **Per-instance data is synthesized** in `wf-data.jsx` (`figState()`) — the sample stores only aggregate accessory counts and derives a plausible per-copy allocation. A real **Instance** entity must replace this (`OPEN_QUESTIONS_Claude.md` #1/#5).
-- **Add Figure runs on superseded, name-keyed sample data** (`OPEN_QUESTIONS_Claude.md` #8).
+- **Per-instance data is synthesized** in `wf-data.jsx` (`figState()`) — the sample stores only aggregate accessory counts and derives a plausible per-copy allocation. A real **Instance** entity must replace this (`OPEN_QUESTIONS.md` Q1/Q5).
+- **Add Figure runs on superseded, name-keyed sample data** (`OPEN_QUESTIONS.md` Q8).
 - **All figure images are hatched placeholders** — real photography is a TODO (source + storage).
-- Brand name is **"G.I. Joe Collection"** (decided June 2026; replaced the "Joe Dossier" placeholder) with a vintage-ARAH-file-card outline mark — live across every current surface (Figures, Vehicles, Parts Bin, and the Scale States reference). The name uses the Hasbro mark by choice (fine for private use; revisit before any public release — see OPEN_QUESTIONS_Claude.md #10). `_archive/` holds superseded design mockups (accessory sub-group prototypes, the old PORT_VERBATIM/START_HERE/HANDOFF docs) — not the "Joe Dossier" working app, whose current whereabouts this doc can no longer verify.
+- Brand name is **"G.I. Joe Collection"** (decided June 2026; replaced the "Joe Dossier" placeholder) with a vintage-ARAH-file-card outline mark — live across every current surface (Figures, Vehicles, Parts Bin, and the Scale States reference). The name uses the Hasbro mark by choice (fine for private use; revisit before any public release — see OPEN_QUESTIONS.md Q10). `_archive/` holds superseded design mockups (accessory sub-group prototypes, the old PORT_VERBATIM/START_HERE/HANDOFF docs) — not the "Joe Dossier" working app, whose current whereabouts this doc can no longer verify.

@@ -162,6 +162,15 @@ const GROUPS = [
   // single thick handle); own any one for completion. Owner-confirmed
   // 2026-07-22.
   { extGroupId: null, figure: 'Zap', accessories: ['A0027', 'A0028', 'A0029'] }, // Bazooka double handle/single thin handle/single thick handle
+  // Capt. Grid-Iron (1990, v1, F345 -> catalog id 264): single catalog row, no
+  // version collision. Was previously (mis)modeled as a whole-figure A/B
+  // production variant in variant_lookup ("Soft helmet" / "Hard helmet") —
+  // owner-corrected 2026-08-16: it's not an identity-level variant, it's a
+  // same-item pick-one accessory slot, same pattern as A.V.A.C.'s and
+  // Countdown's soft/hard-plastic helmets above. The two variant_lookup rows
+  // (figure_id 264, letters A/B) are removed separately in
+  // migrations/020_grid_iron_football_helmet.sql.
+  { extGroupId: null, figure: 'Capt. Grid-Iron', accessories: ['A0695', 'A0696'] }, // Football Helmet soft/hard plastic
 ];
 
 // Same label rule as the locked reference (subgroup-wire-v2.jsx groupLabel):
