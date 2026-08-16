@@ -65,7 +65,7 @@ export function instWhole(bp, acc) {
     && plain.every((members) => members.some(([n]) => (acc[n] || 0) > 0))
     && matchedSetSatisfied(matched, acc);
 }
-// Shared label rule (matches the locked reference subgroup-wire-v2.jsx):
+// Shared label rule (matches the locked reference _archive/subgroup-wire-v2.jsx):
 // text before the first "(" is the slot label; the option label is the FULL
 // name, comma-joined with whatever's inside "(...)" — e.g. "Submachine Gun
 // (light green)" -> "Submachine Gun, light green" — so an option always reads

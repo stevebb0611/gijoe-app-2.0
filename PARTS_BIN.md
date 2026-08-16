@@ -126,7 +126,7 @@ The compatibility question above is **answered by the real schema** (`route.js`)
 
 ## Accessory completeness model — group_id variants & release_context (LOCKED · June 2026)
 
-How a figure's accessory checklist is structured and what counts toward **Complete**. Locked reference: **`GI Joe Tracker - Accessory Sub-Groups v2.html`** + `subgroup-wire-v2.jsx`. A figure owns a **flat list** of `figures_accessories` rows — `accessory_id`, `quantity_required`, `group_id`, `release_context` — and exactly two fields restructure that flat list:
+How a figure's accessory checklist is structured and what counts toward **Complete**. Locked reference (archived): **`_archive/GI Joe Tracker - Accessory Sub-Groups v2.html`** + `_archive/subgroup-wire-v2.jsx`. A figure owns a **flat list** of `figures_accessories` rows — `accessory_id`, `quantity_required`, `group_id`, `release_context` — and exactly two fields restructure that flat list:
 
 ### 1. `group_id` → a variant group ("own any one")
 Two or more accessories that **share a `group_id`** are interchangeable variants: owning **any one** satisfies the group. **(Redesigned July 2026 — see below.)** They render as a left-aligned micro-label ("Helmet · pick one") followed by one full-width row per option, using the exact same row component (bold name, checkbox, `owned/required` count) as any plain accessory — no bordered card, no centered "or" pill row. The group's position in the checklist matches wherever its first blueprint row falls (owner keys the DB head-to-toe: helmet, backpack, weapons, skis/fins…), not pulled to the end.

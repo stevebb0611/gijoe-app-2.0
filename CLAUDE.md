@@ -1,10 +1,5 @@
 # CLAUDE.md — G.I. Joe Tracker handoff
 
-> ⚠️ **PORT, DON'T REDESIGN.** Read `PORT_VERBATIM.md` FIRST. The owner wants the EXACT
-> look/feel/behavior of the prototype — a mechanical port, not a recreation. Where this
-> file or `FRONTEND_STANDARDS.md` say "recreate / rebuild / clean component tree,"
-> `PORT_VERBATIM.md` overrides them.
-
 > ✅ **STATUS UPDATE (July 2026): the port already happened.** Everything below this line
 > describes the original design-handoff bundle and the porting job as a task still to do.
 > That job (`OPEN_QUESTIONS_Claude.md` #17a/#17b) is **done** — there is now a real,
@@ -19,6 +14,10 @@
 > file's framing ("design handoff, not production," "your job: port it") as historical
 > context for the prototype files, not as the current task — **the current task is
 > extending the live app in `web/`/`server/`, following the design rules below.**
+> `PORT_VERBATIM.md` (now in `_archive/`) governed the original port — "mechanical port,
+> smallest possible diff, don't redesign"; kept for historical rationale only, not current
+> instruction. The root-level `.jsx`/`.js` prototype files still carry a header comment
+> pointing at their live `web/src` counterpart — don't edit the root copies.
 
 You are working inside a **design handoff bundle**, not a production codebase. Read this first, then `README.md`, then `OPEN_QUESTIONS_Claude.md`.
 
@@ -41,7 +40,9 @@ A personal **inventory + condition tracker** for a large vintage G.I. Joe collec
 
 ## Your job
 
-**Port these prototypes into a real build with the smallest possible diff — do NOT redesign.** See `PORT_VERBATIM.md` for the exact rule and steps. The prototype is already real React + CSS; move it verbatim, changing only how it compiles (Vite/Next instead of browser-Babel) and how modules share code (`import`/`export` instead of `window`). If no project exists yet, scaffold a **React + TypeScript** Vite SPA (or Next.js) and port into it.
+*(Historical — the port is done; see the STATUS UPDATE above. Kept for context on how the live `web/`/`server/` code came to exist.)*
+
+**Port these prototypes into a real build with the smallest possible diff — do NOT redesign.** See `_archive/PORT_VERBATIM.md` for the exact rule and steps that were followed. The prototype is already real React + CSS; move it verbatim, changing only how it compiles (Vite/Next instead of browser-Babel) and how modules share code (`import`/`export` instead of `window`). If no project exists yet, scaffold a **React + TypeScript** Vite SPA (or Next.js) and port into it.
 
 - Treat the **HTML/JSX as the source of truth for visual design and behavior.**
 - Treat **`FRONTEND_STANDARDS.md` as the source of truth for how to build it properly.**
@@ -77,7 +78,7 @@ npx serve .          # then open the printed URL (e.g. http://localhost:3000)
 | `web/src/main.jsx` | Vite app root — mounts `InventoryView` / `PartsBin` + the Tweaks panel |
 | `web/src/app-inventory.jsx`, `app-detail.jsx`, `app-add-figure.jsx`, `parts-bin.jsx`, `damage-map.jsx`, `store.js`, `accessory-groups.jsx`, `fig-identity.js`/`.jsx`, `filecards.jsx` | The ported + since-extended real components — these, not the root `.jsx` files, are what's running |
 
-**The original prototype** (visual/behavioral reference only — see `PORT_VERBATIM.md`):
+**The original prototype** (visual/behavioral reference only — see `_archive/PORT_VERBATIM.md` for the historical porting rule):
 
 | File | What it is |
 |---|---|
@@ -101,4 +102,4 @@ npx serve .          # then open the printed URL (e.g. http://localhost:3000)
 - **Per-instance data is synthesized** in `wf-data.jsx` (`figState()`) — the sample stores only aggregate accessory counts and derives a plausible per-copy allocation. A real **Instance** entity must replace this (`OPEN_QUESTIONS_Claude.md` #1/#5).
 - **Add Figure runs on superseded, name-keyed sample data** (`OPEN_QUESTIONS_Claude.md` #8).
 - **All figure images are hatched placeholders** — real photography is a TODO (source + storage).
-- Brand name is **"G.I. Joe Collection"** (decided June 2026; replaced the "Joe Dossier" placeholder) with a vintage-ARAH-file-card outline mark — live across every current surface (Figures, Vehicles, Parts Bin, and the Scale States reference). The old "Joe Dossier" working app and the name-exploration sheet are in `_archive/`. The name uses the Hasbro mark by choice (fine for private use; revisit before any public release — see OPEN_QUESTIONS_Claude.md #10).
+- Brand name is **"G.I. Joe Collection"** (decided June 2026; replaced the "Joe Dossier" placeholder) with a vintage-ARAH-file-card outline mark — live across every current surface (Figures, Vehicles, Parts Bin, and the Scale States reference). The name uses the Hasbro mark by choice (fine for private use; revisit before any public release — see OPEN_QUESTIONS_Claude.md #10). `_archive/` holds superseded design mockups (accessory sub-group prototypes, the old PORT_VERBATIM/START_HERE/HANDOFF docs) — not the "Joe Dossier" working app, whose current whereabouts this doc can no longer verify.

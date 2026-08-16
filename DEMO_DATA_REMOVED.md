@@ -17,7 +17,7 @@ reference data, not a fake collection.
 - `seed/*.csv` — canonical Hasbro toyline reference to load into the DB.
 
 ## Standalone screen-reference pages
-Pages like `Instance Detail.html`, `Add Instance.html`, and `Accessory Sub-Groups.html` are
+Pages like `Instance Detail.html`, `Add Instance.html`, and `_archive/GI Joe Tracker - Accessory Sub-Groups.html` are
 **design references**: they intentionally render a representative populated state so a developer
 can see what a filled-in screen looks like (e.g. `instance-detail.jsx`'s `SAMPLE_ACC`). These are
 documentation of the design, not data in the working app. The live app (`Collection App.html`,
