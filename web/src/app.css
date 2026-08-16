@@ -126,19 +126,21 @@
      width on the Figures page (a longer id string, sometimes a +File Card
      tag); here the id text is short ("No. 1 ·B") and the stock cell holds
      only a fixed 78px bar, so stretching it to 1.5fr left a dead gap between
-     the bar and the status text. Packed flex row instead: id/bar/status hug
-     together with no forced-width column between them. The row itself stays
-     full card width (width: 100%, matching the header bar above it — a
-     content-sized row read as an orphaned box under the full-width black
-     header, see OPEN_QUESTIONS_Claude.md #22); the arrow alone pins to the
-     right edge (margin-left: auto), so any leftover width collects as one
-     trailing gap before a fixed icon — the normal label-left/chevron-right
-     list idiom — instead of a gap stranded between the bar and its status. */
-  .mc-inst { display: flex; align-items: center; gap: 12px; width: 100%;
+     the bar and the status text. Two packed groups instead — .mc-inst__lead
+     (star + id) and .mc-inst__stat (bar + status), each internally gapless —
+     spread across the row with justify-content: space-between, echoing the
+     card header's own name-group/target-group split above it. A single
+     margin-left:auto on the arrow was tried first and rejected live ("the
+     info boxes are still crowded far left") — everything but the arrow
+     stayed pinned to the left edge with one huge gap before it; splitting
+     into two independently-positioned groups reads as an intentional
+     left/right layout instead. See OPEN_QUESTIONS_Claude.md #22. */
+  .mc-inst { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%;
     text-align: left; font: inherit; color: inherit; cursor: pointer;
     background: var(--card); border: 1.5px solid var(--line); padding: 7px 12px; }
   .mc-inst:hover { border-color: var(--ink); transform: translateX(1px); }
-  .mc-inst .inv-go { margin-left: auto; }
+  .mc-inst__lead, .mc-inst__stat { display: flex; align-items: center; gap: 12px; }
+  .mc-inst .inv-go { flex: none; }
 
   /* Master Collection year separator — a "thermometer" divider: a black bulb
      (year) at 9 o'clock with a stem line running from its 3-o'clock edge to
