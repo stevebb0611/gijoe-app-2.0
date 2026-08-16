@@ -53,7 +53,7 @@ Instance
                                             // hashed wedge on the completeness ring sized to the
                                             // damaged share of owned accessories, and — since
                                             // August 2026 (see OPEN_QUESTIONS.md
-                                            // #24) — a small ⚠ popover anchored to each accessory
+                                            // F24) — a small ⚠ popover anchored to each accessory
                                             // row's own trigger button, not a global toggle that
                                             // opens a separate list. Every accessory-owning
                                             // screen (Add Figure's DETAILS step, the Parts Bin)
@@ -78,7 +78,7 @@ Instance
   countryOfOrigin: 'China'|'Hong Kong'|'Indonesia'|null   // which of the figure's known
                            // origins (figure_coo, catalog-level) this physical copy is —
                            // a notation like filecardId, optional, doesn't affect completeness.
-                           // See OPEN_QUESTIONS_ISSUES_FOUND.md #17.
+                           // See OPEN_QUESTIONS.md F17.
 
   // derived (not stored): physicalGrade, paintGrade  — computed from damage
 ```
@@ -124,7 +124,7 @@ Each grade badge shows the word, the demerit score, and the cap reason when capp
 ---
 
 ## Completeness & the rebalance engine
-Completeness is **per-instance** (decided May 2026 — see `OPEN_QUESTIONS_Claude.md` #5). An instance is **whole** when, for every required accessory, `have-quantity ≥ required-quantity` (partials give proportional credit: 1 of 2 skis = 1 of the 2 needed). A **figure** is **complete-now** when **≥ 1 of its copies is whole**.
+Completeness is **per-instance** (decided May 2026 — see `OPEN_QUESTIONS.md` Q5). An instance is **whole** when, for every required accessory, `have-quantity ≥ required-quantity` (partials give proportional credit: 1 of 2 skis = 1 of the 2 needed). A **figure** is **complete-now** when **≥ 1 of its copies is whole**.
 
 ### Two states
 - **complete-now** — a copy is whole *as parts are currently assigned to copies*.

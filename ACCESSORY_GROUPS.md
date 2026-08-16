@@ -452,7 +452,7 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
   match_key tag badge on a matched-slot row (`.acc__dmgflag` moved inside `.acc__namewrap`,
   ahead of `.acc__tag`, in `web/src/app-detail.jsx`'s `AccItem` — this is a global layout
   change, not scoped to Recondo). *(Erratum, August 2026: `.acc__dmgflag` itself is gone —
-  superseded by the per-row ⚠ popover unification, `OPEN_QUESTIONS_ISSUES_FOUND.md` #24. The
+  superseded by the per-row ⚠ popover unification, `OPEN_QUESTIONS.md` F24. The
   match_key tag badge's own position relative to the rest of the row is unaffected; only the
   now-removed damage-flag element this note describes changed.)*
 
@@ -648,8 +648,8 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
 
 - **⚠ SUPERSEDED 2026-07-21 — see `FIGURE_SPLITS.md`.** This entry originally documented
   Machine Gun (A0787)/Mine Launcher (A0793) as Roadblock v2's own `convention`-tagged
-  accessories, reclassified on this same row 2026-07-12, based on an `OPEN_QUESTIONS_Claude.md`
-  #18 triage call ("likely accidental duplicate") that turned out to be wrong. Owner
+  accessories, reclassified on this same row 2026-07-12, based on an `OPEN_QUESTIONS.md`
+  Q18 triage call ("likely accidental duplicate") that turned out to be wrong. Owner
   instruction confirmed these are a genuine second edition, not bonus pack-ins on the retail
   card: the source `gijoe_db_figures_accessories.csv` already linked them cleanly to the
   700-block F707 row, disjoint from F167's own A0264/A0265 — unlike Flint's F701, nothing was
@@ -767,7 +767,7 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
 - **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
   group and never block Complete; no `group_id` on this figure.
 - **Variants:** none on file — single catalog row. Part of the parked mainline/convention
-  `(code_name, version)` dedup collision noted in `OPEN_QUESTIONS_Claude.md` (F203 vs.
+  `(code_name, version)` dedup collision noted in `OPEN_QUESTIONS.md` Q18 (F203 vs.
   the 700-block F702 row) — not resolved here; this entry only reclassifies the
   accessories already attached to the surviving F203 row, per owner instruction.
 - **Non-retail accessories:** Kris (wavy) (A0758), Sword (barbed) (A0759) — reclassified
@@ -784,7 +784,7 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
 - **Mechanism:** `release_context` — accessories tagged `convention` sit in their own
   group and never block Complete; no `group_id` on this figure.
 - **Variants:** none on file — single catalog row. Part of the parked mainline/convention
-  dedup collision noted in `OPEN_QUESTIONS_Claude.md` (Outback is on the ~20-name list);
+  dedup collision noted in `OPEN_QUESTIONS.md` Q18 (Outback is on the ~20-name list);
   not resolved here — this entry only fixes the accessories on the surviving F213 row,
   per owner instruction.
 - **Blueprint correction:** Flashlight (black, A0463) removed outright — it belongs to

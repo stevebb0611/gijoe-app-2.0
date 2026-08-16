@@ -2,7 +2,7 @@
 // variant badge, vehicle tag). Every screen (Inventory, Detail, Add Figure,
 // Parts Bin) renders these identically via one component instead of
 // hand-rolling the markup, so field order/markup can't drift between screens
-// the way it had (see OPEN_QUESTIONS_ISSUES_FOUND.md).
+// the way it had (see OPEN_QUESTIONS.md, F19).
 import React from 'react';
 
 export function VersionChip({ version, lg }) {

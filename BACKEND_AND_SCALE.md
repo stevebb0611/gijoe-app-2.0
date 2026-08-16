@@ -1,6 +1,6 @@
 # Backend, Auth & Scale — decisions for Open Questions #3 + #4
 
-> **Update (July 2026 — what actually got built, see `OPEN_QUESTIONS_Claude.md` #17a/17b):**
+> **Update (July 2026 — what actually got built, see `OPEN_QUESTIONS.md` Q17a/Q17b):**
 > the stack call below (**Next.js App Router + Turso/libSQL**) was the right read of the
 > owner's sample `route.js` at the time, but the real build shipped as a **local Express
 > server (`server/index.js`) + `better-sqlite3`** reading `gijoe_collection.db` directly,
@@ -15,7 +15,7 @@
 > anywhere, genuinely single-user. Treat §1/§3's Next.js-specific framing as historical
 > record of the decision process, not the current architecture.
 
-Resolves the load-bearing parts of `OPEN_QUESTIONS_Claude.md` **#3 (data source / backend / auth / sync)** and **#4 (scale & performance)**, grounded in the owner's answers (June 2026) and the real `route.js` the owner shared.
+Resolves the load-bearing parts of `OPEN_QUESTIONS.md` **Q3 (data source / backend / auth / sync)** and **Q4 (scale & performance)**, grounded in the owner's answers (June 2026) and the real `route.js` the owner shared.
 
 > **TL;DR**
 > - **Hosted web app, server + cloud DB. Online-assumed — no offline-write/sync engine.** (Removes the single biggest architectural fork.) *Refinement (June 2026, OPEN_QUESTIONS #9): the PWA **install shell** (manifest + add-to-home-screen, full-screen) is back in scope as a cheap later layer; only the **offline-write/sync engine** stays out. See §5.*
@@ -198,7 +198,7 @@ Virtualization + lazy thumbnails + server paging cover 2,000 comfortably. Only r
 ---
 
 ## 7. What changed in the other docs
-- `OPEN_QUESTIONS_Claude.md` **#3** → backend/stack/auth/sync now decided (this doc). **#4** → performance plan consolidated here; `FRONTEND_STANDARDS.md` "Performance at scale" stays the implementation checklist.
+- `OPEN_QUESTIONS.md` **Q3** → backend/stack/auth/sync now decided (this doc). **Q4** → performance plan consolidated here; `FRONTEND_STANDARDS.md` "Performance at scale" stays the implementation checklist.
 - `FRONTEND_STANDARDS.md` already specifies virtualization, debounce, query-cache, optimistic mutations — unchanged and consistent with the above.
 - See **`GI Joe Tracker - Inventory (Scale States).html`** for the mocked gallery loading/skeleton/lazy-image states this plan produces.
 
