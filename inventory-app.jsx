@@ -1,3 +1,4 @@
+// ⚠️ frozen prototype mirror — superseded by web/src/app-inventory.jsx, do not edit here.
 // inventory-app.jsx — full-page inventory: All grouped into collapsible year
 // sections w/ sticky headers, sticky toolbar (search · filter chips · view ·
 // expand-all), list (with inline multi-instance accordion) + gallery views,

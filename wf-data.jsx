@@ -1,3 +1,5 @@
+// ⚠️ frozen prototype mirror — synthesized sample data, superseded by the real Instance
+// model in web/src (see INSTANCE_MODEL.md), do not edit here.
 // wf-data.jsx — sample catalog + completeness helpers + shared low-fi widgets
 // All exported to window for the other babel scripts to consume.
 

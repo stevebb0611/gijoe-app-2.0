@@ -1,3 +1,4 @@
+// ⚠️ frozen prototype mirror — superseded by web/src/app-add-figure.jsx, do not edit here.
 // add-figure.jsx — Add Figure POP-OUT modal (June 2026 rework):
 //   FIND → DETAILS → CONDITION  (the old FINALIZE step was removed; ＋ADD lives on CONDITION)
 //   • FIND      no pre-loaded list. Search (fuzzy, matches alt_name: "Snake-Eyes"≈"Snake Eyes",

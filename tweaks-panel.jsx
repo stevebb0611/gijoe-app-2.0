@@ -1,3 +1,4 @@
+// ⚠️ frozen prototype mirror — live code is web/src/tweaks-panel.jsx, do not edit here.
 
 /* BEGIN USAGE */
 // tweaks-panel.jsx

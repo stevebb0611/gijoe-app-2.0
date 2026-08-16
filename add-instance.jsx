@@ -1,3 +1,5 @@
+// ⚠️ frozen prototype mirror — superseded by web/src/app-add-figure.jsx's "Add Copy" flow,
+// do not edit here.
 // add-instance.jsx — Add Instance: a LIGHT "add another copy of a figure I already own."
 // Add Figure MINUS the catalog search. TWO windows (OPEN_QUESTIONS #8, revised June 2026):
 //   ① THIS COPY  — variant (ONLY for multi-variant figures) → accessories checklist
