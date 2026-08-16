@@ -1,3 +1,4 @@
+// ⚠️ frozen prototype mirror — live code is web/src/app-add-figure.jsx, do not edit here.
 // app-add-figure.jsx — WORKING Add Figure flow (overlay). Searches the real
 // catalog (window.JOE_CATALOG), and on finalize writes a real owned instance to
 // JoeStore. FIND → DETAILS → CONDITION → FINALIZE. Damage map from damage-map.jsx.

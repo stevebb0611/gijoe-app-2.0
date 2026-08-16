@@ -1,3 +1,4 @@
+// ⚠️ frozen prototype mirror — live code is web/src/parts-bin.jsx, do not edit here.
 // parts-bin.jsx — LIVE loose-accessory inventory, wired to JoeStore.
 // Parts are FIGURE-SCOPED: a loose part belongs to the catalog figure you logged
 // it under (the way a collector thinks — "Snow Job → Ski", not a bare "Ski").

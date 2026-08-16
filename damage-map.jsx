@@ -1,3 +1,4 @@
+// ⚠️ frozen prototype mirror — live code is web/src/damage-map.jsx, do not edit here.
 // damage-map.jsx — SHARED condition-diagram module (zone-cell edition).
 // The figure is real o-ring line-art (male/female · front/rear). Damage is marked
 // per NAMED ZONE over a 24-col body-cell grid, in two tabs:

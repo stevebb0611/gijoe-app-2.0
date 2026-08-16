@@ -1,3 +1,4 @@
+// ⚠️ frozen prototype mirror — live code is web/src/app-inventory.jsx, do not edit here.
 // app-inventory.jsx — WORKING inventory view. All owned copies come from
 // JoeStore; catalog roster + completeness math from app-detail.jsx (window).
 // Starts EMPTY, persists across reloads. Rolls in the full design-of-record UI:

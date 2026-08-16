@@ -1,3 +1,4 @@
+// ⚠️ frozen prototype mirror — live code is web/src/app-detail.jsx, do not edit here.
 // app-detail.jsx — adapter (catalog ⋈ live store) + shared widgets + the
 // flip-card detail modal (FIGURE front / CONDITION back), all wired to JoeStore
 // so every tick, grade, MOC flag, note, file-card and rebalance PERSISTS.
