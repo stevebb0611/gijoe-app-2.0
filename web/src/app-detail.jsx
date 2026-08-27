@@ -535,8 +535,23 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const copies = sum ? sum.copies : [];
   const st = figState(fig);
 
-  const [curId, setCurId] = React.useState(instId || (copies[0] && copies[0].id));
-  const cur = copies.find(c => c.id === curId) || copies[0] || null;
+  // No. labels are completeness-derived (figureSummary in store.js) and can
+  // reorder themselves the instant you act — e.g. moving an accessory off
+  // "No. 4" can drop its completeness below "No. 5"'s, so the two swap ranks
+  // and "No. 4" now names a different physical copy than the one you were
+  // just looking at. Snapshot the No. order once when this window opens and
+  // hold it for the window's whole life (unmount = close, see the `sel &&`
+  // callers) — every other field (acc, req, damage, pct, missing...) still
+  // reads live off `liveById`, only the number itself is frozen. A copy
+  // added mid-session (the ＋ tab) has no snapshot entry and is appended
+  // after the frozen ones rather than disrupting their order.
+  const [noOrder] = React.useState(() => copies.map(c => c.id));
+  const liveById = new Map(copies.map(c => [c.id, c]));
+  const displayCopies = noOrder.filter(id => liveById.has(id)).map((id, i) => ({ ...liveById.get(id), no: i + 1 }));
+  copies.filter(c => !noOrder.includes(c.id)).forEach(c => displayCopies.push({ ...c, no: displayCopies.length + 1 }));
+
+  const [curId, setCurId] = React.useState(instId || (displayCopies[0] && displayCopies[0].id));
+  const cur = displayCopies.find(c => c.id === curId) || displayCopies[0] || null;
   const [flipped, setFlipped] = React.useState(false);
   const [varEdit, setVarEdit] = React.useState(false);
   const [reorderOpen, setReorderOpen] = React.useState(false);
@@ -611,8 +626,8 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   // accessory — a copy already at req (e.g. 1/1) isn't a legal destination,
   // or moving a unit onto it would silently over-fill it (2/1) while the
   // source goes short. Mirrored server-side in moveInstanceAccessory.
-  const moveTargetsFor = (a) => copies.length > 1
-    ? copies.filter((c) => c.id !== cur.id && (!a[7] || a[7] === c.variant) && ((c.acc && c.acc[a[0]]) || 0) < a[1]).map((c) => ({ id: c.id, no: c.no }))
+  const moveTargetsFor = (a) => displayCopies.length > 1
+    ? displayCopies.filter((c) => c.id !== cur.id && (!a[7] || a[7] === c.variant) && ((c.acc && c.acc[a[0]]) || 0) < a[1]).map((c) => ({ id: c.id, no: c.no }))
     : null;
   const moveUnit = (name, destId, qty) => JoeStore.moveAcc(cur.id, destId, name, qty);
   const swapUnitToBin = (name) => JoeStore.swapAccessoryToBin(cur.id, name);
@@ -693,7 +708,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
       <div className="inv-cardhd">
         <div className="inv-cardhd__id">
           <b>{fig.name}</b>
-          {copies.length > 1 ? (
+          {displayCopies.length > 1 ? (
             <button type="button" className="inv-cardhd__no is-pickable" title="Move this copy to a different No."
                     onClick={() => setReorderOpen(v => !v)}>No. {cur.no}</button>
           ) : (
@@ -722,7 +737,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
       {reorderOpen && (
         <div className="inv-reorder">
           <span className="inv-reorder__lab">MOVE TO No.</span>
-          {copies.map((c, i) => (
+          {displayCopies.map((c, i) => (
             <button key={c.id} type="button" className={"inv-reorder__opt" + (i + 1 === cur.no ? " is-current" : "")}
                     disabled={i + 1 === cur.no} onClick={() => moveTo(i + 1)}>{i + 1}</button>
           ))}
@@ -743,14 +758,15 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
           </svg>
         </button>
         <div className={"inv-tabs-rail" + (tucked ? " is-tucked" : "")}>
-          {copies.map((c) => (
+          {displayCopies.map((c) => (
             <button key={c.id} className={"inv-tab" + (cur.id === c.id ? " is-active" : "") + (c.masterCollection ? " is-master" : "")} onClick={() => setCurId(c.id)}>No. {c.no}{c.whole ? " ✓" : ""}</button>
           ))}
-          {/* Defaults to the LAST copy's variant (copies is already ordered by
-              .no — see figState above), not whichever tab happens to be open
-              right now — e.g. No.1=A, No.2=A, No.3=C means + starts at C,
+          {/* Defaults to the LAST copy's variant (displayCopies is already
+              ordered by .no, frozen for this window — see the noOrder
+              snapshot above), not whichever tab happens to be open right
+              now — e.g. No.1=A, No.2=A, No.3=C means + starts at C,
               regardless of which tab you were viewing when you clicked it. */}
-          <button className="inv-tab inv-tab--add" title="Add a copy" onClick={() => { onAddInstance(fig.id, copies[copies.length - 1].variant); onClose(); }}>＋</button>
+          <button className="inv-tab inv-tab--add" title="Add a copy" onClick={() => { onAddInstance(fig.id, displayCopies[displayCopies.length - 1].variant); onClose(); }}>＋</button>
         </div>
 
         <div className="inv-flip">

@@ -959,6 +959,25 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
 - **Status:** ✅ group_id set in DB and verified via direct DB read (figure_id 268:
   A0717/A0718 both carry group_id 29), 2026-07-15. Not yet visually verified in-app.
 
+### 1990 — Capt. Grid-Iron (v1, figure catalog id 264 — source F-code F345)
+
+- **Mechanism:** plain `group_id` — own any one member of the slot below.
+- **Variants:** none — single catalog row, and no longer a `variant_lookup` case at all.
+  Previously mis-modeled as a whole-figure A/B production variant (`variant_lookup`
+  letters A "Soft helmet" / B "Hard helmet") — but the two helmets aren't a
+  distinguishing trait of which release you own, they're just two interchangeable molds
+  of the same accessory, same shape as A.V.A.C.'s and Countdown's soft/hard-plastic
+  helmets below/above. Owner-corrected 2026-08-16; both `variant_lookup` rows deleted in
+  `migrations/020_grid_iron_football_helmet.sql`.
+- **Group_id slot:** Football Helmet (soft plastic) / Football Helmet (hard plastic)
+  (`accessory_groups.id` 39).
+- **Unaffected (plain, independently required):** Visor, Backpack, Elbow Pads, Pistol,
+  Missile Launcher, Missile, Football Grenades.
+- **Source:** hand-built (`extGroupId: null`), owner-corrected 2026-08-16.
+- **Status:** ✅ group_id set in DB and verified via direct DB read (figure_id 264:
+  A0695/A0696 both carry group_id 39, variant_lookup rows removed), 2026-08-16. Not yet
+  visually verified in-app.
+
 ### 1990 — Lampreys (v2, figure catalog id 271 — source F-code F352)
 
 - **Mechanism:** plain `group_id` — own any one member of the slot below.

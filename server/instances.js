@@ -44,13 +44,20 @@ const instanceRowsStmt = db.prepare(`
 `);
 
 const instanceAccStmt = db.prepare(`
-  SELECT ia.instance_id, i.figure_id, ia.accessory_id, ia.units_owned, ia.units_damaged, ia.damage_notes
+  SELECT ia.instance_id, i.figure_id, ia.accessory_id, ia.units_owned
   FROM instance_accessories ia
   JOIN instances i ON i.id = ia.instance_id
   WHERE ia.units_owned > 0
 `);
+// One row per damaged unit (migration 021 — replaces the old scalar
+// units_damaged/damage_notes columns so each unit can carry its own note).
+const instanceDamageStmt = db.prepare(`
+  SELECT iad.id, iad.instance_id, i.figure_id, iad.accessory_id, iad.notes
+  FROM instance_accessory_damage iad
+  JOIN instances i ON i.id = iad.instance_id
+`);
 
-function shapeInstance(row, accByInstance, damageByInstance, damageNotesByInstance) {
+function shapeInstance(row, accByInstance, damageByInstance, damageUnitsByInstance) {
   return {
     id: row.id,
     catalogId: row.catalogId,
@@ -58,7 +65,9 @@ function shapeInstance(row, accByInstance, damageByInstance, damageNotesByInstan
     moc: !!row.moc,
     acc: accByInstance.get(row.id) || {},
     accDamage: damageByInstance.get(row.id) || {},
-    accDamageNotes: damageNotesByInstance.get(row.id) || {},
+    // name -> [{id, notes}, ...], one entry per damaged unit — see DmgPopover
+    // in web/src/app-detail.jsx for how each gets its own editable note.
+    accDamageUnits: damageUnitsByInstance.get(row.id) || {},
     marks: row.marks ? JSON.parse(row.marks) : null,
     loc: row.loc || '',
     notes: row.notes || '',
@@ -72,40 +81,52 @@ function shapeInstance(row, accByInstance, damageByInstance, damageNotesByInstan
 }
 
 const binRowsStmt = db.prepare(`
-  SELECT ai.accessory_id, a.name AS accessory, ai.quantity_owned AS qty, ai.units_damaged AS damaged, ai.notes, ai.damage_notes
+  SELECT ai.accessory_id, a.name AS accessory, ai.quantity_owned AS qty, ai.notes
   FROM accessory_inventory ai
   JOIN accessories a ON a.id = ai.accessory_id
   WHERE ai.quantity_owned > 0
   ORDER BY a.name
 `);
+const binDamageStmt = db.prepare('SELECT id, accessory_id, notes FROM bin_damage');
 
-function shapeBinEntry(row) {
-  return { id: row.accessory_id, catalogId: null, accessory: row.accessory, qty: row.qty, damaged: row.damaged || 0, damageNotes: row.damage_notes || '', notes: row.notes || '', addedAt: null };
+function shapeBinEntry(row, damageUnitsByAccessory) {
+  const units = damageUnitsByAccessory.get(row.accessory_id) || [];
+  return { id: row.accessory_id, catalogId: null, accessory: row.accessory, qty: row.qty, damaged: units.length, damageUnits: units, notes: row.notes || '', addedAt: null };
 }
 
 export function getState() {
   const accByInstance = new Map();
   const damageByInstance = new Map();
-  const damageNotesByInstance = new Map();
+  const damageUnitsByInstance = new Map();
   const idNameByFigure = new Map(); // figure_id -> Map(accessory_id -> disambiguated name)
+  const nameFor = (figureId, accessoryId) => {
+    if (!idNameByFigure.has(figureId)) idNameByFigure.set(figureId, blueprintIdNameMap(figureId));
+    return idNameByFigure.get(figureId).get(accessoryId);
+  };
   for (const r of instanceAccStmt.all()) {
-    if (!idNameByFigure.has(r.figure_id)) idNameByFigure.set(r.figure_id, blueprintIdNameMap(r.figure_id));
-    const name = idNameByFigure.get(r.figure_id).get(r.accessory_id);
+    const name = nameFor(r.figure_id, r.accessory_id);
     if (!name) continue; // accessory no longer on this figure's blueprint
     if (!accByInstance.has(r.instance_id)) accByInstance.set(r.instance_id, {});
     accByInstance.get(r.instance_id)[name] = r.units_owned;
-    if (r.units_damaged > 0) {
-      if (!damageByInstance.has(r.instance_id)) damageByInstance.set(r.instance_id, {});
-      damageByInstance.get(r.instance_id)[name] = r.units_damaged;
-      if (r.damage_notes) {
-        if (!damageNotesByInstance.has(r.instance_id)) damageNotesByInstance.set(r.instance_id, {});
-        damageNotesByInstance.get(r.instance_id)[name] = r.damage_notes;
-      }
-    }
+  }
+  for (const r of instanceDamageStmt.all()) {
+    const name = nameFor(r.figure_id, r.accessory_id);
+    if (!name) continue;
+    if (!damageByInstance.has(r.instance_id)) damageByInstance.set(r.instance_id, {});
+    const counts = damageByInstance.get(r.instance_id);
+    counts[name] = (counts[name] || 0) + 1;
+    if (!damageUnitsByInstance.has(r.instance_id)) damageUnitsByInstance.set(r.instance_id, {});
+    const units = damageUnitsByInstance.get(r.instance_id);
+    (units[name] || (units[name] = [])).push({ id: r.id, notes: r.notes || '' });
+  }
+  const binDamageByAcc = new Map();
+  for (const r of binDamageStmt.all()) {
+    if (!binDamageByAcc.has(r.accessory_id)) binDamageByAcc.set(r.accessory_id, []);
+    binDamageByAcc.get(r.accessory_id).push({ id: r.id, notes: r.notes || '' });
   }
   return {
-    instances: instanceRowsStmt.all().map((r) => shapeInstance(r, accByInstance, damageByInstance, damageNotesByInstance)),
-    bin: binRowsStmt.all().map(shapeBinEntry),
+    instances: instanceRowsStmt.all().map((r) => shapeInstance(r, accByInstance, damageByInstance, damageUnitsByInstance)),
+    bin: binRowsStmt.all().map((r) => shapeBinEntry(r, binDamageByAcc)),
   };
 }
 
@@ -149,14 +170,17 @@ export const createInstance = db.transaction((payload) => {
   }
   // accDamage is a condition notation on units already added above — clamped
   // to [0, units_owned] same as setInstanceAccessoryDamage, since a copy
-  // can't arrive already-damaged for an accessory it doesn't own.
+  // can't arrive already-damaged for an accessory it doesn't own. Each
+  // damaged unit gets its own row (blank note — this intake flow doesn't
+  // collect per-unit notes; see migration 021).
   if (!moc) {
     for (const [name, damaged] of Object.entries(accDamage || {})) {
       if (!damaged) continue;
       const accId = accessoryIdForName(catalogId, name);
       if (!accId) continue;
       const owned = acc && acc[name] ? acc[name] : 0;
-      if (owned) setInstanceAccDamage.run(Math.max(0, Math.min(damaged, owned)), id, accId);
+      const clamped = Math.max(0, Math.min(damaged, owned));
+      for (let i = 0; i < clamped; i++) insertInstanceDamage.run(id, accId, null);
     }
   }
   return id;
@@ -198,7 +222,7 @@ export const updateInstance = db.transaction((id, patch) => {
     if (row) {
       for (const [name, units] of Object.entries(patch.acc)) {
         const accId = accessoryIdForName(row.figure_id, name);
-        if (accId) upsertInstanceAcc.run(id, accId, units);
+        if (accId) { upsertInstanceAcc.run(id, accId, units); trimInstanceDamage(id, accId, units); }
       }
     }
   }
@@ -210,19 +234,39 @@ export function setInstanceAccessory(instanceId, name, units) {
   const accId = accessoryIdForName(row.figure_id, name);
   if (!accId) return false;
   upsertInstanceAcc.run(instanceId, accId, units);
+  trimInstanceDamage(instanceId, accId, units); // a unit can't stay marked damaged once it's no longer owned
   return true;
 }
 
-const setInstanceAccDamage = db.prepare(`
-  UPDATE instance_accessories SET units_damaged = ? WHERE instance_id = ? AND accessory_id = ?
+// ---------------------------------------------------------------------------
+// Per-unit damage (migration 021) — instance_accessory_damage holds one row
+// per damaged unit of one instance's accessory, each with its own optional
+// note, instead of the old scalar units_damaged count + one shared
+// damage_notes string. "Which unit" has no real identity beyond its row —
+// clean units are fully interchangeable — so create/delete just pick
+// whichever row is cheapest to lose: a blank-note one before a noted one,
+// oldest first within that.
+// ---------------------------------------------------------------------------
+const insertInstanceDamage = db.prepare('INSERT INTO instance_accessory_damage (instance_id, accessory_id, notes) VALUES (?, ?, ?)');
+const countInstanceDamage = db.prepare('SELECT COUNT(*) AS n FROM instance_accessory_damage WHERE instance_id = ? AND accessory_id = ?');
+const deleteInstanceDamageRow = db.prepare('DELETE FROM instance_accessory_damage WHERE id = ?');
+const pickInstanceDamageRowsToTrim = db.prepare(`
+  SELECT id FROM instance_accessory_damage WHERE instance_id = ? AND accessory_id = ?
+  ORDER BY (notes IS NULL OR notes = '') DESC, id ASC LIMIT ?
 `);
-const setInstanceAccDamageNotes = db.prepare(`
-  UPDATE instance_accessories SET damage_notes = ? WHERE instance_id = ? AND accessory_id = ?
+const oldestInstanceDamageRow = db.prepare(`
+  SELECT id, notes FROM instance_accessory_damage WHERE instance_id = ? AND accessory_id = ? ORDER BY id ASC LIMIT 1
 `);
 
-// units_damaged is a condition notation on units the copy already owns — never
-// creates a row (upsertInstanceAcc already did that when units_owned was set)
-// and is clamped to [0, units_owned] since you can't damage a part you don't have.
+function trimInstanceDamage(instanceId, accId, maxAllowed) {
+  const n = countInstanceDamage.get(instanceId, accId).n;
+  if (n <= maxAllowed) return;
+  for (const r of pickInstanceDamageRowsToTrim.all(instanceId, accId, n - maxAllowed)) deleteInstanceDamageRow.run(r.id);
+}
+
+// Sets the TARGET damaged count for this instance's accessory — clamped to
+// [0, units_owned] since you can't damage a part you don't have. Growing the
+// count inserts blank-note rows; shrinking it trims via trimInstanceDamage.
 export function setInstanceAccessoryDamage(instanceId, name, units) {
   const row = getInstanceFigure.get(instanceId);
   if (!row) return false;
@@ -232,22 +276,19 @@ export function setInstanceAccessoryDamage(instanceId, name, units) {
   const owned = cur ? cur.units_owned : 0;
   if (!owned) return false;
   const clamped = Math.max(0, Math.min(units, owned));
-  setInstanceAccDamage.run(clamped, instanceId, accId);
-  if (clamped === 0) setInstanceAccDamageNotes.run(null, instanceId, accId); // no damaged units left — stale description
+  const curDamaged = countInstanceDamage.get(instanceId, accId).n;
+  if (clamped > curDamaged) { for (let i = 0; i < clamped - curDamaged; i++) insertInstanceDamage.run(instanceId, accId, null); }
+  else if (clamped < curDamaged) trimInstanceDamage(instanceId, accId, clamped);
   return true;
 }
 
-// Free-text description of what's wrong with the damaged unit(s) — see
-// migration 008. Only settable on a row that actually has a damaged unit,
-// same guard shape as setInstanceAccessoryDamage.
-export function setInstanceAccessoryDamageNotes(instanceId, name, notes) {
-  const row = getInstanceFigure.get(instanceId);
+// Sets the note on ONE specific damaged unit — replaces the old
+// setInstanceAccessoryDamageNotes (a single string shared by however many
+// units happened to be damaged; see migration 021's header comment).
+export function setInstanceAccessoryDamageUnitNotes(instanceId, unitId, notes) {
+  const row = db.prepare('SELECT id FROM instance_accessory_damage WHERE id = ? AND instance_id = ?').get(unitId, instanceId);
   if (!row) return false;
-  const accId = accessoryIdForName(row.figure_id, name);
-  if (!accId) return false;
-  const cur = db.prepare('SELECT units_damaged FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(instanceId, accId);
-  if (!cur || !cur.units_damaged) return false;
-  setInstanceAccDamageNotes.run((notes || '').trim() || null, instanceId, accId);
+  db.prepare('UPDATE instance_accessory_damage SET notes = ? WHERE id = ?').run((notes || '').trim() || null, unitId);
   return true;
 }
 
@@ -265,27 +306,39 @@ const upsertBin = db.prepare(`
   ON CONFLICT(accessory_id) DO UPDATE SET quantity_owned = quantity_owned + excluded.quantity_owned,
     notes = COALESCE(excluded.notes, accessory_inventory.notes)
 `);
+const getBinRow = db.prepare('SELECT quantity_owned FROM accessory_inventory WHERE accessory_id = ?');
+
+// One row per damaged LOOSE unit (migration 021, same idea as
+// instance_accessory_damage above) — clean loose units stay a plain count
+// (quantity_owned) since they're fully interchangeable; only damaged ones
+// need individual identity to carry a distinct note.
+const insertBinDamage = db.prepare('INSERT INTO bin_damage (accessory_id, notes) VALUES (?, ?)');
+const countBinDamage = db.prepare('SELECT COUNT(*) AS n FROM bin_damage WHERE accessory_id = ?');
+const deleteBinDamageRow = db.prepare('DELETE FROM bin_damage WHERE id = ?');
+const pickBinDamageRowsToTrim = db.prepare(`
+  SELECT id FROM bin_damage WHERE accessory_id = ? ORDER BY (notes IS NULL OR notes = '') DESC, id ASC LIMIT ?
+`);
+const oldestBinDamageRow = db.prepare('SELECT id, notes FROM bin_damage WHERE accessory_id = ? ORDER BY id ASC LIMIT 1');
+
+function trimBinDamage(accessoryId, maxAllowed) {
+  const n = countBinDamage.get(accessoryId).n;
+  if (n <= maxAllowed) return;
+  for (const r of pickBinDamageRowsToTrim.all(accessoryId, n - maxAllowed)) deleteBinDamageRow.run(r.id);
+}
 
 // damaged/damageNotes let a part be logged as already-damaged at import time
 // (e.g. sorting a parts lot) instead of requiring a second trip to find the
-// row again in the bin list and mark it via setPartDamage/setPartDamageNotes.
+// row again in the bin list and mark it via setPartDamage/setPartDamageUnitNotes.
+// damageNotes (one string) applies to every newly-damaged unit in this batch
+// alike — a reasonable default for a batch import, and each can be edited
+// individually afterward from the bin list.
 export const addPart = db.transaction(({ catalogId, accessory, qty = 1, notes = '', damaged = 0, damageNotes = '' }) => {
   const accId = accessoryIdForName(catalogId, accessory);
   if (!accId) return false;
-  const before = getBinRow.get(accId);
   upsertBin.run(accId, qty, notes || null);
   const dmg = Math.max(0, Math.min(damaged, qty));
-  if (dmg > 0) {
-    const priorDamaged = before ? before.units_damaged : 0;
-    const totalQty = (before ? before.quantity_owned : 0) + qty;
-    setBinDamaged.run(Math.min(priorDamaged + dmg, totalQty), accId);
-    const notesV = (damageNotes || '').trim();
-    if (notesV) {
-      const existing = (before && before.damage_notes) || '';
-      const merged = existing && existing !== notesV ? existing + '; ' + notesV : (existing || notesV);
-      setBinDamageNotes.run(merged, accId);
-    }
-  }
+  const notesV = (damageNotes || '').trim() || null;
+  for (let i = 0; i < dmg; i++) insertBinDamage.run(accId, notesV);
   return true;
 });
 
@@ -296,71 +349,70 @@ export function depositParts(catalogId, parts) {
   }
 }
 
-const getBinRow = db.prepare('SELECT quantity_owned, units_damaged, damage_notes FROM accessory_inventory WHERE accessory_id = ?');
-const setBinDamaged = db.prepare('UPDATE accessory_inventory SET units_damaged = ? WHERE accessory_id = ?');
-const setBinDamageNotes = db.prepare('UPDATE accessory_inventory SET damage_notes = ? WHERE accessory_id = ?');
-
-// units_damaged is app-clamped to [0, quantity_owned] (migration 006, same
-// rule as instance_accessories.units_damaged) — shrinking quantity_owned
-// below the current damaged count pulls units_damaged down with it.
+// damaged-unit count is app-clamped to [0, quantity_owned] (migration 006) —
+// shrinking quantity_owned below the current damaged count trims damage rows
+// down with it (blank-note ones first — see trimBinDamage).
 export function adjustPart(accessoryId, delta) {
   const row = getBinRow.get(accessoryId);
-  const nextQty = (row ? row.quantity_owned : 0) + delta;
-  if (nextQty <= 0) { db.prepare('DELETE FROM accessory_inventory WHERE accessory_id = ?').run(accessoryId); return; }
-  upsertBin.run(accessoryId, nextQty - (row ? row.quantity_owned : 0), null);
-  if (row && row.units_damaged > nextQty) setBinDamaged.run(nextQty, accessoryId);
+  const curQty = row ? row.quantity_owned : 0;
+  const nextQty = curQty + delta;
+  if (nextQty <= 0) {
+    db.prepare('DELETE FROM accessory_inventory WHERE accessory_id = ?').run(accessoryId);
+    db.prepare('DELETE FROM bin_damage WHERE accessory_id = ?').run(accessoryId); // no FK cascade — bin_damage keys off accessories, not accessory_inventory
+    return;
+  }
+  upsertBin.run(accessoryId, nextQty - curQty, null);
+  trimBinDamage(accessoryId, nextQty);
 }
 
 export function removePart(accessoryId) {
   db.prepare('DELETE FROM accessory_inventory WHERE accessory_id = ?').run(accessoryId);
+  db.prepare('DELETE FROM bin_damage WHERE accessory_id = ?').run(accessoryId);
 }
 
 // Direct write for loose-stock damage — e.g. sorting the bin turns up a
 // broken part, with no instance/swap involved. Same [0, quantity_owned]
-// clamp as everywhere else units_damaged is set.
+// clamp as everywhere else damaged count is set; growing it inserts
+// blank-note rows, shrinking it trims via trimBinDamage.
 export function setPartDamage(accessoryId, units) {
   const row = getBinRow.get(accessoryId);
   if (!row) return false;
   const clamped = Math.max(0, Math.min(units, row.quantity_owned));
-  setBinDamaged.run(clamped, accessoryId);
-  if (clamped === 0) setBinDamageNotes.run(null, accessoryId); // no damaged units left — stale description
+  const cur = countBinDamage.get(accessoryId).n;
+  if (clamped > cur) { for (let i = 0; i < clamped - cur; i++) insertBinDamage.run(accessoryId, null); }
+  else if (clamped < cur) trimBinDamage(accessoryId, clamped);
   return true;
 }
 
-// Free-text description of what's wrong with the damaged loose unit(s) —
-// see migration 008. Only settable on a bin row that actually exists.
-export function setPartDamageNotes(accessoryId, notes) {
-  const row = getBinRow.get(accessoryId);
+// Sets the note on ONE specific damaged loose unit — replaces the old
+// setPartDamageNotes (a single string shared by however many loose units of
+// that accessory happened to be damaged; see migration 021's header comment).
+export function setPartDamageUnitNotes(unitId, notes) {
+  const row = db.prepare('SELECT id FROM bin_damage WHERE id = ?').get(unitId);
   if (!row) return false;
-  setBinDamageNotes.run((notes || '').trim() || null, accessoryId);
+  db.prepare('UPDATE bin_damage SET notes = ? WHERE id = ?').run((notes || '').trim() || null, unitId);
   return true;
 }
 
 // Pulls one loose unit from the bin onto an instance. Prefers clean stock;
 // only reaches for damaged stock if that's all the bin has, in which case
-// the damage status — and its damage_notes description, if any — carries
-// over onto the instance rather than silently laundering a broken part as
-// clean (or dropping the note describing what's wrong with it). If the
-// instance already has its own damage_notes for this accessory (e.g. a
-// prior damaged unit logged before this pull), the two are appended rather
-// than overwritten. adjustPart's own units_damaged clamp keeps the bin side
-// correct once quantity_owned drops (see adjustPart).
+// the damaged unit's own row — note included — re-targets onto the instance
+// rather than silently laundering a broken part as clean (or dropping the
+// note describing what's wrong with it). adjustPart's own trim keeps the
+// bin side's remaining damage rows consistent once quantity_owned drops.
 export const pullPart = db.transaction((accessoryId, instanceId) => {
   const row = getBinRow.get(accessoryId);
   if (!row || row.quantity_owned <= 0) return false;
-  const pullingDamaged = row.units_damaged >= row.quantity_owned; // no clean stock left
+  const damagedCount = countBinDamage.get(accessoryId).n;
+  const pullingDamaged = damagedCount >= row.quantity_owned; // no clean stock left
 
-  const cur = db.prepare('SELECT units_owned, units_damaged, damage_notes FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(instanceId, accessoryId);
+  const cur = db.prepare('SELECT units_owned FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(instanceId, accessoryId);
   const ownedNow = cur ? cur.units_owned : 0;
   upsertInstanceAcc.run(instanceId, accessoryId, ownedNow + 1);
   if (pullingDamaged) {
-    const damagedNow = cur ? cur.units_damaged : 0;
-    setInstanceAccDamage.run(damagedNow + 1, instanceId, accessoryId);
-    if (row.damage_notes) {
-      const existing = (cur && cur.damage_notes) || '';
-      const merged = existing && existing !== row.damage_notes ? existing + '; ' + row.damage_notes : (existing || row.damage_notes);
-      setInstanceAccDamageNotes.run(merged, instanceId, accessoryId);
-    }
+    const leaving = oldestBinDamageRow.get(accessoryId);
+    deleteBinDamageRow.run(leaving.id);
+    insertInstanceDamage.run(instanceId, accessoryId, leaving.notes);
   }
 
   adjustPart(accessoryId, -1);
@@ -369,77 +421,81 @@ export const pullPart = db.transaction((accessoryId, instanceId) => {
 
 // Trades a damaged unit on an instance for a clean one from the bin. A
 // symmetric swap, not a quantity change: the instance's units_owned and the
-// bin's quantity_owned are untouched — only which units are flagged damaged
-// moves (instance -1 damaged, bin +1 damaged). Fails if the instance has no
-// damaged unit of this accessory, or the bin has no clean stock to trade for.
+// bin's quantity_owned are untouched — only which unit is flagged damaged
+// moves. The damaged unit physically leaves the instance for the bin, so its
+// row (and note) re-targets there rather than being dropped and recreated
+// blank. Fails if the instance has no damaged unit of this accessory, or the
+// bin has no clean stock to trade for.
 export const swapAccessoryForClean = db.transaction((instanceId, name) => {
   const row = getInstanceFigure.get(instanceId);
   if (!row) return false;
   const accId = accessoryIdForName(row.figure_id, name);
   if (!accId) return false;
 
-  const instRow = db.prepare('SELECT units_owned, units_damaged FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(instanceId, accId);
-  if (!instRow || instRow.units_damaged <= 0) return false;
+  const instDamagedCount = countInstanceDamage.get(instanceId, accId).n;
+  if (instDamagedCount <= 0) return false;
 
   const binRow = getBinRow.get(accId);
-  const cleanInBin = binRow ? binRow.quantity_owned - binRow.units_damaged : 0;
+  const binDamagedCount = countBinDamage.get(accId).n;
+  const cleanInBin = binRow ? binRow.quantity_owned - binDamagedCount : 0;
   if (cleanInBin <= 0) return false;
 
-  const instDamagedNow = instRow.units_damaged - 1;
-  setInstanceAccDamage.run(instDamagedNow, instanceId, accId);
-  if (instDamagedNow === 0) setInstanceAccDamageNotes.run(null, instanceId, accId); // no damaged units left — stale description
-  setBinDamaged.run(binRow.units_damaged + 1, accId);
+  const leaving = oldestInstanceDamageRow.get(instanceId, accId);
+  deleteInstanceDamageRow.run(leaving.id);
+  insertBinDamage.run(accId, leaving.notes);
   return true;
 });
 
 // Moves 1 unit of an accessory off an instance and into the Parts Bin —
 // the "nowhere left to move it to" complement to moveInstanceAccessory
-// (copy → copy). Prefers taking a damaged unit (and carrying its
-// damage_notes into the bin entry) over a clean one — the opposite
-// preference from moveInstanceAccessory/pullPart — because the primary
-// reason to swap an accessory out this way is that it's damaged.
+// (copy → copy). Prefers taking a damaged unit (its row, note included,
+// re-targets into the bin) over a clean one — the opposite preference from
+// moveInstanceAccessory/pullPart — because the primary reason to swap an
+// accessory out this way is that it's damaged.
 export const swapAccessoryToBin = db.transaction((instanceId, name) => {
   const row = getInstanceFigure.get(instanceId);
   if (!row) return false;
   const accId = accessoryIdForName(row.figure_id, name);
   if (!accId) return false;
 
-  const src = db.prepare('SELECT units_owned, units_damaged, damage_notes FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(instanceId, accId);
+  const src = db.prepare('SELECT units_owned FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(instanceId, accId);
   if (!src || src.units_owned <= 0) return false;
 
-  const movingDamaged = src.units_damaged > 0;
-  const srcDamagedNow = movingDamaged ? src.units_damaged - 1 : src.units_damaged;
-  setInstanceAccDamage.run(srcDamagedNow, instanceId, accId);
-  if (srcDamagedNow === 0) setInstanceAccDamageNotes.run(null, instanceId, accId); // no damaged units left — stale description
+  const instDamagedCount = countInstanceDamage.get(instanceId, accId).n;
+  const movingDamaged = instDamagedCount > 0;
+  let carriedNotes = null;
+  if (movingDamaged) {
+    const leaving = oldestInstanceDamageRow.get(instanceId, accId);
+    deleteInstanceDamageRow.run(leaving.id);
+    carriedNotes = leaving.notes;
+  }
   upsertInstanceAcc.run(instanceId, accId, src.units_owned - 1);
 
-  const before = getBinRow.get(accId);
   upsertBin.run(accId, 1, null);
-  if (movingDamaged) {
-    const priorDamaged = before ? before.units_damaged : 0;
-    setBinDamaged.run(priorDamaged + 1, accId);
-    if (src.damage_notes) {
-      const existing = (before && before.damage_notes) || '';
-      const merged = existing && existing !== src.damage_notes ? existing + '; ' + src.damage_notes : (existing || src.damage_notes);
-      setBinDamageNotes.run(merged, accId);
-    }
-  }
+  if (movingDamaged) insertBinDamage.run(accId, carriedNotes);
   return true;
 });
 
 const getInstanceFigureAndVariant = db.prepare('SELECT figure_id, variant_id FROM instances WHERE id = ?');
 const getFigureAccessoryVariant = db.prepare('SELECT variant_id, quantity_required FROM figure_accessories WHERE figure_id = ? AND accessory_id = ?');
+const oldestInstanceDamageRowsToMove = db.prepare(`
+  SELECT id FROM instance_accessory_damage WHERE instance_id = ? AND accessory_id = ? ORDER BY id ASC LIMIT ?
+`);
+const retargetInstanceDamage = db.prepare('UPDATE instance_accessory_damage SET instance_id = ? WHERE id = ?');
 
 // Moves `count` units of an accessory from one owned copy to another (e.g.
 // give spare missiles from a beat-up copy to a mint one the owner wants
 // complete instead) — the manual counterpart to the ⚖ rebalance engine,
 // which only optimizes for whole-copy count and knows nothing about
 // condition. Prefers moving clean units first; only reaches into damaged
-// stock — carrying the damaged flag + notes over — once the source's clean
-// units run out. Rejects moves across different figures, moves for more
-// units than the source owns, onto a copy of the wrong production variant
-// for a variant-scoped accessory (see ACCESSORY_GROUPS.md "variant_id"), or
-// onto a destination that already holds its full blueprint quantity for this
+// stock once the source's clean units run out, in which case those units'
+// own rows re-target onto the destination — each keeps its own distinct
+// note (migration 021; the old scalar-column version had to merge multiple
+// units' notes into one string here, since it had nowhere else to put them).
+// Rejects moves across different figures, moves for more units than the
+// source owns, onto a copy of the wrong production variant for a
+// variant-scoped accessory (see ACCESSORY_GROUPS.md "variant_id"), or onto a
+// destination that already holds its full blueprint quantity for this
 // accessory — the UI's moveTargetsFor() already hides a full destination as
 // a target, this is the belt-and-suspenders check so the API can't be used
 // to silently over-fill one copy (e.g. 2/1) while starving another (0/1).
@@ -455,35 +511,30 @@ export const moveInstanceAccessory = db.transaction((fromInstanceId, toInstanceI
   const scoped = getFigureAccessoryVariant.get(from.figure_id, accId);
   if (scoped && scoped.variant_id != null && scoped.variant_id !== to.variant_id) return false;
 
-  const src = db.prepare('SELECT units_owned, units_damaged, damage_notes FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(fromInstanceId, accId);
+  const src = db.prepare('SELECT units_owned FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(fromInstanceId, accId);
   if (!src || src.units_owned < count) return false;
 
   const req = (scoped && scoped.quantity_required) || 1;
   const dstBefore = db.prepare('SELECT units_owned FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(toInstanceId, accId);
-  if (((dstBefore && dstBefore.units_owned) || 0) + count > req) return false;
-  const clean = src.units_owned - src.units_damaged;
-  const movingDamaged = Math.max(0, count - clean);
+  const dstOwnedNow = (dstBefore && dstBefore.units_owned) || 0;
+  if (dstOwnedNow + count > req) return false;
 
-  const srcDamagedNow = src.units_damaged - movingDamaged;
-  setInstanceAccDamage.run(srcDamagedNow, fromInstanceId, accId);
-  if (srcDamagedNow === 0) setInstanceAccDamageNotes.run(null, fromInstanceId, accId); // no damaged units left — stale description
+  const srcDamagedCount = countInstanceDamage.get(fromInstanceId, accId).n;
+  const clean = src.units_owned - srcDamagedCount;
+  const movingDamagedN = Math.max(0, count - clean);
+
   upsertInstanceAcc.run(fromInstanceId, accId, src.units_owned - count);
-
-  const dst = db.prepare('SELECT units_owned, units_damaged, damage_notes FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?').get(toInstanceId, accId);
-  const dstOwnedNow = dst ? dst.units_owned : 0;
+  // Destination row must exist before damage rows re-target onto it — the FK
+  // is on (instance_id, accessory_id), validated against instance_accessories.
   upsertInstanceAcc.run(toInstanceId, accId, dstOwnedNow + count);
-  if (movingDamaged) {
-    const dstDamagedNow = (dst ? dst.units_damaged : 0) + movingDamaged;
-    setInstanceAccDamage.run(dstDamagedNow, toInstanceId, accId);
-    if (src.damage_notes) {
-      const existing = (dst && dst.damage_notes) || '';
-      const merged = existing && existing !== src.damage_notes ? existing + '; ' + src.damage_notes : (existing || src.damage_notes);
-      setInstanceAccDamageNotes.run(merged, toInstanceId, accId);
-    }
+
+  if (movingDamagedN > 0) {
+    const moving = oldestInstanceDamageRowsToMove.all(fromInstanceId, accId, movingDamagedN);
+    for (const r of moving) retargetInstanceDamage.run(toInstanceId, r.id);
   }
   return true;
 });
 
 export function clearAll() {
-  db.exec('DELETE FROM instances; DELETE FROM accessory_inventory;');
+  db.exec('DELETE FROM instances; DELETE FROM accessory_inventory; DELETE FROM bin_damage;');
 }

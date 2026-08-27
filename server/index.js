@@ -84,9 +84,12 @@ app.patch('/api/instances/:id/accessory-damage', (req, res) => {
   res.json({ ok: true });
 });
 
-app.patch('/api/instances/:id/accessory-damage-notes', (req, res) => {
-  const ok = store.setInstanceAccessoryDamageNotes(+req.params.id, req.body.name, req.body.notes);
-  if (!ok) return res.status(400).json({ error: 'no damaged unit of this accessory on this copy' });
+// Sets the note on ONE specific damaged unit — each damaged unit is its own
+// row now (migration 021), not a single string shared across however many
+// happen to be damaged.
+app.patch('/api/instances/:id/accessory-damage-unit/:unitId', (req, res) => {
+  const ok = store.setInstanceAccessoryDamageUnitNotes(+req.params.id, +req.params.unitId, req.body.notes);
+  if (!ok) return res.status(400).json({ error: 'no such damaged unit on this copy' });
   res.json({ ok: true });
 });
 
