@@ -132,7 +132,7 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
                         name={entry.accessory} count={entry.qty}
                         checked={Array.from({ length: entry.qty }, (_, k) => k < entry.damaged)}
                         onSet={(k) => JoeStore.setPartDamage(entry.id, k)}
-                        notes={entry.damageNotes} onSetNotes={(v) => JoeStore.setPartDamageNotes(entry.id, v)} />
+                        unitNotes={entry.damageUnits} onSetUnitNotes={(unitId, v) => JoeStore.setPartDamageUnitNotes(unitId, v)} />
           )}
         </span>
       </div>

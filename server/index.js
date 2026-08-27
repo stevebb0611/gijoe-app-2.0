@@ -139,9 +139,13 @@ app.patch('/api/parts-bin/:accessoryId/damage', (req, res) => {
   res.json({ ok: true });
 });
 
-app.patch('/api/parts-bin/:accessoryId/damage-notes', (req, res) => {
-  const ok = store.setPartDamageNotes(+req.params.accessoryId, req.body.notes);
-  if (!ok) return res.status(400).json({ error: 'no such bin entry' });
+// Sets the note on ONE specific damaged loose unit — each damaged unit is
+// its own row now (migration 021), not a single string shared across
+// however many loose units of that accessory happen to be damaged. Keyed by
+// the unit's own id, not the accessoryId (a bin entry can hold several).
+app.patch('/api/parts-bin/damage-unit/:unitId', (req, res) => {
+  const ok = store.setPartDamageUnitNotes(+req.params.unitId, req.body.notes);
+  if (!ok) return res.status(400).json({ error: 'no such damaged unit' });
   res.json({ ok: true });
 });
 

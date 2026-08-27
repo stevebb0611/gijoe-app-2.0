@@ -269,12 +269,16 @@ function buildPartsBinSheet(wb, bin, accById) {
 
   for (const entry of bin) {
     const meta = accById.get(entry.id);
+    // damageUnits is one entry per damaged unit (migration 021) — flatten to
+    // one cell for this report, dropping blanks so a partly-noted batch
+    // doesn't read as "; cracked strap; ".
+    const damageNotes = (entry.damageUnits || []).map((u) => u.notes).filter(Boolean).join('; ');
     const row = ws.addRow({
       accessory: entry.accessory,
       category: (meta && meta.categoryLabel) || '',
       qty: entry.qty,
       damaged: entry.damaged || 0,
-      damageNotes: entry.damageNotes || '',
+      damageNotes,
       fits: meta ? fitsLabel(meta) : '—',
       notes: entry.notes || '',
     });

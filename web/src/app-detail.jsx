@@ -393,7 +393,7 @@ function boxCells(name, req, checked, onSet, dmgTitles) {
 }
 
 function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove, onSwapToBin,
-                    dmgChecked, dmgOnSet, dmgNotes, dmgOnSetNotes, dmgExtra }) {
+                    dmgChecked, dmgOnSet, dmgNotes, dmgOnSetNotes, dmgUnitNotes, dmgOnSetUnitNotes, dmgExtra }) {
   const { cells, cols, rows, own } = boxCells(name, req, checked, onSet, false);
   const done = own >= req;
   const hasDmg = dmgChecked != null;
@@ -431,7 +431,8 @@ function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove, o
           {dmgOpen && canDmg && (
             <DmgPopover anchorRef={dmgBtnRef} onRequestClose={() => setDmgOpen(false)}
                         name={name} count={own} checked={dmgChecked} onSet={dmgOnSet}
-                        notes={dmgNotes} onSetNotes={dmgOnSetNotes} extra={dmgExtra} />
+                        notes={dmgNotes} onSetNotes={dmgOnSetNotes}
+                        unitNotes={dmgUnitNotes} onSetUnitNotes={dmgOnSetUnitNotes} extra={dmgExtra} />
           )}
         </span>
       )}
@@ -485,6 +486,15 @@ function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove, o
 // for damaged-only actions (Detail modal uses it for "swap for clean";
 // nobody else passes it).
 //
+// Notes are per damaged UNIT (migration 021 — instance_accessory_damage /
+// bin_damage), not one string shared across however many units are damaged.
+// Pass `unitNotes` ([{id, notes}], one per damaged unit, from accDamageUnits
+// / a bin entry's damageUnits) + `onSetUnitNotes(id, text)` for that — each
+// gets its own small textarea. The two pre-creation wizards (Add Figure,
+// Parts Bin's "add a loose part" step) don't have real unit ids yet since
+// nothing's persisted, so they still pass the older single `notes` string +
+// `onSetNotes` instead; unitNotes takes priority when both are present.
+//
 // Portaled to document.body and positioned from the anchor button's own
 // getBoundingClientRect(), instead of the plain CSS-absolute anchoring
 // .acc__movepop uses — several of this popover's homes (the Detail modal's
@@ -493,7 +503,7 @@ function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove, o
 // needs more room than the little space left in that box. Closes on scroll
 // or resize rather than trying to continuously re-anchor, same tradeoff
 // most popovers make once they're no longer a plain in-flow child.
-function DmgPopover({ anchorRef, onRequestClose, name, count, checked, onSet, notes, onSetNotes, extra }) {
+function DmgPopover({ anchorRef, onRequestClose, name, count, checked, onSet, notes, onSetNotes, unitNotes, onSetUnitNotes, extra }) {
   const [pos, setPos] = React.useState(null);
   React.useLayoutEffect(() => {
     const el = anchorRef.current;
@@ -514,10 +524,21 @@ function DmgPopover({ anchorRef, onRequestClose, name, count, checked, onSet, no
     <div className="acc__dmgpop" style={{ position: 'fixed', top: pos.top, right: pos.right }}>
       <span className="acc__dmgpop-lab">DAMAGED <b>{dmgCount}</b>/{count}</span>
       <div className="acc__dmgpop-boxes" style={{ gridTemplateColumns: "repeat(" + cols + ", 22px)" }}>{cells}</div>
-      {onSetNotes && dmgCount > 0 && (
-        <textarea className="pb-dmgnotes" key={name} defaultValue={notes || ''}
-                  placeholder="what's damaged — e.g. cracked strap, faded paint…"
-                  onBlur={(e) => onSetNotes(e.target.value)}></textarea>
+      {unitNotes ? (
+        unitNotes.map((u, i) => (
+          <div className="acc__dmgpop-unit" key={u.id}>
+            {unitNotes.length > 1 && <span className="acc__dmgpop-lab">UNIT {i + 1}</span>}
+            <textarea className="pb-dmgnotes" defaultValue={u.notes || ''}
+                      placeholder="what's damaged — e.g. cracked strap, faded paint…"
+                      onBlur={(e) => onSetUnitNotes(u.id, e.target.value)}></textarea>
+          </div>
+        ))
+      ) : (
+        onSetNotes && dmgCount > 0 && (
+          <textarea className="pb-dmgnotes" key={name} defaultValue={notes || ''}
+                    placeholder="what's damaged — e.g. cracked strap, faded paint…"
+                    onBlur={(e) => onSetNotes(e.target.value)}></textarea>
+        )
       )}
       {extra && dmgCount > 0 && extra()}
     </div>,
@@ -588,7 +609,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const bp = fig.sets.length > 0 ? rawBp.filter((row) => row[4] !== 'retailer_exclusive') : rawBp;
   const ordered = orderedBlueprint(bp);
   const accDamage = raw.accDamage || {};
-  const accDamageNotes = raw.accDamageNotes || {};
+  const accDamageUnits = raw.accDamageUnits || {};
   const ownedAcc = bp.filter(([n]) => ((raw.acc && raw.acc[n]) || 0) > 0);
   const dmgDamaged = ownedAcc.reduce((s, [n]) => s + (accDamage[n] || 0), 0);
   const dmgShare = moc ? 0 : JoeData.accDamagePct(bp, raw.acc || {}, accDamage);
@@ -615,8 +636,8 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const dmgPropsFor = (name) => ({
     dmgChecked: Array.from({ length: (raw.acc && raw.acc[name]) || 0 }, (_, k) => k < (accDamage[name] || 0)),
     dmgOnSet: (n) => setDamage(name, n),
-    dmgNotes: accDamageNotes[name],
-    dmgOnSetNotes: (v) => JoeStore.setAccDamageNotes(cur.id, name, v),
+    dmgUnitNotes: accDamageUnits[name],
+    dmgOnSetUnitNotes: (unitId, v) => JoeStore.setAccDamageUnitNotes(cur.id, unitId, v),
     dmgExtra: () => dmgExtraFor(name),
   });
   // Other copies this row's accessory could move to — null when there's only

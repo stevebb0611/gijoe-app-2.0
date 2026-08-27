@@ -15,6 +15,10 @@
 //   to set regardless of completeness/file-card status, not a gate.
 //   accDamage: how many of acc[name]'s owned units are damaged (<= acc[name]).
 //   A condition notation, not a completeness input — see accDamagePct().
+//   accDamageUnits: {[name]: [{id, notes}, ...]} — one entry per damaged
+//   unit (migration 021), each with its own distinct note. length always
+//   equals accDamage[name]; id is the instance_accessory_damage row id, used
+//   by setAccDamageUnitNotes to edit that one unit's note.
 //   variant: '' (single-variant figure) | 'A'|'B'… (a production variant)
 //   coo: '' (unset) | 'China'|'Hong Kong'|'Indonesia' — country of origin, a
 //   notation like filecard, not a completeness input (see catalog `coo[]`).
@@ -208,8 +212,11 @@ export const JoeStore = {
       api('PATCH', '/api/instances/' + id + '/accessory-damage', { name, units });
       refresh(); emit();
     },
-    setAccDamageNotes(id, name, notes) {
-      api('PATCH', '/api/instances/' + id + '/accessory-damage-notes', { name, notes });
+    // sets the note on ONE specific damaged unit (unitId from accDamageUnits
+    // [name][i].id) — each damaged unit is its own row (migration 021), not
+    // a single string shared across however many happen to be damaged.
+    setAccDamageUnitNotes(id, unitId, notes) {
+      api('PATCH', '/api/instances/' + id + '/accessory-damage-unit/' + unitId, { notes });
       refresh(); emit();
     },
     // trades a damaged unit on this instance for a clean one from the Parts Bin
@@ -270,7 +277,9 @@ export const JoeStore = {
     },
 
     // ---- Parts Bin: loose accessories (global stock — see server/instances.js) ----
-    // entry: { id, catalogId, accessory, qty, notes, addedAt }
+    // entry: { id, catalogId, accessory, qty, damaged, damageUnits, notes, addedAt }
+    // damageUnits: [{id, notes}, ...], one per damaged loose unit (migration
+    // 021), length always equals `damaged`; id feeds setPartDamageUnitNotes.
     binEntries() { return state.bin; },
     addPart({ catalogId, accessory, qty = 1, notes = '', damaged = 0, damageNotes = '' }) {
       api('POST', '/api/parts-bin', { catalogId, accessory, qty, notes, damaged, damageNotes });
@@ -284,8 +293,10 @@ export const JoeStore = {
       api('PATCH', '/api/parts-bin/' + id + '/damage', { units });
       refresh(); emit();
     },
-    setPartDamageNotes(id, notes) {
-      api('PATCH', '/api/parts-bin/' + id + '/damage-notes', { notes });
+    // sets the note on ONE specific damaged loose unit (unitId from a bin
+    // entry's damageUnits[i].id) — see setAccDamageUnitNotes above, same idea.
+    setPartDamageUnitNotes(unitId, notes) {
+      api('PATCH', '/api/parts-bin/damage-unit/' + unitId, { notes });
       refresh(); emit();
     },
     removePart(id) {
