@@ -329,16 +329,16 @@ function trimBinDamage(accessoryId, maxAllowed) {
 // damaged/damageNotes let a part be logged as already-damaged at import time
 // (e.g. sorting a parts lot) instead of requiring a second trip to find the
 // row again in the bin list and mark it via setPartDamage/setPartDamageUnitNotes.
-// damageNotes (one string) applies to every newly-damaged unit in this batch
-// alike — a reasonable default for a batch import, and each can be edited
-// individually afterward from the bin list.
-export const addPart = db.transaction(({ catalogId, accessory, qty = 1, notes = '', damaged = 0, damageNotes = '' }) => {
+// damageNotes is one entry per damaged unit (array, e.g. 3 backpacks each
+// damaged a different way) — a bare string is also accepted and applies to
+// every damaged unit in the batch alike, for a caller that doesn't distinguish.
+export const addPart = db.transaction(({ catalogId, accessory, qty = 1, notes = '', damaged = 0, damageNotes = [] }) => {
   const accId = accessoryIdForName(catalogId, accessory);
   if (!accId) return false;
   upsertBin.run(accId, qty, notes || null);
   const dmg = Math.max(0, Math.min(damaged, qty));
-  const notesV = (damageNotes || '').trim() || null;
-  for (let i = 0; i < dmg; i++) insertBinDamage.run(accId, notesV);
+  const notesArr = Array.isArray(damageNotes) ? damageNotes : Array.from({ length: dmg }, () => damageNotes);
+  for (let i = 0; i < dmg; i++) insertBinDamage.run(accId, (notesArr[i] || '').trim() || null);
   return true;
 });
 

@@ -109,9 +109,9 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const setUnit = (n, idx) => setOwnedAcc(o => { const cur = o[n] || 0; return { ...o, [n]: cur > idx ? idx : idx + 1 }; });
   // Damage marking is local wizard state here (accDamage), not yet persisted
   // — the instance doesn't exist until commit() writes it. No notes/extra:
-  // there's no per-copy notes storage at creation time yet (server/instances.js
-  // doesn't accept accDamageNotes on create), and nothing to swap-for-clean
-  // into on a copy that doesn't exist yet.
+  // there's no per-unit notes entry at creation time yet (server/instances.js's
+  // createInstance inserts each damaged unit's row blank — see migration 021),
+  // and nothing to swap-for-clean into on a copy that doesn't exist yet.
   const dmgPropsFor = (n) => ({
     dmgChecked: Array.from({ length: owned[n] || 0 }, (_, k) => k < (accDamage[n] || 0)),
     dmgOnSet: (k) => setAccDamage(d => ({ ...d, [n]: k })),

@@ -667,6 +667,12 @@
   .acc__dmgpop .acc__box.is-on { background: var(--damage);
     background-image: repeating-linear-gradient(45deg, rgba(0,0,0,.3) 0 4px, transparent 4px 8px); color: #fff; }
   .acc__dmgpop .pb-dmgnotes { margin-top: 0; }
+  /* one small note field per damaged unit (migration 021) instead of one
+     shared textarea — .acc__dmgpop-unit just stacks a label above its own
+     textarea, only shown when 2+ units so a single damaged unit isn't
+     labeled "UNIT 1" for no reason (see DmgPopover in app-detail.jsx). */
+  .acc__dmgpop-unit { display: flex; flex-direction: column; gap: 3px; }
+  .acc__dmgpop-unit .pb-dmgnotes { min-height: 34px; }
   .acc-swap { display: block; width: 100%; padding: 0; border: none; background: transparent;
     font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .3px; text-align: left;
     color: var(--accent); cursor: pointer; }

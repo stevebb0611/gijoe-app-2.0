@@ -281,7 +281,11 @@ export const JoeStore = {
     // damageUnits: [{id, notes}, ...], one per damaged loose unit (migration
     // 021), length always equals `damaged`; id feeds setPartDamageUnitNotes.
     binEntries() { return state.bin; },
-    addPart({ catalogId, accessory, qty = 1, notes = '', damaged = 0, damageNotes = '' }) {
+    // damageNotes: one string per damaged unit (array, length up to `damaged`
+    // — missing/blank entries are fine) so a batch of N damaged units can
+    // each get their own distinct note right at intake. A bare string is
+    // also accepted and applies to every damaged unit in the batch alike.
+    addPart({ catalogId, accessory, qty = 1, notes = '', damaged = 0, damageNotes = [] }) {
       api('POST', '/api/parts-bin', { catalogId, accessory, qty, notes, damaged, damageNotes });
       refresh(); emit();
     },

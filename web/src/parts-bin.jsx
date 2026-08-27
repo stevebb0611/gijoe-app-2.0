@@ -143,9 +143,13 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
 // One accessory option row inside AddPartModal's list — its own component
 // (rather than inline in the .map() below) so it can hold its own ⚠ trigger
 // ref for DmgPopover's portal to anchor against.
-function PbAccOpt({ name, qreq, color, meta, item, dOpen, onToggleAcc, onBump, onToggleDmg, onSetDamaged, onSetDamageNotes }) {
+function PbAccOpt({ name, qreq, color, meta, item, dOpen, onToggleAcc, onBump, onToggleDmg, onSetDamaged, onSetDamageNoteUnit }) {
   const dmgBtnRef = React.useRef(null);
   const on = !!item;
+  // One independently-editable note per damaged unit, same as a persisted bin
+  // entry's damageUnits — id is just the array index since nothing's saved
+  // yet (see setDamageNoteUnit in AddPartModal).
+  const unitNotes = on ? Array.from({ length: item.damaged }, (_, i) => ({ id: i, notes: item.damageNotes[i] || '' })) : null;
   return (
     <div className={"pb-accopt" + (on ? " is-sel" : "")}>
       <button type="button" className="pb-accopt__hit" onClick={onToggleAcc}>
@@ -173,7 +177,7 @@ function PbAccOpt({ name, qreq, color, meta, item, dOpen, onToggleAcc, onBump, o
                         name={name} count={item.qty}
                         checked={Array.from({ length: item.qty }, (_, k) => k < item.damaged)}
                         onSet={onSetDamaged}
-                        notes={item.damageNotes} onSetNotes={onSetDamageNotes} />
+                        unitNotes={unitNotes} onSetUnitNotes={onSetDamageNoteUnit} />
           )}
         </span>
       )}
@@ -185,7 +189,7 @@ function PbAccOpt({ name, qreq, color, meta, item, dOpen, onToggleAcc, onBump, o
 function AddPartModal({ onClose }) {
   const [q, setQ] = React.useState('');
   const [figId, setFigId] = React.useState(null);
-  const [sel, setSel] = React.useState({}); // { accessoryName: { qty, damaged, damageNotes } }
+  const [sel, setSel] = React.useState({}); // { accessoryName: { qty, damaged, damageNotes: [one string per damaged unit] } }
   const [dmgOpen, setDmgOpen] = React.useState(() => new Set()); // accessory names with their damage panel open
   const [notes, setNotes] = React.useState('');
 
@@ -200,26 +204,38 @@ function AddPartModal({ onClose }) {
   const canAdd = fig && selNames.length > 0;
 
   const choose = (f) => { setFigId(f.id); setSel({}); setDmgOpen(new Set()); };
-  const toggleAcc = (name) => setSel(s => { const n = { ...s }; if (n[name]) delete n[name]; else n[name] = { qty: 1, damaged: 0, damageNotes: '' }; return n; });
+  const toggleAcc = (name) => setSel(s => { const n = { ...s }; if (n[name]) delete n[name]; else n[name] = { qty: 1, damaged: 0, damageNotes: [] }; return n; });
   const bumpAcc = (name, d) => setSel(s => {
     const cur = s[name]; if (!cur) return s;
     const qty = Math.max(1, cur.qty + d);
-    return { ...s, [name]: { ...cur, qty, damaged: Math.min(cur.damaged, qty) } };
+    const damaged = Math.min(cur.damaged, qty);
+    return { ...s, [name]: { ...cur, qty, damaged, damageNotes: cur.damageNotes.slice(0, damaged) } };
   });
   const toggleDmg = (name) => setDmgOpen(s => { const n = new Set(s); n.has(name) ? n.delete(name) : n.add(name); return n; });
+  // Growing the damaged count pads damageNotes with blank slots (one
+  // independently-editable note each — see PbAccOpt's unitNotes); shrinking
+  // it truncates from the end, same "drop the newest" trim every other
+  // damage-count setter in the app uses (see trimInstanceDamage/trimBinDamage
+  // server-side, though those prefer blank rows first since real rows exist
+  // by then — here nothing's persisted yet, so a plain truncate is enough).
   const setDamaged = (name, units) => setSel(s => {
     const cur = s[name]; if (!cur) return s;
-    return { ...s, [name]: { ...cur, damaged: Math.max(0, Math.min(units, cur.qty)) } };
+    const damaged = Math.max(0, Math.min(units, cur.qty));
+    const damageNotes = damaged > cur.damaged
+      ? [...cur.damageNotes, ...Array.from({ length: damaged - cur.damaged }, () => '')]
+      : cur.damageNotes.slice(0, damaged);
+    return { ...s, [name]: { ...cur, damaged, damageNotes } };
   });
-  const setDamageNotes = (name, text) => setSel(s => {
+  const setDamageNoteUnit = (name, idx, text) => setSel(s => {
     const cur = s[name]; if (!cur) return s;
-    return { ...s, [name]: { ...cur, damageNotes: text } };
+    const damageNotes = [...cur.damageNotes]; damageNotes[idx] = text;
+    return { ...s, [name]: { ...cur, damageNotes } };
   });
   const submit = () => {
     const notesV = notes.trim();
     selNames.forEach(name => {
       const it = sel[name];
-      JoeStore.addPart({ catalogId: figId, accessory: name, qty: it.qty, notes: notesV, damaged: it.damaged, damageNotes: it.damageNotes.trim() });
+      JoeStore.addPart({ catalogId: figId, accessory: name, qty: it.qty, notes: notesV, damaged: it.damaged, damageNotes: it.damageNotes.map(t => t.trim()) });
     });
     onClose();
   };
@@ -276,7 +292,7 @@ function AddPartModal({ onClose }) {
                                   onBump={(d) => bumpAcc(name, d)}
                                   onToggleDmg={() => toggleDmg(name)}
                                   onSetDamaged={(k) => setDamaged(name, k)}
-                                  onSetDamageNotes={(v) => setDamageNotes(name, v)} />
+                                  onSetDamageNoteUnit={(idx, v) => setDamageNoteUnit(name, idx, v)} />
                       ))}
                     </div>}
               </div>
