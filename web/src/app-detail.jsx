@@ -325,14 +325,28 @@ function MasterBadge({ size = 26 }) {
     </svg>
   );
 }
-function CompRing({ pct, size = 46, neutral, damagedPct = 0 }) {
+// previewPct (optional): renders a second wedge past the current pct's arc,
+// in a distinct shade, showing where this copy would land if one more unit
+// got added right now — e.g. Parts Bin's "move to figure" rows, so a
+// scarce-part decision shows the actual before/after, not just a bare link.
+// Gold for "closer but not done", green (the same --ok used for a finished
+// ring) when the preview reaches 100%, so "this pull finishes it" reads at a
+// glance.
+function CompRing({ pct, size = 46, neutral, damagedPct = 0, previewPct = null }) {
   const done = pct === 100;
   const col = done ? "var(--ok)" : (neutral ? "var(--ink-soft)" : "var(--accent)");
   const dmgEnd = pct * 3.6 * Math.min(Math.max(damagedPct, 0), 1);
+  const hasPreview = previewPct != null && previewPct > pct;
+  const previewCol = previewPct === 100 ? "var(--ok)" : "var(--gold)";
   return (
     <div className="wf-ring" style={{ width: size, height: size, background: `conic-gradient(${col} ${pct * 3.6}deg, var(--ring-track) 0)` }}>
       {dmgEnd > 0 && <div className="wf-ring__dmg" style={{ "--dmg-end": dmgEnd + "deg" }} title="Some owned accessories are marked damaged"></div>}
-      <div className="wf-ring__hole"><span className="wf-ring__pct">{pct}<small>%</small></span></div>
+      {hasPreview && (
+        <div className="wf-ring__preview"
+             style={{ "--prev-start": (pct * 3.6) + "deg", "--prev-end": (previewPct * 3.6) + "deg", "--prev-col": previewCol }}
+             title={"Would move from " + pct + "% to " + previewPct + "% complete"}></div>
+      )}
+      <div className="wf-ring__hole"><span className="wf-ring__pct" style={{ fontSize: Math.max(9, Math.round(size * 0.32)) }}>{pct}<small>%</small></span></div>
     </div>
   );
 }
@@ -505,6 +519,7 @@ function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove, o
 // most popovers make once they're no longer a plain in-flow child.
 function DmgPopover({ anchorRef, onRequestClose, name, count, checked, onSet, notes, onSetNotes, unitNotes, onSetUnitNotes, extra }) {
   const [pos, setPos] = React.useState(null);
+  const popRef = React.useRef(null);
   React.useLayoutEffect(() => {
     const el = anchorRef.current;
     if (!el) return;
@@ -517,11 +532,24 @@ function DmgPopover({ anchorRef, onRequestClose, name, count, checked, onSet, no
     window.addEventListener('resize', close);
     return () => { window.removeEventListener('scroll', close, true); window.removeEventListener('resize', close); };
   }, [onRequestClose]);
+  // Click-away closes the popover — mousedown (not click) so it fires before
+  // the anchor's own onClick toggle on the same press; anchor clicks are
+  // excluded here and left to that toggle so the ⚠ button still opens/closes
+  // on repeated clicks rather than fighting this listener to a standstill.
+  React.useEffect(() => {
+    const onDown = (e) => {
+      if (popRef.current && popRef.current.contains(e.target)) return;
+      if (anchorRef.current && anchorRef.current.contains(e.target)) return;
+      onRequestClose();
+    };
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, [anchorRef, onRequestClose]);
   if (!pos) return null;
   const { cells, cols } = boxCells(name, count, checked, onSet, true);
   const dmgCount = checked.reduce((s, c) => s + (c ? 1 : 0), 0);
   return createPortal(
-    <div className="acc__dmgpop" style={{ position: 'fixed', top: pos.top, right: pos.right }}>
+    <div ref={popRef} className="acc__dmgpop" style={{ position: 'fixed', top: pos.top, right: pos.right }}>
       <span className="acc__dmgpop-lab">DAMAGED <b>{dmgCount}</b>/{count}</span>
       <div className="acc__dmgpop-boxes" style={{ gridTemplateColumns: "repeat(" + cols + ", 22px)" }}>{cells}</div>
       {unitNotes ? (

@@ -7,7 +7,7 @@
 // against the real collection in the store.
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
-import { figState, applyRebalance, DmgPopover } from './app-detail.jsx';
+import { figState, applyRebalance, DmgPopover, CompRing } from './app-detail.jsx';
 import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip } from './fig-identity.jsx';
 import { figIdentityText, formatYear } from './fig-identity.js';
@@ -43,11 +43,22 @@ function buildNeeds() {
     const sum = JoeData.figureSummary(id); if (!sum) return;
     const fig = figLabel(cf);
     sum.copies.forEach(c => {
+      if (c.moc) return; // sealed — accessories aren't tracked individually, never a pull target
       // A copy only "needs" what its own production variant actually calls
       // for — see bpForVariant + ACCESSORY_GROUPS.md "variant_id".
-      JoeData.bpForVariant(bp, c.variant).forEach(([name, q, accessoryId]) => {
+      const bpv = JoeData.bpForVariant(bp, c.variant);
+      bpv.forEach(([name, q, accessoryId]) => {
         const have = (c.acc && c.acc[name]) || 0;
-        if (have < q) needs.push({ instanceId: c.id, catalogId: id, no: c.no, fig, accessory: name, accessoryId, missing: q - have });
+        if (have < q) {
+          // One pull only ever advances units_owned by 1 (server/instances.js
+          // pullPart) — pctAfter reflects that single unit, not the full
+          // remaining deficit, so it matches what clicking the row actually does.
+          const accAfter = { ...c.acc, [name]: have + 1 };
+          needs.push({
+            instanceId: c.id, catalogId: id, no: c.no, fig, accessory: name, accessoryId, missing: q - have,
+            pctBefore: c.pct, pctAfter: JoeData.instPct(bpv, accAfter),
+          });
+        }
       });
     });
   });
@@ -113,8 +124,12 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
             {ev.matched.map((n, i) => (
               <button key={i} className="pb-needs__row" disabled={entry.qty === 0}
                       onClick={() => JoeStore.pullPart(entry.id, n.instanceId, entry.accessory)}>
-                <span className="pb-needs__inst">{n.fig} · No. {n.no}</span>
-                <span className="pb-needs__act">pull to complete ›</span>
+                <CompRing pct={n.pctBefore} previewPct={n.pctAfter} size={34} neutral />
+                <span className="pb-needs__label">
+                  <span className="pb-needs__inst">{n.fig} · No. {n.no}</span>
+                  <span className="pb-needs__pct">{n.pctBefore}% <b>&rarr; {n.pctAfter}%</b></span>
+                </span>
+                <span className="pb-needs__act">move to figure ›</span>
               </button>
             ))}
           </div>
@@ -394,8 +409,10 @@ function GroupSection({ sec, sep, collapsed, toggle, NEEDS, openId, setOpenId })
 // Within a "GROUP BY FIGURE" header, several release years can share one
 // bare-name heading (e.g. Bazooka '85 + '88) — sort by the year-qualified
 // label first so same-year accessories cluster instead of interleaving by
-// accessory name alone.
-const byFigureThenNeed = (a, b) => (a.e.homeFigureName || '').localeCompare(b.e.homeFigureName || '') || (b.ev.needed - a.ev.needed) || a.e.accessory.localeCompare(b.e.accessory);
+// accessory name alone. Within a given year, order by category_id (CSV
+// order — helmet before backpack, etc.) so each year-cluster reads like the
+// figure's own blueprint instead of alphabetically by accessory name.
+const byFigureThenNeed = (a, b) => (a.e.homeFigureName || '').localeCompare(b.e.homeFigureName || '') || ((a.e.categoryId ?? Infinity) - (b.e.categoryId ?? Infinity)) || (b.ev.needed - a.ev.needed) || a.e.accessory.localeCompare(b.e.accessory);
 
 function buildSections(items, mode) {
   const byNeed = (a, b) => (b.ev.needed - a.ev.needed) || a.e.accessory.localeCompare(b.e.accessory);
@@ -444,6 +461,7 @@ function PartsBin({ onNavigate }) {
   const [addOpen, setAddOpen] = React.useState(false);
   const [rebalOpen, setRebalOpen] = React.useState(false);
   const [intakeOpen, setIntakeOpen] = React.useState(false); // Ready to Complete starts collapsed every visit
+  const [intakeShowAll, setIntakeShowAll] = React.useState(false); // 8-line cap until "show all"
 
   // bin entries decorated with real accessory metadata
   const bin = store.bin.map(e => {
@@ -566,7 +584,7 @@ function PartsBin({ onNavigate }) {
           <React.Fragment>
             {/* ===== READY TO PULL (live two-way A) ===== */}
             <section className="intake">
-              <button type="button" className="intake__head" onClick={() => setIntakeOpen(v => !v)}>
+              <button type="button" className="intake__head" onClick={() => setIntakeOpen(v => { if (v) setIntakeShowAll(false); return !v; })}>
                 <span className={"grp__chev" + (intakeOpen ? "" : " is-closed")}>▾</span>
                 <span className="intake__title">READY TO COMPLETE
                   {suggestions.length ? <em>{suggestions.length} ready to pull</em> : <em>nothing to pull</em>}
@@ -574,11 +592,11 @@ function PartsBin({ onNavigate }) {
               </button>
               {intakeOpen && (suggestions.length === 0 ? (
                 <div className="intake__empty">
-                  No loose part currently fills a gap. When a bin part matches an owned copy that's missing it, a one-tap <b>pull to complete</b> shows up here.
+                  No loose part currently fills a gap. When a bin part matches an owned copy that's missing it, a one-tap <b>move to figure</b> shows up here.
                 </div>
               ) : (
                 <div className="intake__group">
-                  {suggestions.slice(0, 8).map((s, i) => (
+                  {(intakeShowAll ? suggestions : suggestions.slice(0, 8)).map((s, i) => (
                     <div key={i} className="ev ev--in">
                       <div className="ev__dir">⇣</div>
                       <div className="ev__main">
@@ -587,11 +605,15 @@ function PartsBin({ onNavigate }) {
                         <div className="ev__sub">This copy is missing it and you hold a loose one.</div>
                       </div>
                       <div className="ev__act">
-                        <button className="ev__btn ev__btn--go" onClick={() => JoeStore.pullPart(s.partId, s.need.instanceId, s.accessory)}>⇣ PULL TO COMPLETE</button>
+                        <button className="ev__btn ev__btn--go" onClick={() => JoeStore.pullPart(s.partId, s.need.instanceId, s.accessory)}>⇣ MOVE TO FIGURE</button>
                       </div>
                     </div>
                   ))}
-                  {suggestions.length > 8 && <div className="intake__more">+{suggestions.length - 8} more — pull from the part rows below.</div>}
+                  {suggestions.length > 8 && (
+                    <button type="button" className="intake__more intake__more--btn" onClick={() => setIntakeShowAll(v => !v)}>
+                      {intakeShowAll ? "show fewer" : `+${suggestions.length - 8} more — show all`}
+                    </button>
+                  )}
                 </div>
               ))}
             </section>

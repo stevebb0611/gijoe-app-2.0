@@ -56,6 +56,12 @@
   .wf-ring__dmg { position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
     background: conic-gradient(var(--damage) 0deg calc(var(--dmg-end) - 2.5deg),
       var(--ink) calc(var(--dmg-end) - 2.5deg) var(--dmg-end), transparent var(--dmg-end) 360deg); }
+  /* extra wedge PAST the current-pct arc showing a projected "if this gets added" state —
+     transparent up to prev-start so it doesn't recolor the already-filled arc underneath */
+  .wf-ring__preview { position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+    background: conic-gradient(transparent 0deg var(--prev-start),
+      var(--prev-col) var(--prev-start) calc(var(--prev-end) - 2.5deg),
+      var(--ink) calc(var(--prev-end) - 2.5deg) var(--prev-end), transparent var(--prev-end) 360deg); }
 
   /* ===== page shell ===== */
   .invp { color: var(--ink); font-family: var(--font-mono); font-size: 13px; min-height: 100vh; }
@@ -1039,6 +1045,8 @@
   .intake__empty { border: 1.5px dashed var(--line-soft); padding: 14px; font-size: 11px; color: var(--ink-soft); line-height: 1.5; }
   .intake__empty b { color: var(--ink); }
   .intake__more { font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft); padding: 8px 2px 0; }
+  .intake__more--btn { display: block; width: 100%; text-align: left; background: transparent; border: none; cursor: pointer; letter-spacing: .5px; }
+  .intake__more--btn:hover { color: var(--ink); text-decoration: underline; }
 
   .ev { display: grid; grid-template-columns: 30px 1fr auto; gap: 14px; align-items: center; background: var(--paper); border: 1.5px solid var(--ink); box-shadow: var(--shadow); padding: 11px 14px; }
   .ev--in { border-left: 5px solid var(--ok); }
@@ -1105,10 +1113,14 @@
   .pb-none { font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); font-style: italic; }
 
   .pb-needs { margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 8px; display: flex; flex-direction: column; gap: 5px; }
-  .pb-needs__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; text-decoration: none; color: inherit; border: 1.5px solid var(--line); background: var(--paper); padding: 6px 10px; }
+  .pb-needs__row { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; border: 1.5px solid var(--line); background: var(--paper); padding: 6px 10px; }
   .pb-needs__row:hover { border-color: var(--ink); transform: translateX(1px); }
+  .pb-needs__row .wf-ring { flex: none; }
+  .pb-needs__label { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; text-align: left; }
   .pb-needs__inst { font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .5px; }
-  .pb-needs__act { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--accent); }
+  .pb-needs__pct { font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft); }
+  .pb-needs__pct b { font-weight: 700; color: var(--gold); }
+  .pb-needs__act { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--accent); white-space: nowrap; flex: none; }
 
   .pb-noteline { font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft); margin-top: 8px; display: flex; gap: 7px; align-items: baseline; line-height: 1.4; }
   .pb-noteline span { color: var(--ink); }

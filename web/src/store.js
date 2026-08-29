@@ -111,7 +111,7 @@ function figureSummary(catalogId) {
     const { phys, paint } = gradeOf(i);
     return {
       id: i.id, variant: i.variant, coo: i.coo, loc: i.loc, notes: i.notes, moc,
-      phys, paint, acc, cardOnFile: card, masterCollection: !!i.masterCollection,
+      phys, paint, acc, accDamage: i.accDamage || {}, cardOnFile: card, masterCollection: !!i.masterCollection,
       own: moc ? req : instOwn(bpv, acc), req,
       pct: moc ? 100 : instPct(bpv, acc), whole: moc ? true : instWhole(bpv, acc),
       missing: moc ? [] : missingList(bpv, acc),
