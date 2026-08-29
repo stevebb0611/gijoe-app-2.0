@@ -7,7 +7,7 @@
 // against the real collection in the store.
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
-import { figState, applyRebalance, DmgPopover, CompRing } from './app-detail.jsx';
+import { figState, applyRebalance, swapSuggestions, applySwaps, DmgPopover, CompRing } from './app-detail.jsx';
 import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip } from './fig-identity.jsx';
 import { figIdentityText, formatYear } from './fig-identity.js';
@@ -115,7 +115,7 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
         <div className="pb-status">
           {ev.needed > 0 ? (
             <button className="pb-need" onClick={() => setOpenId(open ? null : entry.id)}>
-              ▸ fills {ev.fillable} gap{ev.fillable !== 1 ? "s" : ""} · needed by {ev.needed} cop{ev.needed !== 1 ? "ies" : "y"}
+              ▸ fills {ev.fillable} gap{ev.fillable !== 1 ? "s" : ""} · needed by {ev.needed} figure{ev.needed !== 1 ? "s" : ""}
             </button>
           ) : <span className="pb-none">no current need</span>}
         </div>
@@ -349,32 +349,39 @@ function RebalanceModal({ figs, onClose }) {
           <button className="modal__x" onClick={onClose}>✕</button>
         </div>
         <div className="rebal-intro">
-          Two ways to tidy a figure's scattered parts. <b>Completes a copy</b> — you own enough to make a whole one, just spread across copies. <b>Best partial</b> — no full copy is possible yet, but consolidating gets your closest copy as complete as it can be.
+          Three ways to tidy a figure's scattered parts. <b>Completes a copy</b> — you own enough to make a whole one, just spread across copies. <b>Best partial</b> — no full copy is possible yet, but consolidating gets your closest copy as complete as it can be. <b>Swap for clean</b> — a damaged unit you own could trade for a clean spare sitting in the Parts Bin.
         </div>
         {figs.length === 0
           ? <div className="rebal-empty">Nothing to rebalance.</div>
           : <div className="rebal-list">
               {figs.map(r => {
                 const partial = r.mode === 'partial';
-                const mvs = partial ? r.st.partial.moves : r.st.moves;
+                const isSwap = r.mode === 'swap';
+                const mvs = isSwap ? r.swapMoves : (partial ? r.st.partial.moves : r.st.moves);
                 return (
-                <div key={r.id} className={"rebal-fig" + (partial ? " rebal-fig--partial" : "")}>
+                <div key={r.key} className={"rebal-fig" + (partial ? " rebal-fig--partial" : "") + (isSwap ? " rebal-fig--swap" : "")}>
                   <div className="rebal-fig__hd">
                     <span className="rebal-fig__name">{r.name}<VersionChip version={r.version} /></span>
-                    <span className="rebal-fig__meta">{r.specialty ? r.specialty + " · " : ""}{formatYear(r.year)} · ×{r.st.owned}</span>
-                    <span className={"rebal-fig__goal" + (partial ? " is-partial" : "")}>
-                      {partial
-                        ? "No. " + r.st.partial.targetNo + ": " + r.st.partial.from + "→" + r.st.partial.to + "/" + r.st.partial.reqCount
-                        : "+" + (r.st.optimalWhole - r.st.currentWhole) + " whole"}
-                    </span>
+                    <span className="rebal-fig__meta">{r.specialty ? r.specialty + " · " : ""}{formatYear(r.year)} · ×{isSwap ? r.owned : r.st.owned}</span>
+                    {isSwap
+                      ? <span className="rebal-fig__goal is-swap">{mvs.length} unit{mvs.length !== 1 ? "s" : ""}</span>
+                      : <span className={"rebal-fig__goal" + (partial ? " is-partial" : "")}>
+                          {partial
+                            ? "No. " + r.st.partial.targetNo + ": " + r.st.partial.from + "→" + r.st.partial.to + "/" + r.st.partial.reqCount
+                            : "+" + (r.st.optimalWhole - r.st.currentWhole) + " whole"}
+                        </span>}
                   </div>
-                  <div className="rebal-fig__kind">{partial ? "BEST PARTIAL · no full copy possible yet" : "COMPLETES A COPY"}</div>
+                  <div className="rebal-fig__kind">{isSwap ? "SWAP FOR CLEAN · trade damaged units for bin spares" : partial ? "BEST PARTIAL · no full copy possible yet" : "COMPLETES A COPY"}</div>
                   <div className="rebal-moves">
-                    {mvs.slice(0, 6).map((m, i) => (
-                      <span key={i} className="rebal-move">Move <b>{m.qty > 1 ? m.qty + "× " : ""}{m.part}</b> from <b>No. {m.from}</b> → <b>No. {m.to}</b></span>
-                    ))}
+                    {isSwap
+                      ? mvs.slice(0, 6).map((m, i) => (
+                          <span key={i} className="rebal-move">Swap damaged <b>{m.accessory}</b> on <b>No. {m.no}</b> for a clean unit — <b>Parts Bin</b></span>
+                        ))
+                      : mvs.slice(0, 6).map((m, i) => (
+                          <span key={i} className="rebal-move">Move <b>{m.qty > 1 ? m.qty + "× " : ""}{m.part}</b> from <b>No. {m.from}</b> → <b>No. {m.to}</b></span>
+                        ))}
                   </div>
-                  <button className="rebal-fig__act" onClick={() => applyRebalance(r.id, r.mode)}>APPLY MOVES</button>
+                  <button className="rebal-fig__act" onClick={() => isSwap ? applySwaps(r.id) : applyRebalance(r.id, r.mode)}>{isSwap ? "APPLY SWAP" : "APPLY MOVES"}</button>
                 </div>
                 );
               })}
@@ -471,17 +478,36 @@ function PartsBin({ onNavigate }) {
   const NEEDS = React.useMemo(buildNeeds, [store]);
   const suggestions = buildSuggestions(bin, NEEDS);
 
-  // figures completable by moving parts between copies
+  // figures completable by moving parts between copies, PLUS figures with a
+  // damaged unit that a clean bin spare could swap in for — a distinct kind
+  // (condition, not count) bundled under the same ⚖ Rebalance KPI/modal
+  // since both are "tidy what you already own" actions. A figure can carry
+  // a move-card and a swap-card at once (unlike whole/partial, which are
+  // mutually exclusive) — see swapSuggestions() (app-detail.jsx) for why
+  // this can't just be folded into figState()'s priority order.
   const rebalFigs = React.useMemo(() => {
     const ownedIds = [...new Set(store.instances.map(i => i.catalogId))];
-    return ownedIds.map(id => {
+    const moveFigs = ownedIds.map(id => {
       const cf = JoeData.CAT_BY_ID.get(id); if (!cf) return null;
       const st = figState({ id, _cf: cf });
       const whole = !!(st.moves && st.moves.length);
       const partial = !whole && !!(st.partial && st.partial.moves.length);
       if (!whole && !partial) return null;
-      return { id, name: cf.name, specialty: cf.role || null, version: 'v' + cf.ver, year: cf.year, st, mode: whole ? 'whole' : 'partial' };
+      return { key: id, id, name: cf.name, specialty: cf.role || null, version: 'v' + cf.ver, year: cf.year, st, mode: whole ? 'whole' : 'partial' };
     }).filter(Boolean);
+
+    const swapsByFig = new Map();
+    swapSuggestions().forEach(s => {
+      if (!swapsByFig.has(s.catalogId)) swapsByFig.set(s.catalogId, []);
+      swapsByFig.get(s.catalogId).push(s);
+    });
+    const swapFigs = [...swapsByFig.entries()].map(([id, moves]) => {
+      const cf = JoeData.CAT_BY_ID.get(id); if (!cf) return null;
+      const sum = JoeData.figureSummary(id);
+      return { key: id + '-swap', id, name: cf.name, specialty: cf.role || null, version: 'v' + cf.ver, year: cf.year, mode: 'swap', swapMoves: moves, owned: sum ? sum.owned : 0 };
+    }).filter(Boolean);
+
+    return [...moveFigs, ...swapFigs];
   }, [store]);
 
   const setChip = (k) => setFilter(cur => cur === k ? 'all' : k);
@@ -539,7 +565,7 @@ function PartsBin({ onNavigate }) {
           </div>
           <div className="inv-kpis">
             <div className="invk"><span className="invk__v">{fillsTotal}</span><span className="invk__k">Fills Gaps</span></div>
-            <button className="invk invk--rebal" onClick={() => setRebalOpen(true)} title="Figures you can complete by moving parts between copies">
+            <button className="invk invk--rebal" onClick={() => setRebalOpen(true)} title="Figures you can improve — move parts between copies, or swap a damaged unit for a clean bin spare">
               <span className="invk__v">{rebalFigs.length}</span><span className="invk__k">Rebalance</span>
             </button>
             <div className="invk"><span className="invk__v">{totals.qty}</span><span className="invk__k">Loose Parts</span></div>
@@ -585,10 +611,11 @@ function PartsBin({ onNavigate }) {
             {/* ===== READY TO PULL (live two-way A) ===== */}
             <section className="intake">
               <button type="button" className="intake__head" onClick={() => setIntakeOpen(v => { if (v) setIntakeShowAll(false); return !v; })}>
-                <span className={"grp__chev" + (intakeOpen ? "" : " is-closed")}>▾</span>
-                <span className="intake__title">READY TO COMPLETE
-                  {suggestions.length ? <em>{suggestions.length} ready to pull</em> : <em>nothing to pull</em>}
+                <span className="intake__head__main">
+                  <span className={"grp__chev" + (intakeOpen ? "" : " is-closed")}>▾</span>
+                  <span className="intake__title">READY TO COMPLETE</span>
                 </span>
+                <span className="intake__count">{suggestions.length ? suggestions.length + " ready to pull" : "nothing to pull"}</span>
               </button>
               {intakeOpen && (suggestions.length === 0 ? (
                 <div className="intake__empty">

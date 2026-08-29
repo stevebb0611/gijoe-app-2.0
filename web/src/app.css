@@ -807,7 +807,13 @@
   .inv-moc__txt i { font-family: var(--font-mono); font-size: 9.5px; font-style: normal; color: var(--ink-soft); line-height: 1.4; }
 
   /* ===== rebalance recommender ===== */
-  .invk--rebal { border-color: var(--accent); background: rgba(184,64,47,.18); }
+  /* Same border/background as the plain .invk tiles beside it (Fills Gaps,
+     Loose Parts) — no separate accent color at rest. The kind distinctions
+     (move vs. swap) live inside the modal once it's opened, not on this
+     summary chip. Only difference from a plain tile is that this one's a
+     button (cursor + hover tint). */
+  .invk--rebal { background: transparent; cursor: pointer; font: inherit; color: inherit; transition: background .12s; }
+  .invk--rebal:hover { background: rgba(255,255,255,.08); }
   .invk--rebal .invk__k { opacity: .85; }
   .inv-rebal { display: inline-block; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .5px;
     color: #fff; background: var(--accent); padding: 2px 6px; margin-left: 8px; vertical-align: middle; }
@@ -1012,14 +1018,18 @@
   .rebal-fig__meta { font-family: var(--font-mono); font-size: 9px; letter-spacing: .5px; color: var(--ink-soft); }
   .rebal-fig__goal { font-family: var(--font-mono); font-weight: 700; font-size: 10px; letter-spacing: .5px; color: var(--accent); margin-left: auto; }
   .rebal-fig__goal.is-partial { color: var(--ink-soft); }
+  .rebal-fig__goal.is-swap { color: var(--damage); }
   .rebal-fig--partial { border-left: 4px solid var(--line); }
+  .rebal-fig--swap { border-left: 4px solid var(--damage); }
   .rebal-fig__kind { font-family: var(--font-mono); font-weight: 700; font-size: 8px; letter-spacing: 1.5px; color: var(--ink-soft); margin-top: 4px; }
   .rebal-fig--partial .rebal-fig__kind { color: var(--accent); }
+  .rebal-fig--swap .rebal-fig__kind { color: var(--damage); }
   .rebal-moves { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
   .rebal-move { font-family: var(--font-mono); font-size: 11px; color: var(--ink); padding-left: 15px; position: relative; }
   .rebal-move::before { content: "↳"; position: absolute; left: 0; color: var(--ink-soft); }
   .rebal-move b { font-weight: 700; }
   .rebal-fig__act { margin-top: 10px; font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: 1px; background: var(--accent); color: #fff; border: none; padding: 7px 12px; cursor: pointer; }
+  .rebal-fig--swap .rebal-fig__act { background: var(--damage); }
   .rebal-empty { padding: 40px; text-align: center; color: var(--ink-soft); font-family: var(--font-display); font-size: 16px; letter-spacing: 1px; }
 
   /* toolbar */
@@ -1038,9 +1048,10 @@
 
   /* bin intake (two-way) */
   .intake { display: flex; flex-direction: column; gap: 14px; }
-  .intake__head { display: flex; align-items: baseline; gap: 9px; width: 100%; text-align: left; font: inherit; background: transparent; border: none; padding: 0; cursor: pointer; }
+  .intake__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; width: 100%; text-align: left; font: inherit; background: transparent; border: none; border-bottom: 2px solid var(--ink); padding: 0 0 5px; cursor: pointer; }
+  .intake__head__main { display: flex; align-items: baseline; gap: 9px; }
   .intake__title { font-family: var(--font-display); font-weight: 700; font-size: 13px; letter-spacing: 1.5px; color: var(--ink); }
-  .intake__title em { font-style: normal; font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft); margin-left: 8px; letter-spacing: 0; }
+  .intake__count { font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft); }
   .intake__group { display: flex; flex-direction: column; gap: 9px; }
   .intake__empty { border: 1.5px dashed var(--line-soft); padding: 14px; font-size: 11px; color: var(--ink-soft); line-height: 1.5; }
   .intake__empty b { color: var(--ink); }

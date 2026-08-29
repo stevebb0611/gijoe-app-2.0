@@ -263,6 +263,59 @@ function applyRebalance(catalogId, mode) {
   });
 }
 
+// ---- swap-for-clean opportunities (⚖ Rebalance, third kind) ----
+// An owned copy holding a damaged unit of an accessory the Parts Bin has a
+// clean spare of. Resolved by accessory_id, scoped through this copy's own
+// blueprint row (bpForVariant) — the same scoping server/instances.js
+// swapAccessoryForClean enforces on the write side — so a same-named
+// accessory belonging to a DIFFERENT figure (e.g. two unrelated "Backpack"
+// rows, each its own accessory_id) never counts as a false match. This is
+// deliberately NOT folded into figState()'s pooling math above: that engine
+// only ever reasons about unit counts (c.acc[n]), never condition, and a
+// swap changes condition without touching any count.
+function buildSwaps() {
+  const swaps = [];
+  const ownedIds = [...new Set(JoeStore.get().instances.map(i => i.catalogId))];
+  ownedIds.forEach(id => {
+    const cf = INV_CAT_BY_ID.get(id); if (!cf) return;
+    const bp = cf.blueprint || []; if (!bp.length) return;
+    const sum = JoeData.figureSummary(id); if (!sum) return;
+    sum.copies.forEach(c => {
+      if (c.moc) return; // sealed — no per-unit damage tracked, nothing to swap
+      const bpv = bpForVariant(bp, c.variant);
+      bpv.forEach(([name, , accessoryId]) => {
+        const damaged = (c.accDamage && c.accDamage[name]) || 0;
+        if (damaged > 0) swaps.push({ instanceId: c.id, catalogId: id, no: c.no, accessory: name, accessoryId });
+      });
+    });
+  });
+  return swaps;
+}
+
+// Caps raw swap opportunities against actual bin stock — two damaged copies
+// of the same accessory can't both claim the bin's one clean spare. Same
+// "decrement as you assign" idiom buildSuggestions() (parts-bin.jsx) uses
+// for pull-to-complete.
+function swapSuggestions() {
+  const bin = JoeStore.binEntries();
+  const remaining = {};
+  bin.forEach(e => { remaining[e.id] = e.qty - (e.damaged || 0); });
+  const out = [];
+  buildSwaps().forEach(s => {
+    if ((remaining[s.accessoryId] || 0) > 0) { remaining[s.accessoryId] -= 1; out.push(s); }
+  });
+  return out;
+}
+
+// Applies every currently-available swap for one figure at once (the
+// modal's APPLY SWAP button) — recomputes fresh from the live store rather
+// than trusting the moves list the card rendered from, same as
+// applyRebalance above.
+function applySwaps(catalogId) {
+  swapSuggestions().filter(s => s.catalogId === catalogId)
+    .forEach(s => JoeStore.swapAccessoryForClean(s.instanceId, s.accessory));
+}
+
 // Roster counts by PRODUCTION VARIANT, not by catalog figure — a true complete
 // year means owning every variant, not just one copy of each code name (e.g.
 // 1982's 16 code names carry 43 variants between them). Every figure carries
@@ -1072,7 +1125,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
 
 export {
   INV_CAT, INV_ERAS, INV_CAT_BY_ID,
-  fvm, figParts, figState, applyRebalance, yearParts, invTotals, invMasterTotals,
+  fvm, figParts, figState, applyRebalance, swapSuggestions, applySwaps, yearParts, invTotals, invMasterTotals,
   FactionTag, CompRing, CompBar, PhotoSlot, StockBar, AccItem, DmgPopover, boxLayout, MasterBadge,
   InvDetailModal,
 };
