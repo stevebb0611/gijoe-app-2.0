@@ -8,6 +8,7 @@ import { AccItem } from './app-detail.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { VersionChip, VariantBadge, VehicleTag, EditionTag, SetTag } from './fig-identity.jsx';
 import { formatYear, SPECIAL_RELEASE_YEAR } from './fig-identity.js';
+import { normalizeSearch } from './search-util.js';
 import { FileCardRow, FileCardTell, FileCardColorInput, FileCardGrade } from './filecards.jsx';
 const AF_CATALOG = JoeData.CAT || [];
 // SPECIAL_RELEASE_YEAR sorts to the end regardless of numeric value — it's not a
@@ -77,7 +78,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
     setSetId(presetSetId && fig.id === presetCatalogId ? presetSetId : null);
   }, [selId]);
 
-  const q = query.trim().toLowerCase();
+  const q = normalizeSearch(query);
   // Alphabetical, matching Inventory's per-year-group sort (app-inventory.jsx) —
   // catalog order (AF_CATALOG/figures.id) has no relation to browsing order, and
   // that's most visible in the Special Release filter, which otherwise pools every
@@ -86,7 +87,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   // etc.; ~120 code names have this) fall back to year (SPECIAL_RELEASE_YEAR=9999
   // already sorts convention/mail-in last) then ver, instead of arbitrary catalog id.
   const allResults = AF_CATALOG.filter(f => (!yearF || f.year === +yearF) && (!q || [f.name, f.role, formatYear(f.year), f.faction]
-    .concat(f.variants.map(v => v.tell)).some(s => s && s.toLowerCase().includes(q))))
+    .concat(f.variants.map(v => v.tell)).some(s => s && normalizeSearch(s).includes(q))))
     .sort((a, b) => a.name.localeCompare(b.name) || a.year - b.year || (parseFloat(a.ver) || 0) - (parseFloat(b.ver) || 0));
   const hasFilter = !!q || !!yearF;
   const results = !hasFilter ? [] : yearF ? allResults : allResults.slice(0, 60);

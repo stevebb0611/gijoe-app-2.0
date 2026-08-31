@@ -11,6 +11,7 @@ import { figState, applyRebalance, swapSuggestions, applySwaps, DmgPopover, Comp
 import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip } from './fig-identity.jsx';
 import { figIdentityText, formatYear } from './fig-identity.js';
+import { normalizeSearch } from './search-util.js';
 
 const figLabel = (cf) => cf ? figIdentityText({ name: cf.name, version: cf.ver ? 'v' + cf.ver : '' }) : "—";
 
@@ -208,9 +209,9 @@ function AddPartModal({ onClose }) {
   const [dmgOpen, setDmgOpen] = React.useState(() => new Set()); // accessory names with their damage panel open
   const [notes, setNotes] = React.useState('');
 
-  const query = q.trim().toLowerCase();
+  const query = normalizeSearch(q);
   const results = query
-    ? JoeData.CAT.filter(f => f.name.toLowerCase().includes(query) || (f.role || '').toLowerCase().includes(query)).slice(0, 40)
+    ? JoeData.CAT.filter(f => normalizeSearch(f.name).includes(query) || normalizeSearch(f.role || '').includes(query)).slice(0, 40)
     : [];
   const fig = figId != null ? JoeData.CAT_BY_ID.get(figId) : null;
   const bp = fig ? (fig.blueprint || []) : [];
@@ -513,10 +514,10 @@ function PartsBin({ onNavigate }) {
   const setChip = (k) => setFilter(cur => cur === k ? 'all' : k);
   const toggle = (k) => setCollapsed(s => { const n = new Set(s); n.has(k) ? n.delete(k) : n.add(k); return n; });
 
-  const q = query.trim().toLowerCase();
+  const q = normalizeSearch(query);
   const items = bin
     .map(e => ({ e, ev: evaluate(e, NEEDS) }))
-    .filter(({ e }) => !q || e.accessory.toLowerCase().includes(q) || (e.homeFigureName || "").toLowerCase().includes(q) || (e.homeFigureNames || []).some(n => n.toLowerCase().includes(q)) || (e.categoryLabel || "").toLowerCase().includes(q))
+    .filter(({ e }) => !q || normalizeSearch(e.accessory).includes(q) || normalizeSearch(e.homeFigureName || "").includes(q) || (e.homeFigureNames || []).some(n => normalizeSearch(n).includes(q)) || normalizeSearch(e.categoryLabel || "").includes(q))
     .filter(({ e }) => {
       if (filter === 'shared') return e.shared;
       if (filter === 'single') return !e.shared;

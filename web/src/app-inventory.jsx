@@ -296,7 +296,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
   }, []);
 
   const empty = t.instances === 0;
-  const q = query.trim().toLowerCase();
+  const q = normalizeSearch(query);
   const yrNarrowed = facYrMin > YR_MIN || facYrMax < YR_MAX;
   const facetCount = facFactions.size + facSubGroups.size + facComplete.size + facDupes.size + (yrNarrowed ? 1 : 0);
   const filtering = !!q || status !== 'all' || facetCount > 0;
@@ -308,7 +308,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
   const toggleSet = (setter) => (key) => setter(s => { const n = new Set(s); n.has(key) ? n.delete(key) : n.add(key); return n; });
   const clearFacets = () => { setStatus('all'); setFacFactions(new Set()); setFacSubGroups(new Set()); setFacComplete(new Set()); setFacDupes(new Set()); setFacYrMin(YR_MIN); setFacYrMax(YR_MAX); };
 
-  const matchQ = (fig) => !q || [fig.name, fig.variant, fig.specialty, fig.version, fig.faction, fig.subGroup, formatYear(fig.year)].some(s => s && s.toLowerCase().includes(q)) || fig.acc.some(a => a[0].toLowerCase().includes(q));
+  const matchQ = (fig) => !q || [fig.name, fig.variant, fig.specialty, fig.version, fig.faction, fig.subGroup, formatYear(fig.year)].some(s => s && normalizeSearch(s).includes(q)) || fig.acc.some(a => normalizeSearch(a[0]).includes(q));
   const passStatus = (fig) => {
     if (status === 'gaps') return isGap(fig);
     if (status === 'dupes') return fig.owned > 1;

@@ -12,6 +12,7 @@ import {
 } from './app-detail.jsx';
 import { VersionChip, VariantBadge, VariantBracket, EditionTag, SetTag } from './fig-identity.jsx';
 import { formatYear } from './fig-identity.js';
+import { normalizeSearch } from './search-util.js';
 
 function useStore() {
   const [, force] = React.useReducer(x => x + 1, 0);
@@ -48,8 +49,8 @@ function MasterCollectionView({ onNavigate, onAddInstance }) {
   React.useEffect(() => { try { localStorage.setItem(YEAR_STATS_KEY, yearStats ? '1' : '0'); } catch {} }, [yearStats]);
   const toggleYear = (y) => setOpenYears(s => { const n = new Set(s); n.has(y) ? n.delete(y) : n.add(y); return n; });
 
-  const q = query.trim().toLowerCase();
-  const matchQ = (fig) => !q || [fig.name, fig.specialty, fig.faction, formatYear(fig.year)].some(s => s && s.toLowerCase().includes(q));
+  const q = normalizeSearch(query);
+  const matchQ = (fig) => !q || [fig.name, fig.specialty, fig.faction, formatYear(fig.year)].some(s => s && normalizeSearch(s).includes(q));
 
   // One entry per figure with >=1 starred instance, carrying ONLY the
   // starred copies plus per-variant target/progress context (target
