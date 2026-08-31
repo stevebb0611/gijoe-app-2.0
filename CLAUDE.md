@@ -86,7 +86,6 @@ npx serve .          # then open the printed URL (e.g. http://localhost:3000)
 | `GI Joe Tracker - Inventory.html` + `inventory-app.jsx` | **Home screen — design of record.** Year-grouped collection, search/filter, List/Gallery, instance accordions, detail modal |
 | `GI Joe Tracker - Instance Detail.html` + `instance-detail.jsx` | Single-copy detail: damage map, derived grade, accessory checklist, variant identity |
 | `GI Joe Tracker - Add Figure.html` + `add-figure.jsx` | 3-step intake (Find → Details → Condition) + production-variant picker (required for multi-variant figures) + Parts-Bin pull |
-| `GI Joe Tracker - Add Instance.html` + `add-instance.jsx` | Add another copy of an owned figure |
 | `GI Joe Tracker - Parts Bin.html` + `parts-bin.jsx` | Loose-accessory inventory, compatibility/reverse-lookup, ⚖ rebalance |
 | `GI Joe Tracker - Inventory (Scale States).html` | Self-contained scale/density stress test (no JSX deps) |
 | `damage-map.jsx` | Shared damage-map condition component |

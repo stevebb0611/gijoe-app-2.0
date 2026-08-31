@@ -87,6 +87,22 @@ Grunt v1.5 (F065) shows `is_vehicle_driver = 0` while its sibling v2 (F066) = 1 
 ### Q21. Live DB backup — remaining gap
 Local-only periodic backups are built (`npm run backup` → `backups/`, 30 kept) plus a catalog-only readable snapshot (`npm run export-catalog` → `exports/`). **Still open:** these are single-machine, same-disk — a drive failure loses both the live DB and every snapshot. Real off-machine backup needs either the GitHub repo going private (reopening "commit the DB" as an option) or pointing backups at some off-machine location. Also parked: replacing the root seed CSVs so `server/seed.mjs` could re-import them faithfully (a lossy, field-by-field design problem, not mechanical).
 
+### Q23. Figure body-parts tracking — 🔭 parked idea, not scoped
+A separate loose-parts concept from the Parts Bin (which is accessories-only, keyed to `accessory_id`/`figures_accessories` — see `PARTS_BIN.md`): tracking figure **body parts** acquired without a complete figure attached — via mixed collection-lot purchases, kit-bashed/disassembled figures, or breakage at common failure points (thumbs, waist) that make swaps with spare/damaged parts possible.
+
+**Physical model as described by the owner:**
+- 6 main parts: head · chest · left arm · right arm · waist · left leg · right leg.
+- 12 total sub-parts: head · chest (front) · chest (rear) · left arm · right arm · waist · left leg (upper outside) · left leg (upper inside) · left leg (knee to foot) · right leg (upper outside) · right leg (upper inside) · right leg (knee to foot).
+- Hardware (assembly documentation only, not intended as trackable stock): 1 rear screw (holds head/arms/chest), 2 leg screws (hold each leg's 3 segments together), 1 j-hook (holds legs together), 1 o-ring (through the waist, joins assembled torso to assembled legs).
+
+**Scope for if/when this gets built:** primary target is a **loose body-parts inventory** — parts not currently attached to any complete figure — as a third bucket alongside the `Instance` entity (`INSTANCE_MODEL.md`) and the Parts Bin (`PARTS_BIN.md`). Per-instance provenance/mismatch tracking (flagging that an assembled copy's leg is a swapped-in spare) is a possible later extension, not a decided companion feature.
+
+**Explicitly out of scope for now** (the reason this is parked, not designed): swap/compatibility recommendations, any damage-map retooling to support them, and color/paint-fade matching across candidate swap parts — all flagged by the owner as real complications worth a dedicated future discussion, not to be guessed at now.
+
+**Standout exceptions:** some figures don't fit this breakdown at all — e.g. Deep-Six v1 has a non-interchangeable body. No master exception list exists; these get flagged figure-by-figure as discovered, the same pattern used elsewhere in this app for other per-figure exceptions (variant splits, `release_context`).
+
+**Still undecided:** whether this becomes its own spec doc alongside `PARTS_BIN.md`/`INSTANCE_MODEL.md` or stays a parked idea until scoped; whether a body part needs its own catalog/identity concept (parallel to `accessory_id`) or reuses/extends the damage map's existing `bodyType` template + o-ring point model (`INSTANCE_MODEL.md`).
+
 ### F4. Explanation/help text — ongoing effort
 Standing rule, not a one-time fix: strip in-app "explanation/help text" wherever it appears, across every screen. Keep checking against this when adding new UI.
 

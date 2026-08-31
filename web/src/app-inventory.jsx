@@ -15,6 +15,7 @@ import {
 } from './app-detail.jsx';
 import { VersionChip, VariantBadge, VariantBracket, VehicleTag, EditionTag, SetTag, SubGroupTag } from './fig-identity.jsx';
 import { formatYear, SPECIAL_RELEASE_YEAR } from './fig-identity.js';
+import { normalizeSearch } from './search-util.js';
 
 function useStore() {
   const [, force] = React.useReducer(x => x + 1, 0);
