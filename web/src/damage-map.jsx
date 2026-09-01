@@ -26,8 +26,8 @@ const DM_GRADE_COLOR = { Mint: '#5d7d4d', Excellent: '#7d8a4a', Good: '#b88a2f',
 
 // three severities, shared colours; label set depends on the tab.
 const DM_SEV = {
-  1: { w: 1, c: '#d4a73a', condition: 'Cracked', paint: 'Mild' },
-  2: { w: 3, c: '#c0612f', condition: 'Damaged', paint: 'Medium' },
+  1: { w: 1, c: '#d4a73a', condition: 'Stressed', paint: 'Mild' },
+  2: { w: 3, c: '#c0612f', condition: 'Cracked', paint: 'Medium' },
   3: { w: 6, c: '#9a2f24', condition: 'Broken',  paint: 'Heavy' },
 };
 const DM_SEV_ORDER = [1, 2, 3];
@@ -161,7 +161,7 @@ function dmInjectCss() {
   .dmx__legend span { display:inline-flex; align-items:center; gap:5px; }
   .dmx__legend i { width:13px; height:13px; border:1.5px solid var(--ink); display:inline-block; }
   .dmx__legend i.f1 { background:var(--dmx-c1); } .dmx__legend i.f2 { background:var(--dmx-c2); } .dmx__legend i.f3 { background:var(--dmx-c3); }
-  .dmx__legend em { font-style:normal; margin-left:auto; }
+  .dmx__legend em { font-style:normal; margin:0 auto; }
   `;
   const el = document.createElement('style');
   el.id = 'dmx-styles';

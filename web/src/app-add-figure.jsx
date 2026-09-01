@@ -55,6 +55,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   // confirmation (vs. not yet mapped), and travels with marks into the stored instance
   const [dmg, setDmg] = React.useState(() => dmEmpty('male'));
   const [accDamage, setAccDamage] = React.useState({}); // accName -> units damaged, a subset of owned
+  const [accDamageNotes, setAccDamageNotes] = React.useState({}); // accName -> [note per damaged unit], index-aligned with accDamage
   const [done, setDone] = React.useState(false);
 
   const fig = AF_CATALOG.find(f => f.id === selId) || null;
@@ -74,7 +75,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
     if (!fig) return;
     setSelVar(isSingle(fig) ? '' : (presetVariant && fig.id === presetCatalogId ? presetVariant : fig.variants[0].letter));
     setOwnedAcc(presetAcc && fig.id === presetCatalogId ? presetAcc : {});
-    setMoc(false); setFilecard({ onFile: false, fileCardId: null, color: '', grade: null }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male')); setCoo(''); setAccDamage({});
+    setMoc(false); setFilecard({ onFile: false, fileCardId: null, color: '', grade: null }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male')); setCoo(''); setAccDamage({}); setAccDamageNotes({});
     setSetId(presetSetId && fig.id === presetCatalogId ? presetSetId : null);
   }, [selId]);
 
@@ -108,15 +109,33 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const back = () => goto(Math.max(step - 1, 0));
 
   const setUnit = (n, idx) => setOwnedAcc(o => { const cur = o[n] || 0; return { ...o, [n]: cur > idx ? idx : idx + 1 }; });
-  // Damage marking is local wizard state here (accDamage), not yet persisted
-  // — the instance doesn't exist until commit() writes it. No notes/extra:
-  // there's no per-unit notes entry at creation time yet (server/instances.js's
-  // createInstance inserts each damaged unit's row blank — see migration 021),
-  // and nothing to swap-for-clean into on a copy that doesn't exist yet.
-  const dmgPropsFor = (n) => ({
-    dmgChecked: Array.from({ length: owned[n] || 0 }, (_, k) => k < (accDamage[n] || 0)),
-    dmgOnSet: (k) => setAccDamage(d => ({ ...d, [n]: k })),
-  });
+  // Damage marking is local wizard state here (accDamage/accDamageNotes), not
+  // yet persisted — the instance doesn't exist until commit() writes it.
+  // accDamageNotes mirrors Parts Bin's AddPartModal (parts-bin.jsx's
+  // setDamaged/setDamageNoteUnit): one string per damaged unit, index-aligned
+  // with accDamage[n], grown/truncated as the damaged count changes so a note
+  // never outlives the unit it was written for. No swap-for-clean extra —
+  // there's nothing to swap into on a copy that doesn't exist yet.
+  const dmgPropsFor = (n) => {
+    const damaged = accDamage[n] || 0;
+    const notesArr = accDamageNotes[n] || [];
+    return {
+      dmgChecked: Array.from({ length: owned[n] || 0 }, (_, k) => k < damaged),
+      dmgOnSet: (k) => {
+        setAccDamage(d => ({ ...d, [n]: k }));
+        setAccDamageNotes(dn => {
+          const arr = dn[n] || [];
+          const next = k > damaged ? [...arr, ...Array.from({ length: k - damaged }, () => '')] : arr.slice(0, k);
+          return { ...dn, [n]: next };
+        });
+      },
+      dmgUnitNotes: Array.from({ length: damaged }, (_, i) => ({ id: i, notes: notesArr[i] || '' })),
+      dmgOnSetUnitNotes: (idx, text) => setAccDamageNotes(dn => {
+        const arr = [...(dn[n] || [])]; arr[idx] = text;
+        return { ...dn, [n]: arr };
+      }),
+    };
+  };
 
   // condition handlers
   const phys = physicalGrade(dmg);
@@ -136,6 +155,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
       catalogId: fig.id, variant: variantKey, moc,
       acc: moc ? accFull : { ...owned },
       accDamage: moc ? {} : { ...accDamage },
+      accDamageNotes: moc ? {} : { ...accDamageNotes },
       phys: moc ? null : (ungraded ? null : phys.grade),
       paint: moc ? null : (ungraded ? null : paint.grade),
       marks: moc ? null : dmg,
@@ -149,7 +169,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
 
   const resetAll = () => {
     setDone(false); setSelId(null); setQuery(""); setSelVar(null); setLoc(""); setNotes("");
-    setOwnedAcc({}); setMoc(false); setFilecard({ onFile: false, fileCardId: null, color: '', grade: null }); setDmg(dmEmpty('male')); setAccDamage({}); setYearF(""); setSetId(null); goto(0);
+    setOwnedAcc({}); setMoc(false); setFilecard({ onFile: false, fileCardId: null, color: '', grade: null }); setDmg(dmEmpty('male')); setAccDamage({}); setAccDamageNotes({}); setYearF(""); setSetId(null); goto(0);
   };
 
   return (

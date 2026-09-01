@@ -4,11 +4,11 @@
 // all normalize the same), dashes become spaces ("Dr Mindbender" / "Dr.
 // Mindbender", "Rock Viper" / "Rock-Viper"), and apostrophes are dropped
 // ("T'Jbang" / "TJbang"). "&" and the word "and" both collapse to "n" so
-// cross-release joiner spelling doesn't matter — catalog names for the same
-// pairing aren't consistent release to release (e.g. "Rock 'N Roll" v1/v3/v4
-// vs "Rock & Roll" v2; also affects real two-name pairs like "Law & Roll"—
-// er, "Law & Order", "Mutt & Junkyard") — while real word boundaries are
-// otherwise preserved.
+// joiner spelling doesn't matter — catalog names for the same pairing
+// aren't consistent release to release ("Rock 'N Roll" v1/v3/v4 vs "Rock &
+// Roll" v2), and it also helps real two-name figures ("Law & Order", "Mutt
+// & Junkyard") match "and"/"n"-typed queries — while real word boundaries
+// are otherwise preserved.
 export function normalizeSearch(s) {
   return (s || '')
     .toLowerCase()

@@ -146,7 +146,7 @@ const upsertInstanceAcc = db.prepare(`
 `);
 
 export const createInstance = db.transaction((payload) => {
-  const { catalogId, variant, moc, acc, accDamage, marks, loc, notes, filecard, coo, setId } = payload;
+  const { catalogId, variant, moc, acc, accDamage, accDamageNotes, marks, loc, notes, filecard, coo, setId } = payload;
   const variantId = resolveVariantId(catalogId, variant);
   const id = insertInstance.run({
     figure_id: catalogId,
@@ -171,8 +171,11 @@ export const createInstance = db.transaction((payload) => {
   // accDamage is a condition notation on units already added above — clamped
   // to [0, units_owned] same as setInstanceAccessoryDamage, since a copy
   // can't arrive already-damaged for an accessory it doesn't own. Each
-  // damaged unit gets its own row (blank note — this intake flow doesn't
-  // collect per-unit notes; see migration 021).
+  // damaged unit gets its own row (migration 021); accDamageNotes[name] is
+  // one note per damaged unit, index-aligned with the clamp below — same
+  // shape as addPart's damageNotes. Missing/short arrays just leave later
+  // units blank rather than erroring, so older callers with no notes at all
+  // still work unchanged.
   if (!moc) {
     for (const [name, damaged] of Object.entries(accDamage || {})) {
       if (!damaged) continue;
@@ -180,7 +183,8 @@ export const createInstance = db.transaction((payload) => {
       if (!accId) continue;
       const owned = acc && acc[name] ? acc[name] : 0;
       const clamped = Math.max(0, Math.min(damaged, owned));
-      for (let i = 0; i < clamped; i++) insertInstanceDamage.run(id, accId, null);
+      const notesArr = (accDamageNotes && accDamageNotes[name]) || [];
+      for (let i = 0; i < clamped; i++) insertInstanceDamage.run(id, accId, (notesArr[i] || '').trim() || null);
     }
   }
   return id;

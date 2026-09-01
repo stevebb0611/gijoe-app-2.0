@@ -883,7 +883,7 @@
   .af-yearsel::after { content: "▾"; position: absolute; right: 11px; pointer-events: none; font-size: 11px; color: var(--ink-soft); }
   .af-search { display: flex; align-items: center; gap: 10px; background: var(--paper); border: 1.5px solid var(--ink); padding: 9px 12px; color: var(--ink-soft); }
   .af-search input { flex: 1; background: transparent; border: none; outline: none; font: inherit; color: var(--ink); }
-  .af-clear { background: transparent; border: none; color: var(--ink-soft); cursor: pointer; font-size: 12px; }
+  .af-clear { background: transparent; border: none; color: var(--ink-soft); cursor: pointer; font: inherit; font-size: 12px; }
   .af-resmeta { font-family: var(--font-mono); font-size: 10px; letter-spacing: .5px; color: var(--ink-soft); margin: 12px 0 4px; }
   .af-results { display: flex; flex-direction: column; gap: 6px; margin: 6px 0 10px; max-height: 42vh; overflow-y: auto; padding-right: 4px; }
   .af-prompt { padding: 44px 20px; text-align: center; font-family: var(--font-mono); font-size: 11px; letter-spacing: .5px; line-height: 1.6; color: var(--ink-soft); border: 1.5px dashed var(--line-soft); }
