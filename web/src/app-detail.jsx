@@ -785,6 +785,9 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   const clean = !!marks.clean;
   const ungraded = marksCount === 0 && !clean;
   const setClean = (v) => setMarks({ ...marks, clean: v });
+  // per-tab reset — wipes only that tab's zone marks (front + rear), leaving
+  // the other tab untouched; mirrors the map's own bulk-clear semantics.
+  const resetTab = (tabKey) => setMarks({ ...marks, [tabKey]: { front: {}, rear: {} } });
   const ringPct = moc ? 100 : cur.pct;
 
 
@@ -1048,10 +1051,11 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                     </div>
                   ) : (
                     <React.Fragment>
-                      <div className="grades"><DGrade kind="PHYSICAL" result={dmgPhys} /><DGrade kind="PAINT" result={dmgPaint} /></div>
-                      {clean && marksCount === 0 ? (
-                        <div className="panel__note">Confirmed clean — no damage mapped. <button className="af-clear" onClick={() => setClean(false)}>undo</button></div>
-                      ) : (
+                      <div className="grades">
+                        <DGrade kind="PHYSICAL" result={dmgPhys} onReset={dmgPhys.zones > 0 ? () => resetTab('condition') : (clean && marksCount === 0 ? () => setClean(false) : null)} />
+                        <DGrade kind="PAINT" result={dmgPaint} onReset={dmgPaint.zones > 0 ? () => resetTab('paint') : (clean && marksCount === 0 ? () => setClean(false) : null)} />
+                      </div>
+                      {!(clean && marksCount === 0) && (
                         <div className="panel__note">Grades update live from the map. Click a zone to cycle its severity; use the Condition / Paint tabs to grade each.</div>
                       )}
                     </React.Fragment>

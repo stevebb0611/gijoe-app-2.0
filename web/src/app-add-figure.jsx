@@ -80,6 +80,16 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   }, [selId]);
 
   const q = normalizeSearch(query);
+  // A match on the figure's own name outranks a match that only hit a secondary
+  // field (role/year/faction/variant tell) — e.g. searching "thunder" should surface
+  // Thunder itself before Long Range (role: "Thunderclap Driver"), and "main" should
+  // surface Mainframe before Dodger (role: "Armored Vehicle Maintenance"). Without
+  // this, alphabetical order alone decided it, which put the non-name match first.
+  const nameRank = (f) => {
+    if (!q) return 0;
+    const n = normalizeSearch(f.name);
+    return n === q ? 0 : n.startsWith(q) ? 1 : n.includes(q) ? 2 : 3;
+  };
   // Alphabetical, matching Inventory's per-year-group sort (app-inventory.jsx) —
   // catalog order (AF_CATALOG/figures.id) has no relation to browsing order, and
   // that's most visible in the Special Release filter, which otherwise pools every
@@ -89,7 +99,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   // already sorts convention/mail-in last) then ver, instead of arbitrary catalog id.
   const allResults = AF_CATALOG.filter(f => (!yearF || f.year === +yearF) && (!q || [f.name, f.role, formatYear(f.year), f.faction]
     .concat(f.variants.map(v => v.tell)).some(s => s && normalizeSearch(s).includes(q))))
-    .sort((a, b) => a.name.localeCompare(b.name) || a.year - b.year || (parseFloat(a.ver) || 0) - (parseFloat(b.ver) || 0));
+    .sort((a, b) => nameRank(a) - nameRank(b) || a.name.localeCompare(b.name) || a.year - b.year || (parseFloat(a.ver) || 0) - (parseFloat(b.ver) || 0));
   const hasFilter = !!q || !!yearF;
   const results = !hasFilter ? [] : yearF ? allResults : allResults.slice(0, 60);
 
@@ -143,6 +153,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const marksCount = phys.zones + paint.zones;
   const clean = !!dmg.clean;
   const ungraded = marksCount === 0 && !clean;
+  const resetTab = (tabKey) => setDmg(d => ({ ...d, [tabKey]: { front: {}, rear: {} } }));
   // Variant is always picked on DETAILS (below), and always has a default
   // (the effect above never leaves selVar unset) — so the only thing left to
   // gate is FIND actually having a figure selected before advancing past it.
@@ -378,12 +389,9 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                   ) : (
                     <React.Fragment>
                       <div className="grades">
-                        <GradeBadge kind="PHYSICAL" result={phys} />
-                        <GradeBadge kind="PAINT" result={paint} />
+                        <GradeBadge kind="PHYSICAL" result={phys} onReset={phys.zones > 0 ? () => resetTab('condition') : (clean && marksCount === 0 ? () => setDmg(d => ({ ...d, clean: false })) : null)} />
+                        <GradeBadge kind="PAINT" result={paint} onReset={paint.zones > 0 ? () => resetTab('paint') : (clean && marksCount === 0 ? () => setDmg(d => ({ ...d, clean: false })) : null)} />
                       </div>
-                      {clean && marksCount === 0 && (
-                        <div className="panel__note">Confirmed clean — no damage mapped. <button className="af-clear" onClick={() => setDmg(d => ({ ...d, clean: false }))}>undo</button></div>
-                      )}
                     </React.Fragment>
                   )}
                 </section>

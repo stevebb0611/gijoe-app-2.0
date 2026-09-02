@@ -143,7 +143,6 @@ function dmInjectCss() {
   .dmx__bulk-sq:hover { box-shadow: inset 0 0 0 2px var(--paper); }
   .dmx__bulk-sq:active { filter:brightness(.9); }
   .dmx__bulk-sq.on { outline:1.5px solid var(--ink); outline-offset:1.5px; }
-  .dmx__bulk-cap { font-size:10px; color:var(--ink-soft); }
   .dmx__stage { position:relative; width:100%; background:var(--card-2,#efe9dc); border:1.5px solid var(--ink); }
   .dmx__inner { position:relative; width:100%; }
   .dmx__inner img { position:relative; display:block; width:100%; height:auto; pointer-events:none; z-index:2; user-select:none; -webkit-user-drag:none; }
@@ -269,7 +268,6 @@ function DamageMap({ value, onChange, genderLocked }) {
           ['male', 'female'].map(g => e('button', { key: g, className: gender === g ? 'on' : '', onClick: () => setGender(g) }, g === 'male' ? 'Male' : 'Female')))
       )
     ),
-    e('div', { className: 'dmx__bulk-cap' }, 'click to mark the whole figure · click again to clear'),
     e('div', { className: 'dmx__stage' },
       f ? e('div', { className: 'dmx__inner', style: { aspectRatio: f.w + ' / ' + f.h } },
         e('div', { className: 'dmx__cells', style: { gridTemplateColumns: 'repeat(' + f.cols + ',1fr)', gridTemplateRows: 'repeat(' + f.rows + ',1fr)' } }, cells),
@@ -285,10 +283,13 @@ function DamageMap({ value, onChange, genderLocked }) {
 }
 
 // ---------- grade badge (unchanged) ----------
-function GradeBadge({ kind, result }) {
+function GradeBadge({ kind, result, onReset }) {
   const e = React.createElement;
   return e('div', { className: 'grade' },
-    e('div', { className: 'grade__kind' }, kind),
+    e('div', { className: 'grade__hd' },
+      e('div', { className: 'grade__kind' }, kind),
+      onReset ? e('button', { type: 'button', className: 'grade__reset', onClick: onReset }, 'reset') : null
+    ),
     e('div', { className: 'grade__val', style: { background: DM_GRADE_COLOR[result.grade] } }, result.grade),
     e('div', { className: 'grade__score' }, 'demerit ' + result.score + (result.capped ? ' · capped @ ' + result.cap : ''))
   );
