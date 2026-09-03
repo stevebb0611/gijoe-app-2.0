@@ -337,7 +337,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
   const sections = years.map(y => {
     const figs = byYear[y].map(fvm).filter(f => matchQ(f) && passStatus(f) && passFacets(f)).sort((a, b) => a.name.localeCompare(b.name));
     return { year: y, figs };
-  }).filter(s => s.figs.length > 0 || (s.year === SPECIAL_RELEASE_YEAR && JoeData.ALL_SETS.size > 0));
+  }).filter(s => s.figs.length > 0 || (s.year === SPECIAL_RELEASE_YEAR && !filtering && JoeData.ALL_SETS.size > 0));
 
   const shownCount = sections.reduce((n, s) => n + s.figs.length, 0);
   const expandAll = () => setOpen(new Set(years));
