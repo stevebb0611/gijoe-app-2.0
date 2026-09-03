@@ -67,16 +67,19 @@ function dmActiveMask(key) {
   return cur;
 }
 
-// cell -> zoneId, and zoneId -> cell count, per gender (cached)
+// cell -> zoneId, and zoneId -> cell count, per gender+view (cached). Front and rear
+// have independent cell geometry (assets/figure-zones.js); falls back to the
+// gender-only (front) set if a view-specific one is ever missing.
 const _dmZoneOf = {}, _dmZoneSize = {};
-function dmZoneOf(gender) {
-  if (_dmZoneOf[gender]) return _dmZoneOf[gender];
+function dmZoneOf(gender, view) {
+  const key = dmKey(gender, view);
+  if (_dmZoneOf[key]) return _dmZoneOf[key];
   const m = {}, sz = {};
-  (DM_ZONES[gender] || []).forEach(z => { sz[z.id] = z.cells.length; z.cells.forEach(c => { m[c] = z.id; }); });
-  _dmZoneOf[gender] = m; _dmZoneSize[gender] = sz;
+  (DM_ZONES[key] || DM_ZONES[gender] || []).forEach(z => { sz[z.id] = z.cells.length; z.cells.forEach(c => { m[c] = z.id; }); });
+  _dmZoneOf[key] = m; _dmZoneSize[key] = sz;
   return m;
 }
-function dmZoneSize(gender) { dmZoneOf(gender); return _dmZoneSize[gender] || {}; }
+function dmZoneSize(gender, view) { dmZoneOf(gender, view); return _dmZoneSize[dmKey(gender, view)] || {}; }
 const dmZoneLabel = (gender, zid) => {
   const z = (DM_ZONES[gender] || []).find(z => z.id === zid);
   return z ? z.label : zid;
