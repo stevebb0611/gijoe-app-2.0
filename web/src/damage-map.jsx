@@ -183,7 +183,7 @@ function DamageMap({ value, onChange, genderLocked }) {
 
   const f = DM_FIG[dmKey(gender, view)];
   const dm = dmActiveMask(dmKey(gender, view));
-  const zoneOf = dmZoneOf(gender);
+  const zoneOf = dmZoneOf(gender, view);
   const marks = (val[tab] && val[tab][view]) || {};
 
   const setGender = (g) => onChange({ ...val, gender: g });

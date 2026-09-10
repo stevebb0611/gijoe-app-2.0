@@ -218,8 +218,13 @@ const YR_MIN = ALL_YEARS[0], YR_MAX = ALL_YEARS[ALL_YEARS.length - 1];
 
 // Special Release set cards, ordered by real-world release year (undated/custom
 // groupings — e.g. Rapid Deployment Force — sort last since they have no release
-// order to place them by).
-const SPECIAL_RELEASE_SETS = [...JoeData.ALL_SETS.values()].sort((a, b) => (a.year ?? Infinity) - (b.year ?? Infinity));
+// order to place them by). Same-year ties break on setId (creation order) — ALL_SETS'
+// insertion order isn't a reliable tiebreak on its own: it's first-encounter order
+// while walking CAT (figures.id ascending), so a set's position can shift depending
+// on which member figure happens to have the lowest catalog id, unrelated to when
+// the set was actually added (see FIGURE_SETS.md's 1988 Night Force/Ultimate Enemies
+// entries for a case where this mattered).
+const SPECIAL_RELEASE_SETS = [...JoeData.ALL_SETS.values()].sort((a, b) => (a.year ?? Infinity) - (b.year ?? Infinity) || a.setId - b.setId);
 
 // distinct production variants actually owned (>=1 copy of that letter)
 function ownedVariantCount(fig) {

@@ -307,6 +307,98 @@ logging unless it's a genuine completionist unit (see above).
 - **Status:** ✅ added via `server/add-figure-set.mjs`, 2026-08-06. Appears as a Special
   Release set card once the app tab is reloaded (catalog loads once per page load).
 
+### 1988 — Night Force: Outback & Crazylegs
+
+- **Members:** Outback v2 (figure id 192) ×1, Crazylegs v2 (figure id 175) ×1 — each in the
+  1988 Night Force dark-camo deco with their own standard accessory loadout, no
+  swapped/exclusive gear.
+- **Note:** v2 is the correct version for both — the seed CSV tags each with
+  `alt_name` "Night Force Outback"/"Night Force Crazylegs", `sub_group_id` 2 (Night Force),
+  `series_id` 8 (1988), `release_context` Toys R Us. v1 for both is the earlier
+  standard-deco retail release, unrelated to this pack.
+- **Source:** Owner-provided, 2026-09-09; cross-checked against `seed/gijoe_db_figures_2.0.csv`.
+- **Reconstruction record:**
+  ```
+  node server/add-figure-set.mjs --name "Night Force: Outback & Crazylegs" --year 1988 \
+    --description "Toys R Us exclusive 2-pack from the 1988 Night Force wave: Outback v2, Crazylegs v2, each in Night Force dark-camo deco with their standard accessories." \
+    --members "192:1,175:1"
+  ```
+  ```sql
+  INSERT OR IGNORE INTO figure_sets (set_id, name, year, description) VALUES
+      (10, 'Night Force: Outback & Crazylegs', 1988, 'Toys R Us exclusive 2-pack from the 1988 Night Force wave: Outback v2, Crazylegs v2, each in Night Force dark-camo deco with their standard accessories.');
+  INSERT OR IGNORE INTO figure_set_members (set_id, figure_id, quantity_required) VALUES
+      (10, 192, 1), (10, 175, 1);
+  ```
+- **Status:** ✅ added via `server/add-figure-set.mjs`, 2026-09-09. Appears as a Special
+  Release set card once the app tab is reloaded (catalog loads once per page load).
+
+### 1988 — Night Force: Sneak Peek & Lt. Falcon
+
+- **Members:** Sneak Peek v2 (figure id 203) ×1, Lt. Falcon v2 (figure id 189) ×1 — each in
+  the 1988 Night Force dark-camo deco with their own standard accessory loadout, no
+  swapped/exclusive gear.
+- **Note:** same v2/Night Force basis as the Outback & Crazylegs entry above.
+- **Source:** Owner-provided, 2026-09-09; cross-checked against `seed/gijoe_db_figures_2.0.csv`.
+- **Reconstruction record:**
+  ```
+  node server/add-figure-set.mjs --name "Night Force: Sneak Peek & Lt. Falcon" --year 1988 \
+    --description "Toys R Us exclusive 2-pack from the 1988 Night Force wave: Sneak Peek v2, Lt. Falcon v2, each in Night Force dark-camo deco with their standard accessories." \
+    --members "203:1,189:1"
+  ```
+  ```sql
+  INSERT OR IGNORE INTO figure_sets (set_id, name, year, description) VALUES
+      (11, 'Night Force: Sneak Peek & Lt. Falcon', 1988, 'Toys R Us exclusive 2-pack from the 1988 Night Force wave: Sneak Peek v2, Lt. Falcon v2, each in Night Force dark-camo deco with their standard accessories.');
+  INSERT OR IGNORE INTO figure_set_members (set_id, figure_id, quantity_required) VALUES
+      (11, 203, 1), (11, 189, 1);
+  ```
+- **Status:** ✅ added via `server/add-figure-set.mjs`, 2026-09-09. Appears as a Special
+  Release set card once the app tab is reloaded (catalog loads once per page load).
+
+### 1988 — Night Force: Tunnel Rat & Psyche-Out
+
+- **Members:** Tunnel Rat v2 (figure id 210) ×1, Psyche-Out v2 (figure id 193) ×1 — each in
+  the 1988 Night Force dark-camo deco with their own standard accessory loadout, no
+  swapped/exclusive gear.
+- **Note:** same v2/Night Force basis as the Outback & Crazylegs entry above.
+- **Source:** Owner-provided, 2026-09-09; cross-checked against `seed/gijoe_db_figures_2.0.csv`.
+- **Reconstruction record:**
+  ```
+  node server/add-figure-set.mjs --name "Night Force: Tunnel Rat & Psyche-Out" --year 1988 \
+    --description "Toys R Us exclusive 2-pack from the 1988 Night Force wave: Tunnel Rat v2, Psyche-Out v2, each in Night Force dark-camo deco with their standard accessories." \
+    --members "210:1,193:1"
+  ```
+  ```sql
+  INSERT OR IGNORE INTO figure_sets (set_id, name, year, description) VALUES
+      (12, 'Night Force: Tunnel Rat & Psyche-Out', 1988, 'Toys R Us exclusive 2-pack from the 1988 Night Force wave: Tunnel Rat v2, Psyche-Out v2, each in Night Force dark-camo deco with their standard accessories.');
+  INSERT OR IGNORE INTO figure_set_members (set_id, figure_id, quantity_required) VALUES
+      (12, 210, 1), (12, 193, 1);
+  ```
+- **Status:** ✅ added via `server/add-figure-set.mjs`, 2026-09-09. Appears as a Special
+  Release set card once the app tab is reloaded (catalog loads once per page load).
+
+### 1988 — Ultimate Enemies: Muskrat & Voltar
+
+- **Members:** Muskrat v1 (figure id 190) ×1, Voltar v1 (figure id 211) ×1 — each in their
+  standard 1988 retail deco (not a Night Force–style redeco) with their own standard
+  accessory loadout, no swapped/exclusive gear.
+- **Note:** Muskrat v1 (not v2) is correct here — v2 is the 1989 Night Force redeco
+  (`series_id` 9), a different, unrelated pack. Voltar has only one catalog version.
+- **Source:** Owner-provided, 2026-09-09; cross-checked against `seed/gijoe_db_figures_2.0.csv`.
+- **Reconstruction record:**
+  ```
+  node server/add-figure-set.mjs --name "Ultimate Enemies: Muskrat & Voltar" --year 1988 \
+    --description "Toys R Us exclusive 2-pack pairing a G.I. Joe and Cobra figure in their standard 1988 retail decos: Muskrat v1, Voltar v1, each with their standard accessories." \
+    --members "190:1,211:1"
+  ```
+  ```sql
+  INSERT OR IGNORE INTO figure_sets (set_id, name, year, description) VALUES
+      (13, 'Ultimate Enemies: Muskrat & Voltar', 1988, 'Toys R Us exclusive 2-pack pairing a G.I. Joe and Cobra figure in their standard 1988 retail decos: Muskrat v1, Voltar v1, each with their standard accessories.');
+  INSERT OR IGNORE INTO figure_set_members (set_id, figure_id, quantity_required) VALUES
+      (13, 190, 1), (13, 211, 1);
+  ```
+- **Status:** ✅ added via `server/add-figure-set.mjs`, 2026-09-09. Appears as a Special
+  Release set card once the app tab is reloaded (catalog loads once per page load).
+
 ### 1993 — Arctic Commandos
 
 - **Members:** Dee-Jay v2 (figure id 402) ×1, Snow Serpent v3 (figure id 466) ×1, Stalker v4

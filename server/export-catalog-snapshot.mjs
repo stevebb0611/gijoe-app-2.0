@@ -25,6 +25,7 @@ const TABLES = [
   'series', 'conditions', 'accessory_categories', 'factions', 'sub_groups',
   'figures', 'accessories', 'variant_lookup', 'accessory_groups',
   'figure_accessories', 'file_cards', 'figure_file_cards', 'figure_coo',
+  'figure_sets', 'figure_set_members', 'v_figures_missing_file_card',
 ];
 
 function csvValue(v) {
