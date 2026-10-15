@@ -47,9 +47,12 @@ fs.mkdirSync(outDir, { recursive: true });
 
 const manifest = { generatedAt: new Date().toISOString(), sourceDb: 'gijoe_collection.db', tables: {} };
 
+const isView = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'view' AND name = ?");
+
 for (const table of TABLES) {
   const columns = db.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
-  const rows = db.prepare(`SELECT * FROM ${table} ORDER BY rowid`).all();
+  const orderBy = isView.get(table) ? '' : ' ORDER BY rowid';
+  const rows = db.prepare(`SELECT * FROM ${table}${orderBy}`).all();
 
   const lines = [columns.join(',')];
   for (const row of rows) lines.push(columns.map((c) => csvValue(row[c])).join(','));

@@ -313,7 +313,8 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
   const toggleSet = (setter) => (key) => setter(s => { const n = new Set(s); n.has(key) ? n.delete(key) : n.add(key); return n; });
   const clearFacets = () => { setStatus('all'); setFacFactions(new Set()); setFacSubGroups(new Set()); setFacComplete(new Set()); setFacDupes(new Set()); setFacYrMin(YR_MIN); setFacYrMax(YR_MAX); };
 
-  const matchQ = (fig) => !q || [fig.name, fig.variant, fig.specialty, fig.version, fig.faction, fig.subGroup, formatYear(fig.year)].some(s => s && normalizeSearch(s).includes(q)) || fig.acc.some(a => normalizeSearch(a[0]).includes(q));
+  const matchQ = (fig) => !q || [fig.name, fig.variant, fig.specialty, fig.version, fig.faction, fig.subGroup, formatYear(fig.year)].some(s => s && normalizeSearch(s).includes(q)) || fig.acc.some(a => normalizeSearch(a[0]).includes(q))
+    || (fig._sum ? fig._sum.copies : []).some(c => c.loc && normalizeSearch(c.loc).includes(q)); // per-copy BIN / BOX LOCATION
   const passStatus = (fig) => {
     if (status === 'gaps') return isGap(fig);
     if (status === 'dupes') return fig.owned > 1;
