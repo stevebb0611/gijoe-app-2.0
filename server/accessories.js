@@ -13,7 +13,7 @@ const CONVENTION_YEAR = 9999;
 const formatYear = (year) => (year === CONVENTION_YEAR ? 'Convention' : String(year));
 
 const accessoriesStmt = db.prepare(`
-  SELECT a.id, a.name, a.color, a.category_id, ac.name AS category_name,
+  SELECT a.id, a.accessory_code, a.name, a.color, a.category_id, ac.name AS category_name,
          COUNT(DISTINCT fa.figure_id) AS figure_count,
          MIN(fa.figure_id) AS solo_figure_id
   FROM accessories a
@@ -71,6 +71,7 @@ export function buildAccessoryCatalog() {
     const homeFigureNames = shared ? nameYearLabels(rowsByAccessory.get(r.id) || []) : null;
     return {
       id: r.id,
+      code: r.accessory_code,
       name: r.name,
       color: r.color,
       categoryId: r.category_id,

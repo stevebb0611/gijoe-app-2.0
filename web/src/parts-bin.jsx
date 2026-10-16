@@ -459,6 +459,83 @@ function buildSections(items, mode) {
 }
 
 // ============================================================ app
+// ---- hose balance: the three generic black hose lengths (A1900–A1902) ----
+// One physical part per length, shared across ~30 figures, so the useful view
+// is per-figure tallies (copies with / without) rather than per-copy needs —
+// tells the owner where a hose can come from and where it would finish a copy.
+// Read-only; sealed (MOC) copies are skipped, same as buildNeeds().
+const HOSE_LENGTHS = [
+  { code: 'A1900', label: 'SHORT HOSE · 1½"', short: 'short' },
+  { code: 'A1901', label: 'MEDIUM HOSE · 3"', short: 'med' },
+  { code: 'A1902', label: 'LONG HOSE · 6"', short: 'long' },
+];
+
+function buildHoseBalance() {
+  const byCode = new Map(HOSE_LENGTHS.map(h => [h.code, { ...h, rows: [], have: 0, need: 0, without: 0 }]));
+  const ownedIds = [...new Set(JoeStore.get().instances.map(i => i.catalogId))];
+  ownedIds.forEach(id => {
+    const cf = JoeData.CAT_BY_ID.get(id); if (!cf) return;
+    const bp = cf.blueprint || []; if (!bp.length) return;
+    const sum = JoeData.figureSummary(id); if (!sum) return;
+    const rows = new Map(); // hose code -> row for this figure
+    sum.copies.forEach(c => {
+      if (c.moc) return;
+      JoeData.bpForVariant(bp, c.variant).forEach(([name, q, accessoryId]) => {
+        const meta = JoeData.ACC_BY_ID.get(accessoryId);
+        const len = meta && byCode.get(meta.code); if (!len) return;
+        if (!rows.has(len.code)) rows.set(len.code, { id, year: cf.year, fig: figLabel(cf), req: q, copies: 0, withN: 0, withoutN: 0, have: 0, need: 0 });
+        const r = rows.get(len.code);
+        const have = Math.min((c.acc && c.acc[name]) || 0, q);
+        r.copies++; r.have += have; r.need += q;
+        if (have >= q) r.withN++; else r.withoutN++;
+      });
+    });
+    rows.forEach((r, code) => {
+      const len = byCode.get(code);
+      len.rows.push(r); len.have += r.have; len.need += r.need; len.without += r.withoutN;
+    });
+  });
+  const out = [...byCode.values()].filter(l => l.rows.length);
+  out.forEach(l => l.rows.sort((a, b) => (a.year || 0) - (b.year || 0) || a.fig.localeCompare(b.fig)));
+  return out;
+}
+
+// Shown in place of the parts list when the [Hose Balance] chip is on.
+function HoseBalance({ store }) {
+  const lengths = React.useMemo(buildHoseBalance, [store]);
+  if (!lengths.length) return <div className="pbp-empty">No hose-carrying figures in the collection.</div>;
+  return (
+    <section className="pbp-stack">
+      <div className="pbp-secthead">
+        <span className="pbp-secthead__t">HOSE BALANCE</span>
+        <span className="pbp-secthead__c">{lengths.map(l => `${l.short} ${l.have}/${l.need}`).join(" · ")}</span>
+      </div>
+      {(
+        <div className="hose">
+          {lengths.map(l => (
+            <div key={l.code} className="hose__len">
+              <div className="hose__lenhead">
+                <span className="hose__lentitle">{l.label}</span>
+                <span className="hose__lencount">{l.have} on figures · {l.need - l.have} short · {l.without} cop{l.without === 1 ? "y" : "ies"} incomplete</span>
+              </div>
+              {l.rows.map(r => (
+                <div key={r.id} className={"hose__row" + (r.withoutN === 0 ? " is-full" : "")}>
+                  <span className="hose__yr">{formatYear(r.year)}</span>
+                  <span className="hose__fig">{r.fig}{r.req > 1 ? <em className="hose__req">needs {r.req}</em> : null}</span>
+                  <span className="hose__n">
+                    {r.copies} figure{r.copies === 1 ? "" : "s"} · <b>{r.withN}</b> with hoses · <b>{r.withoutN}</b> without
+                    {r.req > 1 ? <span className="hose__units"> · {r.have}/{r.need} hoses</span> : null}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function PartsBin({ onNavigate }) {
   const store = useStore();
   const [query, setQuery] = React.useState('');
@@ -586,15 +663,19 @@ function PartsBin({ onNavigate }) {
                     </button>
                   ))}
                 </div>
+                <span className="pbp-bar__chipgap"></span>
+                <button className={"chip" + (filter === 'hose' ? " is-on" : "")} onClick={() => setChip('hose')}>
+                  Hose Balance{filter === 'hose' ? <span className="chip__x">✕</span> : null}
+                </button>
               </div>
               <span className="pbp-bar__spacer"></span>
               <span className="pbp-bar__lab">GROUP BY</span>
               <div className="seg seg--sm">
                 {GROUPBYS.map(g => (
-                  <button key={g.key} className={groupBy === g.key ? "is-on" : ""} onClick={() => setGroupBy(g.key)}>{g.label}</button>
+                  <button key={g.key} className={groupBy === g.key ? "is-on" : ""} disabled={filter === 'hose'} onClick={() => setGroupBy(g.key)}>{g.label}</button>
                 ))}
               </div>
-              <button className="rbtn rbtn--all" onClick={toggleAll}>{allCollapsed ? "▸ expand all" : "▾ collapse all"}</button>
+              <button className="rbtn rbtn--all" disabled={filter === 'hose'} onClick={toggleAll}>{allCollapsed ? "▸ expand all" : "▾ collapse all"}</button>
             </div>
           </div>
         )}
@@ -646,7 +727,8 @@ function PartsBin({ onNavigate }) {
               ))}
             </section>
 
-            {/* ===== PARTS LIST ===== */}
+            {filter === 'hose' ? <HoseBalance store={store} /> : (
+            /* ===== PARTS LIST ===== */
             <section className="pbp-stack">
               <div className="pbp-secthead">
                 <span className="pbp-secthead__t">LOOSE PARTS</span>
@@ -659,6 +741,7 @@ function PartsBin({ onNavigate }) {
                       NEEDS={NEEDS} openId={openId} setOpenId={setOpenId} />
                   ))}
             </section>
+            )}
           </React.Fragment>
         )}
       </main>

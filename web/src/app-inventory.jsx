@@ -386,7 +386,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
           <div className="invp-mid">
             <label className="inv-search invp-search">
               <span>⌕</span>
-              <input value={query} onChange={e => setQuery(e.target.value)} placeholder="search code name · accessory · year…" />
+              <input value={query} onChange={e => setQuery(e.target.value)} placeholder="search code name · accessory · year · bin/box…" />
               {query && <button className="invp-search__x" onClick={() => setQuery('')}>✕</button>}
             </label>
             <button className="inv-addfig" onClick={onAddFigure}><span className="inv-addfig__mk">＋</span>Add Figure</button>

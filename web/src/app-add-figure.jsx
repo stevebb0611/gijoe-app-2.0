@@ -118,7 +118,10 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const next = () => goto(Math.min(step + 1, AF_STEPS.length - 1));
   const back = () => goto(Math.max(step - 1, 0));
 
-  const setUnit = (n, idx) => setOwnedAcc(o => { const cur = o[n] || 0; return { ...o, [n]: cur > idx ? idx : idx + 1 }; });
+  // boxCells (app-detail.jsx) already hands onSet the new owned COUNT, not a
+  // box index — same contract as the Detail modal's setUnit. Treating it as an
+  // index here stored req+1 for every checked accessory.
+  const setUnit = (n, units) => setOwnedAcc(o => ({ ...o, [n]: units }));
   // Damage marking is local wizard state here (accDamage/accDamageNotes), not
   // yet persisted — the instance doesn't exist until commit() writes it.
   // accDamageNotes mirrors Parts Bin's AddPartModal (parts-bin.jsx's
