@@ -430,5 +430,35 @@ logging unless it's a genuine completionist unit (see above).
   Release set card once the app tab is reloaded and the backend restarted (catalog loads
   once per page load; `server/*.js` has no hot-reload).
 
+### 1986 — Special Missions: Brazil
+
+- **Members:** Claymore v1 (figure id 99) ×1, Dial-Tone v2 (figure id 102) ×1, Leatherneck v2
+  (figure id 107) ×1, Mainframe v2 (figure id 112) ×1, Wet-Suit v2 (figure id 125) ×1 — each
+  with their own standard accessory loadout, no swapped/exclusive gear.
+- **Note:** all five are `series_id` 6 (1986), already noted "Toys R Us exclusive". Claymore
+  has only one catalog version; for the other four, v2 is the Brazil-pack redeco and v1 is the
+  standard 1986 retail release. Also tagged as sub-team **Special Missions: Brazil**
+  (`sub_group_id` 24, G.I. Joe faction) — the first sub-group created for a boxed set rather
+  than a carded sub-line, so the SubGroupTag and the Special Release set card both show it.
+- **Source:** Owner-provided, 2026-10-16.
+- **Reconstruction record:**
+  ```
+  node server/add-figure-set.mjs --name "Special Missions: Brazil" --year 1986 \
+    --description "Toys R Us exclusive 5-figure boxed set: Claymore v1, Dial-Tone v2, Leatherneck v2, Mainframe v2, Wet-Suit v2, each with their standard accessories." \
+    --members "99:1,102:1,107:1,112:1,125:1"
+  ```
+  ```sql
+  INSERT OR IGNORE INTO figure_sets (set_id, name, year, description) VALUES
+      (14, 'Special Missions: Brazil', 1986, 'Toys R Us exclusive 5-figure boxed set: Claymore v1, Dial-Tone v2, Leatherneck v2, Mainframe v2, Wet-Suit v2, each with their standard accessories.');
+  INSERT OR IGNORE INTO figure_set_members (set_id, figure_id, quantity_required) VALUES
+      (14, 99, 1), (14, 102, 1), (14, 107, 1), (14, 112, 1), (14, 125, 1);
+  -- sub-team tag (no CLI for sub_groups; seed CSVs not yet resynced)
+  INSERT OR IGNORE INTO sub_groups (sub_group_id, name, faction_id, description) VALUES
+      (24, 'Special Missions: Brazil', 1, 'Toys R Us exclusive 5-figure boxed set — 1986');
+  UPDATE figures SET sub_group_id = 24 WHERE id IN (99, 102, 107, 112, 125);
+  ```
+- **Status:** ✅ added 2026-10-16. Appears as a Special Release set card once the app tab is
+  reloaded (catalog loads once per page load).
+
 Future sets get appended here one at a time as the owner identifies/confirms them — this
 doc is explicitly not meant to be exhaustive at launch; dozens more are expected over time.

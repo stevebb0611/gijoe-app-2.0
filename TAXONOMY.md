@@ -96,7 +96,7 @@ section, not 1993's Series 12 — see `OPEN_QUESTIONS.md` F21.
 ## Sub-team (`sub_group_id`) — optional tag, faction-scoped
 71% of figures have **no** sub-team, so this is never a required field and **not** the default grouping (would yield a huge "—none—" bucket). It is: a small **tag** on rows that have one, a **filter**, and an **optional** group-by mode. Each sub-team belongs to a faction:
 
-- **G.I. Joe (1):** Tiger Force, Night Force, Slaughter's Marauders, Sky Patrol, Eco Warriors, Ninja Force, DEF, Battle Force 2000, Star Brigade, Battle Corps, Mega Marines, Dino Hunters, Street Fighter II
+- **G.I. Joe (1):** Tiger Force, Night Force, Slaughter's Marauders, Sky Patrol, Eco Warriors, Ninja Force, DEF, Battle Force 2000, Star Brigade, Battle Corps, Mega Marines, Dino Hunters, Street Fighter II, Special Missions: Brazil *(1986 TRU boxed set — also a Figure Set, see `FIGURE_SETS.md`)*
 - **Cobra (2):** Python Patrol, Crimson Guard, Iron Grenadiers, Cobra Ninja Force, Cobra Eco Warriors, Headhunters, Cobra Star Brigade, Mega Monsters, Cobra Street Fighter II
 - **Dreadnoks (4):** Dreadnoks *(redundant with faction 4 — ignore the sub-group row, classify via `faction_id`)*
 

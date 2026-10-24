@@ -579,12 +579,20 @@ function DmgPopover({ anchorRef, onRequestClose, name, count, checked, onSet, no
     const r = el.getBoundingClientRect();
     setPos({ top: r.bottom + 4, right: window.innerWidth - r.right });
   }, [anchorRef]);
+  // Notes save onBlur, but closing unmounts the textarea before the browser
+  // moves focus, so that blur never reaches React and the typed note was
+  // silently dropped. Blur it ourselves first so onBlur commits the note.
+  const commitAndClose = React.useCallback(() => {
+    const a = document.activeElement;
+    if (a && popRef.current && popRef.current.contains(a)) a.blur();
+    onRequestClose();
+  }, [onRequestClose]);
   React.useEffect(() => {
-    const close = () => onRequestClose();
+    const close = () => commitAndClose();
     window.addEventListener('scroll', close, true);
     window.addEventListener('resize', close);
     return () => { window.removeEventListener('scroll', close, true); window.removeEventListener('resize', close); };
-  }, [onRequestClose]);
+  }, [commitAndClose]);
   // Click-away closes the popover — mousedown (not click) so it fires before
   // the anchor's own onClick toggle on the same press; anchor clicks are
   // excluded here and left to that toggle so the ⚠ button still opens/closes

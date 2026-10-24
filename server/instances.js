@@ -25,11 +25,11 @@ function blueprintNameMap(figureId) { return new Map(blueprintRows(figureId).map
 function blueprintIdNameMap(figureId) { return new Map(blueprintRows(figureId).map((r) => [r.id, r.name])); }
 
 function accessoryIdForName(figureId, name) {
-  const id = blueprintNameMap(figureId).get(name);
-  if (id) return id;
-  // fallback: best-effort global match (shouldn't normally be needed)
-  const row = db.prepare('SELECT id FROM accessories WHERE name = ? LIMIT 1').get(name);
-  return row ? row.id : null;
+  // Blueprint-only — no global by-name fallback. Names like "Backpack" exist on
+  // dozens of figures, so a global match just grabbed the lowest id (A0063,
+  // Baroness's) and wrote a stray row onto Quick Kick copy 194. Every caller
+  // already treats null as "skip" / 400, which is the right outcome here.
+  return blueprintNameMap(figureId).get(name) || null;
 }
 
 const instanceRowsStmt = db.prepare(`

@@ -7,6 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import Database from 'better-sqlite3';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
@@ -23,7 +24,14 @@ fs.mkdirSync(BACKUP_DIR, { recursive: true });
 
 const stamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
 const dest = path.join(BACKUP_DIR, `gijoe_collection_${stamp}.db`);
-fs.copyFileSync(DB_PATH, dest);
+// The live DB runs in WAL mode, so a plain file copy of gijoe_collection.db
+// misses every write still sitting in gijoe_collection.db-wal (it went ~4 weeks
+// without a checkpoint — every snapshot in that stretch was a Sep 23 copy).
+// SQLite's online backup API reads through the WAL and is safe while the
+// server has the DB open.
+const src = new Database(DB_PATH, { readonly: true, fileMustExist: true });
+await src.backup(dest);
+src.close();
 console.log(`Backed up -> ${path.relative(ROOT, dest)}`);
 
 const snapshots = fs.readdirSync(BACKUP_DIR)
