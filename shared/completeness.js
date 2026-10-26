@@ -38,31 +38,43 @@ export function clusterBlueprint(bp) {
   const plain = groups.filter((members) => !members.some((m) => m[5] != null));
   return { solo, groups, matched, plain };
 }
-// Is there one match_key value K such that every matched slot's K-tagged member is owned?
+// Group members honor quantity_required: a member only satisfies its slot once
+// you own its full count, and the count must come from ONE member — 2 of the
+// same pick-one option, not 1 of each (Metal-Head's 2 Missile Packs are both
+// small-hole or both large-hole; Rock 'N Roll v4's 2 Missiles are both yellow
+// or both purple). Was a bare "owned > 0" check until 2026-10-26, which let a
+// single missile pass for a pair. Every q=1 group behaves exactly as before.
+const memberQty = (m) => m[1] || 1;
+const memberMet = (m, acc) => (acc[m[0]] || 0) >= memberQty(m);
+export function slotQty(members) { return Math.max(...members.map(memberQty)); }
+// Is there one match_key value K such that every matched slot's K-tagged member is owned (in full)?
 export function matchedSetSatisfied(matched, acc) {
   if (matched.length === 0) return true;
   const keys = new Set();
   matched.forEach((members) => members.forEach((m) => { if (m[5] != null) keys.add(m[5]); }));
   for (const k of keys) {
-    if (matched.every((members) => members.some((m) => m[5] === k && (acc[m[0]] || 0) > 0))) return true;
+    if (matched.every((members) => members.some((m) => m[5] === k && memberMet(m, acc)))) return true;
   }
   return false;
 }
+// A plain slot counts like a solo row of slotQty units, credited from whichever
+// single member you hold the most of.
+function plainUnits(members, acc) { return Math.max(...members.map((m) => Math.min(acc[m[0]] || 0, memberQty(m)))); }
 export function bpReq(bp) {
   const { solo, plain, matched } = clusterBlueprint(bp);
-  return solo.reduce((s, a) => s + a[1], 0) + plain.length + (matched.length > 0 ? 1 : 0);
+  return solo.reduce((s, a) => s + a[1], 0) + plain.reduce((s, members) => s + slotQty(members), 0) + (matched.length > 0 ? 1 : 0);
 }
 export function instOwn(bp, acc) {
   const { solo, plain, matched } = clusterBlueprint(bp);
   const soloOwn = solo.reduce((s, [n, q]) => s + Math.min(acc[n] || 0, q), 0);
-  const plainOwn = plain.reduce((s, members) => s + (members.some(([n]) => (acc[n] || 0) > 0) ? 1 : 0), 0);
+  const plainOwn = plain.reduce((s, members) => s + plainUnits(members, acc), 0);
   return soloOwn + plainOwn + (matched.length > 0 && matchedSetSatisfied(matched, acc) ? 1 : 0);
 }
 export function instPct(bp, acc) { const r = bpReq(bp); return r ? Math.round(instOwn(bp, acc) / r * 100) : 100; }
 export function instWhole(bp, acc) {
   const { solo, plain, matched } = clusterBlueprint(bp);
   return solo.every(([n, q]) => (acc[n] || 0) >= q)
-    && plain.every((members) => members.some(([n]) => (acc[n] || 0) > 0))
+    && plain.every((members) => members.some((m) => memberMet(m, acc)))
     && matchedSetSatisfied(matched, acc);
 }
 // Shared label rule (matches the locked reference _archive/subgroup-wire-v2.jsx):
@@ -95,8 +107,12 @@ export function accDamagePct(bp, acc, accDamage) {
 export function missingList(bp, acc) {
   const { solo, plain, matched } = clusterBlueprint(bp);
   const soloMissing = solo.filter(([n, q]) => (acc[n] || 0) < q).map(([n, q]) => q > 1 ? `${n} ${acc[n] || 0}/${q}` : n);
-  const plainMissing = plain.filter((members) => !members.some(([n]) => (acc[n] || 0) > 0))
-    .map((members) => members.map((m) => optLabel(m[0])).join(' or '));
+  const plainMissing = plain.filter((members) => !members.some((m) => memberMet(m, acc)))
+    .map((members) => {
+      const opts = members.map((m) => optLabel(m[0])).join(' or ');
+      const q = slotQty(members);
+      return q > 1 ? `${opts} ${plainUnits(members, acc)}/${q}` : opts;
+    });
   const matchedMissing = (matched.length > 0 && !matchedSetSatisfied(matched, acc))
     ? [matched.map((members) => groupLabel(members)).join(' & ') + ' (matching color)']
     : [];

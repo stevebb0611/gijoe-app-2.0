@@ -171,6 +171,25 @@ const GROUPS = [
   // (figure_id 264, letters A/B) are removed separately in
   // migrations/020_grid_iron_football_helmet.sql.
   { extGroupId: null, figure: 'Capt. Grid-Iron', accessories: ['A0695', 'A0696'] }, // Football Helmet soft/hard plastic
+  // Rock 'N Roll v4 (1994, F557) and Payload v4 (1993, F611): two complete
+  // colored weapon sets, pick one whole set — every slot below gets a
+  // match_key (Y/P, G/O) via set-match-key.mjs. Shared, always-required:
+  // Helmet + Robotizer Cannon / Missile Cannon. Owner-specified 2026-10-26.
+  // fcode because both code names match other versions.
+  { extGroupId: null, fcode: 'F557', figure: "Rock 'N Roll", accessories: ['A1465', 'A1466'] }, // Submachine Gun yellow/purple
+  { extGroupId: null, fcode: 'F557', figure: "Rock 'N Roll", accessories: ['A1467', 'A1468'] }, // Shotgun yellow/purple
+  { extGroupId: null, fcode: 'F557', figure: "Rock 'N Roll", accessories: ['A1370', 'A1469'] }, // Rifle yellow/purple
+  { extGroupId: null, fcode: 'F557', figure: "Rock 'N Roll", accessories: ['A1470', 'A1471'] }, // Machete yellow/purple
+  { extGroupId: null, fcode: 'F557', figure: "Rock 'N Roll", accessories: ['A1473', 'A1474'] }, // Missile (x2) yellow/purple
+  { extGroupId: null, fcode: 'F557', figure: "Rock 'N Roll", accessories: ['A1822', 'A1814'] }, // Action Figure Battle Stand yellow/purple
+  { extGroupId: null, fcode: 'F557', figure: "Rock 'N Roll", accessories: ['A1871', 'A1863'] }, // Accessory Tree yellow/purple (bonus)
+  { extGroupId: null, fcode: 'F611', figure: 'Payload', accessories: ['A1692', 'A1693'] }, // Pistol gray/orange
+  { extGroupId: null, fcode: 'F611', figure: 'Payload', accessories: ['A1694', 'A1695'] }, // XM-15 Rifle gray/orange
+  { extGroupId: null, fcode: 'F611', figure: 'Payload', accessories: ['A1696', 'A1697'] }, // Laser Rifle gray/orange
+  { extGroupId: null, fcode: 'F611', figure: 'Payload', accessories: ['A1698', 'A1699'] }, // Knife gray/orange
+  { extGroupId: null, fcode: 'F611', figure: 'Payload', accessories: ['A1700', 'A1701'] }, // Missile (x2) gray/orange
+  { extGroupId: null, fcode: 'F611', figure: 'Payload', accessories: ['A1807', 'A1812'] }, // Action Figure Battle Stand gray/orange
+  { extGroupId: null, fcode: 'F611', figure: 'Payload', accessories: ['A1856', 'A1861'] }, // Accessory Tree gray/orange (bonus)
 ];
 
 // Same label rule as the locked reference (subgroup-wire-v2.jsx groupLabel):

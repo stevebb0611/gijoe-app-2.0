@@ -4,7 +4,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { JoeStore, JoeData } from './store.js';
-import { clusterBlueprint, matchedSetSatisfied, bpReq, bpForVariant } from '../../shared/completeness.js';
+import { clusterBlueprint, matchedSetSatisfied, bpReq, bpForVariant, slotQty } from '../../shared/completeness.js';
 import { physicalGrade, paintGrade, dmEmpty, DamageMap, GradeBadge } from './damage-map.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { AccSwatch } from './acc-colors.jsx';
@@ -64,7 +64,7 @@ function figParts(fig) {
 function buildSlots(bp) {
   const { solo, plain, matched } = clusterBlueprint(bp);
   const slots = solo.map(([n, q]) => ({ kind: 'solo', names: [n], qty: q }));
-  plain.forEach((members) => slots.push({ kind: 'plain', names: [...new Set(members.map((m) => m[0]))] }));
+  plain.forEach((members) => slots.push({ kind: 'plain', names: [...new Set(members.map((m) => m[0]))], qty: slotQty(members) }));
   if (matched.length) slots.push({ kind: 'matched', groups: matched });
   return slots;
 }
@@ -81,7 +81,8 @@ function matchedCapacities(slot, pool) {
   keys.forEach((k) => {
     let min = Infinity;
     slot.groups.forEach((g) => {
-      const have = g.filter((m) => m[5] === k).reduce((s, m) => s + (pool[m[0]] || 0), 0);
+      // whole copies' worth, not raw units — 3 missiles at qty 2 only fill 1 copy
+      const have = g.filter((m) => m[5] === k).reduce((s, m) => s + Math.floor((pool[m[0]] || 0) / (m[1] || 1)), 0);
       min = Math.min(min, have);
     });
     if (min !== Infinity) caps.push({ key: k, cap: min });
@@ -92,13 +93,13 @@ function matchedCapacities(slot, pool) {
 // how many additional whole copies this one slot alone could supply, capped at `cap`
 function slotCapacity(slot, pool, cap) {
   if (slot.kind === 'solo') return Math.min(cap, Math.floor((pool[slot.names[0]] || 0) / slot.qty));
-  if (slot.kind === 'plain') return Math.min(cap, slot.names.reduce((s, n) => s + (pool[n] || 0), 0));
+  if (slot.kind === 'plain') return Math.min(cap, slot.names.reduce((s, n) => s + Math.floor((pool[n] || 0) / slot.qty), 0));
   const caps = matchedCapacities(slot, pool);
   return Math.min(cap, caps.length ? caps[0].cap : 0);
 }
 function slotSatisfiedOnCopy(slot, acc) {
   if (slot.kind === 'solo') return (acc[slot.names[0]] || 0) >= slot.qty;
-  if (slot.kind === 'plain') return slot.names.some((n) => (acc[n] || 0) > 0);
+  if (slot.kind === 'plain') return slot.names.some((n) => (acc[n] || 0) >= slot.qty);
   return matchedSetSatisfied(slot.groups, acc);
 }
 // classic per-name redistribution for a solo slot: the first `maxWhole` copies
@@ -111,24 +112,36 @@ function applySoloTarget(name, qty, copies, maxWhole, pool, target) {
   if (left > 0 && copies.length) target[copies.length - 1][name] = (target[copies.length - 1][name] || 0) + left;
 }
 // "own any one of these names" redistribution: any copy in `receivers` lacking
-// a member gets one donated from wherever there's a spare unit. Copies in
-// `keepSet` that already have a member keep exactly one; every other copy can
-// be stripped bare (it isn't being targeted to end up whole via this slot).
-function applyPoolTarget(names, copies, keepSet, receivers, target) {
+// a member gets `qty` units of ONE member donated from wherever there are
+// spares (topping up what it already holds first). Copies in `keepSet` that
+// already have a member keep exactly `qty` of it; every other copy can be
+// stripped bare (it isn't being targeted to end up whole via this slot).
+// qty > 1 is a pick-one slot needing a pair (Metal-Head's Missile Packs) —
+// never split across members or copies; see completeness.js memberMet.
+function applyPoolTarget(names, copies, keepSet, receivers, target, qty = 1) {
   copies.forEach((c, i) => names.forEach((n) => { if (target[i][n] == null) target[i][n] = c.acc[n] || 0; }));
-  const has = (i) => names.some((n) => target[i][n] > 0);
+  const has = (i) => names.some((n) => target[i][n] >= qty);
   const donors = [];
   copies.forEach((c, j) => {
-    let keepOne = keepSet.has(j) && has(j);
+    let keepName = keepSet.has(j) ? names.find((n) => target[j][n] >= qty) : null;
     names.forEach((n) => {
-      let qty = target[j][n];
-      while (qty > 0) { if (keepOne) { keepOne = false; qty--; continue; } donors.push({ j, n }); qty--; }
+      for (let u = n === keepName ? qty : 0; u < target[j][n]; u++) donors.push({ j, n });
     });
   });
   receivers.forEach((i) => {
     if (has(i)) return;
-    const d = donors.shift(); if (!d) return;
-    target[d.j][d.n] -= 1; target[i][d.n] = (target[i][d.n] || 0) + 1;
+    // most-held first, then earliest donor — at qty 1 that's exactly the old donors.shift() pick
+    const firstDonor = (n) => { const k = donors.findIndex((d) => d.n === n && d.j !== i); return k < 0 ? Infinity : k; };
+    const byHeld = [...names].sort((a, b) => ((target[i][b] || 0) - (target[i][a] || 0)) || (firstDonor(a) - firstDonor(b)));
+    for (const n of byHeld) {
+      const need = qty - (target[i][n] || 0);
+      const avail = donors.filter((d) => d.n === n && d.j !== i);
+      if (avail.length < need) continue;
+      avail.slice(0, need).forEach((d) => { donors.splice(donors.indexOf(d), 1); target[d.j][n] -= 1; });
+      target[i][n] = qty;
+      for (let k = donors.length - 1; k >= 0; k--) if (donors[k].j === i && donors[k].n === n) donors.splice(k, 1);
+      return;
+    }
   });
 }
 function diffMoves(names, copies, target) {
@@ -195,12 +208,12 @@ function figState(fig) {
     for (let i = 0; i < optimalLoose && i < loose.length; i++) { keep.add(i); receivers.push(i); }
     slots.forEach((s) => {
       if (s.kind === 'solo') applySoloTarget(s.names[0], s.qty, loose, optimalLoose, pool, target);
-      else if (s.kind === 'plain') applyPoolTarget(s.names, loose, keep, receivers, target);
+      else if (s.kind === 'plain') applyPoolTarget(s.names, loose, keep, receivers, target, s.qty);
       else {
         const best = matchedCapacities(s, pool)[0];
         if (best) s.groups.forEach((g) => {
-          const names = g.filter((m) => m[5] === best.key).map((m) => m[0]);
-          applyPoolTarget(names, loose, keep, receivers, target);
+          const keyed = g.filter((m) => m[5] === best.key);
+          applyPoolTarget(keyed.map((m) => m[0]), loose, keep, receivers, target, slotQty(keyed));
         });
       }
     });
@@ -235,12 +248,12 @@ function figState(fig) {
             ptarget[i][n] -= give; ptarget[targetIdx][n] = (ptarget[targetIdx][n] || 0) + give; need -= give;
           }
         } else if (s.kind === 'plain') {
-          applyPoolTarget(s.names, vcopies, new Set(), [targetIdx], ptarget);
+          applyPoolTarget(s.names, vcopies, new Set(), [targetIdx], ptarget, s.qty);
         } else {
           const bestKey = matchedCapacities(s, pool)[0];
           if (bestKey) s.groups.forEach((g) => {
-            const names = g.filter((m) => m[5] === bestKey.key).map((m) => m[0]);
-            applyPoolTarget(names, vcopies, new Set(), [targetIdx], ptarget);
+            const keyed = g.filter((m) => m[5] === bestKey.key);
+            applyPoolTarget(keyed.map((m) => m[0]), vcopies, new Set(), [targetIdx], ptarget, slotQty(keyed));
           });
         }
       });
