@@ -162,7 +162,7 @@
 161,A0161,Dress Backpack (solid back),,3,Backpack,light red,,,,,,,,,1985,Crimson Guard (v1),1
 162,A0162,Dress Backpack (solid back),,3,Backpack,dark red,,,,,,,,,1985,Crimson Guard (v1),1
 163,A0163,Dress Backpack (hollow back),,3,Backpack,light red,,,,,,,,,1985,Crimson Guard (v1),1
-164,A0164,AK-48AW Rifle with Bayonet,,6,Weapon Rifle,black,,,,,,,,,1985,Crimson Guard (v1),2
+164,A0164,AK-48AW Rifle with Bayonet,,8,Weapon Rifle,black,,,,,,,,,1985,Crimson Guard (v1),2
 165,A0165,Desert Field Pack,,3,Backpack,tan,,,,,,,,,1985,Dusty (v1),1
 166,A0166,FAMAS Submachine Gun,,9,Weapon Submachine Gun,black,,,,,,,,,1985,Dusty (v1),2
 167,A0167,Bipod,,22,Weapon Accessory,black,,,,,,,,,1985,Dusty (v1),2
@@ -1046,7 +1046,7 @@
 1045,A1045,"Portable, Recoilless Missile Launcher",,24,Spring-Loaded Launcher,green,,,,,,,,,1992,Bullet-Proof (v1),1
 1046,A1046,Heat-Seeking Surface-to-Air Missile,,25,Spring-Loaded Missile,green,,,,,,,,,1992,Bullet-Proof (v1),2
 1047,A1047,Talking Sonic Backpack with Battery Cover (attached to figure),,4,Backpack with Battery,black,,,,,,,,,1992,Cobra Commander (v5),1
-1048,A1048,Rifle,,6,Weapon Rifle,black,,,,,,,,,1992,Cobra Commander (v5),1
+1048,A1048,Rifle,,8,Weapon Rifle,black,,,,,,,,,1992,Cobra Commander (v5),1
 1049,A1049,Long RangeDual Missile Launcher,,13,Weapon Bazooka/ Launcher,black,,,,,,,,,1992,Cobra Commander (v5),1
 1050,A1050,Missile,,23,Missile,black,2,,,,,,,,1992,Cobra Commander (v5),1
 1051,A1051,"BM-201 Short Stock, Fully Automatic Boarding Rifle",,8,Weapon Rifle,white,,,,,,,,,1992,Cutter (v2),1

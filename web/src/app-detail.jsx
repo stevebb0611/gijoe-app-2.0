@@ -601,11 +601,11 @@ function DmgPopover({ anchorRef, onRequestClose, name, count, checked, onSet, no
     const onDown = (e) => {
       if (popRef.current && popRef.current.contains(e.target)) return;
       if (anchorRef.current && anchorRef.current.contains(e.target)) return;
-      onRequestClose();
+      commitAndClose();
     };
     document.addEventListener('mousedown', onDown);
     return () => document.removeEventListener('mousedown', onDown);
-  }, [anchorRef, onRequestClose]);
+  }, [anchorRef, commitAndClose]);
   if (!pos) return null;
   const { cells, cols } = boxCells(name, count, checked, onSet, true);
   const dmgCount = checked.reduce((s, c) => s + (c ? 1 : 0), 0);

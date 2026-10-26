@@ -348,10 +348,12 @@
   .idvarbr__l:last-child { border-right: none; }
   .idvarbr__l.is-owned { color: var(--paper); background: var(--ink); }
   /* sub-team tag (TAXONOMY.md) — sparse/optional (~31% of figures), so a
-     quieter dashed-outline mono chip rather than a bold accent pill; 23
-     possible values rules out a per-team color scheme like Faction's. */
-  .idsubteam { font-style: normal; display: inline-flex; align-items: center; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .3px; color: var(--ink-soft); border: 1.5px dashed var(--ink-soft); padding: 1px 6px; margin-left: 8px; vertical-align: 1px; }
-  .idsubteam--lg { font-size: 11px; padding: 2px 7px; margin-left: 9px; vertical-align: 2px; }
+     quiet mono label with a solid left "file-tab" rule rather than a bold
+     accent pill. Not a dashed box: dashed means missing/to-do everywhere
+     else (ghost rows, add prompts), and a closed solid box is VehicleTag's
+     look. 23 possible values rules out a per-team color scheme like Faction's. */
+  .idsubteam { font-style: normal; display: inline-flex; align-items: center; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .3px; color: var(--ink-soft); border-left: 2px solid var(--ink-soft); padding: 0 0 0 5px; margin-left: 9px; vertical-align: 1px; line-height: 1.35; }
+  .idsubteam--lg { font-size: 11px; border-left-width: 2.5px; padding-left: 6px; margin-left: 10px; vertical-align: 2px; }
   .idfull { display: block; font-style: normal; font-family: var(--font-display); font-weight: 500; font-size: 11px; color: var(--ink-soft); line-height: 1.15; margin-top: 2px; }
   .idveh { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .3px; color: var(--ink); background: var(--paper); border: 1.5px solid var(--ink); padding: 2px 7px; box-shadow: 1.5px 1.5px 0 var(--line-soft); }
   span.idveh b { font-family: var(--font-display); font-weight: 700; font-size: 8px; letter-spacing: .6px; color: var(--ink-soft); }

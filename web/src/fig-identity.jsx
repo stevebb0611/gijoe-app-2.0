@@ -89,7 +89,8 @@ export function SetTag({ sets, lg }) {
 }
 
 // Sub-team tag (TAXONOMY.md "Sub-team" — sub_group_id, ~31% of figures).
-// Sparse and optional by design, so styled as a quieter mono outline rather
+// Sparse and optional by design, so styled as a quiet mono label with a left
+// file-tab rule (not a dashed box — dashed reads as "missing" here) rather
 // than a bold accent pill like EditionTag/SetTag — it's a bonus classification,
 // not core identity. 23 possible values means no per-team color scheme.
 export function SubGroupTag({ subGroup, lg }) {
