@@ -1020,12 +1020,14 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
 - **Unaffected (plain, independently required):** Helmet, Backpack Frame, Pistol, Missile
   Launcher, Missiles, Hose 1 1/2" Long (short).
 - **Note on quantity:** both options carry `quantity_required = 2` (the figure ships with
-  2 physical packs). `clusterBlueprint`'s plain-group math only checks "is at least one
-  unit of either option owned" (`shared/completeness.js` `plainOwn`) — it doesn't sum
-  toward 2 the way a solo row would. Every other group_id slot in this doc happens to need
-  only 1, so this is the first case where that binary check under-counts against physical
-  reality; flagged, not fixed — would need the completeness engine's group math extended
-  to be quantity-aware.
+  2 physical packs). This was the first group slot needing more than 1, and the engine
+  originally only checked "at least one unit of either option owned", so one pack passed
+  for two. **Fixed 2026-10-26:** group math is now quantity-aware. The slot needs 2 of
+  the *same* option (2 small-hole or 2 large-hole, not one of each), counts as 2 units
+  toward the %, and ⚖ Rebalance moves the pair together (see `PARTS_BIN.md` §1
+  "Quantity-aware"). `accessory_groups.quantity_required` for group 35 set to 2 to match
+  (bookkeeping only; the engine reads `figure_accessories.quantity_required`). Instance
+  594 re-checked: 2/2 small-hole packs, Missile Pack slot ✓, copy 54% → 57%.
 - **Source:** owner-corrected 2026-07-21 — a first pass wrongly modeled this as
   `variant_id`-scoped (assuming hole size tracked the leg-peg variant); owner clarified it
   should be a plain pick-one slot instead, same shape as the Helmet/Helmet-with-holes
@@ -1083,6 +1085,42 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
 - **Source:** hand-built (`extGroupId: null`), owner-found 2026-07-15.
 - **Status:** ✅ group_id set in DB and verified via direct DB read (figure_id 318:
   A0953/A0954 both carry group_id 34), 2026-07-15. Not yet visually verified in-app.
+
+### 1993 — Payload (v4, figure catalog id 509 — source F-code F611)
+
+- **Mechanism:** `match_key` — a whole-set colorway pick. Tags `G` (gray) / `O` (orange)
+  tie six retail slots plus the bonus tree together: own the full gray set or the full
+  orange set, never a mix.
+- **Matched slots (`accessory_groups.group_id` 47–53), gray / orange:** Pistol
+  A1692/A1693 · XM-15 Rifle A1694/A1695 · Laser Rifle A1696/A1697 · Knife A1698/A1699 ·
+  Missile ×2 A1700/A1701 · Action Figure Battle Stand A1807/A1812 · Accessory Tree
+  A1856/A1861 (`bonus`, tagged for bookkeeping only; non-blocking, see "match_key on
+  non-retail" above).
+- **Unaffected (plain, independently required):** High-Powered, Quick-Fire Missile Cannon
+  (A1299, shared by both sets).
+- **Note:** the gray members are the same accessory rows Payload v5 uses as its only set;
+  v5 is unaffected (groups live on `figure_accessories`, per figure). Missile slot needs
+  2 of one color, per the quantity-aware group rule (see Metal-Head above).
+- **Source:** owner-specified 2026-10-26, alongside Rock 'N Roll v4 (same two-set
+  packaging pattern).
+- **Status:** ✅ group_id + match_key set (`migrate-accessory-groups.mjs` +
+  `set-match-key.mjs`), API round-trip checked, 2026-10-26. No owned copies yet.
+
+### 1993 — Rock 'N Roll (v4, figure catalog id 458 — source F-code F557)
+
+- **Mechanism:** `match_key` — a whole-set colorway pick. Tags `Y` (yellow) / `P`
+  (purple) tie six retail slots plus the bonus tree together.
+- **Matched slots (`accessory_groups.group_id` 40–46), yellow / purple:** Submachine Gun
+  A1465/A1466 · Shotgun A1467/A1468 · Rifle A1370/A1469 · Machete A1470/A1471 · Missile
+  ×2 A1473/A1474 · Action Figure Battle Stand A1822/A1814 · Accessory Tree A1871/A1863
+  (`bonus`, bookkeeping only).
+- **Unaffected (plain, independently required):** Helmet (A1464, silver/purple) and
+  Robotizer Cannon (A1472), shared by both sets.
+- **Source:** owner-specified 2026-10-26 ("shared Helmet and Cannon; pick one: purple set
+  or yellow set").
+- **Status:** ✅ group_id + match_key set, API round-trip checked, and visually confirmed
+  in the Add Figure details step (each slot labeled "match a colorway", Y/P tags, Missile
+  0/2, "0/3 complete" = Helmet + Cannon + one set), 2026-10-26. No owned copies yet.
 
 ## Non-retail backlog (not yet reviewed)
 

@@ -52,8 +52,21 @@
 // group; only ungrouped context items still render as flat rows. This is
 // display-only: store.js already filters non-retail out before it ever builds
 // match_key buckets, so this cannot change what counts toward Complete.
+//
+// 2026-10-26: whole-set colorway kits (Rock 'N Roll v4, Payload v4 — 6
+// matched retail slots + a matched bonus tree each) rendered as 7 stacked
+// "· match a colorway" groups of two "X, yellow" / "X, purple" rows, which
+// made Add Figure scroll forever. A match_key bucket spanning KIT_MIN_SLOTS+
+// retail slots now renders as ONE block: shared (untagged) items stay on top,
+// then one column per color with short names (the column says the color),
+// that color's bonus items at the column foot. The 2-slot matched figures
+// (Duke/Firefly/Recondo/…) keep the per-slot layout above — their two pieces
+// sit far apart head-to-toe, which is what that layout was built for.
 import React from 'react';
 import { JoeData } from './store.js';
+import { AccSwatch } from './acc-colors.jsx';
+
+const KIT_MIN_SLOTS = 3;
 
 const CTX_LABEL = { convention: 'Convention', mail_in: 'Mail-in', bonus: 'Bonus', exclusive: 'Exclusive', retailer_exclusive: 'Retailer Exclusive' };
 
@@ -118,7 +131,31 @@ function clusterUnits(items) {
 // Gun, Binocular" in DB order instead of the old solo-then-groups-then-context
 // concatenation, and what keeps a matched colorway's slots (Helmet, Gun) each
 // at their own position instead of merged into one combined block.
+// Columns for a whole-set colorway kit, or null when the figure isn't one.
+// One column per match_key, ordered by color name (purple before yellow, gray
+// before orange); each holds that key's retail rows then its non-retail rows.
+function colorwayKit(bp) {
+  const tagged = bp.filter((a) => a[5] != null);
+  const retailSlots = new Set(tagged.filter((a) => !a[4] || a[4] === 'retail').map((a) => a[3]));
+  if (retailSlots.size < KIT_MIN_SLOTS) return null;
+  return [...new Set(tagged.map((a) => a[5]))].map((key) => {
+    const items = tagged.filter((a) => a[5] === key);
+    return {
+      key, color: items[0][6] || key,
+      retail: items.filter((a) => !a[4] || a[4] === 'retail'),
+      extra: items.filter((a) => a[4] && a[4] !== 'retail'),
+    };
+  }).sort((x, y) => String(x.color).localeCompare(String(y.color)));
+}
+
 export function orderedBlueprint(bp) {
+  const kit = colorwayKit(bp || []);
+  if (kit) {
+    // shared pieces on top in blueprint order, then the kit as one block
+    const order = orderedBlueprint((bp || []).filter((a) => a[5] == null));
+    order.push({ type: 'kit', cols: kit });
+    return order;
+  }
   const list = bp || [];
   const groupMembers = new Map();   // group_id -> retail members
   const contextMembers = new Map(); // release_context -> non-retail members
@@ -157,9 +194,34 @@ export function orderedBlueprint(bp) {
 // (e.g. "Helmet, with holes", via JoeData.optLabel) — the caller decides its
 // shape (every current caller renders it as an AccItem row), same as
 // ContextGroup's renderRow always was.
+// renderOption's 2nd arg { short: true } asks for the bare item name with no
+// color suffix or tag badge — inside a kit column the column header says it.
+export function ColorwayKit({ cols, renderOption }) {
+  return (
+    <div className="sgw-group sgw-kit">
+      <div className="sgw-label"><span className="sgw-label__name">Color set</span> <em>· pick one</em></div>
+      <div className="sgw-kit__cols">
+        {cols.map((c) => (
+          <div className="sgw-kit__col" key={c.key}>
+            <div className="sgw-kit__hd"><AccSwatch color={c.color} />{c.color}</div>
+            {c.retail.map((it) => renderOption(it, { short: true }))}
+            {c.extra.length > 0 && (
+              <React.Fragment>
+                <div className="sgw-label sgw-label--cap">{CTX_LABEL[c.extra[0][4]] || c.extra[0][4]}</div>
+                {c.extra.map((it) => renderOption(it, { short: true }))}
+              </React.Fragment>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function AccessoryList({ ordered, renderSolo, renderOption }) {
   return ordered.map((u, i) => {
     if (u.type === 'solo') return renderSolo(u.item, i);
+    if (u.type === 'kit') return <ColorwayKit key={'k' + i} cols={u.cols} renderOption={renderOption} />;
     if (u.type === 'group') return <VariantGroup key={'g' + i} items={u.items} renderOption={renderOption} />;
     if (u.type === 'context') return <ContextGroup key={'c' + i} context={u.context} units={u.units} renderOption={renderOption}
                                                     renderRow={(a) => renderSolo(a, u.context + '-' + a[0])} />;
