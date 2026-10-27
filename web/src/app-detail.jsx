@@ -472,6 +472,22 @@ function boxCells(name, req, checked, onSet, dmgTitles) {
   return { cells, cols, rows, own };
 }
 
+// How many loose units of blueprint row `a` the Parts Bin could fill on this
+// copy right now (PARTS_BIN.md "A. Figure → Bin draws FROM the Bin") —
+// capped by both the bin's stock and the row's remaining gap. Matches by
+// accessory_id (a[2]), not name, since blueprint names can be disambiguated
+// per figure (blueprint-names.js). A group_id pick-one slot already filled by
+// another option (full count from one option, same rule as completeness.js)
+// isn't a gap, so it offers nothing. ownedOf(name) and binQty(accessoryId)
+// are passed in so the modal (saved copy) and Add Figure (unsaved wizard
+// state) share the same rule.
+function binPullAvail(a, bp, ownedOf, binQty) {
+  const own = ownedOf(a[0]);
+  if (own >= a[1]) return 0;
+  if (a[3] != null && bp.some((r) => r[3] === a[3] && r[0] !== a[0] && ownedOf(r[0]) >= r[1])) return 0;
+  return Math.min(binQty(a[2]), a[1] - own);
+}
+
 function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove, onSwapToBin,
                     dmgChecked, dmgOnSet, dmgNotes, dmgOnSetNotes, dmgUnitNotes, dmgOnSetUnitNotes, dmgExtra }) {
   const { cells, cols, rows, own } = boxCells(name, req, checked, onSet, false);

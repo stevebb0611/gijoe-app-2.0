@@ -710,6 +710,20 @@
   /* context headers (Bonus/Convention/Mail-in) are a category label, not an
      accessory name — keep the small muted caption treatment. */
   .sgw-label--cap { font-family: var(--font-mono); font-weight: 700; font-size: 9.5px; letter-spacing: .8px; color: var(--ink-soft); text-transform: uppercase; }
+  /* whole-set colorway kit (accessory-groups.jsx ColorwayKit) — one column per
+     color, split by a solid ink rule like any other section boundary. The
+     column's bonus caption gets a hairline so it reads as the column's foot. */
+  .sgw-kit__cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sgw-kit__col { min-width: 0; }
+  .sgw-kit__col + .sgw-kit__col { border-left: 1.5px solid var(--ink); }
+  .sgw-kit__hd { display: flex; align-items: center; gap: 7px; padding: 6px 12px; border-top: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft);
+    font-family: var(--font-mono); font-weight: 700; font-size: 10px; letter-spacing: .8px; text-transform: uppercase; color: var(--ink); background: var(--card); }
+  .sgw-kit .sgw-kit__col .sgw-label.sgw-label--cap { border-top: 1px solid var(--line-soft); padding: 7px 12px 5px; }
+  .sgw-kit__col .acc { column-gap: 8px; padding: 8px 10px; }
+  @media (max-width: 560px) {
+    .sgw-kit__cols { grid-template-columns: 1fr; }
+    .sgw-kit__col + .sgw-kit__col { border-left: none; border-top: 1.5px solid var(--ink); }
+  }
 
   /* file-card box in the detail modal — mirrors the accessory checklist frame */
   .fc-row { grid-template-columns: 1fr auto auto; }

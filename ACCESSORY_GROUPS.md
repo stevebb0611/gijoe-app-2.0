@@ -1086,7 +1086,29 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
 - **Status:** ✅ group_id set in DB and verified via direct DB read (figure_id 318:
   A0953/A0954 both carry group_id 34), 2026-07-15. Not yet visually verified in-app.
 
-### 1993 — Payload (v4, figure catalog id 509 — source F-code F611)
+### 1993 — Rock 'N Roll (v4, figure catalog id 458 — source F-code F557)
+
+- **Mechanism:** `match_key` — a whole-set colorway pick. Tags `Y` (yellow) / `P`
+  (purple) tie six retail slots plus the bonus tree together.
+- **Matched slots (`accessory_groups.group_id` 40–46), yellow / purple:** Submachine Gun
+  A1465/A1466 · Shotgun A1467/A1468 · Rifle A1370/A1469 · Machete A1470/A1471 · Missile
+  ×2 A1473/A1474 · Action Figure Battle Stand A1822/A1814 · Accessory Tree A1871/A1863
+  (`bonus`, bookkeeping only).
+- **Unaffected (plain, independently required):** Helmet (A1464, silver/purple) and
+  Robotizer Cannon (A1472), shared by both sets.
+- **Source:** owner-specified 2026-10-26 ("shared Helmet and Cannon; pick one: purple set
+  or yellow set").
+- **Status:** ✅ group_id + match_key set, API round-trip checked, and visually confirmed
+  in the Add Figure details step ("0/3 complete" = Helmet + Cannon + one set), 2026-10-26.
+  No owned copies yet.
+- **Display:** a matched bucket of 3+ retail slots renders as a "Color set · pick one"
+  block of side-by-side color columns (shared pieces on top, short names, bonus at each
+  column's foot) instead of one "match a colorway" group per slot; `colorwayKit` /
+  `ColorwayKit` in `web/src/accessory-groups.jsx`, owner-requested 2026-10-26. Columns sort
+  by color name (purple | yellow, gray | orange). The 2-slot matched figures above keep the
+  per-slot layout.
+
+### 1994 — Payload (v4, figure catalog id 509 — source F-code F611)
 
 - **Mechanism:** `match_key` — a whole-set colorway pick. Tags `G` (gray) / `O` (orange)
   tie six retail slots plus the bonus tree together: own the full gray set or the full
@@ -1105,22 +1127,6 @@ already-owned variant-exclusive part on copies whose variant it doesn't even app
   packaging pattern).
 - **Status:** ✅ group_id + match_key set (`migrate-accessory-groups.mjs` +
   `set-match-key.mjs`), API round-trip checked, 2026-10-26. No owned copies yet.
-
-### 1993 — Rock 'N Roll (v4, figure catalog id 458 — source F-code F557)
-
-- **Mechanism:** `match_key` — a whole-set colorway pick. Tags `Y` (yellow) / `P`
-  (purple) tie six retail slots plus the bonus tree together.
-- **Matched slots (`accessory_groups.group_id` 40–46), yellow / purple:** Submachine Gun
-  A1465/A1466 · Shotgun A1467/A1468 · Rifle A1370/A1469 · Machete A1470/A1471 · Missile
-  ×2 A1473/A1474 · Action Figure Battle Stand A1822/A1814 · Accessory Tree A1871/A1863
-  (`bonus`, bookkeeping only).
-- **Unaffected (plain, independently required):** Helmet (A1464, silver/purple) and
-  Robotizer Cannon (A1472), shared by both sets.
-- **Source:** owner-specified 2026-10-26 ("shared Helmet and Cannon; pick one: purple set
-  or yellow set").
-- **Status:** ✅ group_id + match_key set, API round-trip checked, and visually confirmed
-  in the Add Figure details step (each slot labeled "match a colorway", Y/P tags, Missile
-  0/2, "0/3 complete" = Helmet + Cannon + one set), 2026-10-26. No owned copies yet.
 
 ## Non-retail backlog (not yet reviewed)
 

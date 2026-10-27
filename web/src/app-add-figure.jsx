@@ -299,8 +299,8 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                                                   onSet={(n) => setUnit(a[0], n)}
                                                   {...dmgPropsFor(a[0])} />
                                        )}
-                                       renderOption={(a) => (
-                                         <AccItem key={a[0]} name={JoeData.optLabel(a[0])} req={a[1]} color={a[6]} tag={a[5]}
+                                       renderOption={(a, o) => (
+                                         <AccItem key={a[0]} name={o && o.short ? JoeData.groupLabel([a]) : JoeData.optLabel(a[0])} req={a[1]} color={a[6]} tag={o && o.short ? null : a[5]}
                                                   checked={Array.from({ length: a[1] }, (_, k) => k < (owned[a[0]] || 0))}
                                                   onSet={(n) => setUnit(a[0], n)}
                                                   {...dmgPropsFor(a[0])} />
