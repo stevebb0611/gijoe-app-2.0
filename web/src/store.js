@@ -196,8 +196,17 @@ function setSlots(setId) {
 export const JoeStore = {
     get: () => state,
     subscribe(fn) { subs.add(fn); return () => subs.delete(fn); },
-    addInstance(inst) {
-      api('POST', '/api/instances', inst);
+    // pulls: [{ accessoryId, count }] — Add Figure's held Parts Bin pulls,
+    // applied onto the new copy one unit at a time through the same pullPart
+    // route the modal uses, so a damaged bin unit's note travels with it.
+    // inst.acc must NOT already count these units (pullPart adds them).
+    addInstance(inst, pulls = []) {
+      const res = api('POST', '/api/instances', inst);
+      if (res && res.id != null) {
+        pulls.forEach(({ accessoryId, count }) => {
+          for (let k = 0; k < count; k++) api('POST', '/api/parts-bin/' + accessoryId + '/pull', { instanceId: res.id });
+        });
+      }
       refresh(); emit();
     },
     updateInstance(id, patch) {

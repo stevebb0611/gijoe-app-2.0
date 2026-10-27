@@ -25,7 +25,9 @@ When building or repairing an instance's checklist, any **missing** accessory th
 - decrements that bin entry's quantity by 1,
 - marks the instance's accessory `have = true`.
 
-This is already mocked on the Instance Detail screen. It must also drive the **Add Figure / Add Instance** flow: when a new instance is created, immediately surface which of its required accessories are available in the bin and let the user pull them in one step ("3 of this figure's 5 parts are in your Parts Bin — add them?").
+**Built (October 2026)** — it was only ever in the prototype mockups until then; the live port had dropped it. Shared rule: `binPullAvail` (`web/src/app-detail.jsx`) — matches bin stock to a blueprint row by `accessory_id`, capped by the row's remaining gap, and offers nothing on a `group_id` pick-one slot another option already fills.
+- **Figure modal:** an unfilled row with bin stock shows an inline **"pull from bin (N) ›"** link under its name; clicking it calls `pullPart` immediately (clean stock first; a damaged unit, note included, only if that's all the bin has).
+- **Add Figure (DETAILS):** an **IN YOUR PARTS BIN** banner above the checklist lists every part available to pull, with **pull it / pull all ›**, plus the same per-row link. Pulls are *held* (shown as "N from bin · undo") until **＋ ADD TO INVENTORY** — the copy is created without those units, then `JoeStore.addInstance(inst, pulls)` runs each through `pullPart`, so cancelling the wizard never touches the bin. Pulled units aren't damage-markable in the wizard; they keep the bin's own damage state.
 
 ### B. Bin ← Figure feeds INTO the Bin  (removing a copy)
 When **removing** an instance (the action is labeled **Remove**), prompt (per the owner's "ask each time"):

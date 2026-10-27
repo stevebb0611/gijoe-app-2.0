@@ -606,7 +606,15 @@
   .acc { display: grid; grid-template-columns: 1fr auto auto; column-gap: 14px; align-items: center; padding: 9px 12px; }
   .acc + .acc { border-top: 1px solid var(--line-soft); }
   .acc.is-stack { align-items: center; }
-  .acc__namewrap { display: flex; align-items: center; gap: 7px; min-width: 0; }
+  .acc__namewrap { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; min-width: 0; }
+  /* bin → copy pull (PARTS_BIN.md "A") — its own line under the name, same
+     accent text-link voice as .acc-swap / .acc__movepop-bin */
+  .acc__bin { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-top: -3px;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .3px; }
+  .acc__bin-pull, .acc__bin-undo { padding: 0; border: none; background: transparent; font: inherit; letter-spacing: inherit; color: var(--accent); cursor: pointer; }
+  .acc__bin-pull:hover, .acc__bin-undo:hover { text-decoration: underline; }
+  .acc__bin-held { color: var(--ok); }
+  .acc__bin-undo { color: var(--ink-soft); font-weight: 400; }
   .acc__name { font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .2px; line-height: 1.15; }
   .acc__tag { font-family: var(--font-mono); font-weight: 700; font-size: 9px; color: var(--accent); border: 1px solid var(--accent); padding: 0 4px; line-height: 1.6; flex: none; }
   .acc__boxes { display: grid; gap: 5px; justify-content: end; }
@@ -938,6 +946,15 @@
   .af-in { width: 100%; background: var(--paper); border: 1.5px solid var(--ink); padding: 9px 11px; font: inherit; font-size: 12px; color: var(--ink); }
   .af-markall { margin-top: 12px; font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .5px; color: var(--accent); background: var(--paper); border: 1.5px dashed var(--accent); padding: 6px 10px; cursor: pointer; }
   .af-markall:hover { background: var(--accent); color: #fff; }
+  /* "you have this loose in the Parts Bin" heads-up above the checklist —
+     solid accent rule, not dashed (dashed = missing, see .acc dashed rules) */
+  .af-binhint { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0 0 10px; padding: 7px 10px;
+    border: 1.5px solid var(--line); border-left: 4px solid var(--accent); background: var(--card);
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: .3px; }
+  .af-binhint__lab { font-size: 9px; letter-spacing: 1px; color: var(--ink-soft); }
+  .af-binhint__list { display: flex; flex-wrap: wrap; gap: 4px 10px; font-family: var(--font-display); font-weight: 600; font-size: 13px; color: var(--ink); }
+  .af-binhint__all { margin-left: auto; padding: 0; border: none; background: transparent; font: inherit; font-weight: 700; color: var(--accent); cursor: pointer; }
+  .af-binhint__all:hover { text-decoration: underline; }
   .af-acc { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 22px; }
   .af-acc .sgw-group { grid-column: 1 / -1; padding: 0; border-top: none; }
   .af-acc .sgw-group .sgw-label { padding: 7px 0 5px; }

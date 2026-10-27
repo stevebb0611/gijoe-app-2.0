@@ -488,13 +488,20 @@ function binPullAvail(a, bp, ownedOf, binQty) {
   return Math.min(binQty(a[2]), a[1] - own);
 }
 
-function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove, onSwapToBin,
+// binPull (optional) — { avail, onPull, pulled, onUndo }: avail > 0 shows an
+// inline "pull from bin (N) ›" link under the name (see binPullAvail);
+// pulled/onUndo is Add Figure's held-until-Finalize state, shown as a
+// "N from bin · undo" note instead (the modal pulls immediately, so never
+// passes it).
+function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove, onSwapToBin, binPull,
                     dmgChecked, dmgOnSet, dmgNotes, dmgOnSetNotes, dmgUnitNotes, dmgOnSetUnitNotes, dmgExtra }) {
   const { cells, cols, rows, own } = boxCells(name, req, checked, onSet, false);
   const done = own >= req;
   const hasDmg = dmgChecked != null;
   const dmgCount = hasDmg ? dmgChecked.reduce((s, c) => s + (c ? 1 : 0), 0) : 0;
-  const canDmg = hasDmg && own > 0;
+  // dmgChecked can be shorter than own — Add Figure excludes units held as
+  // Parts Bin pulls (they keep the bin's own damage state) — so gate on it
+  const canDmg = hasDmg && own > 0 && dmgChecked.length > 0;
   // moveTargets is the "TO No." options (needs 2+ owned copies); onSwapToBin
   // needs neither — a single-copy figure can still swap a unit to the bin —
   // so the ⇄ column shows whenever either affordance applies, and both live
@@ -516,6 +523,17 @@ function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove, o
     <div className={"acc" + (rows === 2 ? " is-stack" : "") + (done ? " is-done" : "") + (hasDmg ? " has-dmg" : "") + (canMoveCol ? " has-move" : "")}>
       <span className="acc__namewrap">
         {tag != null && <span className="acc__tag">{tag}</span>}{color && <AccSwatch color={color} />}<span className="acc__name">{name}</span>
+        {binPull && (binPull.avail > 0 || binPull.pulled > 0) && (
+          <span className="acc__bin">
+            {binPull.pulled > 0 && (
+              <span className="acc__bin-held">{binPull.pulled} from bin · <button type="button" className="acc__bin-undo" onClick={binPull.onUndo}>undo</button></span>
+            )}
+            {binPull.avail > 0 && (
+              <button type="button" className="acc__bin-pull" title={"Move a loose " + name + " from the Parts Bin onto this copy"}
+                      onClick={binPull.onPull}>pull from bin ({binPull.avail}) ›</button>
+            )}
+          </span>
+        )}
       </span>
       <div className="acc__boxes" style={{ gridTemplateColumns: "repeat(" + cols + ", 22px)" }}>{cells}</div>
       <span className="acc__count">{own}/{req}</span>
@@ -770,6 +788,13 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
     : null;
   const moveUnit = (name, destId, qty) => JoeStore.moveAcc(cur.id, destId, name, qty);
   const swapUnitToBin = (name) => JoeStore.swapAccessoryToBin(cur.id, name);
+  // Bin → this copy (pullPart: clean stock first, a damaged unit's note
+  // travels with it only if that's all the bin has). Keyed by accessory_id.
+  const binQtyById = new Map(JoeStore.binEntries().map(e => [e.id, e.qty]));
+  const binPullFor = (a) => ({
+    avail: binPullAvail(a, bp, (n) => (raw.acc && raw.acc[n]) || 0, (id) => binQtyById.get(id) || 0),
+    onPull: () => JoeStore.pullPart(a[2], cur.id, a[0]),
+  });
   const setMoc = (v) => JoeStore.updateInstance(cur.id, { moc: v });
   const setMaster = (v) => JoeStore.updateInstance(cur.id, { masterCollection: v });
   const setCard = (patch) => JoeStore.updateInstance(cur.id, { filecard: { ...filecard, ...patch } });
@@ -996,7 +1021,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                                               onSet={(n) => setUnit(a[0], n)}
                                               {...dmgPropsFor(a[0])}
                                               moveTargets={moveTargetsFor(a)} onMove={(destId, qty) => moveUnit(a[0], destId, qty)}
-                                              onSwapToBin={() => swapUnitToBin(a[0])} />
+                                              onSwapToBin={() => swapUnitToBin(a[0])} binPull={binPullFor(a)} />
                                    )}
                                    renderOption={(a, o) => (
                                      <AccItem key={a[0]} name={o && o.short ? JoeData.groupLabel([a]) : JoeData.optLabel(a[0])} req={a[1]} color={a[6]} tag={o && o.short ? null : a[5]}
@@ -1004,7 +1029,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                                               onSet={(n) => setUnit(a[0], n)}
                                               {...dmgPropsFor(a[0])}
                                               moveTargets={moveTargetsFor(a)} onMove={(destId, qty) => moveUnit(a[0], destId, qty)}
-                                              onSwapToBin={() => swapUnitToBin(a[0])} />
+                                              onSwapToBin={() => swapUnitToBin(a[0])} binPull={binPullFor(a)} />
                                    )} />
                   </div>
                 )}
@@ -1167,6 +1192,6 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
 export {
   INV_CAT, INV_ERAS, INV_CAT_BY_ID,
   fvm, figParts, figState, applyRebalance, swapSuggestions, applySwaps, yearParts, invTotals, invMasterTotals,
-  FactionTag, CompRing, CompBar, PhotoSlot, StockBar, AccItem, DmgPopover, boxLayout, MasterBadge,
+  FactionTag, CompRing, CompBar, PhotoSlot, StockBar, AccItem, DmgPopover, boxLayout, binPullAvail, MasterBadge,
   InvDetailModal,
 };

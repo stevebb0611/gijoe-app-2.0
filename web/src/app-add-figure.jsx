@@ -4,7 +4,7 @@
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
 import { DamageMap, GradeBadge, physicalGrade, paintGrade, dmEmpty } from './damage-map.jsx';
-import { AccItem } from './app-detail.jsx';
+import { AccItem, binPullAvail } from './app-detail.jsx';
 import { AccessoryList, orderedBlueprint } from './accessory-groups.jsx';
 import { VersionChip, VariantBadge, VehicleTag, EditionTag, SetTag } from './fig-identity.jsx';
 import { formatYear, SPECIAL_RELEASE_YEAR } from './fig-identity.js';
@@ -47,6 +47,9 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const [loc, setLoc] = React.useState("");
   const [notes, setNotes] = React.useState("");
   const [owned, setOwnedAcc] = React.useState(() => presetAcc || {});   // accName -> units owned
+  // accName -> how many of owned[accName] are Parts Bin pulls, held until
+  // commit() (cancelling the wizard never touches the bin). Always <= owned.
+  const [pulled, setPulled] = React.useState({});
   const [moc, setMoc] = React.useState(false);       // Mint on Card (sealed) — counts 100% complete
   const [filecard, setFilecard] = React.useState({ onFile: false, fileCardId: null, color: '', grade: null });
   const [coo, setCoo] = React.useState(''); // optional — country of origin, only offered when fig.coo has entries
@@ -74,7 +77,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   React.useEffect(() => {
     if (!fig) return;
     setSelVar(isSingle(fig) ? '' : (presetVariant && fig.id === presetCatalogId ? presetVariant : fig.variants[0].letter));
-    setOwnedAcc(presetAcc && fig.id === presetCatalogId ? presetAcc : {});
+    setOwnedAcc(presetAcc && fig.id === presetCatalogId ? presetAcc : {}); setPulled({});
     setMoc(false); setFilecard({ onFile: false, fileCardId: null, color: '', grade: null }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male')); setCoo(''); setAccDamage({}); setAccDamageNotes({});
     setSetId(presetSetId && fig.id === presetCatalogId ? presetSetId : null);
   }, [selId]);
@@ -121,7 +124,41 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   // boxCells (app-detail.jsx) already hands onSet the new owned COUNT, not a
   // box index — same contract as the Detail modal's setUnit. Treating it as an
   // index here stored req+1 for every checked accessory.
-  const setUnit = (n, units) => setOwnedAcc(o => ({ ...o, [n]: units }));
+  const setUnit = (n, units) => {
+    setOwnedAcc(o => ({ ...o, [n]: units }));
+    setPulled(p => (p[n] || 0) > units ? { ...p, [n]: units } : p); // unchecking eats pulled units first
+  };
+
+  // Parts Bin pulls (PARTS_BIN.md "A") — offered per row via binPullAvail,
+  // the same rule as the Detail modal, against this wizard's unsaved `owned`.
+  // Bin stock already held by this wizard is subtracted so the same loose
+  // unit can't be offered twice. Applied in commit() via JoeStore.addInstance.
+  const binQtyById = new Map(JoeStore.binEntries().map(e => [e.id, e.qty]));
+  const idOf = new Map(blueprint.map(r => [r[0], r[2]]));
+  const heldById = new Map();
+  Object.entries(pulled).forEach(([n, k]) => { const id = idOf.get(n); if (id != null && k > 0) heldById.set(id, (heldById.get(id) || 0) + k); });
+  const binAvail = (a) => binPullAvail(a, blueprint, (n) => owned[n] || 0, (id) => (binQtyById.get(id) || 0) - (heldById.get(id) || 0));
+  const pullFromBin = (n, k = 1) => {
+    setOwnedAcc(o => ({ ...o, [n]: (o[n] || 0) + k }));
+    setPulled(p => ({ ...p, [n]: (p[n] || 0) + k }));
+  };
+  const undoPull = (n) => {
+    const k = pulled[n] || 0;
+    setOwnedAcc(o => ({ ...o, [n]: Math.max(0, (o[n] || 0) - k) }));
+    setPulled(p => ({ ...p, [n]: 0 }));
+  };
+  const binPullFor = (a) => ({ avail: binAvail(a), onPull: () => pullFromBin(a[0]), pulled: pulled[a[0]] || 0, onUndo: () => undoPull(a[0]) });
+  // banner list — every row with something waiting in the bin right now
+  const binOffers = blueprint.map(a => ({ a, avail: binAvail(a) })).filter(o => o.avail > 0);
+  // a group_id pick-one slot only takes its first offered option — pulling
+  // every option would fill the slot twice over
+  const pullAll = () => {
+    const slots = new Set();
+    binOffers.forEach(({ a, avail }) => {
+      if (a[3] != null) { if (slots.has(a[3])) return; slots.add(a[3]); }
+      pullFromBin(a[0], avail);
+    });
+  };
   // Damage marking is local wizard state here (accDamage/accDamageNotes), not
   // yet persisted — the instance doesn't exist until commit() writes it.
   // accDamageNotes mirrors Parts Bin's AddPartModal (parts-bin.jsx's
@@ -129,11 +166,14 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   // with accDamage[n], grown/truncated as the damaged count changes so a note
   // never outlives the unit it was written for. No swap-for-clean extra —
   // there's nothing to swap into on a copy that doesn't exist yet.
+  // Only this copy's own units are markable — units pulled from the bin keep
+  // whatever damage state (and notes) the bin already has on them, which
+  // pullPart carries over at commit.
   const dmgPropsFor = (n) => {
     const damaged = accDamage[n] || 0;
     const notesArr = accDamageNotes[n] || [];
     return {
-      dmgChecked: Array.from({ length: owned[n] || 0 }, (_, k) => k < damaged),
+      dmgChecked: Array.from({ length: Math.max(0, (owned[n] || 0) - (pulled[n] || 0)) }, (_, k) => k < damaged),
       dmgOnSet: (k) => {
         setAccDamage(d => ({ ...d, [n]: k }));
         setAccDamageNotes(dn => {
@@ -165,11 +205,23 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   const commit = () => {
     if (!fig) return;
     const accFull = {}; blueprint.forEach(([n, qr]) => accFull[n] = qr);
+    // Held bin pulls aren't written as plain owned units — the copy is created
+    // without them and addInstance() runs each through pullPart, so the bin
+    // actually decrements and a damaged loose unit brings its note along.
+    // Damage marked here only ever covers the copy's own (non-pulled) units.
+    const ownAcc = {}, ownDamage = {}, ownDamageNotes = {}, pulls = [];
+    Object.entries(owned).forEach(([n, u]) => {
+      const p = idOf.has(n) ? Math.min(pulled[n] || 0, u) : 0;
+      ownAcc[n] = u - p;
+      if (accDamage[n]) ownDamage[n] = Math.min(accDamage[n], u - p);
+      if (accDamageNotes[n]) ownDamageNotes[n] = accDamageNotes[n].slice(0, ownDamage[n] || 0);
+      if (p > 0) pulls.push({ accessoryId: idOf.get(n), count: p });
+    });
     JoeStore.addInstance({
       catalogId: fig.id, variant: variantKey, moc,
-      acc: moc ? accFull : { ...owned },
-      accDamage: moc ? {} : { ...accDamage },
-      accDamageNotes: moc ? {} : { ...accDamageNotes },
+      acc: moc ? accFull : ownAcc,
+      accDamage: moc ? {} : ownDamage,
+      accDamageNotes: moc ? {} : ownDamageNotes,
       phys: moc ? null : (ungraded ? null : phys.grade),
       paint: moc ? null : (ungraded ? null : paint.grade),
       marks: moc ? null : dmg,
@@ -177,13 +229,13 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
       filecard: filecard.onFile ? { onFile: true, fileCardId: filecard.fileCardId, color: filecard.color, grade: filecard.grade } : { onFile: false, fileCardId: null, color: '', grade: null },
       coo: coo || '',
       setId,
-    });
+    }, moc ? [] : pulls);
     setDone(true);
   };
 
   const resetAll = () => {
     setDone(false); setSelId(null); setQuery(""); setSelVar(null); setLoc(""); setNotes("");
-    setOwnedAcc({}); setMoc(false); setFilecard({ onFile: false, fileCardId: null, color: '', grade: null }); setDmg(dmEmpty('male')); setAccDamage({}); setAccDamageNotes({}); setYearF(""); setSetId(null); goto(0);
+    setOwnedAcc({}); setPulled({}); setMoc(false); setFilecard({ onFile: false, fileCardId: null, color: '', grade: null }); setDmg(dmEmpty('male')); setAccDamage({}); setAccDamageNotes({}); setYearF(""); setSetId(null); goto(0);
   };
 
   return (
@@ -290,6 +342,15 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                 ) : (
                   <React.Fragment>
                     <p className="af-seclab"><b>Accessories</b> · {fullDone}/{bpReq} complete{blueprint.length ? "" : " — no blueprint on file for this figure"}</p>
+                    {binOffers.length > 0 && (
+                      <div className="af-binhint">
+                        <span className="af-binhint__lab">IN YOUR PARTS BIN</span>
+                        <span className="af-binhint__list">
+                          {binOffers.map(({ a, avail }) => <span key={a[0]}>{a[0]}{avail > 1 ? " ×" + avail : ""}</span>)}
+                        </span>
+                        <button type="button" className="af-binhint__all" onClick={pullAll}>pull {binOffers.length > 1 ? "all" : "it"} ›</button>
+                      </div>
+                    )}
                     {blueprint.length > 0 && (
                       <div className="af-acc">
                         <AccessoryList ordered={ordered}
@@ -297,13 +358,13 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                                          <AccItem key={key} name={a[0]} req={a[1]} color={a[6]}
                                                   checked={Array.from({ length: a[1] }, (_, k) => k < (owned[a[0]] || 0))}
                                                   onSet={(n) => setUnit(a[0], n)}
-                                                  {...dmgPropsFor(a[0])} />
+                                                  {...dmgPropsFor(a[0])} binPull={binPullFor(a)} />
                                        )}
                                        renderOption={(a, o) => (
                                          <AccItem key={a[0]} name={o && o.short ? JoeData.groupLabel([a]) : JoeData.optLabel(a[0])} req={a[1]} color={a[6]} tag={o && o.short ? null : a[5]}
                                                   checked={Array.from({ length: a[1] }, (_, k) => k < (owned[a[0]] || 0))}
                                                   onSet={(n) => setUnit(a[0], n)}
-                                                  {...dmgPropsFor(a[0])} />
+                                                  {...dmgPropsFor(a[0])} binPull={binPullFor(a)} />
                                        )} />
                       </div>
                     )}
