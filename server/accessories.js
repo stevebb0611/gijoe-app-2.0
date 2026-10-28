@@ -69,6 +69,12 @@ export function buildAccessoryCatalog() {
     const soloRow = !shared ? (rowsByAccessory.get(r.id) || [])[0] : null;
     const homeFigureGroup = soloRow ? (soloRow.code_name || '').toUpperCase() : null;
     const homeFigureNames = shared ? nameYearLabels(rowsByAccessory.get(r.id) || []) : null;
+    // Bare-name twin of homeFigureNames, in the same format as homeFigureGroup,
+    // so the Parts Bin can point a figure's group header at shared parts that
+    // fit it (the "also in Shared" line — PARTS_BIN.md, 2026-10-28).
+    const homeFigureGroups = shared
+      ? [...new Set((rowsByAccessory.get(r.id) || []).map(x => (x.code_name || '').toUpperCase()))].sort()
+      : null;
     return {
       id: r.id,
       code: r.accessory_code,
@@ -84,6 +90,7 @@ export function buildAccessoryCatalog() {
         ? homeFigureGroup + (soloRow.year ? ' (' + formatYear(soloRow.year) + ')' : '')
         : null,
       homeFigureNames,
+      homeFigureGroups,
     };
   });
 }

@@ -103,7 +103,7 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
   const dmgBtnRef = React.useRef(null);
   const home = entry.shared ? fitsLabel(entry.homeFigureNames, entry.figureCount) : (entry.homeFigureName || "—");
   return (
-    <div className={"pb-row" + (ev.needed ? " is-needed" : "")}>
+    <div id={"pb-part-" + entry.id} className={"pb-row" + (ev.needed ? " is-needed" : "")}>
       <div className="pb-qty">
         <span className="pb-qty__n">×{entry.qty}</span>
         {entry.damaged > 0 && <span className="pb-qty__dmg" title={entry.damaged + " of these units are damaged"}>{entry.damaged} damaged</span>}
@@ -393,7 +393,7 @@ function RebalanceModal({ figs, onClose }) {
 }
 
 // ============================================================ group section
-function GroupSection({ sec, sep, collapsed, toggle, NEEDS, openId, setOpenId }) {
+function GroupSection({ sec, sep, collapsed, toggle, NEEDS, openId, setOpenId, jumpToShared }) {
   const t = sec.rows.reduce((o, { e, ev }) => { o.pieces += e.qty; o.fills += ev.fillable; return o; }, { pieces: 0, fills: 0 });
   return (
     <section className={"grp" + (sep ? " grp--sep" : "")}>
@@ -408,6 +408,17 @@ function GroupSection({ sec, sep, collapsed, toggle, NEEDS, openId, setOpenId })
       {!collapsed && (
         <div className="grp__body">
           {sec.rows.map(({ e }) => <PartRow key={e.id} entry={e} NEEDS={NEEDS} openId={openId} setOpenId={setOpenId} />)}
+          {sec.alsoShared && sec.alsoShared.length > 0 && (
+            <div className="grp__also">
+              also in Shared ↓{" "}
+              {sec.alsoShared.map(({ e }, i) => (
+                <React.Fragment key={e.id}>
+                  {i > 0 && " · "}
+                  <button type="button" className="grp__also-link" onClick={() => jumpToShared(e.id)}>{e.accessory}</button>
+                </React.Fragment>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </section>
@@ -455,7 +466,15 @@ function buildSections(items, mode) {
     keys.sort((a, b) => order ? order.indexOf(a) - order.indexOf(b) : String(a).localeCompare(String(b)));
   }
   const rowSort = mode === 'home' ? byFigureThenNeed : byNeed;
-  return keys.map(k => ({ key: k, label: labelOf(k), rows: map.get(k).sort(rowSort), sep: mode === 'home' && k === 'Shared' }));
+  // A part shared only between a few characters (often just one character's
+  // reissues — Barbecue's Tank Bracket Frame spans '85/'89) still lands in
+  // Shared, so its figure's header looked like it was missing. Point each
+  // figure group at those parts; capped at FITS_CAP characters so a battle
+  // stand (fits 92) doesn't echo under every figure.
+  const alsoSharedOf = (k) => mode !== 'home' || k === 'Shared' || !map.has('Shared') ? null
+    : map.get('Shared').filter(({ e }) => e.homeFigureGroups && e.homeFigureGroups.length <= FITS_CAP && e.homeFigureGroups.includes(k))
+        .sort((a, b) => a.e.accessory.localeCompare(b.e.accessory));
+  return keys.map(k => ({ key: k, label: labelOf(k), rows: map.get(k).sort(rowSort), sep: mode === 'home' && k === 'Shared', alsoShared: alsoSharedOf(k) }));
 }
 
 // ============================================================ app
@@ -551,7 +570,7 @@ function PartsBin({ onNavigate }) {
   // bin entries decorated with real accessory metadata
   const bin = store.bin.map(e => {
     const meta = JoeData.ACC_BY_ID.get(e.id) || {};
-    return { ...e, categoryId: meta.categoryId != null ? meta.categoryId : null, categoryLabel: meta.categoryLabel || null, color: meta.color || null, shared: !!meta.shared, figureCount: meta.figureCount || null, homeFigureGroup: meta.homeFigureGroup || null, homeFigureName: meta.homeFigureName || null, homeFigureNames: meta.homeFigureNames || null };
+    return { ...e, categoryId: meta.categoryId != null ? meta.categoryId : null, categoryLabel: meta.categoryLabel || null, color: meta.color || null, shared: !!meta.shared, figureCount: meta.figureCount || null, homeFigureGroup: meta.homeFigureGroup || null, homeFigureName: meta.homeFigureName || null, homeFigureNames: meta.homeFigureNames || null, homeFigureGroups: meta.homeFigureGroups || null };
   });
   const NEEDS = React.useMemo(buildNeeds, [store]);
   const suggestions = buildSuggestions(bin, NEEDS);
@@ -590,6 +609,14 @@ function PartsBin({ onNavigate }) {
 
   const setChip = (k) => setFilter(cur => cur === k ? 'all' : k);
   const toggle = (k) => setCollapsed(s => { const n = new Set(s); n.has(k) ? n.delete(k) : n.add(k); return n; });
+  // "also in Shared" link — expand Shared if collapsed, then scroll once it renders.
+  const jumpToShared = (id) => {
+    setCollapsed(s => { if (!s.has('Shared')) return s; const n = new Set(s); n.delete('Shared'); return n; });
+    requestAnimationFrame(() => {
+      const el = document.getElementById('pb-part-' + id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  };
 
   const q = normalizeSearch(query);
   const items = bin
@@ -738,7 +765,7 @@ function PartsBin({ onNavigate }) {
                 ? <div className="pbp-empty">No parts match.</div>
                 : sections.map((sec, i) => (
                     <GroupSection key={sec.key} sec={sec} sep={i > 0 && sec.sep} collapsed={collapsed.has(sec.key)} toggle={toggle}
-                      NEEDS={NEEDS} openId={openId} setOpenId={setOpenId} />
+                      NEEDS={NEEDS} openId={openId} setOpenId={setOpenId} jumpToShared={jumpToShared} />
                   ))}
             </section>
             )}

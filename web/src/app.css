@@ -610,7 +610,7 @@
   /* bin → copy pull (PARTS_BIN.md "A") — its own line under the name, same
      accent text-link voice as .acc-swap / .acc__movepop-bin */
   .acc__bin { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-top: -3px;
-    font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .3px; }
+    font-family: var(--font-display); font-size: 12px; font-weight: 500; letter-spacing: .2px; }
   .acc__bin-pull, .acc__bin-undo { padding: 0; border: none; background: transparent; font: inherit; letter-spacing: inherit; color: var(--accent); cursor: pointer; }
   .acc__bin-pull:hover, .acc__bin-undo:hover { text-decoration: underline; }
   .acc__bin-held { color: var(--ok); }
@@ -654,7 +654,7 @@
   .acc__movepop-step:disabled { opacity: .35; cursor: default; }
   .acc__movepop-opt:hover { border-color: var(--accent); color: var(--accent); }
   .acc__movepop-bin { display: block; width: 100%; padding-top: 6px; border: none; border-top: 1px dashed var(--line-soft);
-    background: transparent; font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .3px; text-align: right;
+    background: transparent; font-family: var(--font-display); font-size: 12px; font-weight: 500; letter-spacing: .2px; text-align: right;
     color: var(--accent); cursor: pointer; }
   .acc__movepop-bin:hover { text-decoration: underline; }
 
@@ -693,7 +693,7 @@
   .acc__dmgpop-unit { display: flex; flex-direction: column; gap: 3px; }
   .acc__dmgpop-unit .pb-dmgnotes { min-height: 34px; }
   .acc-swap { display: block; width: 100%; padding: 0; border: none; background: transparent;
-    font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .3px; text-align: left;
+    font-family: var(--font-display); font-size: 12px; font-weight: 500; letter-spacing: .2px; text-align: left;
     color: var(--accent); cursor: pointer; }
   .acc-swap:hover:not(:disabled) { text-decoration: underline; }
   .acc-swap:disabled { color: var(--ink-soft); cursor: default; }
@@ -1181,6 +1181,9 @@
   .pb-need { font-family: var(--font-mono); font-weight: 700; font-size: 11px; color: var(--ok); background: var(--paper); border: 1.5px solid var(--ok); padding: 4px 9px; cursor: pointer; }
   .pb-need:hover { background: var(--ok); color: #fff; }
   .pb-none { font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); font-style: italic; }
+  .grp__also { font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); padding: 2px 0 0 4px; }
+  .grp__also-link { font-family: var(--font-display); font-weight: 500; font-size: 13px; text-transform: lowercase; color: var(--ink); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+  .grp__also-link:hover { color: var(--ok); }
 
   .pb-needs { margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 8px; display: flex; flex-direction: column; gap: 5px; }
   .pb-needs__row { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; border: 1.5px solid var(--line); background: var(--paper); padding: 6px 10px; }

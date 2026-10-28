@@ -108,6 +108,32 @@ A separate loose-parts concept from the Parts Bin (which is accessories-only, ke
 
 **Still undecided:** whether this becomes its own spec doc alongside `PARTS_BIN.md`/`INSTANCE_MODEL.md` or stays a parked idea until scoped; whether a body part needs its own catalog/identity concept (parallel to `accessory_id`) or reuses/extends the damage map's existing `bodyType` template + o-ring point model (`INSTANCE_MODEL.md`).
 
+### Q24. Selling-lot recommendations — 🔭 parked idea, owner likes the direction, not committed to build
+Recommend lots of surplus copies to sell (owner's example: lots of 10 or 15), driven by the Master Collection goal (`MASTER_COLLECTION.md`) — and strip anything the kept collection still needs off outgoing copies before they ship (owner's example: hoses).
+
+**Proposed approach (talked through 2026-10-27, not built):**
+1. **Keeper vs surplus per figure** — the first `master_target` copies are keepers, ranked by the existing instance order (manual pin first, then completeness — see migration 017 `pinned_no`); every copy beyond that is surplus. Raised per-variant targets (wanting multiple copies) shrink the surplus automatically, so targets need to be accurate before trusting a recommendation.
+2. **Pull-before-ship list** — walk each surplus copy's attached accessories; anything a keeper is still missing gets flagged to move first (e.g. "Lot 3: pull A1902 hose off Barbecue No.3 → Barbecue No.1"). Should reuse the shared completeness/group clustering (`shared/completeness.js`), not the raw `v_instance_missing_accessories` view, which ignores pick-one `group_id` slots.
+3. **Lot assembly** — group surplus copies into N-sized lots; candidate axes: year/wave, faction/sub-team, complete vs. parts-figure, condition (damage data already exists).
+4. **Damaged option (owner request 2026-10-27)** — a per-lot condition mode, chosen when building the lot:
+   - **Damaged only** — a "damaged lot": damaged surplus figures together with damaged accessories (both ones still attached to outgoing copies and loose damaged units in the Parts Bin).
+   - **Mixed** — clean and damaged figures and accessories in the same lot, the lot's condition makeup listed alongside it.
+
+   Condition data already exists to drive this: figure physical/paint grades from the damage map (`instances.phys`/`paint`, `marks`), damaged attached units (`instance_accessory_damage`, one row + note per unit), and damaged loose units (`bin_damage`, same). Per-unit damage notes should print on the lot's listing so the buyer-facing description matches what ships — the same notes already travel with units through `pullPart` / `swapAccessoryForClean` / `swapAccessoryToBin`, so they'll be accurate by the time a lot is built.
+
+**Snapshot at time of discussion (live DB, 2026-10-27):** 937 instances across 292 figures; Master Collection = 528 starred figures / 532 target units; ~641 surplus copies across 193 figures (upper bound against current targets); 236 figures still short of target. Hose shortfall on keepers is real — A1900 short 29 units (20 copies), A1901 short 19 (18), A1902 short 76 (56) — vs. only 8 / 7 / 31 units attached anywhere — so every hose on an outgoing copy likely stays.
+
+**Known gaps / still undecided:**
+- **No price/value data** — lots can't be value-balanced or optimized without at least rough values per figure.
+- **Form factor** — one-off generated report (suggested first step: one sample lot with keeper/surplus reasoning + pull list) vs. a "Selling Lots" screen alongside Parts Bin.
+- Lot size and preferred grouping axis — not chosen.
+- Whether sold copies get a disposition record or are just deleted (Master Collection deliberately has no disposition tracking — see `MASTER_COLLECTION.md`).
+- **Damaged option — undecided details:**
+  - **Damage threshold** — what makes a *figure* "damaged" for lot purposes: any damage mark, or below a grade cutoff (e.g. physical or paint grade under some level)? An accessory is simpler — it has a damage row or it doesn't.
+  - **Ungraded copies** — copies whose damage map was never filled in (no marks, not confirmed clean) aren't known to be clean *or* damaged; exclude them from both modes, or flag them as "condition unknown"?
+  - **Clean-for-damaged swap before shipping** — should a damaged lot first trade clean accessories on outgoing copies onto keepers that hold damaged units (same idea as `swapAccessoryForClean`, but copy → copy instead of bin → copy), so the damaged unit ships and the keeper gets the clean one? Fits naturally beside step 2's pull-before-ship list.
+  - **Loose damaged parts with no figure** — can a damaged lot include Parts Bin units alone (no figure attached), or are bin parts only ever added to lots that already contain figures?
+
 ### F4. Explanation/help text — ongoing effort
 Standing rule, not a one-time fix: strip in-app "explanation/help text" wherever it appears, across every screen. Keep checking against this when adding new UI.
 

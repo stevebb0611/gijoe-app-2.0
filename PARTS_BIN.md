@@ -59,6 +59,7 @@ A standalone page, peer to Inventory, in the same field-manual style:
   - **“no current need.”**
   - A green left-border = fills a gap.
   - Row actions: **＋ / －** quantity, and a **⚠** trigger that opens a small popover (anchored to that button, not a separate panel) for marking units damaged + a notes field — same inline mechanism as the ＋ Add a loose part flow's own per-accessory ⚠ (August 2026, see the Damage marking note above and `OPEN_QUESTIONS.md` F24).
+- **"also in Shared" pointer (GROUP BY FIGURE, 2026-10-28).** Any part with `figure_count > 1` sorts into the trailing **SHARED · FITS MULTIPLE FIGURES** group, including one shared only between versions of the same character (Barbecue's Tank Bracket Frame Backpack spans '85/'89). That made the figure's own header look like the part was missing from the bin. Each figure group now ends with a muted `also in Shared ↓ <part> · <part>` line listing the shared bin parts that fit that character. Clicking a part name expands Shared if needed and scrolls to the row. Parts stay in Shared, and the group's part/pc counts don't include them. Capped to parts fitting ≤ `FITS_CAP` (5) distinct characters so generic pieces like the battle stand (fits 92) don't echo under every figure. Data: `homeFigureGroups` (bare uppercase code names) from `server/accessories.js`.
 
 ### Reverse-lookup math (per entry)
 ```
