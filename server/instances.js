@@ -444,6 +444,9 @@ const instanceSplitsStmt = db.prepare('SELECT instance_id, accessory_id FROM ins
 const unitsOwnedStmt = db.prepare('SELECT units_owned FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?');
 const instanceDamageRowsStmt = db.prepare('SELECT id, notes FROM instance_accessory_damage WHERE instance_id = ? AND accessory_id = ? ORDER BY id');
 const unitsOf = (instanceId, accId) => { const r = unitsOwnedStmt.get(instanceId, accId); return r ? r.units_owned : 0; };
+// Zero means no row — don't leave units_owned = 0 rows behind (see the 2026-10-30 data audit).
+const deleteInstanceAccStmt = db.prepare('DELETE FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?');
+const setUnits = (instanceId, accId, n) => n > 0 ? upsertInstanceAcc.run(instanceId, accId, n) : deleteInstanceAccStmt.run(instanceId, accId);
 const onBlueprint = (figureId, accId) => blueprintIdNameMap(figureId).has(accId);
 
 export const splitInstanceAccessory = db.transaction((instanceId, parentId) => {
@@ -454,11 +457,11 @@ export const splitInstanceAccessory = db.transaction((instanceId, parentId) => {
   const sheets = unitsOf(instanceId, parentId);
   const dmg = instanceDamageRowsStmt.all(instanceId, parentId);
   for (const c of children) {
-    upsertInstanceAcc.run(instanceId, c, unitsOf(instanceId, c) + sheets);
+    setUnits(instanceId, c, unitsOf(instanceId, c) + sheets);
     for (const d of dmg) insertInstanceDamage.run(instanceId, c, d.notes);
   }
   for (const d of dmg) deleteInstanceDamageRow.run(d.id);
-  upsertInstanceAcc.run(instanceId, parentId, 0);
+  setUnits(instanceId, parentId, 0);
   db.prepare('INSERT INTO instance_accessory_splits (instance_id, accessory_id) VALUES (?, ?)').run(instanceId, parentId);
   return true;
 });
@@ -474,13 +477,14 @@ export const unsplitInstanceAccessory = db.transaction((instanceId, parentId) =>
   if (counts.some((n) => n !== counts[0])) return false;
   const dmgByChild = children.map((c) => instanceDamageRowsStmt.all(instanceId, c));
   const damagedSheets = Math.max(0, ...dmgByChild.map((r) => r.length));
+  // sheet row first — instance_accessory_damage references it
+  setUnits(instanceId, parentId, unitsOf(instanceId, parentId) + counts[0]);
   for (let k = 0; k < damagedSheets; k++) {
     const notes = [...new Set(dmgByChild.map((r) => r[k] && r[k].notes).filter(Boolean))].join('; ');
     insertInstanceDamage.run(instanceId, parentId, notes || null);
   }
   for (const rows of dmgByChild) for (const d of rows) deleteInstanceDamageRow.run(d.id);
-  for (const c of children) upsertInstanceAcc.run(instanceId, c, 0);
-  upsertInstanceAcc.run(instanceId, parentId, unitsOf(instanceId, parentId) + counts[0]);
+  for (const c of children) setUnits(instanceId, c, 0);
   db.prepare('DELETE FROM instance_accessory_splits WHERE instance_id = ? AND accessory_id = ?').run(instanceId, parentId);
   return true;
 });

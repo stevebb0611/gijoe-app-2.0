@@ -254,6 +254,37 @@ in `st._bp` (now `rebalanceBp`) — if a variant-scoped name had leaked into tha
 write-back would upsert `0` for it on every copy the plan touches, silently wiping an
 already-owned variant-exclusive part on copies whose variant it doesn't even apply to.
 
+## Splittable accessories (`split_of`, per copy, migration 022, 2026-10-30)
+
+Some accessories are a single physical piece that a collector may have cut apart, e.g.
+Gung-Ho v2's **A0328 Rank and Stripes (decal)**, one sheet holding the stripes and the
+rank. The owner decided the split is **per copy**: one copy can hold an uncut sheet while
+another holds the cut pieces.
+
+- **Data:** each piece is its own accessory with `accessories.split_of` = the parent
+  (A1751 Stripes (decal), red/yellow; A1752 Rank (decal), blue/black/yellow). Pieces are
+  linked to the parent's figure(s) with the parent's `release_context` (`bonus` here).
+  `instance_accessory_splits(instance_id, accessory_id)` records which copies have split
+  which parent.
+- **Display:** `bpForVariant(bp, variant, splits)` (`shared/completeness.js`, blueprint
+  tuple index 8 = `splitOf`) shows the pieces only on copies that split the parent, and
+  the parent only on copies that didn't. Catalog views and a new copy in Add Figure
+  pass no splits, so they always show the sheet.
+- **Actions:**
+  - **split ›** on the sheet row turns each owned sheet into one of every piece. A
+    damaged sheet's note follows onto each piece.
+  - **unsplit** sits on the first piece row and is offered only while all pieces are
+    held in the same count. It is an undo for a mis-click.
+  - **split ›** on a Parts Bin sheet row cuts one loose sheet into its pieces.
+  - Server: `splitInstanceAccessory` / `unsplitInstanceAccessory` / `splitBinPart`
+    (`server/instances.js`).
+- **Completeness:** unaffected while the sheet is a bonus item, since bonus rows never
+  count. Split rows sit out of ⚖ rebalance (like `variant_id` rows above), and ⇄ move
+  only offers copies with the same split state.
+- **Parts Bin:** bonus accessories aren't in `/api/accessories` (retail-only query), so
+  a loose sheet or piece shows without a home figure. This was already true of all bonus
+  parts, not just split ones.
+
 ## Figures (chronological by year of release, then by catalog id)
 
 ### 1982 — Cobra (v1, figure catalog id 3 — source F-code F007)

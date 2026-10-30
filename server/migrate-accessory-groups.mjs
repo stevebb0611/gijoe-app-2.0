@@ -190,6 +190,21 @@ const GROUPS = [
   { extGroupId: null, fcode: 'F611', figure: 'Payload', accessories: ['A1700', 'A1701'] }, // Missile (x2) gray/orange
   { extGroupId: null, fcode: 'F611', figure: 'Payload', accessories: ['A1807', 'A1812'] }, // Action Figure Battle Stand gray/orange
   { extGroupId: null, fcode: 'F611', figure: 'Payload', accessories: ['A1856', 'A1861'] }, // Accessory Tree gray/orange (bonus)
+  // Action Soldier v1 (F585): same whole-set pattern, brown/black (match_key
+  // BR/BK). Backpack + Missile Launcher shared and always required; each
+  // color has TWO Side Bunker Walls, paired #1↔#1 and #2↔#2 by catalog order.
+  // Owner-specified 2026-10-30.
+  { extGroupId: null, fcode: 'F585', figure: 'Action Soldier', accessories: ['A1574', 'A1585'] }, // Pistol brown/black
+  { extGroupId: null, fcode: 'F585', figure: 'Action Soldier', accessories: ['A1575', 'A1586'] }, // Rifle brown/black
+  { extGroupId: null, fcode: 'F585', figure: 'Action Soldier', accessories: ['A1576', 'A1587'] }, // Missile brown/black
+  { extGroupId: null, fcode: 'F585', figure: 'Action Soldier', accessories: ['A1577', 'A1588'] }, // Front Bunker Wall brown/black
+  { extGroupId: null, fcode: 'F585', figure: 'Action Soldier', accessories: ['A1578', 'A1589'] }, // Side Bunker Wall #1 brown/black
+  { extGroupId: null, fcode: 'F585', figure: 'Action Soldier', accessories: ['A1579', 'A1590'] }, // Side Bunker Wall #2 brown/black
+  { extGroupId: null, fcode: 'F585', figure: 'Action Soldier', accessories: ['A1580', 'A1591'] }, // Gun Post Mount brown/black
+  { extGroupId: null, fcode: 'F585', figure: 'Action Soldier', accessories: ['A1581', 'A1592'] }, // Sandbags brown/black
+  { extGroupId: null, fcode: 'F585', figure: 'Action Soldier', accessories: ['A1582', 'A1593'] }, // Figure Stand brown/black
+  { extGroupId: null, fcode: 'F585', figure: 'Action Soldier', accessories: ['A1583', 'A1594'] }, // Accessory Tree "Bunker One Piece" brown/black (bonus)
+  { extGroupId: null, fcode: 'F585', figure: 'Action Soldier', accessories: ['A1584', 'A1595'] }, // Accessory Tree "Bunker Two Pieces" brown/black (bonus)
 ];
 
 // Same label rule as the locked reference (subgroup-wire-v2.jsx groupLabel):

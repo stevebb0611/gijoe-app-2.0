@@ -356,3 +356,64 @@ doc.
 - **Status:** ✅ `series_id` corrected in the root CSV + live DB, verified via `/api/catalog`
   (`year: 9999` → renders "Special Release" per `web/src/fig-identity.js`). No owned
   `instances` existed on any of the three rows, so no recovery step was needed.
+
+### 1987–1989 — 2026-10-30 convention sweep: Gung-Ho v2, Falcon v1, Outback v1, Skystriker v1, Python Officer v1, Python Tele-Viper v1
+
+- **Mechanism:** release-edition split, the same pattern as Flint/Roadblock/Snow Serpent
+  above. Run via `server/split-release-edition.mjs` (six new `SPLITS` entries).
+- **The owner's distinction, which framed the sweep:** "CONVENTION accessories are different
+  than CONVENTION figures." A retail figure that a convention re-released with different
+  gear gets a separate convention-edition row (`convention_kind = 'accessories'`, quiet
+  CONV. ACCESSORIES badge). A figure with no US retail release (e.g. Undercover Scarlett)
+  stays a single CONVENTION row.
+- **Bug:** the seed collision folded each 1992 Convention 700-block row's gear into the
+  retail row. Gung-Ho v2, Falcon v1, Outback v1 and Skystriker v1 were also tagged
+  `release_context = 'convention'` as a whole, so the retail figure showed a bold
+  CONVENTION badge. The two Pythons were tagged retail but carried the convention gear.
+- **Splits** (retail row kept, owned copies stay on it; new convention row in Special Release):
+  - **Gung-Ho v2 (Dress Blues):** retail F203 (id 142) keeps the Non-Com Dress Sabre and the
+    Rank and Stripes decal (bonus, splittable). New convention row F702 (id 529) gets
+    Kris (wavy) and Sword (barbed).
+  - **Falcon v1:** retail F199 (id 139). New convention row F700 (id 530) gets the Rifle
+    and Flare Gun, the same gear as Flint's convention edition.
+  - **Outback v1:** retail F213 (id 152). New convention row F703 (id 531) gets the Rifle,
+    the Machine Gun and the green Flashlight A1746. A1746 is the owner's replacement for
+    the CSV's black A0463.
+  - **Skystriker v1 (Tiger Force):** retail F272 (id 202). New convention row F712 (id 532,
+    "Thunder") gets the Pistol and Rifle. Both releases have the A/B map-grid variants
+    (F712/F713 in the CSV), so `copyVariants` gives the new row its own A/B.
+  - **Python Officer v1:** retail F316 (id 240). New convention row F704 (id 533) gets
+    the Pistol and Rifle.
+  - **Python Tele-Viper v1:** retail F317 (id 241). New convention row F705 (id 534) gets
+    the Pistol and Knife, plus the long hose A1902, which is copied (`keepOnRetail`)
+    because both releases include it.
+- **Tool extensions:** `newConventionKind`, `copyVariants` and `keepOnRetail`.
+- **Owned copies:** no copy had any convention gear checked off, so all copies stay on the
+  retail rows. Total: Gung-Ho 4, Falcon 6, Outback 4, Skystriker 1, Python Officer 1,
+  Tele-Viper 2.
+- **Round 2 (owner answers, same day):**
+  - **Zarana v1:** variants A/B/C are all retail, so the CSV's "1992 Convention" tag on
+    F184 (variant C) is wrong. Retail F182 (id 127) keeps its gear; owned C copies stay
+    put. New CONV. ACCESSORIES row F716 (id 535) gets the white Submachine Gun and the
+    Sword (barbed).
+  - **Python Trooper v1:** the owner confirmed a convention release with the white AK-47
+    (A0610). The source has no 700-block row, so it got new code **F725** (id 536,
+    CONV. ACCESSORIES). Retail F318 (id 242) keeps the black AK-47.
+  - **Heavy Metal v1 / "Rampage":** retail F129 (id 81, 1985 Mauler driver) keeps the
+    Microphone and Submachine Gun. The 1992 Convention "Rampage" (F706, id 537) is a
+    **convention figure** (owner), so `convention_kind` stays NULL and it shows the bold
+    CONVENTION badge. Its gear is Snake Eyes v3's Uzi and Dee-Jay's Laser Rifle. The
+    "Rampage" alt name moved off the retail row (`retailAltName`).
+  - **Rumbler v1 / "Footloose":** retail F219 (id 158, 1987) keeps the Helmet and Submachine
+    Gun. The 1992 Convention "Footloose" Rumbler (F721, id 538) is a **convention figure**
+    with Recoil's Rifle and Pistol. The alt name moved the same way.
+  - **Shortfuse (id 359) and Fighter Pilot v1 (id 496):** convention-only figures (owner).
+    No split was needed, only a miscategorization fix like Snake Eyes/Tripwire/Scarlett
+    above: `series_id` 12→15 and 14→15. The CSV's F708 and F723 are their 700-block
+    duplicates with identical gear.
+  - Pre-run backup: `backups/gijoe_collection_20261030140815.db`.
+- **End state:** no retail row carries `convention`-tagged gear, and every convention row is
+  in Special Release (series 15).
+- **Source:** owner instruction, 2026-10-30. Pre-run backup:
+  `backups/gijoe_collection_20261030135247.db`.
+- **Status:** ✅ live DB. The root CSVs are not updated (deferred resync).
