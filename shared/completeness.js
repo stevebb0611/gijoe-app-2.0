@@ -3,7 +3,7 @@
 // functions over plain arrays/objects only — no DOM/XHR/Node dependencies — so
 // the same file imports cleanly from both a Vite bundle and a Node ESM module.
 //
-// Blueprint items are [name, quantity_required, accessory_id, group_id, release_context, match_key, color, variantLetter].
+// Blueprint items are [name, quantity_required, accessory_id, group_id, release_context, match_key, color, variantLetter, splitOf].
 // Three axes restructure the flat list (see PARTS_BIN.md "Accessory completeness model" + ACCESSORY_GROUPS.md):
 //   group_id    — interchangeable variants ("own any one" satisfies the slot)
 //   match_key   — when 2+ group_id slots have members sharing a match_key, those
@@ -20,8 +20,17 @@
 // production variant — rows with no variantLetter apply everywhere. Call this
 // before bpReq/instOwn/instPct/instWhole/missingList/clusterBlueprint/orderedBlueprint
 // whenever bp is being used for a specific owned (or about-to-be-added) copy.
-export function bpForVariant(bp, variantLetter) {
-  return (bp || []).filter((a) => !a[7] || a[7] === variantLetter);
+//
+// splitOf (index 8, migration 022) marks a piece of a splittable parent (e.g.
+// Gung-Ho v2's Rank and Stripes decal sheet). Splitting is per copy, so it is
+// handled here too. Pass the copy's `splits` (parent accessory ids). Pieces
+// show only on copies that split their parent; the parent shows only on copies
+// that didn't. Without a copy (catalog views, a new copy in Add Figure) nothing
+// is split.
+export function bpForVariant(bp, variantLetter, splits) {
+  const split = new Set(splits || []);
+  return (bp || []).filter((a) => (!a[7] || a[7] === variantLetter)
+    && (a[8] ? split.has(a[8]) : !split.has(a[2])));
 }
 export function clusterBlueprint(bp) {
   const retail = (bp || []).filter((a) => !a[4] || a[4] === 'retail');

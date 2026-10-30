@@ -103,7 +103,7 @@ function figureSummary(catalogId) {
     // A copy's own production variant only owes the accessories scoped to it
     // (e.g. Blocker v1 B's Visor doesn't apply to a v1 A copy) — see
     // bpForVariant (shared/completeness.js) and ACCESSORY_GROUPS.md "variant_id".
-    const bpv = bpForVariant(bp, i.variant);
+    const bpv = bpForVariant(bp, i.variant, i.splits);
     const req = bpReq(bpv);
     // The file card does NOT gate completeness — it's a separate notation.
     // (A sealed/MOC copy carries its card on the backer, so it reads as on file.)
@@ -116,6 +116,7 @@ function figureSummary(catalogId) {
       pct: moc ? 100 : instPct(bpv, acc), whole: moc ? true : instWhole(bpv, acc),
       missing: moc ? [] : missingList(bpv, acc),
       pinnedNo: i.pinnedNo ?? null,
+      splits: i.splits || [],
     };
   });
   // Best copy first, EXCEPT a copy the owner has manually pinned (the "Move to
@@ -314,6 +315,20 @@ export const JoeStore = {
     },
     removePart(id) {
       api('DELETE', '/api/parts-bin/' + id);
+      refresh(); emit();
+    },
+    // splittable accessories (migration 022): cut a copy's sheet into its
+    // pieces, undo that, or cut one loose sheet in the bin
+    splitAcc(id, accessoryId) {
+      api('POST', '/api/instances/' + id + '/accessory/split', { accessoryId });
+      refresh(); emit();
+    },
+    unsplitAcc(id, accessoryId) {
+      api('POST', '/api/instances/' + id + '/accessory/unsplit', { accessoryId });
+      refresh(); emit();
+    },
+    splitPart(accessoryId) {
+      api('POST', '/api/parts-bin/' + accessoryId + '/split');
       refresh(); emit();
     },
     // pull one loose unit onto an owned instance's accessory checklist (two-way A)

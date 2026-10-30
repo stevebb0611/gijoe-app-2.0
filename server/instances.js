@@ -57,7 +57,7 @@ const instanceDamageStmt = db.prepare(`
   JOIN instances i ON i.id = iad.instance_id
 `);
 
-function shapeInstance(row, accByInstance, damageByInstance, damageUnitsByInstance) {
+function shapeInstance(row, accByInstance, damageByInstance, damageUnitsByInstance, splitsByInstance) {
   return {
     id: row.id,
     catalogId: row.catalogId,
@@ -76,6 +76,8 @@ function shapeInstance(row, accByInstance, damageByInstance, damageUnitsByInstan
     masterCollection: !!row.masterCollection,
     setId: row.setId || null,
     pinnedNo: row.pinnedNo ?? null,
+    // parent accessory ids this copy has split into pieces (migration 022)
+    splits: splitsByInstance.get(row.id) || [],
     addedAt: row.created_at,
   };
 }
@@ -124,8 +126,13 @@ export function getState() {
     if (!binDamageByAcc.has(r.accessory_id)) binDamageByAcc.set(r.accessory_id, []);
     binDamageByAcc.get(r.accessory_id).push({ id: r.id, notes: r.notes || '' });
   }
+  const splitsByInstance = new Map();
+  for (const r of instanceSplitsStmt.all()) {
+    if (!splitsByInstance.has(r.instance_id)) splitsByInstance.set(r.instance_id, []);
+    splitsByInstance.get(r.instance_id).push(r.accessory_id);
+  }
   return {
-    instances: instanceRowsStmt.all().map((r) => shapeInstance(r, accByInstance, damageByInstance, damageUnitsByInstance)),
+    instances: instanceRowsStmt.all().map((r) => shapeInstance(r, accByInstance, damageByInstance, damageUnitsByInstance, splitsByInstance)),
     bin: binRowsStmt.all().map((r) => shapeBinEntry(r, binDamageByAcc)),
   };
 }
@@ -420,6 +427,82 @@ export const pullPart = db.transaction((accessoryId, instanceId) => {
   }
 
   adjustPart(accessoryId, -1);
+  return true;
+});
+
+// ---------------------------------------------------------------------------
+// Splittable accessories (migration 022) — a parent sheet (e.g. A0328 "Rank
+// and Stripes (decal)") whose piece rows carry accessories.split_of. Split is
+// per copy: instance_accessory_splits records which copies show the pieces
+// instead of the sheet (completeness.js bpForVariant does the hiding).
+// Splitting a copy that owns the sheet cuts it: each owned sheet becomes one
+// of every piece, and a damaged sheet's note follows onto each piece.
+// ---------------------------------------------------------------------------
+const splitChildrenStmt = db.prepare('SELECT id FROM accessories WHERE split_of = ? ORDER BY id');
+const isSplitStmt = db.prepare('SELECT 1 FROM instance_accessory_splits WHERE instance_id = ? AND accessory_id = ?');
+const instanceSplitsStmt = db.prepare('SELECT instance_id, accessory_id FROM instance_accessory_splits');
+const unitsOwnedStmt = db.prepare('SELECT units_owned FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?');
+const instanceDamageRowsStmt = db.prepare('SELECT id, notes FROM instance_accessory_damage WHERE instance_id = ? AND accessory_id = ? ORDER BY id');
+const unitsOf = (instanceId, accId) => { const r = unitsOwnedStmt.get(instanceId, accId); return r ? r.units_owned : 0; };
+const onBlueprint = (figureId, accId) => blueprintIdNameMap(figureId).has(accId);
+
+export const splitInstanceAccessory = db.transaction((instanceId, parentId) => {
+  const row = getInstanceFigure.get(instanceId);
+  if (!row || !onBlueprint(row.figure_id, parentId)) return false;
+  const children = splitChildrenStmt.all(parentId).map((c) => c.id);
+  if (!children.length || isSplitStmt.get(instanceId, parentId)) return false;
+  const sheets = unitsOf(instanceId, parentId);
+  const dmg = instanceDamageRowsStmt.all(instanceId, parentId);
+  for (const c of children) {
+    upsertInstanceAcc.run(instanceId, c, unitsOf(instanceId, c) + sheets);
+    for (const d of dmg) insertInstanceDamage.run(instanceId, c, d.notes);
+  }
+  for (const d of dmg) deleteInstanceDamageRow.run(d.id);
+  upsertInstanceAcc.run(instanceId, parentId, 0);
+  db.prepare('INSERT INTO instance_accessory_splits (instance_id, accessory_id) VALUES (?, ?)').run(instanceId, parentId);
+  return true;
+});
+
+// Undo for a mis-click: only when every piece is held in the same count (none,
+// or a matched set per sheet) — a lone leftover piece can't become a sheet.
+// A damaged piece makes the rebuilt sheet damaged, notes combined.
+export const unsplitInstanceAccessory = db.transaction((instanceId, parentId) => {
+  const row = getInstanceFigure.get(instanceId);
+  if (!row || !isSplitStmt.get(instanceId, parentId)) return false;
+  const children = splitChildrenStmt.all(parentId).map((c) => c.id);
+  const counts = children.map((c) => unitsOf(instanceId, c));
+  if (counts.some((n) => n !== counts[0])) return false;
+  const dmgByChild = children.map((c) => instanceDamageRowsStmt.all(instanceId, c));
+  const damagedSheets = Math.max(0, ...dmgByChild.map((r) => r.length));
+  for (let k = 0; k < damagedSheets; k++) {
+    const notes = [...new Set(dmgByChild.map((r) => r[k] && r[k].notes).filter(Boolean))].join('; ');
+    insertInstanceDamage.run(instanceId, parentId, notes || null);
+  }
+  for (const rows of dmgByChild) for (const d of rows) deleteInstanceDamageRow.run(d.id);
+  for (const c of children) upsertInstanceAcc.run(instanceId, c, 0);
+  upsertInstanceAcc.run(instanceId, parentId, unitsOf(instanceId, parentId) + counts[0]);
+  db.prepare('DELETE FROM instance_accessory_splits WHERE instance_id = ? AND accessory_id = ?').run(instanceId, parentId);
+  return true;
+});
+
+// Parts Bin: cut one loose sheet into its pieces. Clean stock first; if only
+// damaged sheets are left, that unit's note follows onto each piece.
+export const splitBinPart = db.transaction((parentId) => {
+  const row = getBinRow.get(parentId);
+  const children = splitChildrenStmt.all(parentId).map((c) => c.id);
+  if (!row || row.quantity_owned <= 0 || !children.length) return false;
+  const damaged = countBinDamage.get(parentId).n >= row.quantity_owned;
+  let note = null;
+  if (damaged) {
+    const leaving = oldestBinDamageRow.get(parentId);
+    note = leaving.notes;
+    deleteBinDamageRow.run(leaving.id);
+  }
+  adjustPart(parentId, -1);
+  for (const c of children) {
+    upsertBin.run(c, 1, null);
+    if (damaged) insertBinDamage.run(c, note);
+  }
   return true;
 });
 

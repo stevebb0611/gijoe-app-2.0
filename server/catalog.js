@@ -51,7 +51,7 @@ const figureSetsStmt = db.prepare(`
 
 const blueprintStmt = db.prepare(`
   SELECT fa.figure_id, a.name, a.color, fa.quantity_required, a.id AS accessory_id,
-         fa.group_id, fa.release_context, fa.match_key, vl.letter AS variant_letter
+         fa.group_id, fa.release_context, fa.match_key, vl.letter AS variant_letter, a.split_of
   FROM figure_accessories fa
   JOIN accessories a ON a.id = fa.accessory_id
   LEFT JOIN variant_lookup vl ON vl.id = fa.variant_id
@@ -97,7 +97,7 @@ export function buildCatalog() {
     // above but dropped here before this fix — the frontend's AccSwatch
     // (web/src/acc-colors.jsx) had nothing to render off of until now.
     blueprintByFigure.set(figureId, disambiguateNames(rows)
-      .map((b) => [b.name, b.quantity_required, b.accessory_id, b.group_id, b.release_context, b.match_key, b.color, b.variant_letter]));
+      .map((b) => [b.name, b.quantity_required, b.accessory_id, b.group_id, b.release_context, b.match_key, b.color, b.variant_letter, b.split_of]));
   }
 
   return figuresStmt.all().map((f) => ({

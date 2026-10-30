@@ -13,6 +13,15 @@ import { VersionChip } from './fig-identity.jsx';
 import { figIdentityText, formatYear } from './fig-identity.js';
 import { normalizeSearch } from './search-util.js';
 
+// Splittable sheets (migration 022): parent accessory_id -> its piece names,
+// read off the catalog blueprints (tuple index 8 = splitOf).
+const SPLIT_PIECES = new Map();
+JoeData.CAT.forEach(cf => (cf.blueprint || []).forEach(r => {
+  if (!r[8]) return;
+  if (!SPLIT_PIECES.has(r[8])) SPLIT_PIECES.set(r[8], new Set());
+  SPLIT_PIECES.get(r[8]).add(r[0]);
+}));
+
 const figLabel = (cf) => cf ? figIdentityText({ name: cf.name, version: cf.ver ? 'v' + cf.ver : '' }) : "—";
 
 // "Shared by N · fits X / Y / Z / ..." — name list capped so hyper-common
@@ -47,7 +56,7 @@ function buildNeeds() {
       if (c.moc) return; // sealed — accessories aren't tracked individually, never a pull target
       // A copy only "needs" what its own production variant actually calls
       // for — see bpForVariant + ACCESSORY_GROUPS.md "variant_id".
-      const bpv = JoeData.bpForVariant(bp, c.variant);
+      const bpv = JoeData.bpForVariant(bp, c.variant, c.splits);
       bpv.forEach(([name, q, accessoryId]) => {
         const have = (c.acc && c.acc[name]) || 0;
         if (have < q) {
@@ -111,6 +120,10 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
       <div className="pb-main">
         <div className="pb-name">
           <AccSwatch color={entry.color} />{entry.accessory}
+          {SPLIT_PIECES.has(entry.id) && (
+            <button type="button" className="acc__bin-pull pb-split" title={"Cut one " + entry.accessory + " into " + [...SPLIT_PIECES.get(entry.id)].join(" + ")}
+                    onClick={() => JoeStore.splitPart(entry.id)}>split ›</button>
+          )}
         </div>
         <div className="pb-fits">figure: <b>{home}</b></div>
         <div className="pb-status">
@@ -530,7 +543,7 @@ function buildHoseBalance() {
     const rows = new Map(); // hose code -> row for this figure
     sum.copies.forEach(c => {
       if (c.moc) return;
-      JoeData.bpForVariant(bp, c.variant).forEach(([name, q, accessoryId]) => {
+      JoeData.bpForVariant(bp, c.variant, c.splits).forEach(([name, q, accessoryId]) => {
         const meta = JoeData.ACC_BY_ID.get(accessoryId);
         const len = meta && byCode.get(meta.code); if (!len) return;
         if (!rows.has(len.code)) rows.set(len.code, { id, year: cf.year, fig: figLabel(cf), req: q, copies: 0, withN: 0, withoutN: 0, have: 0, need: 0 });

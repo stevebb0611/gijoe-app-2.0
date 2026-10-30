@@ -176,12 +176,15 @@ function figState(fig) {
   // would. Simplest correct fix: variant-scoped rows sit out of rebalance
   // entirely (per-copy completeness above still requires/shows them correctly
   // via bpForVariant — this only affects the ⚖ suggestion engine).
-  const rebalanceBp = bp.filter((row) => !row[7]);
+  // Split sheets and their pieces (migration 022) sit out too — which of the
+  // two a copy shows depends on that copy's own split state.
+  const splitParents = new Set(bp.map((row) => row[8]).filter(Boolean));
+  const rebalanceBp = bp.filter((row) => !row[7] && !row[8] && !splitParents.has(row[2]));
   const copies = sum ? sum.copies : [];
   const owned = copies.length;
   const reqPer = bpReq(bp);
   const instances = copies.map(c => {
-    const bpv = bpForVariant(bp, c.variant);
+    const bpv = bpForVariant(bp, c.variant, c.splits);
     return {
       id: c.id, no: c.no, own: c.own, req: c.req, pct: c.pct, whole: c.whole, missing: c.missing, moc: !!c.moc,
       have: c.moc ? bpv.map(([, q]) => q) : bpv.map(([n, q]) => Math.min(c.acc[n] || 0, q)),
@@ -295,7 +298,7 @@ function buildSwaps() {
     const sum = JoeData.figureSummary(id); if (!sum) return;
     sum.copies.forEach(c => {
       if (c.moc) return; // sealed — no per-unit damage tracked, nothing to swap
-      const bpv = bpForVariant(bp, c.variant);
+      const bpv = bpForVariant(bp, c.variant, c.splits);
       bpv.forEach(([name, , accessoryId]) => {
         const damaged = (c.accDamage && c.accDamage[name]) || 0;
         if (damaged > 0) swaps.push({ instanceId: c.id, catalogId: id, no: c.no, accessory: name, accessoryId });
@@ -493,7 +496,7 @@ function binPullAvail(a, bp, ownedOf, binQty) {
 // pulled/onUndo is Add Figure's held-until-Finalize state, shown as a
 // "N from bin · undo" note instead (the modal pulls immediately, so never
 // passes it).
-function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove, onSwapToBin, binPull,
+function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove, onSwapToBin, binPull, split,
                     dmgChecked, dmgOnSet, dmgNotes, dmgOnSetNotes, dmgUnitNotes, dmgOnSetUnitNotes, dmgExtra }) {
   const { cells, cols, rows, own } = boxCells(name, req, checked, onSet, false);
   const done = own >= req;
@@ -532,6 +535,11 @@ function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove, o
               <button type="button" className="acc__bin-pull" title={"Move a loose " + name + " from the Parts Bin onto this copy"}
                       onClick={binPull.onPull}>pull from bin ({binPull.avail}) ›</button>
             )}
+          </span>
+        )}
+        {split && (
+          <span className="acc__bin">
+            <button type="button" className="acc__bin-pull" title={split.title} onClick={split.onClick}>{split.label}</button>
           </span>
         )}
       </span>
@@ -738,7 +746,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   // Scope the checklist to this copy's own production variant — a v1 A copy
   // shouldn't be asked (or able) to check off a v1 B-only accessory. See
   // bpForVariant (shared/completeness.js) + ACCESSORY_GROUPS.md "variant_id".
-  const rawBp = bpForVariant(fig.blueprint, cur ? cur.variant : null);
+  const rawBp = bpForVariant(fig.blueprint, cur ? cur.variant : null, cur ? cur.splits : null);
   // Retailer-exclusive accessories on a figure that belongs to a known set move
   // to being editable only inside that set's Special Release card (set-card.jsx)
   // — showing them here too was the "too congested" complaint (migration 016).
@@ -783,8 +791,10 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   // accessory — a copy already at req (e.g. 1/1) isn't a legal destination,
   // or moving a unit onto it would silently over-fill it (2/1) while the
   // source goes short. Mirrored server-side in moveInstanceAccessory.
+  // A piece can only move to a copy that has split that sheet; a sheet only to one that hasn't.
+  const splitMatches = (a, c) => a[8] ? (c.splits || []).includes(a[8]) : !(c.splits || []).includes(a[2]);
   const moveTargetsFor = (a) => displayCopies.length > 1
-    ? displayCopies.filter((c) => c.id !== cur.id && (!a[7] || a[7] === c.variant) && ((c.acc && c.acc[a[0]]) || 0) < a[1]).map((c) => ({ id: c.id, no: c.no }))
+    ? displayCopies.filter((c) => c.id !== cur.id && (!a[7] || a[7] === c.variant) && splitMatches(a, c) && ((c.acc && c.acc[a[0]]) || 0) < a[1]).map((c) => ({ id: c.id, no: c.no }))
     : null;
   const moveUnit = (name, destId, qty) => JoeStore.moveAcc(cur.id, destId, name, qty);
   const swapUnitToBin = (name) => JoeStore.swapAccessoryToBin(cur.id, name);
@@ -795,6 +805,22 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
     avail: binPullAvail(a, bp, (n) => (raw.acc && raw.acc[n]) || 0, (id) => binQtyById.get(id) || 0),
     onPull: () => JoeStore.pullPart(a[2], cur.id, a[0]),
   });
+  // Splittable sheets (migration 022): "split ›" on the sheet row cuts it into
+  // its pieces; "unsplit" sits on the first piece row and is offered only while
+  // every piece is held in the same count (a lone piece can't rebuild a sheet).
+  const piecesOf = (pid) => fig.blueprint.filter((r) => r[8] === pid);
+  const splitFor = (a) => {
+    if (!cur || moc) return null;
+    if (piecesOf(a[2]).length) {
+      return { label: 'split ›', title: 'Cut ' + a[0] + ' into ' + piecesOf(a[2]).map((r) => r[0]).join(' + '), onClick: () => JoeStore.splitAcc(cur.id, a[2]) };
+    }
+    if (!a[8]) return null;
+    const pieces = piecesOf(a[8]);
+    if (pieces[0][2] !== a[2]) return null;
+    const counts = pieces.map((r) => (raw.acc && raw.acc[r[0]]) || 0);
+    if (counts.some((n) => n !== counts[0])) return null;
+    return { label: 'unsplit', title: 'Put these pieces back as one sheet', onClick: () => JoeStore.unsplitAcc(cur.id, a[8]) };
+  };
   const setMoc = (v) => JoeStore.updateInstance(cur.id, { moc: v });
   const setMaster = (v) => JoeStore.updateInstance(cur.id, { masterCollection: v });
   const setCard = (patch) => JoeStore.updateInstance(cur.id, { filecard: { ...filecard, ...patch } });
@@ -1021,7 +1047,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                                               onSet={(n) => setUnit(a[0], n)}
                                               {...dmgPropsFor(a[0])}
                                               moveTargets={moveTargetsFor(a)} onMove={(destId, qty) => moveUnit(a[0], destId, qty)}
-                                              onSwapToBin={() => swapUnitToBin(a[0])} binPull={binPullFor(a)} />
+                                              onSwapToBin={() => swapUnitToBin(a[0])} binPull={binPullFor(a)} split={splitFor(a)} />
                                    )}
                                    renderOption={(a, o) => (
                                      <AccItem key={a[0]} name={o && o.short ? JoeData.groupLabel([a]) : JoeData.optLabel(a[0])} req={a[1]} color={a[6]} tag={o && o.short ? null : a[5]}
@@ -1029,7 +1055,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                                               onSet={(n) => setUnit(a[0], n)}
                                               {...dmgPropsFor(a[0])}
                                               moveTargets={moveTargetsFor(a)} onMove={(destId, qty) => moveUnit(a[0], destId, qty)}
-                                              onSwapToBin={() => swapUnitToBin(a[0])} binPull={binPullFor(a)} />
+                                              onSwapToBin={() => swapUnitToBin(a[0])} binPull={binPullFor(a)} split={splitFor(a)} />
                                    )} />
                   </div>
                 )}

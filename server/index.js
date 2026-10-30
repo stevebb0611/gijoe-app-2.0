@@ -112,6 +112,19 @@ app.post('/api/instances/:id/accessory/swap-to-bin', (req, res) => {
   res.json({ ok: true });
 });
 
+// Splittable accessories (migration 022) — body { accessoryId } is the parent sheet.
+app.post('/api/instances/:id/accessory/split', (req, res) => {
+  const ok = store.splitInstanceAccessory(+req.params.id, +req.body.accessoryId);
+  if (!ok) return res.status(400).json({ error: 'not a splittable accessory on this copy, or already split' });
+  res.json({ ok: true });
+});
+
+app.post('/api/instances/:id/accessory/unsplit', (req, res) => {
+  const ok = store.unsplitInstanceAccessory(+req.params.id, +req.body.accessoryId);
+  if (!ok) return res.status(400).json({ error: 'not split, or pieces held in uneven counts' });
+  res.json({ ok: true });
+});
+
 app.delete('/api/instances/:id', (req, res) => {
   store.removeInstance(+req.params.id);
   res.status(204).end();
@@ -157,6 +170,12 @@ app.delete('/api/parts-bin/:accessoryId', (req, res) => {
 app.post('/api/parts-bin/:accessoryId/pull', (req, res) => {
   const ok = store.pullPart(+req.params.accessoryId, req.body.instanceId);
   if (!ok) return res.status(400).json({ error: 'nothing to pull' });
+  res.json({ ok: true });
+});
+
+app.post('/api/parts-bin/:accessoryId/split', (req, res) => {
+  const ok = store.splitBinPart(+req.params.accessoryId);
+  if (!ok) return res.status(400).json({ error: 'nothing to split' });
   res.json({ ok: true });
 });
 
