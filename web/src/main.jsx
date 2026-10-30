@@ -58,7 +58,7 @@ function App() {
   return (
     <React.Fragment>
       {page === 'parts-bin'
-        ? <PartsBin onNavigate={setPage} />
+        ? <PartsBin onNavigate={setPage} onAddInstance={addInstance} />
         : page === 'master-collection'
         ? <MasterCollectionView onNavigate={setPage} onAddInstance={addInstance} />
         : <InventoryView onAddFigure={openAdd} onAddInstance={addInstance} onNavigate={setPage} />}

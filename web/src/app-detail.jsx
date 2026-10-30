@@ -522,7 +522,7 @@ function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove, o
   return (
     <div className={"acc" + (rows === 2 ? " is-stack" : "") + (done ? " is-done" : "") + (hasDmg ? " has-dmg" : "") + (canMoveCol ? " has-move" : "")}>
       <span className="acc__namewrap">
-        {tag != null && <span className="acc__tag">{tag}</span>}{color && <AccSwatch color={color} />}<span className="acc__name">{name}</span>
+        {tag != null && <span className="acc__tag">{tag}</span>}<AccSwatch color={color} /><span className="acc__name">{name}</span>
         {binPull && (binPull.avail > 0 || binPull.pulled > 0) && (
           <span className="acc__bin">
             {binPull.pulled > 0 && (

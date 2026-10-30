@@ -15,6 +15,7 @@
     --ring-track: rgba(33,31,26,.16);
     --card: #e9e2d2;
     --gold: #b8952e;
+    --partial: #d9771a; /* rebalance Best Partial — the only orange indicator; kept apart from --gold (MC) and --dreadnok (faction) */
     --font-display: 'Oswald', sans-serif;
     --font-mono: 'Space Mono', monospace;
     --shadow: 3px 3px 0 var(--ink);
@@ -1048,26 +1049,35 @@
   .pbp .chip.is-on { border-color: var(--ink); color: #fff; background: var(--ink); }
 
   /* rebalance panel */
-  .rebal-intro { padding: 12px 18px; font-size: 11px; color: var(--ink-soft); line-height: 1.55; border-bottom: 1px dashed var(--line); }
+  .rebal-intro { padding: 12px 18px; font-size: 11px; color: var(--ink-soft); line-height: 1.55; border-bottom: 1px dashed var(--line); display: flex; flex-direction: column; gap: 3px; }
   .rebal-intro b { color: var(--ink); }
+  .rebal-intro__hd { font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: 1.5px; color: var(--ink); margin-bottom: 3px; }
+  .rebal-intro__row { display: flex; align-items: center; gap: 8px; }
+  .rebal-key { flex: none; width: 4px; height: 13px; }
+  .rebal-key--whole { background: var(--ok); }
+  .rebal-key--partial { background: var(--partial); }
+  .rebal-key--swap { background: var(--damage); }
   .rebal-list { padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; overflow: auto; }
   .rebal-fig { border: 1.5px solid var(--ink); background: var(--card); box-shadow: var(--shadow); padding: 11px 13px; }
   .rebal-fig__hd { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
   .rebal-fig__name { font-family: var(--font-display); font-weight: 700; font-size: 16px; letter-spacing: .5px; }
   .rebal-fig__meta { font-family: var(--font-mono); font-size: 9px; letter-spacing: .5px; color: var(--ink-soft); }
-  .rebal-fig__goal { font-family: var(--font-mono); font-weight: 700; font-size: 10px; letter-spacing: .5px; color: var(--accent); margin-left: auto; }
-  .rebal-fig__goal.is-partial { color: var(--ink-soft); }
+  .rebal-fig__goal { font-family: var(--font-mono); font-weight: 700; font-size: 10px; letter-spacing: .5px; color: var(--ok); margin-left: auto; }
+  .rebal-fig__goal.is-partial { color: var(--partial); }
   .rebal-fig__goal.is-swap { color: var(--damage); }
-  .rebal-fig--partial { border-left: 4px solid var(--line); }
-  .rebal-fig--swap { border-left: 4px solid var(--damage); }
+  .rebal-fig { border-left: 4px solid var(--ok); }
+  .rebal-fig--partial { border-left-color: var(--partial); }
+  .rebal-fig--swap { border-left-color: var(--damage); }
   .rebal-fig__kind { font-family: var(--font-mono); font-weight: 700; font-size: 8px; letter-spacing: 1.5px; color: var(--ink-soft); margin-top: 4px; }
-  .rebal-fig--partial .rebal-fig__kind { color: var(--accent); }
+  .rebal-fig .rebal-fig__kind { color: var(--ok); }
+  .rebal-fig--partial .rebal-fig__kind { color: var(--partial); }
   .rebal-fig--swap .rebal-fig__kind { color: var(--damage); }
   .rebal-moves { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
   .rebal-move { font-family: var(--font-mono); font-size: 11px; color: var(--ink); padding-left: 15px; position: relative; }
   .rebal-move::before { content: "↳"; position: absolute; left: 0; color: var(--ink-soft); }
   .rebal-move b { font-weight: 700; }
-  .rebal-fig__act { margin-top: 10px; font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: 1px; background: var(--accent); color: #fff; border: none; padding: 7px 12px; cursor: pointer; }
+  .rebal-fig__act { margin-top: 10px; font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: 1px; background: var(--ok); color: #fff; border: none; padding: 7px 12px; cursor: pointer; }
+  .rebal-fig--partial .rebal-fig__act { background: var(--partial); }
   .rebal-fig--swap .rebal-fig__act { background: var(--damage); }
   .rebal-empty { padding: 40px; text-align: center; color: var(--ink-soft); font-family: var(--font-display); font-size: 16px; letter-spacing: 1px; }
 
@@ -1123,9 +1133,7 @@
   .ev__dir { font-family: var(--font-display); font-weight: 700; font-size: 22px; line-height: 1; text-align: center; }
   .ev--in .ev__dir { color: var(--ok); }
   .ev__main { min-width: 0; }
-  .ev__kind { font-family: var(--font-mono); font-weight: 700; font-size: 8px; letter-spacing: 1.5px; color: var(--ink-soft); }
-  .ev__line { font-family: var(--font-display); font-weight: 600; font-size: 15px; letter-spacing: .5px; margin-top: 1px; }
-  .ev__sub { font-size: 11px; color: var(--ink-soft); margin-top: 2px; }
+  .ev__line { font-family: var(--font-display); font-weight: 600; font-size: 15px; letter-spacing: .5px; }
   .ev__act { display: flex; flex-direction: column; gap: 5px; align-items: stretch; }
   .ev__btn { font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: 1px; padding: 8px 12px; cursor: pointer; white-space: nowrap; border: 1.5px solid var(--ink); }
   .ev__btn--go { background: var(--ink); color: var(--paper); border-color: var(--ink); }
@@ -1155,6 +1163,9 @@
   .grp__chev.is-closed { transform: rotate(-90deg); }
   .grp__title { font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: 1.5px; }
   .grp__meta { font-family: var(--font-mono); font-size: 10px; color: rgba(243,238,226,.6); margin-left: auto; }
+  .grp__years { color: rgba(243,238,226,.6); }
+  .grp__year { font: inherit; letter-spacing: inherit; color: var(--paper); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  .grp__year:hover { color: var(--ok); }
   .grp__meta em { font-style: normal; }
   .grp__meta em.is-fill { color: var(--ok); }
   .grp__body { display: flex; flex-direction: column; gap: 8px; padding: 8px 0 4px; }
@@ -1181,8 +1192,9 @@
   .pb-need { font-family: var(--font-mono); font-weight: 700; font-size: 11px; color: var(--ok); background: var(--paper); border: 1.5px solid var(--ok); padding: 4px 9px; cursor: pointer; }
   .pb-need:hover { background: var(--ok); color: #fff; }
   .pb-none { font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); font-style: italic; }
-  .grp__also { font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); padding: 2px 0 0 4px; }
-  .grp__also-link { font-family: var(--font-display); font-weight: 500; font-size: 13px; text-transform: lowercase; color: var(--ink); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+  /* Thin sibling of .pb-row (same card/border/shadow, ~1/4 scale), indented to start under the ×qty. */
+  .grp__also { align-self: flex-start; margin-left: 40px; font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); background: var(--card); border: 1px solid var(--ink); box-shadow: 1.5px 1.5px 0 var(--ink); padding: 4px 10px; }
+  .grp__also-link { font-family: var(--font-display); font-weight: 500; font-size: 13px; color: var(--ink); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
   .grp__also-link:hover { color: var(--ok); }
 
   .pb-needs { margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 8px; display: flex; flex-direction: column; gap: 5px; }

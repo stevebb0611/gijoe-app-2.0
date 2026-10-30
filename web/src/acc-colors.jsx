@@ -86,6 +86,13 @@ export function colorFor(raw) {
 
 // small swatch that takes a raw DB colour string
 export function AccSwatch({ color, size = 11, title }) {
+  // No color on file (decals, soft goods): an empty solid-outline square holds
+  // the slot so names stay aligned. Solid, not dashed — dashed means missing.
+  if (!color) {
+    return <span className="acc-sw" title={title || "no color"}
+      style={{ width: size, height: size, background: "transparent", border: "1px solid rgba(0,0,0,.32)",
+               borderRadius: 2, display: "inline-block", flex: "0 0 auto", boxSizing: "border-box" }}></span>;
+  }
   const r = colorFor(color);
   return <span className="acc-sw" title={title || color}
     style={{ width: size, height: size, background: r.css,

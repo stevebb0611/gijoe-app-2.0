@@ -7,7 +7,7 @@
 // against the real collection in the store.
 import React from 'react';
 import { JoeStore, JoeData } from './store.js';
-import { figState, applyRebalance, swapSuggestions, applySwaps, DmgPopover, CompRing } from './app-detail.jsx';
+import { figState, applyRebalance, swapSuggestions, applySwaps, DmgPopover, CompRing, InvDetailModal } from './app-detail.jsx';
 import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip } from './fig-identity.jsx';
 import { figIdentityText, formatYear } from './fig-identity.js';
@@ -110,7 +110,7 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
       </div>
       <div className="pb-main">
         <div className="pb-name">
-          {entry.color && <AccSwatch color={entry.color} />}{entry.accessory}
+          <AccSwatch color={entry.color} />{entry.accessory}
         </div>
         <div className="pb-fits">figure: <b>{home}</b></div>
         <div className="pb-status">
@@ -171,7 +171,7 @@ function PbAccOpt({ name, qreq, color, meta, item, dOpen, onToggleAcc, onBump, o
       <button type="button" className="pb-accopt__hit" onClick={onToggleAcc}>
         <span className="pb-accopt__radio"></span>
         <span className="pb-accopt__namewrap">
-          {color && <AccSwatch color={color} />}
+          <AccSwatch color={color} />
           <span className="pb-accopt__n">{name}{qreq > 1 ? " ×" + qreq : ""}</span>
         </span>
         <span className="pb-accopt__cat">{(meta && meta.categoryLabel) || "—"}</span>
@@ -350,7 +350,10 @@ function RebalanceModal({ figs, onClose }) {
           <button className="modal__x" onClick={onClose}>✕</button>
         </div>
         <div className="rebal-intro">
-          Three ways to tidy a figure's scattered parts. <b>Completes a copy</b> — you own enough to make a whole one, just spread across copies. <b>Best partial</b> — no full copy is possible yet, but consolidating gets your closest copy as complete as it can be. <b>Swap for clean</b> — a damaged unit you own could trade for a clean spare sitting in the Parts Bin.
+          <div className="rebal-intro__hd">ACCESSORY MOVEMENT TYPES</div>
+          <div className="rebal-intro__row"><i className="rebal-key rebal-key--whole" /><span><b>Completes a Copy</b>, move accessories to complete a whole figure</span></div>
+          <div className="rebal-intro__row"><i className="rebal-key rebal-key--partial" /><span><b>Best Partial</b>, move accessories to close completion gaps</span></div>
+          <div className="rebal-intro__row"><i className="rebal-key rebal-key--swap" /><span><b>Swap for Clean</b>, swap damaged for clean accessories within the Parts Bin</span></div>
         </div>
         {figs.length === 0
           ? <div className="rebal-empty">Nothing to rebalance.</div>
@@ -393,18 +396,32 @@ function RebalanceModal({ figs, onClose }) {
 }
 
 // ============================================================ group section
-function GroupSection({ sec, sep, collapsed, toggle, NEEDS, openId, setOpenId, jumpToShared }) {
+function GroupSection({ sec, sep, collapsed, toggle, NEEDS, openId, setOpenId, jumpToShared, openFigure }) {
   const t = sec.rows.reduce((o, { e, ev }) => { o.pieces += e.qty; o.fills += ev.fillable; return o; }, { pieces: 0, fills: 0 });
+  // The head is a div (not a button) so the year links inside it can be real buttons.
   return (
     <section className={"grp" + (sep ? " grp--sep" : "")}>
-      <button className="grp__head" onClick={() => toggle(sec.key)}>
+      <div className="grp__head" role="button" tabIndex={0} onClick={() => toggle(sec.key)}
+           onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggle(sec.key); } }}>
         <span className={"grp__chev" + (collapsed ? " is-closed" : "")}>▾</span>
-        <span className="grp__title">{sec.label}</span>
+        <span className="grp__title">{sec.label}
+          {sec.figs && sec.figs.length > 0 && (
+            <span className="grp__years"> (
+              {sec.figs.map((f, i) => (
+                <React.Fragment key={f.id}>
+                  {i > 0 && " / "}
+                  <button type="button" className="grp__year" title={f.owned ? "Open figure" : "Add figure"}
+                          onClick={(e) => { e.stopPropagation(); openFigure(f.id, f.owned); }}>{f.label}</button>
+                </React.Fragment>
+              ))}
+            )</span>
+          )}
+        </span>
         <span className="grp__meta">
           {sec.rows.length} part{sec.rows.length !== 1 ? "s" : ""} · {t.pieces} pc
           {t.fills > 0 ? <em className="is-fill"> · {t.fills} fill gaps</em> : null}
         </span>
-      </button>
+      </div>
       {!collapsed && (
         <div className="grp__body">
           {sec.rows.map(({ e }) => <PartRow key={e.id} entry={e} NEEDS={NEEDS} openId={openId} setOpenId={setOpenId} />)}
@@ -474,7 +491,21 @@ function buildSections(items, mode) {
   const alsoSharedOf = (k) => mode !== 'home' || k === 'Shared' || !map.has('Shared') ? null
     : map.get('Shared').filter(({ e }) => e.homeFigureGroups && e.homeFigureGroups.length <= FITS_CAP && e.homeFigureGroups.includes(k))
         .sort((a, b) => a.e.accessory.localeCompare(b.e.accessory));
-  return keys.map(k => ({ key: k, label: labelOf(k), rows: map.get(k).sort(rowSort), sep: mode === 'home' && k === 'Shared', alsoShared: alsoSharedOf(k) }));
+  // Figure-group header years — one per distinct home figure among the
+  // group's own (single-use) rows, e.g. SPIRIT (1984 / 1989). Each opens that
+  // figure's detail modal, or Add Figure if it isn't owned yet.
+  const figsOf = (k) => {
+    if (mode !== 'home' || k === 'Shared') return null;
+    const ids = [...new Set(map.get(k).map(({ e }) => e.homeFigureId).filter(Boolean))];
+    const figs = ids.map(id => {
+      const cf = JoeData.CAT_BY_ID.get(id);
+      return { id, year: cf ? cf.year : null, ver: cf ? cf.ver : null, owned: JoeData.ownedCount(id) > 0 };
+    }).sort((a, b) => (a.year || 0) - (b.year || 0) || (a.ver || 0) - (b.ver || 0));
+    // Two versions released the same year would read "1985 / 1985" — add the version to tell them apart.
+    const dupYear = (f) => figs.filter(g => g.year === f.year).length > 1;
+    return figs.map(f => ({ ...f, label: (f.year ? formatYear(f.year) : '?') + (dupYear(f) && f.ver ? ' v' + f.ver : '') }));
+  };
+  return keys.map(k => ({ key: k, label: labelOf(k), rows: map.get(k).sort(rowSort), sep: mode === 'home' && k === 'Shared', alsoShared: alsoSharedOf(k), figs: figsOf(k) }));
 }
 
 // ============================================================ app
@@ -555,7 +586,7 @@ function HoseBalance({ store }) {
   );
 }
 
-function PartsBin({ onNavigate }) {
+function PartsBin({ onNavigate, onAddInstance }) {
   const store = useStore();
   const [query, setQuery] = React.useState('');
   const [filter, setFilter] = React.useState('all');
@@ -564,13 +595,15 @@ function PartsBin({ onNavigate }) {
   const [collapsed, setCollapsed] = React.useState(() => new Set());
   const [addOpen, setAddOpen] = React.useState(false);
   const [rebalOpen, setRebalOpen] = React.useState(false);
+  const [figSel, setFigSel] = React.useState(null); // catalogId whose detail modal is open over the bin
+  const openFigure = (id, owned) => owned ? setFigSel(id) : onAddInstance(id, null);
   const [intakeOpen, setIntakeOpen] = React.useState(false); // Ready to Complete starts collapsed every visit
   const [intakeShowAll, setIntakeShowAll] = React.useState(false); // 8-line cap until "show all"
 
   // bin entries decorated with real accessory metadata
   const bin = store.bin.map(e => {
     const meta = JoeData.ACC_BY_ID.get(e.id) || {};
-    return { ...e, categoryId: meta.categoryId != null ? meta.categoryId : null, categoryLabel: meta.categoryLabel || null, color: meta.color || null, shared: !!meta.shared, figureCount: meta.figureCount || null, homeFigureGroup: meta.homeFigureGroup || null, homeFigureName: meta.homeFigureName || null, homeFigureNames: meta.homeFigureNames || null, homeFigureGroups: meta.homeFigureGroups || null };
+    return { ...e, categoryId: meta.categoryId != null ? meta.categoryId : null, categoryLabel: meta.categoryLabel || null, color: meta.color || null, shared: !!meta.shared, figureCount: meta.figureCount || null, homeFigureId: meta.homeFigureId || null, homeFigureGroup: meta.homeFigureGroup || null, homeFigureName: meta.homeFigureName || null, homeFigureNames: meta.homeFigureNames || null, homeFigureGroups: meta.homeFigureGroups || null };
   });
   const NEEDS = React.useMemo(buildNeeds, [store]);
   const suggestions = buildSuggestions(bin, NEEDS);
@@ -609,14 +642,19 @@ function PartsBin({ onNavigate }) {
 
   const setChip = (k) => setFilter(cur => cur === k ? 'all' : k);
   const toggle = (k) => setCollapsed(s => { const n = new Set(s); n.has(k) ? n.delete(k) : n.add(k); return n; });
-  // "also in Shared" link — expand Shared if collapsed, then scroll once it renders.
+  // "also in Shared" link — expand Shared if collapsed, then scroll once it
+  // has rendered (effect below), not in the click handler.
+  const [jumpId, setJumpId] = React.useState(null);
   const jumpToShared = (id) => {
     setCollapsed(s => { if (!s.has('Shared')) return s; const n = new Set(s); n.delete('Shared'); return n; });
-    requestAnimationFrame(() => {
-      const el = document.getElementById('pb-part-' + id);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    });
+    setJumpId(id);
   };
+  React.useEffect(() => {
+    if (jumpId == null) return;
+    const el = document.getElementById('pb-part-' + jumpId);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setJumpId(null);
+  }, [jumpId]);
 
   const q = normalizeSearch(query);
   const items = bin
@@ -736,9 +774,7 @@ function PartsBin({ onNavigate }) {
                     <div key={i} className="ev ev--in">
                       <div className="ev__dir">⇣</div>
                       <div className="ev__main">
-                        <div className="ev__kind">PULL · COMPLETES A GAP</div>
                         <div className="ev__line">{s.accessory} → {s.need.fig} · No. {s.need.no}</div>
-                        <div className="ev__sub">This copy is missing it and you hold a loose one.</div>
                       </div>
                       <div className="ev__act">
                         <button className="ev__btn ev__btn--go" onClick={() => JoeStore.pullPart(s.partId, s.need.instanceId, s.accessory)}>⇣ MOVE TO FIGURE</button>
@@ -765,7 +801,7 @@ function PartsBin({ onNavigate }) {
                 ? <div className="pbp-empty">No parts match.</div>
                 : sections.map((sec, i) => (
                     <GroupSection key={sec.key} sec={sec} sep={i > 0 && sec.sep} collapsed={collapsed.has(sec.key)} toggle={toggle}
-                      NEEDS={NEEDS} openId={openId} setOpenId={setOpenId} jumpToShared={jumpToShared} />
+                      NEEDS={NEEDS} openId={openId} setOpenId={setOpenId} jumpToShared={jumpToShared} openFigure={openFigure} />
                   ))}
             </section>
             )}
@@ -775,6 +811,7 @@ function PartsBin({ onNavigate }) {
 
       {addOpen && <AddPartModal onClose={() => setAddOpen(false)} />}
       {rebalOpen && <RebalanceModal figs={rebalFigs} onClose={() => setRebalOpen(false)} />}
+      {figSel != null && <InvDetailModal key={figSel} catalogId={figSel} onClose={() => setFigSel(null)} onAddInstance={onAddInstance} />}
     </div>
   );
 }
