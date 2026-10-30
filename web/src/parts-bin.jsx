@@ -274,11 +274,8 @@ function AddPartModal({ onClose }) {
       <div className="modal" onClick={e => e.stopPropagation()}>
         <div className="modal__top">
           <span className="mk mk--add">＋</span>
-          <div className="modal__title">ADD LOOSE PARTS<em>figure → its accessories · into bin</em></div>
+          <div className="modal__title">ADD LOOSE PARTS</div>
           <button className="modal__x" onClick={onClose}>✕</button>
-        </div>
-        <div className="modal__sub">
-          Loose parts are logged under the figure they belong to. Find the figure (any of the {JoeData.CAT.length} in the catalog — you don't have to own it yet), then tap each accessory you're stashing and set how many of each.
         </div>
 
         <div className="modal__list">
@@ -309,7 +306,7 @@ function AddPartModal({ onClose }) {
                 </div>
               </div>
               <div className="fld">
-                <label className="fld__lab">ACCESSORIES <span className="fld__opt">tap to add · set qty per line</span></label>
+                <label className="fld__lab">ACCESSORIES</label>
                 {bp.length === 0
                   ? <div className="fld__note">No accessories on file for this figure.</div>
                   : <div className="pb-acclist">
@@ -335,11 +332,9 @@ function AddPartModal({ onClose }) {
 
         <div className="modal__foot">
           <div className="modal__sum">
-            {!fig
-              ? <span>pick a figure, then its accessories</span>
-              : selNames.length
-                ? <span><b>{selNames.length}</b> part{selNames.length !== 1 ? "s" : ""} · {totalPieces} piece{totalPieces !== 1 ? "s" : ""} → {fig.name}</span>
-                : <span>tap the accessories you're stashing</span>}
+            {fig && selNames.length > 0 && (
+              <span><b>{selNames.length}</b> part{selNames.length !== 1 ? "s" : ""} · {totalPieces} piece{totalPieces !== 1 ? "s" : ""} → {fig.name}</span>
+            )}
           </div>
           <button className="modal__confirm" disabled={!canAdd} onClick={submit}>ADD TO BIN</button>
         </div>
@@ -359,7 +354,7 @@ function RebalanceModal({ figs, onClose }) {
       <div className="modal" onClick={e => e.stopPropagation()}>
         <div className="modal__top">
           <span className="mk" style={{ color: 'var(--accent)' }}>⚖</span>
-          <div className="modal__title">REBALANCE ACCESSORIES<em>complete a copy — or get your closest copy as far as it'll go</em></div>
+          <div className="modal__title">REBALANCE ACCESSORIES</div>
           <button className="modal__x" onClick={onClose}>✕</button>
         </div>
         <div className="rebal-intro">
@@ -388,7 +383,7 @@ function RebalanceModal({ figs, onClose }) {
                             : "+" + (r.st.optimalWhole - r.st.currentWhole) + " whole"}
                         </span>}
                   </div>
-                  <div className="rebal-fig__kind">{isSwap ? "SWAP FOR CLEAN · trade damaged units for bin spares" : partial ? "BEST PARTIAL · no full copy possible yet" : "COMPLETES A COPY"}</div>
+                  <div className="rebal-fig__kind">{isSwap ? "SWAP FOR CLEAN" : partial ? "BEST PARTIAL" : "COMPLETES A COPY"}</div>
                   <div className="rebal-moves">
                     {isSwap
                       ? mvs.slice(0, 6).map((m, i) => (
@@ -763,7 +758,6 @@ function PartsBin({ onNavigate, onAddInstance }) {
         {empty ? (
           <div className="pbp-empty pbp-empty--zero">
             <div className="pbp-empty__h">Your Parts Bin is empty</div>
-            <div className="pbp-empty__sub">Stash a loose accessory and it lands here — tagged to its figure, watching your collection for a copy it can complete.</div>
             <button className="inv-zero__btn pbp-empty__btn" onClick={() => setAddOpen(true)}><span>＋</span> ADD A LOOSE PART</button>
           </div>
         ) : (
@@ -777,11 +771,7 @@ function PartsBin({ onNavigate, onAddInstance }) {
                 </span>
                 <span className="intake__count">{suggestions.length ? suggestions.length + " ready to pull" : "nothing to pull"}</span>
               </button>
-              {intakeOpen && (suggestions.length === 0 ? (
-                <div className="intake__empty">
-                  No loose part currently fills a gap. When a bin part matches an owned copy that's missing it, a one-tap <b>move to figure</b> shows up here.
-                </div>
-              ) : (
+              {intakeOpen && (suggestions.length === 0 ? null : (
                 <div className="intake__group">
                   {(intakeShowAll ? suggestions : suggestions.slice(0, 8)).map((s, i) => (
                     <div key={i} className="ev ev--in">

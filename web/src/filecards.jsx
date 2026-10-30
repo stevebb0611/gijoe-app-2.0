@@ -55,7 +55,7 @@ export function FileCardTell({ fig, printing }) {
   const cards = filecardsFor(fig);
   if (cards.length === 0) return null;
   const sel = filecardById(fig, printing);
-  if (!sel) return <div className="fc-tellrow"><span>Pick a printing to see its details</span><span className="fc-cat">{cards.length} on record</span></div>;
+  if (!sel) return <div className="fc-tellrow"><span /><span className="fc-cat">{cards.length} on record</span></div>;
   const parts = [
     sel.card_back && sel.card_back + " card back",
     sel.logo_version && sel.logo_version + " logo",

@@ -1117,6 +1117,24 @@ another holds the cut pieces.
 - **Status:** ✅ group_id set in DB and verified via direct DB read (figure_id 318:
   A0953/A0954 both carry group_id 34), 2026-07-15. Not yet visually verified in-app.
 
+### 1991 — Zap (v2, figure catalog id 330 — source F-code F416)
+
+- **Mechanism:** `match_key` — a whole-set colorway pick, tags `GR` (gray) / `SV`
+  (silver).
+- **Matched slots (`accessory_groups.group_id` 65–69), gray / silver:** Helmet
+  A1011/A1012 · Backpack Gun A1015/A1016 · Double Barreled Rocket Launcher A1017/A1018 ·
+  Sonic Rocket Launcher A1019/A1020 · Muzzle attachment to Sonic Rocket Launcher
+  A1021/A1022.
+- **Unaffected (plain, independently required):** Sonic Backpack (A1013) and Battery
+  Cover (A1014), gray only and shared by both sets, plus the black Action Figure Battle
+  Stand (A1800, not part of either color set).
+- **Source:** owner-specified 2026-10-30 ("backpack and battery cover 100% required; gray
+  and silver accessories are grouped"). Including the Battle Stand as shared was my
+  inference: it's a single black row that isn't in either color set.
+- **Status:** ✅ group_id + match_key set, completeness unit-checked (shared + full silver
+  = complete; a missing Battery Cover or a mixed helmet = not complete), and visually
+  confirmed in Add Figure (gray | silver columns), 2026-10-30. No owned copies yet.
+
 ### 1993 — Rock 'N Roll (v4, figure catalog id 458 — source F-code F557)
 
 - **Mechanism:** `match_key` — a whole-set colorway pick. Tags `Y` (yellow) / `P`

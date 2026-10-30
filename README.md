@@ -45,7 +45,7 @@ The look is a **vintage field-manual / cardback** aesthetic — it intentionally
 - **Hard edges, offset shadows.** Cards and rows use 1.5–2.5px solid ink borders and a hard offset drop shadow (`3px 3px 0 ink`), never soft blurred shadows or rounded corners. Border-radius is effectively **0** everywhere.
 - **Three type roles:** a condensed display face (Oswald) for names/numbers, a monospace (Space Mono) for labels/metadata/data, and a hand face (Patrick Hand) loaded for optional flavor (minimal use in the final).
 - **Faction color-coding:** JOE = olive, COBRA = crimson. These are data-driven tags, toggleable.
-- **Restraint on color:** the only "status" colors are green (complete/owned-fully) and the single accent (incomplete actions, needs). Everything else is paper/ink.
+- **Restraint on color:** the status colors are green `--ok` (complete / Completes a Copy), orange `--partial` (Best Partial), dark red `--damage` (damage / Swap for Clean), gold `--gold` (Master Collection star), and the single user-selectable accent (incomplete actions, needs). Everything else is paper/ink. See the **Accent & indicator colors** panel under Design Tokens.
 - **Theming is a feature.** The prototype exposes a small theme panel (paper kraft/white, accent choice, faction colors on/off, a playful "hand-drawn wobble" that is **off by default**). Preserve this as a real theme config, not hard-coded values.
 
 ---
@@ -209,12 +209,23 @@ Exact values from the prototype CSS (`GI Joe Tracker - Inventory.html`). Expose 
 | `--line` | `rgba(33,31,26,.55)` | — | strong hairlines |
 | `--line-soft` | `rgba(33,31,26,.22)` | — | faint hatching/dividers |
 | `--accent` | `#b8402f` (default) | — | needs/actions; **user-selectable** |
-| `--ok` | `#5d7d4d` | — | complete / fully-owned |
+| `--ok` | `#5d7d4d` | — | complete / fully-owned; ⚖ Completes a Copy |
+| `--partial` | `#d9771a` | — | ⚖ Best Partial (the only orange indicator) |
+| `--damage` | `#8f2f24` | — | damage; ⚖ Swap for Clean |
+| `--gold` | `#b8952e` | — | Master Collection star |
 | `--olive` | `#5f6b39` | — | JOE faction |
 | `--crimson` | `#a23a2c` | — | COBRA faction |
+| `--oktober` | `oklch(0.5 0.085 245)` ≈ `#356890` | — | OKTOBER faction |
+| `--dreadnok` | `oklch(0.55 0.108 58)` ≈ `#a06029` | — | DREADNOK faction |
 | `--ring-track` | `rgba(33,31,26,.16)` | — | unfilled ring track |
 
-Accent options offered in the theme panel: `#b8402f` (red), `#6b6f39` (olive), `#c9772f` (amber), `#3f6f86` (steel blue). *(User's current preference: olive `#6b6f39`.)*
+Accent options offered in the theme panel (`web/src/main.jsx`): `#6b6f39` (olive, **default**), `#b8402f` (red; the `app.css` base value), `#c9772f` (amber), `#3f6f86` (steel blue).
+
+**Accent & indicator colors panel:**
+
+![Accent & indicator colors](assets/design/color-panel.png)
+
+Source: `assets/design/color-panel.html`. **Keep it current.** When a color token or Tweaks accent option is added or changed, update the `acc`/`ind` arrays in that file and re-render the PNG (headless screenshot at 2× scale), along with the table above. The amber accent `#c9772f` sits close to `--partial` and `--dreadnok` (tagged NEAR ORANGE). The owner reviewed this on 2026-10-30 and kept all three.
 
 **Typography**
 | Role | Family | Usage |

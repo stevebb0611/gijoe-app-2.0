@@ -509,9 +509,12 @@ function AccItem({ name, req, checked, onSet, color, tag, moveTargets, onMove, o
   // needs neither — a single-copy figure can still swap a unit to the bin —
   // so the ⇄ column shows whenever either affordance applies, and both live
   // in the same popover, swap-to-bin listed last (see acc__movepop-bin below).
+  // The column keys off the list supporting swap-to-bin, not this row owning
+  // a unit — an unowned row on a single-copy figure still gets a disabled ⇄
+  // so every row lines up (Barbecue v2's Fire Axe, 2026-10-30).
   const canMove = moveTargets != null && moveTargets.length > 0 && own > 0;
   const canSwapBin = typeof onSwapToBin === 'function' && own > 0;
-  const canMoveCol = moveTargets != null || canSwapBin;
+  const canMoveCol = moveTargets != null || typeof onSwapToBin === 'function';
   const moveOrSwap = canMove || canSwapBin;
   const [moveOpen, setMoveOpen] = React.useState(false);
   const [moveQty, setMoveQty] = React.useState(1);
@@ -1027,7 +1030,6 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                 {moc ? (
                   <div className="acc-list">
                     <div className="acc-list__cap"><span>ACCESSORY · SEALED ON CARD</span><span><b>MOC</b></span></div>
-                    <div className="acc acc--note">Sealed &amp; unopened — accessories assumed complete on card; not tracked individually while MOC.</div>
                   </div>
                 ) : bp.length === 0 ? (
                   <div className="acc-list">
@@ -1121,7 +1123,6 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                 {moc ? (
                   <div className="id-sealed">
                     <div className="id-sealed__card"><div className="id-sealed__tag">MINT ON CARD</div><div className="id-sealed__sub">SEALED · UNOPENED</div></div>
-                    <p>The loose-figure condition diagram doesn't apply to a carded copy. Note any card or bubble flaws in the copy's notes.</p>
                   </div>
                 ) : (
                   <DMap value={marks} onChange={setMarks} genderLocked={true} />
@@ -1131,7 +1132,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                 <section className="panel">
                   <div className="panel__hd">CONDITION <em>· {moc ? "mint on card" : ungraded ? "ungraded" : marksCount === 0 ? "clean · confirmed" : "derived from damage"}</em></div>
                   {moc ? (
-                    <div className="id-mocgrade"><span className="id-mocgrade__badge">MOC</span><div className="id-mocgrade__txt"><b>Factory mint · sealed</b><i>100% complete — not graded on the loose scale while carded.</i></div></div>
+                    <div className="id-mocgrade"><span className="id-mocgrade__badge">MOC</span><div className="id-mocgrade__txt"><b>Factory mint · sealed</b></div></div>
                   ) : ungraded ? (
                     <div className="panel__note">
                       <div>Tag the diagram to record condition, or mark it clean.</div>

@@ -24,6 +24,7 @@ Keep the completeness math (`figParts`/`yearParts`/`totals`) as **pure, tested f
 
 ## Styling & design tokens
 - Put every value from the README's **Design Tokens** into the theme layer (CSS variables / Tailwind theme / CSS-in-JS theme). **No hard-coded hex in components.**
+- The README's **Accent & indicator colors** panel (`assets/design/color-panel.png`, source `assets/design/color-panel.html`) is the visual reference for every accent and status color. Check a new indicator color against it for clashes before using it. If you add or change a color token, update the panel in the same change.
 - Preserve the **theme switches** (paper kraft/white, accent choice, faction colors on/off, optional wobble) as a real, persisted theme config — not a dev panel. Wobble defaults **off**.
 - Honor the aesthetic invariants: **border-radius 0**, solid ink borders, **hard offset shadows (no blur)**, paper/ink palette, the two type roles. A reviewer should not be able to tell the production build from the prototype.
 - Use the hatched/striped gradient utilities for placeholders and bars; centralize them.

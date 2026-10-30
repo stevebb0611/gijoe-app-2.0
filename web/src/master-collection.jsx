@@ -216,7 +216,11 @@ function MasterCollectionView({ onNavigate, onAddInstance }) {
 
       <main className="invp-body">
         {empty ? (
-          <div className="invp-empty">No figures starred yet — open a figure's detail modal and tap the star next to MOC to add a copy to your Master Collection.</div>
+          <div className="inv-zero">
+            <div className="inv-zero__h">Your Master Collection is empty</div>
+            <div className="inv-zero__sub">No figures starred yet — open a figure's detail modal and tap the star next to MOC to add a copy to your Master Collection.</div>
+            <button className="inv-zero__btn" onClick={() => onNavigate('figures')}><span>＋</span> ADD YOUR FIRST FIGURE TO YOUR MASTER COLLECTION</button>
+          </div>
         ) : entries.length === 0 ? (
           <div className="invp-empty">No figures match.</div>
         ) : yearGroups ? (

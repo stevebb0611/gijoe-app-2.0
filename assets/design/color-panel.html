@@ -1,0 +1,29 @@
+<!doctype html><html><head><meta charset="utf-8">
+<!-- Source for color-panel.png (README.md "Design Tokens"). Edit the acc/ind arrays when a token or Tweaks accent option changes, then re-render the PNG. -->
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f3eee2;color:#211f1a;font-family:'Space Mono',monospace;padding:24px;width:860px}
+h1{font-family:Oswald;font-weight:600;letter-spacing:2px;font-size:22px;margin:0 0 4px}
+h2{font-family:Oswald;font-weight:500;letter-spacing:1.5px;font-size:15px;margin:22px 0 10px;border-bottom:1.5px solid #211f1a;padding-bottom:4px}
+.row{display:flex;gap:14px;flex-wrap:wrap}
+.sw{width:196px;border:1.5px solid #211f1a;box-shadow:3px 3px 0 #211f1a;background:#e9e2d2}
+.chip{height:62px;border-bottom:1.5px solid #211f1a}
+.lab{padding:6px 8px;font-size:11px;line-height:1.45}
+.lab b{font-family:Oswald;font-weight:500;font-size:14px;letter-spacing:.5px;display:block}
+.tag{display:inline-block;font-size:9px;font-weight:700;border:1px solid #211f1a;padding:0 4px;margin-left:4px;vertical-align:2px}
+.warn{background:#d9771a;color:#fff;border-color:#211f1a}
+</style></head><body>
+<h1>ACCENT &amp; INDICATOR COLORS</h1>
+<div style="font-size:11px">web/src/main.jsx:70 (Tweaks accent options) · web/src/app.css:1–18 (tokens)</div>
+<h2>TWEAKS · ACCENT OPTIONS (--accent)</h2>
+<div class="row" id="acc"></div>
+<h2>INDICATORS &amp; FACTION TOKENS</h2>
+<div class="row" id="ind"></div>
+<script>
+const acc=[['#6b6f39','Olive','default (active)'],['#b8402f','Brick red','app.css base value'],['#c9772f','Orange','',1],['#3f6f86','Slate blue','']];
+const ind=[['--ok','#5d7d4d','Green','Complete / Completes a Copy'],['--partial','#d9771a','Orange','Best Partial',1],['--damage','#8f2f24','Dark red','Damage / Swap for Clean'],['--gold','#b8952e','Gold','Master Collection star'],['--olive','#5f6b39','Olive','G.I. Joe faction'],['--crimson','#a23a2c','Crimson','Cobra faction'],['--oktober','oklch(0.5 0.085 245)','Blue','Oktober Guard faction'],['--dreadnok','oklch(0.55 0.108 58)','Brown-orange','Dreadnok faction',1]];
+const hex=c=>{const x=document.createElement('canvas').getContext('2d');x.fillStyle=c;x.fillRect(0,0,1,1);const [r,g,b]=x.getImageData(0,0,1,1).data;const h='#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');return c.startsWith('#')?c:c+' ≈ '+h};
+const card=(c,name,sub,w)=>`<div class="sw"><div class="chip" style="background:${c}"></div><div class="lab"><b>${name}${w?'<span class="tag warn">NEAR ORANGE</span>':''}</b>${hex(c)}<br>${sub||'&nbsp;'}</div></div>`;
+document.getElementById('acc').innerHTML=acc.map(([c,n,s,w])=>card(c,n,s,w)).join('');
+document.getElementById('ind').innerHTML=ind.map(([t,c,n,s,w])=>card(c,n,t+' · '+s,w)).join('');
+</script></body></html>

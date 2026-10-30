@@ -151,6 +151,11 @@ const upsertInstanceAcc = db.prepare(`
   INSERT INTO instance_accessories (instance_id, accessory_id, units_owned) VALUES (?, ?, ?)
   ON CONFLICT(instance_id, accessory_id) DO UPDATE SET units_owned = excluded.units_owned
 `);
+// Zero means no row — don't leave units_owned = 0 rows behind (see the 2026-10-30
+// data audit). Deleting cascades the row's damage, so callers that move damage
+// elsewhere must do so before zeroing the source.
+const deleteInstanceAccStmt = db.prepare('DELETE FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?');
+const setUnits = (instanceId, accId, n) => n > 0 ? upsertInstanceAcc.run(instanceId, accId, n) : deleteInstanceAccStmt.run(instanceId, accId);
 
 export const createInstance = db.transaction((payload) => {
   const { catalogId, variant, moc, acc, accDamage, accDamageNotes, marks, loc, notes, filecard, coo, setId } = payload;
@@ -233,7 +238,7 @@ export const updateInstance = db.transaction((id, patch) => {
     if (row) {
       for (const [name, units] of Object.entries(patch.acc)) {
         const accId = accessoryIdForName(row.figure_id, name);
-        if (accId) { upsertInstanceAcc.run(id, accId, units); trimInstanceDamage(id, accId, units); }
+        if (accId) { setUnits(id, accId, units); trimInstanceDamage(id, accId, units); }
       }
     }
   }
@@ -244,7 +249,7 @@ export function setInstanceAccessory(instanceId, name, units) {
   if (!row) return false;
   const accId = accessoryIdForName(row.figure_id, name);
   if (!accId) return false;
-  upsertInstanceAcc.run(instanceId, accId, units);
+  setUnits(instanceId, accId, units);
   trimInstanceDamage(instanceId, accId, units); // a unit can't stay marked damaged once it's no longer owned
   return true;
 }
@@ -444,9 +449,6 @@ const instanceSplitsStmt = db.prepare('SELECT instance_id, accessory_id FROM ins
 const unitsOwnedStmt = db.prepare('SELECT units_owned FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?');
 const instanceDamageRowsStmt = db.prepare('SELECT id, notes FROM instance_accessory_damage WHERE instance_id = ? AND accessory_id = ? ORDER BY id');
 const unitsOf = (instanceId, accId) => { const r = unitsOwnedStmt.get(instanceId, accId); return r ? r.units_owned : 0; };
-// Zero means no row — don't leave units_owned = 0 rows behind (see the 2026-10-30 data audit).
-const deleteInstanceAccStmt = db.prepare('DELETE FROM instance_accessories WHERE instance_id = ? AND accessory_id = ?');
-const setUnits = (instanceId, accId, n) => n > 0 ? upsertInstanceAcc.run(instanceId, accId, n) : deleteInstanceAccStmt.run(instanceId, accId);
 const onBlueprint = (figureId, accId) => blueprintIdNameMap(figureId).has(accId);
 
 export const splitInstanceAccessory = db.transaction((instanceId, parentId) => {
@@ -560,7 +562,7 @@ export const swapAccessoryToBin = db.transaction((instanceId, name) => {
     deleteInstanceDamageRow.run(leaving.id);
     carriedNotes = leaving.notes;
   }
-  upsertInstanceAcc.run(instanceId, accId, src.units_owned - 1);
+  setUnits(instanceId, accId, src.units_owned - 1);
 
   upsertBin.run(accId, 1, null);
   if (movingDamaged) insertBinDamage.run(accId, carriedNotes);
@@ -614,15 +616,17 @@ export const moveInstanceAccessory = db.transaction((fromInstanceId, toInstanceI
   const clean = src.units_owned - srcDamagedCount;
   const movingDamagedN = Math.max(0, count - clean);
 
-  upsertInstanceAcc.run(fromInstanceId, accId, src.units_owned - count);
   // Destination row must exist before damage rows re-target onto it — the FK
   // is on (instance_id, accessory_id), validated against instance_accessories.
+  // The source is written last: moving every unit deletes its row, which
+  // would cascade away damage that hasn't re-targeted yet.
   upsertInstanceAcc.run(toInstanceId, accId, dstOwnedNow + count);
 
   if (movingDamagedN > 0) {
     const moving = oldestInstanceDamageRowsToMove.all(fromInstanceId, accId, movingDamagedN);
     for (const r of moving) retargetInstanceDamage.run(toInstanceId, r.id);
   }
+  setUnits(fromInstanceId, accId, src.units_owned - count);
   return true;
 });
 

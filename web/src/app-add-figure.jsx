@@ -431,7 +431,6 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                 {moc ? (
                   <div className="id-sealed">
                     <div className="id-sealed__card"><div className="id-sealed__tag">MINT ON CARD</div><div className="id-sealed__sub">SEALED · UNOPENED</div></div>
-                    <p>The loose-figure condition diagram doesn't apply to a carded copy. Note any card or bubble flaws below.</p>
                   </div>
                 ) : (
                   <DamageMap value={dmg} onChange={setDmg} genderLocked={true} />
@@ -443,7 +442,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                   {moc ? (
                     <div className="id-mocgrade">
                       <span className="id-mocgrade__badge">MOC</span>
-                      <span className="id-mocgrade__txt"><b>Factory mint · sealed</b><i>Grade derives from the card &amp; bubble, not the figure — record specifics in notes.</i></span>
+                      <span className="id-mocgrade__txt"><b>Factory mint · sealed</b></span>
                     </div>
                   ) : ungraded ? (
                     <div className="panel__note">
