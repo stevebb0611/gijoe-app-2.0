@@ -205,6 +205,14 @@ const GROUPS = [
   { extGroupId: null, fcode: 'F585', figure: 'Action Soldier', accessories: ['A1582', 'A1593'] }, // Figure Stand brown/black
   { extGroupId: null, fcode: 'F585', figure: 'Action Soldier', accessories: ['A1583', 'A1594'] }, // Accessory Tree "Bunker One Piece" brown/black (bonus)
   { extGroupId: null, fcode: 'F585', figure: 'Action Soldier', accessories: ['A1584', 'A1595'] }, // Accessory Tree "Bunker Two Pieces" brown/black (bonus)
+  // Zap v2 (1991, F416): same whole-set pattern, gray/silver (match_key
+  // GR/SV). Sonic Backpack + Battery Cover (gray only) and the black Battle
+  // Stand are shared and always required. Owner-specified 2026-10-30.
+  { extGroupId: null, fcode: 'F416', figure: 'Zap', accessories: ['A1011', 'A1012'] }, // Helmet gray/silver
+  { extGroupId: null, fcode: 'F416', figure: 'Zap', accessories: ['A1015', 'A1016'] }, // Backpack Gun gray/silver
+  { extGroupId: null, fcode: 'F416', figure: 'Zap', accessories: ['A1017', 'A1018'] }, // Double Barreled Rocket Launcher gray/silver
+  { extGroupId: null, fcode: 'F416', figure: 'Zap', accessories: ['A1019', 'A1020'] }, // Sonic Rocket Launcher gray/silver
+  { extGroupId: null, fcode: 'F416', figure: 'Zap', accessories: ['A1021', 'A1022'] }, // Muzzle attachment to Sonic Rocket Launcher gray/silver
 ];
 
 // Same label rule as the locked reference (subgroup-wire-v2.jsx groupLabel):

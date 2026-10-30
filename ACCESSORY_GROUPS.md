@@ -1139,6 +1139,29 @@ another holds the cut pieces.
   by color name (purple | yellow, gray | orange). The 2-slot matched figures above keep the
   per-slot layout.
 
+### 1994 — Action Soldier (v1, figure catalog id 485 — source F-code F585)
+
+- **Mechanism:** `match_key` — a whole-set colorway pick, tags `BR` (brown) / `BK`
+  (black): own the full brown set or the full black set, never a mix.
+- **Matched slots (`accessory_groups.group_id` 54–64), brown / black:** Pistol
+  A1574/A1585 · Rifle A1575/A1586 · Missile A1576/A1587 · Front Bunker Wall A1577/A1588 ·
+  Side Bunker Wall #1 A1578/A1589 · Side Bunker Wall #2 A1579/A1590 · Gun Post Mount
+  A1580/A1591 · Sandbags A1581/A1592 · Figure Stand A1582/A1593 · Accessory Tree "Bunker
+  One Piece" A1583/A1594 and "Bunker Two Pieces" A1584/A1595 (`bonus`, bookkeeping only).
+- **Unaffected (plain, independently required):** Backpack (A1573) and Missile Launcher
+  (A1538), both green and shared by both sets.
+- **Note:** each color has two Side Bunker Wall rows, which `disambiguateNames` serves as
+  "Side Bunker Wall (brown) #1/#2". They're paired #1↔#1 and #2↔#2 by catalog order, and
+  the kit columns keep the "#N" in their short labels (`kitLabel`,
+  `web/src/accessory-groups.jsx`).
+- **Source:** owner-specified 2026-10-30 ("backpack and missile launcher are 100%
+  required; black and brown accessories are grouped in their colors; accessory trees
+  are Bonus").
+- **Status:** ✅ group_id + match_key set, completeness unit-checked (shared + full brown
+  = 100%; a mixed pistol, a missing backpack or a missing wall #2 = not complete), and
+  visually confirmed in Add Figure (black | brown columns), 2026-10-30. No owned copies
+  yet.
+
 ### 1994 — Payload (v4, figure catalog id 509 — source F-code F611)
 
 - **Mechanism:** `match_key` — a whole-set colorway pick. Tags `G` (gray) / `O` (orange)

@@ -194,8 +194,14 @@ export function orderedBlueprint(bp) {
 // (e.g. "Helmet, with holes", via JoeData.optLabel) — the caller decides its
 // shape (every current caller renders it as an AccItem row), same as
 // ContextGroup's renderRow always was.
-// renderOption's 2nd arg { short: true } asks for the bare item name with no
-// color suffix or tag badge — inside a kit column the column header says it.
+// renderOption's 2nd arg { short: label } gives the bare item name to show,
+// no color suffix or tag badge — inside a kit column the header says it.
+// Keeps a disambiguateNames "#N" so Action Soldier's two Side Bunker Walls
+// per color don't read as one name twice.
+function kitLabel(name) {
+  const n = name.match(/ #\d+$/);
+  return JoeData.groupLabel([[name]]) + (n ? n[0] : '');
+}
 export function ColorwayKit({ cols, renderOption }) {
   return (
     <div className="sgw-group sgw-kit">
@@ -204,11 +210,11 @@ export function ColorwayKit({ cols, renderOption }) {
         {cols.map((c) => (
           <div className="sgw-kit__col" key={c.key}>
             <div className="sgw-kit__hd"><AccSwatch color={c.color} />{c.color}</div>
-            {c.retail.map((it) => renderOption(it, { short: true }))}
+            {c.retail.map((it) => renderOption(it, { short: kitLabel(it[0]) }))}
             {c.extra.length > 0 && (
               <React.Fragment>
                 <div className="sgw-label sgw-label--cap">{CTX_LABEL[c.extra[0][4]] || c.extra[0][4]}</div>
-                {c.extra.map((it) => renderOption(it, { short: true }))}
+                {c.extra.map((it) => renderOption(it, { short: kitLabel(it[0]) }))}
               </React.Fragment>
             )}
           </div>

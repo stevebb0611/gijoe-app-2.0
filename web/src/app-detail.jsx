@@ -1050,7 +1050,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                                               onSwapToBin={() => swapUnitToBin(a[0])} binPull={binPullFor(a)} split={splitFor(a)} />
                                    )}
                                    renderOption={(a, o) => (
-                                     <AccItem key={a[0]} name={o && o.short ? JoeData.groupLabel([a]) : JoeData.optLabel(a[0])} req={a[1]} color={a[6]} tag={o && o.short ? null : a[5]}
+                                     <AccItem key={a[0]} name={o && o.short ? o.short : JoeData.optLabel(a[0])} req={a[1]} color={a[6]} tag={o && o.short ? null : a[5]}
                                               checked={Array.from({ length: a[1] }, (_, k) => k < (raw.acc && raw.acc[a[0]] || 0))}
                                               onSet={(n) => setUnit(a[0], n)}
                                               {...dmgPropsFor(a[0])}
