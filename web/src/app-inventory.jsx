@@ -425,7 +425,7 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
                 More Filters{facetCount ? <span className="txtbtn__n">{facetCount}</span> : null}<span className="txtbtn__caret">{showMore ? "▴" : "▾"}</span>
               </button>
               <span className="invp-bar__spacer"></span>
-              <span className="invp-bar__count">{filtering ? `${shownCount} of ${t.inInventory}` : `${t.inInventory} figure${t.inInventory !== 1 ? "s" : ""}`}</span>
+              {filtering && <span className="invp-bar__count">{`${shownCount} of ${t.inInventory}`}</span>}
               <button className="txtbtn" onClick={() => setYrAsc(v => !v)}>YEAR {yrAsc ? "↑" : "↓"}</button>
               {!q && <button className="txtbtn" onClick={open.size ? collapseAll : expandAll}>{open.size ? "Collapse All" : "Expand All"}</button>}
               <div className="inv-seg">

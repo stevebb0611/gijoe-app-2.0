@@ -106,64 +106,21 @@
   .invk--master { position: relative; background: transparent; border-color: var(--gold); cursor: pointer; font: inherit; color: inherit; transition: background .12s, box-shadow .12s; }
   .invk--master .mcbadge { position: absolute; top: -8px; right: -8px; }
   .invk--master:hover { background: rgba(184,149,46,.14); }
-  .invk--master.is-active { background: rgba(184,149,46,.24); box-shadow: inset 0 0 0 1.5px var(--gold); }
   .invk--master .invk__k { opacity: .85; }
 
-  /* ===== Master Collection page — instance-level cards, not figure rows ===== */
-  .mc-list { display: flex; flex-direction: column; gap: 14px; padding-top: 18px; }
-  .mc-card { border: 1.5px solid var(--ink); background: var(--card); }
-  .mc-card__hd { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--ink); color: var(--paper); flex-wrap: wrap; }
-  .mc-card__name { font-family: var(--font-display); font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; }
-  /* the [A|B|C] bracket's default ink-fill (app.css .idvarbr__l.is-owned) reads
-     as near-black-on-black against this card header's own var(--ink)
-     background — swap owned cells to gold here, matching this page's existing
-     gold = "met/kept" language (.mc-target.is-met, MasterBadge star) instead
-     of the Figures page's ink-stamp treatment. */
-  .mc-card__name .idvarbr__l.is-owned { background: var(--gold); color: var(--ink); }
-  .mc-card__year { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; opacity: .65; }
-  .mc-card__targets { margin-left: auto; display: flex; gap: 8px; }
-  .mc-target { font-family: var(--font-mono); font-size: 10px; letter-spacing: .5px; display: inline-flex; align-items: center; gap: 4px; color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.3); padding: 2px 6px; }
-  .mc-target.is-met { color: var(--gold); border-color: var(--gold); }
-  .mc-card__note { flex: 1 1 100%; order: 99; background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.3); padding: 6px 10px; color: var(--paper); font-family: var(--font-mono); font-size: 12px; outline: none; }
-  .mc-card__note::placeholder { color: rgba(255,255,255,.45); }
-  .mc-card__note:focus { border-color: var(--gold); }
-  .mc-card__insts { display: flex; flex-direction: column; gap: 6px; padding: 10px; }
-  /* Starred-copy row — deliberately its own layout, not a reuse of .inv-inst's
-     16px/1fr/1.5fr/92px/24px grid. That grid's 1.5fr stock column earns its
-     width on the Figures page (a longer id string, sometimes a +File Card
-     tag); here the id text is short ("No. 1 ·B") and the stock cell holds
-     only a fixed 78px bar, so stretching it to 1.5fr left a dead gap between
-     the bar and the status text. Two packed groups instead — .mc-inst__lead
-     (star + id) and .mc-inst__stat (bar + status), each internally gapless —
-     spread across the row with justify-content: space-between, echoing the
-     card header's own name-group/target-group split above it. A single
-     margin-left:auto on the arrow was tried first and rejected live ("the
-     info boxes are still crowded far left") — everything but the arrow
-     stayed pinned to the left edge with one huge gap before it; splitting
-     into two independently-positioned groups reads as an intentional
-     left/right layout instead. See OPEN_QUESTIONS_Claude.md #22. */
-  .mc-inst { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%;
-    text-align: left; font: inherit; color: inherit; cursor: pointer;
-    background: var(--card); border: 1.5px solid var(--line); padding: 7px 12px; }
-  .mc-inst:hover { border-color: var(--ink); transform: translateX(1px); }
-  .mc-inst__lead, .mc-inst__stat { display: flex; align-items: center; gap: 12px; }
-  .mc-inst .inv-go { flex: none; }
-
-  /* Master Collection year separator — reuses the Figures page's boxed year
-     marker (ink-filled rect, offset shadow, invert-on-open) instead of its
-     own circular "bulb", so the two pages' headers read as one system. Stays
-     a single thin rule + chevron rather than the full two-meter .ysec grid,
-     since this page groups a short curated list, not a filterable roster. */
-  .mcyr-sec { margin-bottom: 4px; }
-  .mcyr { display: flex; align-items: center; width: 100%; gap: 14px; margin: 30px 0 6px; padding: 0; border: none; background: none; font: inherit; color: inherit; cursor: pointer; }
-  .mcyr-sec:first-child .mcyr { margin-top: 6px; }
-  .mcyr__dot { flex: 0 0 auto; font-family: var(--font-display); font-weight: 700; font-size: 23px; line-height: 1; letter-spacing: .5px; white-space: nowrap;
-    background: var(--ink); color: var(--paper); padding: 8px 10px; box-shadow: 2px 2px 0 var(--line); }
-  .mcyr-sec.is-open .mcyr__dot { background: var(--paper); color: var(--ink); box-shadow: 2px 2px 0 var(--line-soft); }
-  .mcyr__line { position: relative; flex: 1; height: 2px; background: var(--ink); display: flex; align-items: center; justify-content: flex-end; padding-right: 24px; }
-  .mcyr__stat { background: var(--paper); padding: 0 10px; font-family: var(--font-mono); font-weight: 700; font-size: 10px; letter-spacing: .5px; color: var(--ink-soft); white-space: nowrap; }
-  .mcyr__chev { flex: 0 0 auto; font-size: 15px; }
-  .mcyr-sec .mc-list { padding-top: 0; }
+  /* ===== Master Collection page — Figures-page rows (.ysec / .inv-row / .inv-insts)
+     with the Stock column holding per-variant kept/target pills ===== */
+  .mc-targets { gap: 5px; }
+  .mc-target { font-family: var(--font-mono); font-weight: 700; font-size: 10px; letter-spacing: .5px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 48px; border: 1.5px solid var(--line); padding: 2px 6px; line-height: 1.2; color: var(--ink-soft); }
+  .mc-target b { color: var(--accent); }
+  .mc-target.is-met { border-color: var(--ink); color: var(--ink); }
+  .mc-target--coo.is-first { margin-left: 9px; }
+  .mc-coo { font-family: var(--font-mono); font-weight: 700; font-size: 9px; letter-spacing: .5px; text-transform: uppercase; border: 1.5px solid var(--ink); padding: 1px 6px; white-space: nowrap; }
+  .mc-coo.is-missing { border-style: dashed; border-color: var(--line); color: var(--ink-soft); }
+  .inv-owned.mc-starred, .mc-cols__starred { font-size: 12px; text-align: center; }
+  .mc-cols__starred { font-size: inherit; }
+  .mc-note { width: 100%; background: var(--card); border: 1.5px dashed var(--line); padding: 7px 12px; color: var(--ink); font-family: var(--font-mono); font-size: 12px; outline: none; }
+  .mc-note:focus { border-style: solid; border-color: var(--ink); }
 
   /* toolbar */
   .invp-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 9px 26px; background: var(--card); border-bottom: 2px solid var(--ink); }

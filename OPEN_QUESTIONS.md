@@ -152,6 +152,9 @@ The claw is molded onto Polly (A0200), so a broken claw is damage on Polly, not 
 ### Q29. Instance ID on the detail modal — deferred
 Showing `instances.id` next to "No. N" was ruled out for this owner (copies aren't physically labeled, so the number connects to nothing). Revisit only for collectors who label copies at intake, e.g. if multi-user lands.
 
+### Q30. Country of origin × production variant — no data link yet
+`figure_coo` is per figure (54 figures, each with exactly 2 countries), so the schema can't say "variant A was made in Hong Kong". Checked 2026-10-31: only **Keel-Haul v1** has both COO data (China/Hong Kong) and variants (A painted collar stars / B unpainted), with nothing tying a letter to a country and no owned copies. **Eels v1 B**'s variant tell is "no country stamp", but Eels has no `figure_coo` row. If a variant↔country link turns up, it needs a `variant_id` on `figure_coo` (or a COO column on `variant_lookup`). Owner hasn't asked for that yet.
+
 ### F4. Explanation/help text — ongoing effort
 Standing rule, not a one-time fix: strip in-app "explanation/help text" wherever it appears, across every screen. Keep checking against this when adding new UI. (The October 2026 sweep closed 2026-10-30 after three rounds. Kept by owner decision: the damage-map prompt, "Grades update live from the map…", the Add Figure search prompt, the empty-collection screen, and destructive-confirm consequence text.)
 

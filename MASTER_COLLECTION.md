@@ -89,7 +89,7 @@ in `web/src/store.js` per the currently selected instance's variant, not stored.
 - **Header badge + dedicated view — built 2026-07-15.** A circular gold "military
   badge" chip in the main header links to a Master Collection view. The badge's
   full 150px ceremonial design (see `Master Collection Chip.html` /
-  `README_Master_Collection.md` design handoff, "05d") didn't fit the ~116px
+  `README_Master_Collection.md` design handoff, "05d" — external, not in this repo) didn't fit the ~116px
   header chrome — scaled down to a compact `.invk`-style KPI chip instead,
   keeping the gold star + ring motif but dropping the three-star/thread detail,
   which doesn't read at that size. First implementation reused `InventoryView`
@@ -140,8 +140,9 @@ in `web/src/store.js` per the currently selected instance's variant, not stored.
   wide `{metSum}/{targetSum}` fraction (every figure/variant's `Math.min(starred,
   target)` summed over its target — see `JoeStore.masterTotals()` in `store.js`).
   On the Figures page it's a plain nav link to the Master Collection view; on the
-  Master Collection view itself it's rendered `.is-active` (gold-tinted) and
-  navigates back to Figures. The badge icon is positioned as an absolutely-placed
+  Master Collection view it navigates back to Figures. (The gold-tinted
+  `.is-active` fill it used to get there was dropped 2026-10-31 — owner: it broke
+  from the main look.) The badge icon is positioned as an absolutely-placed
   corner accent (`top:-8px; right:-8px` in `app.css`), not stacked inline — kept
   out of the chip's normal flex flow so the chip stays the exact same height as
   the other three KPI chips regardless of icon size.
@@ -153,64 +154,61 @@ A standalone page component, structurally a peer of `PartsBin`
 search), wired into `main.jsx`'s `page` state as `'master-collection'`, not a
 prop/mode of `InventoryView`.
 
-- **Data shape — one card per figure, one row per starred copy.** For every
-  catalog figure, only its instances with `masterCollection: true` are
-  collected; figures with zero starred copies don't appear at all. Each
-  card's header shows the figure identity (name, version, faction, year) plus
-  a small per-variant target/progress readout (`.mc-target`, e.g. a Blowtorch
-  card showing `A 1/1 · B 1/3 · C 0/1`), gold-highlighted (`.is-met`) once a
-  variant's starred count reaches its target. Below that, each starred copy
-  renders as its own row reusing the same `.inv-inst` styling as the Figures
-  page's per-copy accordion rows (identity, stock/completeness bar, file-card
-  flag, missing count) — a duplicate figure with 1 of 3 copies starred shows
-  exactly that 1 row, not 3.
-- **KPI chips** — `Figures In` / `Starred Copies` / `Target Filled` (from
-  `JoeData.masterTotals()` via the shared `invMasterTotals()` wrapper in
-  `app-detail.jsx`), replacing the Figures page's Unique/Total/Complete chips
-  in this view's own header — there's no shared/toggling state between the two
-  pages' headers since they're now separate component instances.
-  `masterTotals()` walks every figure × variant slot in the catalog (not just
-  owned ones, since every slot defaults to a target of 1) and caps each slot's
-  contribution at its own target, so over-starring a troop-builder past its
-  target doesn't inflate the overall completion fraction.
-- **Opening a copy** — clicking a starred row opens the same `InvDetailModal`
-  used everywhere else, pinned to that instance (`{catalogId, instId}`). The
-  modal still shows *all* of that figure's copies as tabs (not just starred
-  ones) with gold outlines marking which are starred — the Master Collection
-  view's list is scoped, but the modal you land in is the normal full one, so
-  you can still star/unstar other copies from there.
-- **Search** — a single free-text box (name/specialty/faction/year) filters
-  the card list; there's no faceted filter bar like the Figures page, since
-  the Master Collection is already a small, curated subset.
-- **Sort toggle** (added 2026-07-19) — a slim `.invp-bar` under the header
-  (figure count + `YEAR ↑/↓` / `A–Z` buttons, `.txtbtn`) lets the list re-sort
-  as it grows past a glance-able size. Year mode defaults to newest-first,
-  matching the pre-toggle sort; clicking Year again flips direction; A–Z
-  ignores year entirely. *(Superseded 2026-07-25 — see the next bullet: Year
-  mode now groups into collapsible year sections.)*
-- **Year sections** (added 2026-07-25, Year sort mode only — A–Z stays a flat
-  list). Each year gets a "thermometer" separator: a black pill holding the
-  year (`.mcyr__dot` — a pill, not a fixed circle, so "Special Release" fits),
-  with a stem line running to the right edge carrying a per-year
-  kept/target tick-mark label (`yearTargetStats()`, same capped math as
-  `invMasterTotals()`). Sections **default collapsed**, with an Expand
-  All/Collapse All button. A **Stats** toggle (persisted to
-  `localStorage['mc_year_stats_v1']`) strips the tick-mark back to a plain
-  divider — an explicit owner ask, not dead UI. The per-card year is hidden
-  while grouped. Visually its own language, not the Figures page's boxed
-  `.ysec` header.
-- **Variant bracket** (2026-07-22) — each card header carries the shared
+> **Restyled 2026-10-31** to the Figures page's layout (owner: the card layout
+> felt minimal and broken from the rest of the app). It now reuses the Figures
+> page's `.ysec` year sections, `.inv-row` figure rows and `.inv-insts` copy
+> accordion. The bullets below describe the current build. The earlier card +
+> "thermometer" separator design is in git history.
+
+- **Data shape — one row per figure, one accordion row per starred copy.** For
+  every catalog figure, only its instances with `masterCollection: true` are
+  collected; figures with zero starred copies don't appear at all. Each row
+  uses the Figures page's columns: thumb, identity (name, version, edition, set,
+  sub-team, variant bracket, vehicle, specialty), faction, **Starred** (`★N`),
+  **Targets** (per-variant `.mc-target` pills, e.g. `A 1/1 · B 1/3 · C 0/1`, ink
+  border once met), and **Need** (`✓ Kept` or `Need N`). Clicking the row opens
+  the accordion: the per-figure note, then each starred copy as an `.inv-inst`
+  row (★ tab) — a duplicate figure with 1 of 3 copies starred shows exactly
+  that 1 row, not 3.
+- **KPI tiles** — the same four as the Figures page (Unique Figures / Total
+  Figures / Complete / Master Collection), so the header doesn't reflow between
+  pages. Replaced the page-specific `Figures In` / `Starred Copies` / `Target
+  Filled` set on 2026-10-31. `masterTotals()` walks every figure × variant slot
+  in the catalog (not just owned ones, since every slot defaults to a target of
+  1) and caps each slot's contribution at its own target, so over-starring a
+  troop-builder past its target doesn't inflate the overall completion fraction.
+- **Opening a copy** — clicking a starred copy row opens the same
+  `InvDetailModal` used everywhere else, pinned to that instance (`{catalogId,
+  instId}`). The modal still shows *all* of that figure's copies as tabs (not
+  just starred ones) with gold outlines marking which are starred, so you can
+  still star/unstar other copies from there.
+- **Search + filter chips** — a free-text box (name/specialty/faction/year) plus
+  an `All / Target Met / Under Target` chip group in the `.invp-bar`, matching
+  the Figures page's chip bar. An `N of M` count shows only while filtering.
+- **Sort** — `YEAR ↑/↓` / `A–Z` (`.txtbtn`). Year mode groups into collapsible
+  `.ysec` year sections (default collapsed, Expand All/Collapse All); A–Z is a
+  flat list. Each year header shows `N starred` and a single **Kept** meter
+  (`targetStats()`, same capped math as `invMasterTotals()`) with a percent. The
+  **Stats** toggle (persisted to `localStorage['mc_year_stats_v1']`) hides the
+  meter and percent — an explicit owner ask, not dead UI.
+- **Variant bracket** (2026-07-22) — each row carries the shared
   `VariantBracket` (`web/src/fig-identity.jsx`). On this page a letter fills
-  (gold) only when a **starred** copy of that variant exists, unlike the
-  Figures page, which fills on any owned copy. Display-only; changing a copy's
-  variant stays on the detail card's single-letter `VariantBadge`.
-- **Per-figure note** (added 2026-07-19) — a free-text input (`.mc-card__note`)
-  inside the card's dark header bar, wired to `figures.master_notes`. Saved
-  on blur (`JoeStore.setFigureMasterNotes`), same debounce-free
+  only when a **starred** copy of that variant exists, unlike the Figures page,
+  which fills on any owned copy. Display-only; changing a copy's variant stays
+  on the detail card's single-letter `VariantBadge`.
+- **Country of origin** (2026-10-31) — only for figures with `figure_coo` rows.
+  The figure row's Targets cell gets one pill per listed country after the
+  variant pills (`CN` / `HK` / `ID`, ink border + `✓` once a starred copy carries
+  that country, `—` otherwise). Each starred copy row gets a country tag
+  (`.mc-coo`), dashed `COO` when the copy is untagged. Display only: it doesn't
+  feed targets, the Kept meter or Need. Variant × country is OPEN_QUESTIONS Q30.
+- **Per-figure note** (added 2026-07-19) — a free-text input (`.mc-note`) at the
+  top of the row's accordion, wired to `figures.master_notes`. Saved on blur
+  (`JoeStore.setFigureMasterNotes`), same debounce-free
   patch-the-cached-catalog-object pattern as the master-target stepper — no
   `/api/catalog` refetch. Included in the xlsx export as its own "Master
-  Collection Notes" column (`server/export-xlsx.js`), separate from the
-  general per-figure "Notes" column.
+  Collection Notes" column (`server/export-xlsx.js`), separate from the general
+  per-figure "Notes" column.
 
 ## 5. Disposition policy — movement log
 
