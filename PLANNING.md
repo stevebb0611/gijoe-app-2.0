@@ -1,6 +1,6 @@
 # PLANNING.md — Parts Bin: "closest to completion" priority + starred-copy protection
 
-> Status: **planned, not yet implemented.** This document is the design
+> Status: **planned, not yet implemented** (`OPEN_QUESTIONS.md` Q25, re-checked 2026-10-30). This document is the design
 > record; the code changes described below have not been made yet. See
 > `OPEN_QUESTIONS.md`/`PARTS_BIN.md` for how this fits the rest of the app's
 > design docs.

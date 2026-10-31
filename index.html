@@ -98,13 +98,12 @@
 <body>
 <div class="mast">
   <div class="mast__inner">
-    <div class="mast__kick">DESIGN HANDOFF · LOCAL DEV BUNDLE</div>
+    <div class="mast__kick">PROJECT INDEX · LOCAL</div>
     <h1 class="mast__h">G.I. JOE COLLECTION <em>//</em> TRACKER</h1>
-    <p class="mast__sub">A personal inventory &amp; condition tracker for a 700&ndash;800 figure vintage G.I. Joe collection. This bundle is the <b>design source of truth</b>: high-fidelity <b>reference mockups</b> for screen-by-screen review, plus the <b>spec docs</b> that define the data model, decisions, and standards. Serve it locally (below), open any screen, then hand it to Claude Code to build from.</p>
+    <p class="mast__sub">A personal inventory &amp; condition tracker for a 700&ndash;800 figure vintage G.I. Joe collection. Open the <b>live app</b> below, review the frozen <b>reference mockups</b> screen by screen, or read the <b>spec docs</b> that define the data model, decisions and standards.</p>
     <div class="mast__tags">
-      <span class="tag tag--ok">REFERENCE MOCKUPS + SPEC DOCS</span>
+      <span class="tag tag--ok">LIVE APP + REFERENCE MOCKUPS + SPEC DOCS</span>
       <span class="tag">VINTAGE FIELD-MANUAL UI</span>
-      <span class="tag">SOURCE OF TRUTH FOR BUILD</span>
     </div>
   </div>
 </div>
@@ -114,32 +113,25 @@
   <div class="run">
     <div class="run__hd">RUN IT LOCALLY <span>~60 SECONDS</span></div>
     <div class="run__body">
-      <p class="run__lead">The prototypes compile JSX in the browser, so they must be served over <b>http://localhost</b> — opening the files directly (<code>file://</code>) will leave the screens blank. Any static server works; here's the zero-install path.</p>
+      <p class="run__lead">The live app is a Vite React build served by a local Express + SQLite server. One command serves both the app and this page.</p>
       <div class="steps">
         <div class="step">
           <div class="step__n"></div>
-          <div class="step__b"><b>Open the folder in VS Code.</b> File → Open Folder → choose this <code>design_handoff_inventory</code> folder. Open the built-in terminal (<code>Ctrl</code>/<code>Cmd</code> + <code>`</code>).</div>
-        </div>
-        <div class="step">
-          <div class="step__n"></div>
-          <div class="step__b"><b>Start a static server</b> from the terminal (requires Node, which ships with VS Code workflows):
-            <code class="codeblock"><span class="c"># zero-install, recommended</span>
-npx serve .
-
-<span class="c"># …or with the package.json in this folder</span>
+          <div class="step__b"><b>Build and start</b> from the repo root (first time: <code>npm install</code> here and in <code>web/</code>):
+            <code class="codeblock">(cd web &amp;&amp; npm run build)
 npm start</code>
           </div>
         </div>
         <div class="step">
           <div class="step__n"></div>
-          <div class="step__b"><b>Open the printed URL</b> (usually <code>http://localhost:3000</code>) in your browser. This index page loads first — open any reference screen below (start with <span class="g">Inventory</span>, the design of record).</div>
+          <div class="step__b"><b>Open <code>http://localhost:3000</code></b> for the live app. This page is at <code>/index.html</code>.</div>
         </div>
         <div class="step">
           <div class="step__n"></div>
-          <div class="step__b"><b>Hand it to Claude Code.</b> Run <code>claude</code> in this same folder and start with: <span class="g">"Read CLAUDE.md, then the README and spec docs."</span> It now has the full design context plus a live preview to compare against.</div>
+          <div class="step__b"><b>Front-end work:</b> also run <code>cd web &amp;&amp; npm run dev</code> for hot reload on <code>:5173</code> (proxies <code>/api</code> to <code>:3000</code>). Restart <code>npm start</code> after server edits.</div>
         </div>
       </div>
-      <p class="alt"><b>No Node?</b> Use <code>python3 -m http.server 3000</code> instead, or install the <b>Live Server</b> VS Code extension and click "Go Live". <b>Heads-up:</b> screens pull React, Babel &amp; fonts from CDNs, so keep an internet connection for the first load.</p>
+      <p class="alt"><b>Heads-up:</b> the live app reads and writes the real <code>gijoe_collection.db</code>. The reference mockups below pull React, Babel &amp; fonts from CDNs, so keep an internet connection for them.</p>
     </div>
   </div>
 
@@ -152,17 +144,17 @@ npm start</code>
     <div class="launch__go">OPEN ›</div>
   </a>
 
-  <a class="launch" href="GI Joe Tracker - Collection App.html">
+  <a class="launch" href="/">
     <div class="launch__l">
-      <div class="launch__kick">▶ TEST-DRIVE · BUILD A REAL COLLECTION · SAVES LOCALLY</div>
-      <div class="launch__h">COLLECTION APP</div>
-      <div class="launch__d">The working, test-drivable app — not a mockup. Starts <b>empty</b>, searches the full ~520-figure catalog, and <b>saves everything you add to this browser</b> (localStorage). Add figures, pick the production variant, log condition on the damage map, tick accessories. Export / import a JSON backup from the panel. A single-browser prototype — real multi-device persistence is the backend work in <code>BACKEND_AND_SCALE.md</code>.</div>
+      <div class="launch__kick">▶ THE LIVE APP · YOUR REAL COLLECTION</div>
+      <div class="launch__h">G.I. JOE COLLECTION</div>
+      <div class="launch__d">Figures, Master Collection and Parts Bin, backed by <code>gijoe_collection.db</code>. Every change here persists to the real collection.</div>
     </div>
     <div class="launch__go">OPEN ›</div>
   </a>
 
   <h2 class="seclab">REFERENCE MOCKUPS · STATIC, PRELOADED SAMPLE DATA</h2>
-  <p class="seclab-note">These are the original design prototypes — fixed sample figures, not connected to the working app. Use them to review look &amp; behavior screen-by-screen.</p>
+  <p class="seclab-note">The original design prototypes, frozen. They use fixed sample figures and aren't connected to the live app. Use them to review look &amp; behavior screen-by-screen.</p>
   <div class="grid">
 
     <a class="scr" href="GI Joe Tracker - Inventory.html">
@@ -214,6 +206,27 @@ npm start</code>
       <div class="scr__foot"><span class="scr__files">self-contained</span><span class="scr__go">OPEN ▸</span></div>
     </a>
 
+    <a class="scr" href="GI Joe Tracker - Damage Map.html">
+      <div class="scr__top"><span class="scr__no">SCR-08</span><span class="scr__badge scr__badge--util">TOOL · ZONE EDITOR</span></div>
+      <div class="scr__h">Damage Map</div>
+      <div class="scr__d">The damage-map zone editor — the source of the committed zone presets. See DAMAGE_MAP.md for how to edit and export zones.</div>
+      <div class="scr__foot"><span class="scr__files">self-contained · assets/figure-*.js</span><span class="scr__go">OPEN ▸</span></div>
+    </a>
+
+    <a class="scr" href="GI Joe Tracker - Vehicles.html">
+      <div class="scr__top"><span class="scr__no">SCR-09</span><span class="scr__badge scr__badge--util">FUTURE · NOT BUILT</span></div>
+      <div class="scr__h">Vehicles</div>
+      <div class="scr__d">Prototype for the planned Vehicles (+ Playsets) expansion, using sample data. OPEN_QUESTIONS.md Q15.</div>
+      <div class="scr__foot"><span class="scr__files">vehicles-app.jsx · vehicle-data.jsx</span><span class="scr__go">OPEN ▸</span></div>
+    </a>
+
+    <a class="scr" href="GI Joe Tracker - Collection App.html">
+      <div class="scr__top"><span class="scr__no">SCR-00</span><span class="scr__badge scr__badge--util">SUPERSEDED</span></div>
+      <div class="scr__h">Collection App (pre-port)</div>
+      <div class="scr__d">The browser-Babel working app that the live build was ported from. Kept for reference only.</div>
+      <div class="scr__foot"><span class="scr__files">app-*.jsx · store.js</span><span class="scr__go">OPEN ▸</span></div>
+    </a>
+
   <h2 class="seclab" style="margin-top:40px;">SPEC DOCS · READ THESE</h2>
   <div class="docs">
     <a class="doc doc--star" href="README.md"><span class="doc__f">README.md</span><span class="doc__d">Start here — overview, design language, screen-by-screen spec, tokens, data model.</span></a>
@@ -225,13 +238,20 @@ npm start</code>
     <a class="doc" href="PARTS_BIN.md"><span class="doc__f">PARTS_BIN.md</span><span class="doc__d">Loose-accessory inventory and the two-way figure↔bin flow.</span></a>
     <a class="doc" href="TAXONOMY.md"><span class="doc__f">TAXONOMY.md</span><span class="doc__d">Naming &amp; categorization of figures, factions, and accessories.</span></a>
     <a class="doc" href="NAVIGATION.md"><span class="doc__f">NAVIGATION.md</span><span class="doc__d">How the screens connect and how each detail view is reached.</span></a>
+    <a class="doc" href="DAMAGE_MAP.md"><span class="doc__f">DAMAGE_MAP.md</span><span class="doc__d">How the damage map works and how to edit its zones.</span></a>
+    <a class="doc" href="ACCESSORY_GROUPS.md"><span class="doc__f">ACCESSORY_GROUPS.md</span><span class="doc__d">Per-figure log: pick-one groups, match keys, release context, splittable sheets.</span></a>
+    <a class="doc" href="MASTER_COLLECTION.md"><span class="doc__f">MASTER_COLLECTION.md</span><span class="doc__d">Keeper targets, the per-copy star, and the Master Collection page.</span></a>
+    <a class="doc" href="FIGURE_SETS.md"><span class="doc__f">FIGURE_SETS.md</span><span class="doc__d">Multi-pack sets and the Special Release cards.</span></a>
+    <a class="doc" href="FIGURE_SPLITS.md"><span class="doc__f">FIGURE_SPLITS.md</span><span class="doc__d">Retail vs convention/mail-in edition splits, figure by figure.</span></a>
+    <a class="doc" href="MAIL_RELEASES.md"><span class="doc__f">MAIL_RELEASES.md</span><span class="doc__d">Mail-in vs mail-order terminology and log.</span></a>
+    <a class="doc" href="FILE_CARDS.md"><span class="doc__f">FILE_CARDS.md</span><span class="doc__d">The file-card style catalog and per-figure printings.</span></a>
+    <a class="doc" href="PLANNING.md"><span class="doc__f">PLANNING.md</span><span class="doc__d">Planned, not built: Parts Bin priority ranking + starred-copy protection.</span></a>
     <a class="doc" href="BACKEND_AND_SCALE.md"><span class="doc__f">BACKEND_AND_SCALE.md</span><span class="doc__d">Data layer, persistence, and the 700–800 figure scale plan.</span></a>
-    <a class="doc" href="CLAUDE.md"><span class="doc__f">CLAUDE.md</span><span class="doc__d">Primer for Claude Code — what this bundle is and how to work in it.</span></a>
+    <a class="doc" href="CLAUDE.md"><span class="doc__f">CLAUDE.md</span><span class="doc__d">Primer for Claude Code — repo map and working rules.</span></a>
   </div>
 
   <div class="foot">
-    BUNDLE CONTENTS · 7 reference screens (fixed sample data, incl. the IA site map) · 1 working app (Collection App — saves locally) · 10 markdown spec docs · package.json · this index. <br />
-    Rebuild for production using the README + spec docs as the source of truth. The bundled Collection App is a localStorage prototype (single browser); real multi-device persistence is the backend work in BACKEND_AND_SCALE.md.
+    CONTENTS · the live app (web/ + server/) · 10 frozen reference screens (incl. the IA site map, damage-map editor and Vehicles prototype) · 18 markdown docs · this index.
   </div>
 
 </div>

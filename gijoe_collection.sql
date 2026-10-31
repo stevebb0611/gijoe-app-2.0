@@ -25,6 +25,10 @@
 --              fallback for single-variant figures with no variant_lookup rows)
 --    - instances.is_master: ADDED (the star — this copy is a committed keeper)
 --    - v_master_collection_progress: ADDED (target vs. starred_count per figure/variant)
+--
+--  Synced through migration 022 (verified 2026-10-30 against the live DB:
+--  every table, column, index and view matches). Each later migration in
+--  migrations/ must be mirrored here too — server/seed.mjs builds from this file.
 -- ============================================================
 
 PRAGMA foreign_keys = ON;
@@ -141,7 +145,10 @@ CREATE TABLE IF NOT EXISTS accessories (
     image_url_primary     TEXT,
     image_url_detail      TEXT,
     created_at            DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at            DATETIME DEFAULT CURRENT_TIMESTAMP
+    updated_at            DATETIME DEFAULT CURRENT_TIMESTAMP,
+    split_of              INTEGER REFERENCES accessories(id) ON DELETE SET NULL
+                          -- migration 022: this row is one cut piece of a splittable parent
+                          -- (e.g. A1751 Stripes / A1752 Rank of A0328). NULL = an ordinary accessory.
 );
 
 -- ─────────────────────────────────────────────
@@ -228,7 +235,11 @@ CREATE TABLE IF NOT EXISTS instances (
                 -- ON DELETE SET NULL (not CASCADE, unlike figure_set_members.set_id) —
                 -- deleting a set definition clears the tag, never deletes the owned copy.
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+    updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+    pinned_no   INTEGER
+                -- migration 017: manual "No. N" display-order pin. NULL = unpinned (sorts
+                -- most-complete-first). An insertion point, not a hard slot — see
+                -- figureSummary() in web/src/store.js.
 );
 
 -- ─────────────────────────────────────────────
@@ -242,15 +253,33 @@ CREATE TABLE IF NOT EXISTS instances (
 -- than one unit of an accessory (e.g. a figure needing two of the same
 -- weapon). A line is satisfied when units_owned >= figure_accessories.quantity_required.
 -- units_owned = 0 → this copy is missing this accessory entirely.
--- units_damaged (migration 004) is a subset of units_owned — a condition
--- notation, not a completeness input. Clamped to <= units_owned at the app
--- layer (SQLite ALTER TABLE can't add cross-column CHECK constraints).
+-- Damaged units are one row each in instance_accessory_damage (migration 021,
+-- replacing the old units_damaged/damage_notes columns) — a condition notation,
+-- not a completeness input.
 
 CREATE TABLE IF NOT EXISTS instance_accessories (
     instance_id    INTEGER NOT NULL REFERENCES instances(id) ON DELETE CASCADE,
     accessory_id   INTEGER NOT NULL REFERENCES accessories(id) ON DELETE RESTRICT,
     units_owned    INTEGER NOT NULL DEFAULT 0,
-    units_damaged  INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (instance_id, accessory_id)
+);
+
+-- One row per damaged unit on an owned copy, each with its own optional note
+-- (migration 021). The damaged count is COUNT(*) per (instance_id, accessory_id).
+CREATE TABLE IF NOT EXISTS instance_accessory_damage (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    instance_id  INTEGER NOT NULL,
+    accessory_id INTEGER NOT NULL,
+    notes        TEXT,
+    FOREIGN KEY (instance_id, accessory_id) REFERENCES instance_accessories(instance_id, accessory_id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_iad_instance_accessory ON instance_accessory_damage(instance_id, accessory_id);
+
+-- Which copies have split which splittable parent accessory (migration 022).
+-- A split copy shows the parent's pieces (accessories.split_of) instead of the parent.
+CREATE TABLE IF NOT EXISTS instance_accessory_splits (
+    instance_id  INTEGER NOT NULL REFERENCES instances(id) ON DELETE CASCADE,
+    accessory_id INTEGER NOT NULL REFERENCES accessories(id) ON DELETE CASCADE,
     PRIMARY KEY (instance_id, accessory_id)
 );
 
@@ -301,9 +330,17 @@ CREATE TABLE IF NOT EXISTS figure_accessories (
 CREATE TABLE IF NOT EXISTS accessory_inventory (
     accessory_id    INTEGER PRIMARY KEY REFERENCES accessories(id) ON DELETE CASCADE,
     quantity_owned  INTEGER NOT NULL DEFAULT 0,
-    units_damaged   INTEGER NOT NULL DEFAULT 0,   -- subset of quantity_owned; app-clamped (migration 006)
     notes           TEXT
 );
+
+-- One row per damaged LOOSE unit, each with its own optional note (migration 021).
+-- Clean loose units stay a plain count in accessory_inventory.quantity_owned.
+CREATE TABLE IF NOT EXISTS bin_damage (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    accessory_id INTEGER NOT NULL REFERENCES accessories(id) ON DELETE CASCADE,
+    notes        TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_bin_damage_accessory ON bin_damage(accessory_id);
 
 -- ─────────────────────────────────────────────
 --  LOCATIONS (optional reference lookup)
@@ -690,12 +727,14 @@ SELECT
     a.color,
     a.release_context,
     ai.quantity_owned       AS total_owned,
-    ai.units_damaged        AS damaged_owned,
-    ai.quantity_owned - ai.units_damaged AS clean_owned,
+    COALESCE(bd.damaged_count, 0) AS damaged_owned,
+    ai.quantity_owned - COALESCE(bd.damaged_count, 0) AS clean_owned,
     ai.notes
 FROM accessory_inventory ai
 JOIN accessories            a  ON a.id          = ai.accessory_id
 LEFT JOIN accessory_categories ac ON ac.category_id = a.category_id
+LEFT JOIN (SELECT accessory_id, COUNT(*) AS damaged_count FROM bin_damage GROUP BY accessory_id) bd
+       ON bd.accessory_id = ai.accessory_id
 ORDER BY a.name;
 
 

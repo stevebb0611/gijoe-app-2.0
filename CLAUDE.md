@@ -1,104 +1,95 @@
-# CLAUDE.md — G.I. Joe Tracker handoff
+# CLAUDE.md — G.I. Joe Collection
 
-> ✅ **STATUS UPDATE (July 2026): the port already happened.** Everything below this line
-> describes the original design-handoff bundle and the porting job as a task still to do.
-> That job (`OPEN_QUESTIONS.md` Q17a/Q17b) is **done** — there is now a real,
-> running app: a Vite build in **`web/`** (`web/src/*.jsx`, built to `web/dist`) served by a
-> local **Express + `better-sqlite3`** server (**`server/`**), reading/writing the live
-> `gijoe_collection.db`. **Run it with `npm start`**, not `npx serve .` — that serves the
-> real built app + `/api/*` routes at `http://localhost:3000`; the raw HTML/JSX files below
-> remain reachable only as reference mockups the server also serves statically. Dozens of
-> real features (variants, damage tracking, Parts Bin, file cards, country-of-origin, the
-> rebalance engine, accessory groups) have shipped into `web/`/`server/` since the port —
-> see the git log and `OPEN_QUESTIONS.md` for what's actually built. Treat this
-> file's framing ("design handoff, not production," "your job: port it") as historical
-> context for the prototype files, not as the current task — **the current task is
-> extending the live app in `web/`/`server/`, following the design rules below.**
-> `PORT_VERBATIM.md` (now in `_archive/`) governed the original port — "mechanical port,
-> smallest possible diff, don't redesign"; kept for historical rationale only, not current
-> instruction. The root-level `.jsx`/`.js` prototype files still carry a header comment
-> pointing at their live `web/src` counterpart — don't edit the root copies.
+A personal **inventory + condition tracker** for a large vintage G.I. Joe collection
+(target **700–800 figures**; ~940 owned copies as of October 2026). Single user,
+localhost only. Read this, then `README.md`, then `OPEN_QUESTIONS.md`.
 
-You are working inside a **design handoff bundle**, not a production codebase. Read this first, then `README.md`, then `OPEN_QUESTIONS.md`.
+**The current task is always extending the live app in `web/` + `server/`.** The
+repo began as a design-handoff bundle. The port to a real build (`OPEN_QUESTIONS.md`
+Q17a/Q17b) finished in July 2026, and dozens of features have shipped since. The
+root-level HTML/JSX files are the **frozen prototype**: design reference only.
 
-## What this bundle is
+## Run it
 
-A personal **inventory + condition tracker** for a large vintage G.I. Joe collection (target **700–800 figures**). It contains two layers:
-
-- **The live app** (`web/` + `server/`, see below) — the real, ported, database-backed build; run it with `npm start`.
-- **A WORKING APP prototype** (`GI Joe Tracker - Collection App.html`) — the pre-port reference: starts empty, searches the real catalog parsed from the CSVs, and saved owned copies to `localStorage`. Superseded by the live app for anything but visual/behavioral reference.
-- **Static reference mockups** + **JSX/JS modules** — the original visual prototypes (fixed sample data).
-- **Markdown specs** — the source of truth for design, data model, and decisions (see the Specs list below — now includes `FILE_CARDS.md`).
-
-### The working app (start here to run it)
-- `GI Joe Tracker - Collection App.html` — shell (combined CSS, mounts the app, Tweaks panel with Export/Import/Clear).
-- `catalog-data.js` — GENERATED reference catalog (`window.JOE_CATALOG`, 520 entries grouped by code name + version, with variants and accessory blueprints joined from the accessories CSVs). Never mutated.
-- `store.js` — `window.JoeStore` (localStorage-backed owned inventory + pub/sub) and `window.JoeData` (completeness math). Storage key: `gi_joe_collection_v1`.
-- `app-inventory.jsx` — live inventory view (empty state, year groups, detail modal, accessory toggles, remove).
-- `app-add-figure.jsx` — Add Figure flow (FIND → DETAILS → CONDITION → FINALIZE) writing real instances to the store.
-- `damage-map.jsx` — shared condition diagram + grade engine (reused by the add flow).
-
-## Your job
-
-*(Historical — the port is done; see the STATUS UPDATE above. Kept for context on how the live `web/`/`server/` code came to exist.)*
-
-**Port these prototypes into a real build with the smallest possible diff — do NOT redesign.** See `_archive/PORT_VERBATIM.md` for the exact rule and steps that were followed. The prototype is already real React + CSS; move it verbatim, changing only how it compiles (Vite/Next instead of browser-Babel) and how modules share code (`import`/`export` instead of `window`). If no project exists yet, scaffold a **React + TypeScript** Vite SPA (or Next.js) and port into it.
-
-- Treat the **HTML/JSX as the source of truth for visual design and behavior.**
-- Treat **`FRONTEND_STANDARDS.md` as the source of truth for how to build it properly.**
-- Treat **`OPEN_QUESTIONS.md`'s Open section as a blocker list** — several modeling decisions (notably the per-instance data model) must be resolved before or early in implementation. Surface these to the user rather than guessing.
-
-## Fidelity
-
-**High-fidelity.** Colors, typography, spacing, borders, and interactions are final-intent — match them faithfully. The aesthetic is a deliberate **vintage field-manual / cardback** look (paper & ink, hard edges, offset shadows, zero border-radius, Oswald + Space Mono). It is not a generic admin table. See "Design Language" and "Design Tokens" in `README.md`.
-
-Production swaps to make: replace unicode-glyph icons (`▸ ▾ ✕ ⚖ ＋ ✓` …) with a real icon set (Lucide/Feather), self-host or pipeline the fonts, and replace the in-browser Babel with a real build.
-
-## Running the prototypes locally
-
-The JSX is fetched and compiled at runtime, so the screens **must be served over http://localhost** — opening files directly (`file://`) leaves them blank.
-
-```
-npx serve .          # then open the printed URL (e.g. http://localhost:3000)
-# or: npm start
-# or: python3 -m http.server 3000
+```bash
+(cd web && npm run build) && npm start   # http://localhost:3000 — live app + /api/*
+cd web && npm run dev                    # :5173 with hot reload, proxies /api to :3000
 ```
 
-`index.html` is the landing page — it links every screen and every spec doc. Keep an internet connection for the first load (CDN React/Babel/fonts).
+- `server/*.js` has **no hot reload**. Restart `npm start` after server edits.
+- Both servers are often **already running** against the real DB. Check with
+  `lsof -nP -iTCP -sTCP:LISTEN | grep node` before starting your own.
+- There is no test suite. Smoke-check with `cd web && npm run build && npm run lint`,
+  then look at the running app (`web/.claude/skills/verify/SKILL.md`).
+- `npm run backup` snapshots the DB into `backups/` (keeps 30). `npm run export-catalog`
+  writes a readable catalog CSV snapshot into `exports/`.
 
-## Map of the bundle
+## Ground rules
 
-**The live app** (query this, not the prototype, when checking current behavior):
+- **The DB is live data.** `gijoe_collection.db` is the owner's real collection.
+  Read-only navigation is fine. Confirm before driving any write action (Add Figure,
+  Apply Moves, Pull to Complete, …) or running a mutating script. Run `npm run backup`
+  before bulk data edits.
+- **Never commit the DB.** The GitHub repo is public and the DB holds bin/box
+  locations. `*.db`, `backups/` and `exports/` are gitignored. Keep it that way.
+- **`npm run seed` is destructive.** It rebuilds from the root CSVs, which lag the
+  live DB (`release_context` tags, splits, groups were applied live only). It refuses to
+  run over owned instances without `--force`. Don't regenerate the seed CSVs without the
+  owner — see `OPEN_QUESTIONS.md` Q21.
+- **An auto-commit hook** (`.claude/hooks/git-auto-push.sh`, PostToolUse on
+  Edit/Write/NotebookEdit/Bash) commits *and pushes* once 5+ files are dirty. Expect
+  mid-task commits.
+- **Schema changes** go in a new numbered file in `migrations/` (next: `023_…`), applied
+  to the live DB, and mirrored into `gijoe_collection.sql`.
+- **`web/src/store.js` uses synchronous XHR on purpose** (see its header). Don't convert
+  it to async without also reworking every `JoeStore.*` call site.
+- **The catalog is fetched once per page load.** A writable catalog field needs an
+  in-place cache patch in the `store.js` setter, not a refetch.
+- **Don't edit the root-level prototype files.** Each carries a "frozen prototype"
+  header pointing at its live counterpart.
+- **No helper language in the UI.** New UI gets labels and data only, with no
+  explanatory sub-lines or intro copy (`OPEN_QUESTIONS.md` F4).
+
+## Map
 
 | Path | What it is |
 |---|---|
-| `server/index.js` | Express entry point — serves `web/dist` + the `/api/*` routes, falls back to the raw repo root for reference mockups |
-| `server/catalog.js`, `server/accessories.js`, `server/instances.js`, `server/export-xlsx.js` | API handlers reading/writing `gijoe_collection.db` (`better-sqlite3`) |
-| `gijoe_collection.db` + `gijoe_collection.sql` (schema) + `migrations/*.sql` | The live database and its schema/migration history — the actual source of truth, not the CSVs |
-| `web/src/main.jsx` | Vite app root — mounts `InventoryView` / `PartsBin` + the Tweaks panel |
-| `web/src/app-inventory.jsx`, `app-detail.jsx`, `app-add-figure.jsx`, `parts-bin.jsx`, `damage-map.jsx`, `store.js`, `accessory-groups.jsx`, `fig-identity.js`/`.jsx`, `filecards.jsx` | The ported + since-extended real components — these, not the root `.jsx` files, are what's running |
-
-**The original prototype** (visual/behavioral reference only — see `_archive/PORT_VERBATIM.md` for the historical porting rule):
-
-| File | What it is |
-|---|---|
-| `index.html` | Landing page — run instructions + links to all screens & docs |
-| `GI Joe Tracker - Inventory.html` + `inventory-app.jsx` | **Home screen — design of record.** Year-grouped collection, search/filter, List/Gallery, instance accordions, detail modal |
-| `GI Joe Tracker - Instance Detail.html` + `instance-detail.jsx` | Single-copy detail: damage map, derived grade, accessory checklist, variant identity |
-| `GI Joe Tracker - Add Figure.html` + `add-figure.jsx` | 3-step intake (Find → Details → Condition) + production-variant picker (required for multi-variant figures) + Parts-Bin pull |
-| `GI Joe Tracker - Parts Bin.html` + `parts-bin.jsx` | Loose-accessory inventory, compatibility/reverse-lookup, ⚖ rebalance |
-| `GI Joe Tracker - Inventory (Scale States).html` | Self-contained scale/density stress test (no JSX deps) |
-| `damage-map.jsx` | Shared damage-map condition component |
-| `wf-data.jsx` | Sample catalog + completeness math (`figParts`, `figState`, `yearParts`, `totals`) |
-| `parts-catalog.js` | 798-entry accessory catalog driving the Parts Bin |
-| `tweaks-panel.jsx` | Theme panel (paper/accent/faction/wobble) — informs a real theme config, not shipped as-is |
+| `web/src/` | The live React app. Per-file map in `web/README.md` |
+| `server/index.js` | Express entry — serves `web/dist`, the `/api/*` routes, and (fallback) the raw repo root for the prototypes |
+| `server/catalog.js`, `accessories.js`, `instances.js`, `export-xlsx.js`, `db.js` | API handlers over `gijoe_collection.db` (`better-sqlite3`, WAL mode) |
+| `server/*.mjs` | Reusable owner CLI tools: `add-figure`, `add-figure-set`, `split-release-edition`, `set-accessory-context`, `set-match-key`, `migrate-accessory-groups` (append-only group list), `migrate-file-cards`, `seed`, `backup-db`, `export-catalog-snapshot` |
+| `server/one-off/` | Data fixes already applied to the live DB — kept for provenance, idempotent |
+| `shared/completeness.js` | Completeness/group clustering math used by both server and client |
+| `migrations/`, `gijoe_collection.sql` | Numbered schema history + base schema |
+| `gijoe_db_*.csv` (root) | Seed sources `server/seed.mjs` reads. `seed/` is the original handoff copy, used only for cross-checks |
+| `assets/` | Prototype damage-map assets + `assets/design/color-panel.png` (re-render it when tokens change) |
+| Root `*.html` / `*.jsx` / `*.js` / `*.css` | Frozen prototype — `index.html` (at `/index.html`) links every screen |
+| `_archive/` | Superseded mockups and the original handoff docs (`PORT_VERBATIM.md`, `START_HERE.md`, …) |
 
 ### Specs
-`README.md` (start here) · `OPEN_QUESTIONS.md` (open items + resolved-decision log — read second) · `FRONTEND_STANDARDS.md` · `INSTANCE_MODEL.md` · `VARIANTS.md` · `PARTS_BIN.md` · `ACCESSORY_GROUPS.md` · `FIGURE_SPLITS.md` · `FILE_CARDS.md` · `MASTER_COLLECTION.md` · `TAXONOMY.md` · `MAIL_RELEASES.md` · `FIGURE_SETS.md` · `NAVIGATION.md` · `BACKEND_AND_SCALE.md` · `DAMAGE_MAP.md`.
+`README.md` (design language, tokens, what's built) · `OPEN_QUESTIONS.md` (open items +
+resolved log) · `FRONTEND_STANDARDS.md` · `INSTANCE_MODEL.md` · `DAMAGE_MAP.md` ·
+`VARIANTS.md` · `PARTS_BIN.md` · `ACCESSORY_GROUPS.md` · `FIGURE_SPLITS.md` ·
+`FIGURE_SETS.md` · `MAIL_RELEASES.md` · `MASTER_COLLECTION.md` · `FILE_CARDS.md` ·
+`TAXONOMY.md` · `NAVIGATION.md` · `BACKEND_AND_SCALE.md` · `PLANNING.md` (planned,
+unbuilt Parts Bin work — Q25).
 
-## Known prototype shortcuts to NOT carry over
+Per-figure data decisions (splits, groups, release context) are logged in the spec
+docs, figure by figure. Check the relevant log before changing a figure's data.
 
-- **Per-instance data is synthesized** in `wf-data.jsx` (`figState()`) — the sample stores only aggregate accessory counts and derives a plausible per-copy allocation. A real **Instance** entity must replace this (`OPEN_QUESTIONS.md` Q1/Q5).
-- **Add Figure runs on superseded, name-keyed sample data** (`OPEN_QUESTIONS.md` Q8).
-- **All figure images are hatched placeholders** — real photography is a TODO (source + storage).
-- Brand name is **"G.I. Joe Collection"** (decided June 2026; replaced the "Joe Dossier" placeholder) with a vintage-ARAH-file-card outline mark — live across every current surface (Figures, Vehicles, Parts Bin, and the Scale States reference). The name uses the Hasbro mark by choice (fine for private use; revisit before any public release — see OPEN_QUESTIONS.md Q10). `_archive/` holds superseded design mockups (accessory sub-group prototypes, the old PORT_VERBATIM/START_HERE/HANDOFF docs) — not the "Joe Dossier" working app, whose current whereabouts this doc can no longer verify.
+## Fidelity
+
+**High-fidelity.** Colors, typography, spacing, borders and interactions are
+final-intent. The look is a deliberate **vintage field-manual / cardback**: paper and
+ink, hard edges, offset shadows, zero border-radius, Oswald + Space Mono. It is not a
+generic admin table. See "Design Language" and "Design Tokens" in `README.md`, and
+`FRONTEND_STANDARDS.md` for UI conventions. Dashed outlines mean missing/to-do.
+
+Still-open production swaps: unicode-glyph icons (`▸ ▾ ✕ ⚖ ＋ ✓` …) → a real icon set,
+and self-hosted fonts (Q14).
+
+## Brand
+
+**"G.I. Joe Collection"** (decided June 2026) with a vintage-ARAH-file-card outline
+mark, live on every surface. The name uses the Hasbro mark by choice — fine for private
+use; revisit before any public release (`OPEN_QUESTIONS.md` Q10).

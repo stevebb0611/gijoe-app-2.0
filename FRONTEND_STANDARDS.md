@@ -5,6 +5,8 @@ How to recreate the prototype properly. The prototype optimizes for fast iterati
 ---
 
 ## Stack
+> **As built (checked 2026-10-30):** Vite 8 SPA, React 19, **plain JSX (no TypeScript)**, one global `web/src/app.css`, oxlint. No router — `main.jsx` switches pages from state. The API is the local Express server (`server/`). The bullets below are the original recommendation. TypeScript has not been adopted.
+
 - **React + TypeScript** is the natural target (the prototype is React-shaped). Next.js if you want routing/SSR/URL-state ergonomics; a Vite SPA is fine for a personal tool.
 - **TypeScript is strongly recommended** — the data model (catalog × ownership × instances × accessories) has enough shape that types will prevent real bugs. Model `Series`, `Figure`, `Instance`, `Accessory`, and the completeness derivations as typed functions.
 - **Drop the prototype mechanics**: no Babel-in-browser, no `Object.assign(window, …)` module sharing, no single inline `<style>`. Use the codebase's bundler, real ES modules, and its styling system.
