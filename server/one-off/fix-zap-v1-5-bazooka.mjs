@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// server/fix-zap-v1-5-bazooka.mjs — one-off, re-runnable fix for Zap
+// server/one-off/fix-zap-v1-5-bazooka.mjs — one-off, re-runnable fix for Zap
 // (v1.5, figure catalog id 48, source F084), owner-confirmed 2026-07-22.
 //
 // Zap v1.5's blueprint carried all 3 Zap bazooka mold variants (Bazooka
@@ -17,7 +17,7 @@
 // than renaming it globally, this creates a new accessory row named plain
 // "Bazooka" scoped only to Zap v1.5 — same "new row for a figure-specific
 // need" pattern as fix-outback-v1-blueprint.mjs's convention-issue Flashlight.
-import db from './db.js';
+import db from '../db.js';
 
 const figure = db.prepare("SELECT id, code_name, version FROM figures WHERE figure_id = 'F084'").get();
 if (!figure) { console.error('✕ F084 (Zap v1.5) not found.'); process.exit(1); }

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// server/import-coo.mjs — one-off loader for gijoe_db_figures_coo.csv into
+// server/one-off/import-coo.mjs — one-off loader for gijoe_db_figures_coo.csv into
 // figure_coo (migration 005). Run once after that migration is applied:
-//   node server/import-coo.mjs
+//   node server/one-off/import-coo.mjs
 //
 // The CSV has no header — each row is "code_name vVersion[ variant-letter],code",
 // two rows per figure (it was produced in two of the three known countries).
@@ -10,10 +10,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'csv-parse/sync';
-import db from './db.js';
+import db from '../db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.join(__dirname, '..');
+const ROOT = path.join(__dirname, '..', '..');
 const CSV_PATH = path.join(ROOT, 'gijoe_db_figures_coo.csv');
 
 const COUNTRY = { 1: 'China', 2: 'Hong Kong', 3: 'Indonesia' };

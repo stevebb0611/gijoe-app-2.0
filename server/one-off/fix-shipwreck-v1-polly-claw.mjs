@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// server/fix-shipwreck-v1-polly-claw.mjs — one-off, re-runnable fix for
+// server/one-off/fix-shipwreck-v1-polly-claw.mjs — one-off, re-runnable fix for
 // Shipwreck (v1, figure catalog id 87, source F135), owner-confirmed
 // 2026-08-09.
 //
@@ -14,7 +14,7 @@
 // unlink-not-delete fixes (fix-zap-v1-5-bazooka.mjs) — Parts Bin only lists
 // accessories still joined to a figure_accessories row, so it drops out of
 // view on its own.
-import db from './db.js';
+import db from '../db.js';
 
 const figure = db.prepare("SELECT id, code_name FROM figures WHERE figure_id = 'F135'").get();
 if (!figure) { console.error('✕ F135 (Shipwreck v1) not found.'); process.exit(1); }

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// server/fix-outback-v1-blueprint.mjs — one-off, re-runnable fix for Outback
+// server/one-off/fix-outback-v1-blueprint.mjs — one-off, re-runnable fix for Outback
 // (v1, figure catalog id 152, source F-code F213), owner-confirmed 2026-07-13.
 //
 // Three corrections to one blueprint:
@@ -19,7 +19,7 @@
 //      A1930) and attaches it convention-only. web/src/blueprint-names.js's
 //      disambiguateNames() already handles same-name+same-color siblings via
 //      numbered suffix, so no code change needed for display.
-import db from './db.js';
+import db from '../db.js';
 
 const figure = db.prepare("SELECT id, code_name FROM figures WHERE figure_id = 'F213'").get();
 if (!figure) { console.error('✕ F213 (Outback v1) not found.'); process.exit(1); }

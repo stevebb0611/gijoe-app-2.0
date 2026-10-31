@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// server/fix-cobra-sub-team-mismap.mjs — one-off, re-runnable fix for a
+// server/one-off/fix-cobra-sub-team-mismap.mjs — one-off, re-runnable fix for a
 // systemic sub_group_id mis-keying, owner-confirmed 2026-08-10.
 //
 // gijoe_db_figures_2.0.csv hand-keyed sub_group_id as a raw number, and six
@@ -25,10 +25,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'csv-parse/sync';
-import db from './db.js';
+import db from '../db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.join(__dirname, '..');
+const ROOT = path.join(__dirname, '..', '..');
 const CSV_PATH = path.join(ROOT, 'gijoe_db_figures_2.0.csv');
 
 const subGroupId = (name) => {

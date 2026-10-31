@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// server/split-quick-kick-convention.mjs — one-off, re-runnable fix for Quick
+// server/one-off/split-quick-kick-convention.mjs — one-off, re-runnable fix for Quick
 // Kick (v1). The CSV carried this as two rows (F133 "A" 1985 retail, F404 "B"
 // "Peach-colored skin" 1991 mail order) sharing code_name+version, so
 // seed.mjs's dedup silently folded them into one catalog figure (id 85) whose
@@ -14,7 +14,7 @@
 // is confirmed. Companion CSV edits already applied to gijoe_db_figures_2.0.csv,
 // gijoe_db_accessories.csv, gijoe_db_figures_accessories(_group_id).csv so a
 // future from-scratch reseed reproduces this same state.
-import db from './db.js';
+import db from '../db.js';
 
 const CONVENTION_ACCESSORY_CODES = ['A0188', 'A0190', 'A0192']; // dark gray backpack, flimsy sword, flimsy nunchuks
 

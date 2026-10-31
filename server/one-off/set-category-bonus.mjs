@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// server/set-category-bonus.mjs — one-off, owner-confirmed bulk reclassification
+// server/one-off/set-category-bonus.mjs — one-off, owner-confirmed bulk reclassification
 // of figure_accessories.release_context to 'bonus' for entire accessory
 // categories, as opposed to the figure-by-figure story set-accessory-context.mjs
 // handles.
@@ -16,8 +16,8 @@
 // touched it either).
 //
 // Re-runnable: only rows not already 'bonus' are updated.
-// Usage: node server/set-category-bonus.mjs
-import db from './db.js';
+// Usage: node server/one-off/set-category-bonus.mjs
+import db from '../db.js';
 
 const CATEGORY_IDS = [39, 48, 52]; // Decal, Putty, Cassette / VHS
 
