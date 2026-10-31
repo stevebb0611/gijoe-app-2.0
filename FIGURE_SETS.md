@@ -68,7 +68,7 @@ instance as one of that set's slots.
 
 **Reseed caveat:** a from-scratch `npm run seed` does **not** repopulate `figure_sets`/
 `figure_set_members` — same limitation `figure_coo` already has (that one's populated by the
-separate `server/import-coo.mjs`, not by `gijoe_collection.sql`'s inline seed data, for the
+separate `server/one-off/import-coo.mjs`, not by `gijoe_collection.sql`'s inline seed data, for the
 identical reason: the inline seed section runs before any `figures` rows exist from the
 CSVs, so it can't reference a `figure_id`). Recovery after a reseed means replaying the
 confirmed-set entries below, one `add-figure-set.mjs` command per entry (or pasting each

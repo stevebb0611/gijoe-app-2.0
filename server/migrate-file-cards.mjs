@@ -2,7 +2,7 @@
 // server/migrate-file-cards.mjs — CSV-driven, idempotent import of real per-figure
 // file-card printings into the live DB. `file_cards` / `figure_file_cards` already
 // existed in the schema but were empty and unwired — this syncs them from two
-// hand-maintained CSVs, the same way server/import-coo.mjs syncs figure_coo from
+// hand-maintained CSVs, the same way server/one-off/import-coo.mjs syncs figure_coo from
 // gijoe_db_figures_coo.csv. See FILE_CARDS.md for the narrative worklog.
 //
 // Source files (repo root):

@@ -3,7 +3,7 @@
 // mainline/700-block CSV collision into two real catalog rows: the retail
 // edition stays on its existing figure_id, the convention/mail-in edition
 // becomes its own `figures` row with its own accessory blueprint. Generalizes
-// server/split-quick-kick-convention.mjs (kept as-is; this is the same
+// server/one-off/split-quick-kick-convention.mjs (kept as-is; this is the same
 // pattern for future confirmed splits, so they don't each need a bespoke
 // one-off file).
 //
@@ -374,7 +374,7 @@ function run() {
         const acc = getAccByCode.get(code);
         if (!acc) throw new Error(`${split.codeName}: accessory ${code} not found.`);
         if (!keepOnRetail) deleteFromRetail.run(retail.id, acc.id); // no-op if it wasn't there
-        insertOnNew.run(newId, acc.id, qty || 1, 'retail'); // 'retail' *within this row's own blueprint* — see split-quick-kick-convention.mjs precedent
+        insertOnNew.run(newId, acc.id, qty || 1, 'retail'); // 'retail' *within this row's own blueprint* — see server/one-off/split-quick-kick-convention.mjs precedent
       }
 
       // Same A/B production variants on both releases (Skystriker) — copy the

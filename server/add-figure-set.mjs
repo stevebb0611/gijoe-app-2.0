@@ -9,7 +9,7 @@
 // after running this to see the new set's badge/progress.
 //
 // A from-scratch `npm run seed` does NOT repopulate figure_sets/figure_set_members
-// (same reseed caveat figure_coo already has, see server/import-coo.mjs) — recovery
+// (same reseed caveat figure_coo already has, see server/one-off/import-coo.mjs) — recovery
 // after a reseed means re-running the commands logged in FIGURE_SETS.md.
 //
 // Usage:

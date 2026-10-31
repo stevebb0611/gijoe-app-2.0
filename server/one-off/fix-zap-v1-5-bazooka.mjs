@@ -16,7 +16,7 @@
 // A0029 is shared with Zap v1 + Cobra v1 (both still ambiguous), so rather
 // than renaming it globally, this creates a new accessory row named plain
 // "Bazooka" scoped only to Zap v1.5 — same "new row for a figure-specific
-// need" pattern as fix-outback-v1-blueprint.mjs's convention-issue Flashlight.
+// need" pattern as server/one-off/fix-outback-v1-blueprint.mjs's convention-issue Flashlight.
 import db from '../db.js';
 
 const figure = db.prepare("SELECT id, code_name, version FROM figures WHERE figure_id = 'F084'").get();

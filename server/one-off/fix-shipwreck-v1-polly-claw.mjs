@@ -11,7 +11,7 @@
 // checklist item; also clear the one existing instance_accessories row that
 // was tracking it (units_owned was already 0, so no ownership data is lost).
 // The orphaned accessories row (A0201) is left in place, same as other
-// unlink-not-delete fixes (fix-zap-v1-5-bazooka.mjs) — Parts Bin only lists
+// unlink-not-delete fixes (server/one-off/fix-zap-v1-5-bazooka.mjs) — Parts Bin only lists
 // accessories still joined to a figure_accessories row, so it drops out of
 // view on its own.
 import db from '../db.js';

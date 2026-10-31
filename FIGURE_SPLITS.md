@@ -88,7 +88,7 @@ F701       Flint       NULL     15         convention       own, disjoint from F
 
 `version` is deliberately blanked (or left distinct from the retail row's) on the new row —
 that's what stops the two from colliding on `seed.mjs`'s dedup key on the next from-scratch
-rebuild, the same fix `server/split-quick-kick-convention.mjs` established first.
+rebuild, the same fix `server/one-off/split-quick-kick-convention.mjs` established first.
 
 ## Tooling
 
@@ -96,7 +96,7 @@ rebuild, the same fix `server/split-quick-kick-convention.mjs` established first
    `release_context`) of any row dropped by the blank-variant collision path, instead of only
    an aggregate counter — so a future collision can't vanish silently again.
 2. **`server/split-release-edition.mjs`** — the reusable split tool, generalized from
-   `server/split-quick-kick-convention.mjs`. A small array of confirmed split specs; applying
+   `server/one-off/split-quick-kick-convention.mjs`. A small array of confirmed split specs; applying
    a newly-verified split means appending an entry, not writing a new script. Each spec:
    retail `figure_id`, new 700-block `figure_id`, the fields that differ, the accessory codes
    that belong on the new row's own blueprint (and any wrong accessory codes to strip off the
@@ -209,11 +209,11 @@ doc.
   sword/nunchuks — distinct from retail's gear, owner-confirmed not a same-release paint
   variant.
 - **Accessories:** dark gray Backpack, flimsy Sword, flimsy Nunchuks — moved off the retail
-  row's blueprint onto F404's own (`server/split-quick-kick-convention.mjs`).
+  row's blueprint onto F404's own (`server/one-off/split-quick-kick-convention.mjs`).
 - **Side fix:** the "silver (flimsy)" color note on two of those accessories was split into a
   proper `accessories.color` value + `variant_notes`, same session.
 - **Source:** owner-confirmed, 2026-07-12.
-- **Status:** ✅ split applied via `server/split-quick-kick-convention.mjs` (the one-off
+- **Status:** ✅ split applied via `server/one-off/split-quick-kick-convention.mjs` (the one-off
   script this doc's generalized tool was built from), verified via API round-trip, 2026-07-12.
 
 ### 1985 — Snow Serpent (v1 retail, figure catalog id 89 — source F-code F137; convention edition, id 527 — F710)

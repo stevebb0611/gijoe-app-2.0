@@ -137,7 +137,7 @@ retail part).
 **Categories marked `bonus`:** Decal (`accessory_categories.category_id` 39), Putty (48),
 Cassette / VHS (52).
 
-**Tooling:** `server/set-category-bonus.mjs` — bulk `UPDATE figure_accessories SET
+**Tooling:** `server/one-off/set-category-bonus.mjs` — bulk `UPDATE figure_accessories SET
 release_context = 'bonus'` for every row whose accessory's `category_id` is in that list
 and isn't already `bonus`. Re-runnable (only non-`bonus` rows are touched; a second run
 reclassified 0). Only touches `figure_accessories.release_context` (what
@@ -173,7 +173,7 @@ Note: Claymore/Dial-Tone/Leatherneck/Mainframe/Wet-Suit's Cassette Tape is one s
 accessory row (`accessories.id` 236) reused across all five figures' blueprints, not five
 separate accessories.
 
-**Status:** ✅ `release_context` set in DB via `server/set-category-bonus.mjs` and verified
+**Status:** ✅ `release_context` set in DB via `server/one-off/set-category-bonus.mjs` and verified
 via `/api/catalog` (Mirage, Rapid-Fire, Tripwire spot-checked), 2026-07-11. Not yet visually
 verified in-app. None of these figures have a `group_id`/`match_key` slot, so no separate
 Figures-list entry is needed for them individually — this table is their record instead.
@@ -828,7 +828,7 @@ another holds the cut pieces.
 - **New accessory:** the convention release also shipped its own Flashlight (green) —
   same name+color as the retail one (A0352), but a physically distinct pack-in, not a
   reused row (no spare green Flashlight existed anywhere else in the catalog to
-  repurpose). Created `A1931` (`server/fix-outback-v1-blueprint.mjs`), attached
+  repurpose). Created `A1931` (`server/one-off/fix-outback-v1-blueprint.mjs`), attached
   convention-only.
 - **Unaffected (plain retail, required):** Survival Backpack (A0349), Heckler & Koch G3
   Rifle (A0350), Web Belt (A0351), Flashlight (green, A0352, retail copy).
@@ -845,7 +845,7 @@ another holds the cut pieces.
   other figures with pre-existing, unrelated same-name-same-color collisions (Major Bludd
   v2, Mercer v2, Chun Li v1, Alley Viper v3) that had the same latent bug.
 - **Status:** ✅ release_context/removal/new-accessory applied via
-  `server/fix-outback-v1-blueprint.mjs`, `disambiguateNames()` fixed in
+  `server/one-off/fix-outback-v1-blueprint.mjs`, `disambiguateNames()` fixed in
   `server/blueprint-names.js`, both verified via `/api/catalog` (blueprint shows Backpack/
   Rifle/Web Belt/Flashlight #1 retail, Rifle/Machine Gun/Flashlight #2 convention, no black
   Flashlight), 2026-07-13. Not yet visually verified in-app.
