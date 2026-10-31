@@ -13,7 +13,6 @@ import { formatYear } from './fig-identity.js';
 import { FileCardRow, FileCardTell, FileCardColorInput, FileCardGrade } from './filecards.jsx';
 
 const INV_CAT = JoeData.CAT || [];
-const INV_ERAS = {}; // was window.JOE_ERAS from the retired catalog-data.js — always {}
 const INV_CAT_BY_ID = new Map(INV_CAT.map(f => [f.id, f]));
 
 // ---------------------------------------------------------------------------
@@ -1217,7 +1216,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
 }
 
 export {
-  INV_CAT, INV_ERAS, INV_CAT_BY_ID,
+  INV_CAT, INV_CAT_BY_ID,
   fvm, figParts, figState, applyRebalance, swapSuggestions, applySwaps, yearParts, invTotals, invMasterTotals,
   FactionTag, CompRing, CompBar, PhotoSlot, StockBar, AccItem, DmgPopover, boxLayout, binPullAvail, MasterBadge,
   InvDetailModal,

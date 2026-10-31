@@ -8,7 +8,7 @@ import React from 'react';
 import { JoeStore, JoeData } from './store.js';
 import { SetCard } from './set-card.jsx';
 import {
-  INV_CAT, INV_ERAS, INV_CAT_BY_ID,
+  INV_CAT,
   fvm, figParts, figState, yearParts, invTotals, invMasterTotals,
   FactionTag, CompRing, CompBar, PhotoSlot, StockBar, MasterBadge,
   InvDetailModal,

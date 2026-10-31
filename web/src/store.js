@@ -27,7 +27,7 @@
 //   from `marks` (not stored), same as the DB's own damage JSON design.
 import { physicalGrade, paintGrade } from './damage-map.jsx';
 import {
-  clusterBlueprint, matchedSetSatisfied, bpReq, instOwn, instPct, instWhole,
+  clusterBlueprint, bpReq, instOwn, instPct, instWhole,
   groupLabel, optLabel, accDamagePct, missingList, bpForVariant,
 } from '../../shared/completeness.js';
 
@@ -355,7 +355,7 @@ export const JoeStore = {
           refresh(); emit();
           return true;
         }
-      } catch (e) {}
+      } catch {}
       return false;
     },
   };

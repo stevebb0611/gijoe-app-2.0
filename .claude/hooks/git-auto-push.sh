@@ -1,5 +1,6 @@
 #!/bin/bash
-# Fires on PostToolUse for Edit/Write/NotebookEdit. When 5+ files are dirty
+# Fires on PostToolUse for Edit/Write/NotebookEdit/Bash (Bash added 2026-10-30:
+# script-driven edits were skipping the push). When 5+ files are dirty
 # in `git status --porcelain`, auto-commits and pushes to the current
 # branch's existing upstream. No force-push; skips silently if no upstream.
 
