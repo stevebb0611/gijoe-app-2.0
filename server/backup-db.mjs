@@ -40,7 +40,11 @@ const snapshots = fs.readdirSync(BACKUP_DIR)
 
 const stale = snapshots.slice(0, Math.max(0, snapshots.length - BACKUP_KEEP));
 for (const f of stale) {
-  fs.unlinkSync(path.join(BACKUP_DIR, f));
+  // Pre-.backup() snapshots (before 2026-10-24) were plain file copies that left
+  // -wal/-shm sidecars behind — remove those with their .db.
+  for (const side of [f, `${f}-wal`, `${f}-shm`]) {
+    fs.rmSync(path.join(BACKUP_DIR, side), { force: true });
+  }
   console.log(`Pruned old backup -> backups/${f}`);
 }
 

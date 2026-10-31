@@ -54,8 +54,12 @@ if (fs.existsSync(DB_PATH)) {
   try { instanceCount = probe.prepare('SELECT COUNT(*) AS n FROM instances').get().n; } catch { /* no instances table yet */ }
   probe.close();
 
-  const backupPath = path.join(ROOT, `gijoe_collection.db.bak.${new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14)}`);
-  fs.copyFileSync(DB_PATH, backupPath);
+  fs.mkdirSync(path.join(ROOT, 'backups'), { recursive: true });
+  const backupPath = path.join(ROOT, 'backups', `gijoe_collection.db.bak.${new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14)}`);
+  // backup() reads through the WAL — a plain file copy would miss uncheckpointed writes (see backup-db.mjs).
+  const snap = new Database(DB_PATH, { readonly: true });
+  await snap.backup(backupPath);
+  snap.close();
   console.log(`Backed up existing DB -> ${backupPath}`);
 
   if (instanceCount > 0 && !process.argv.includes('--force')) {

@@ -1,16 +1,34 @@
-# React + Vite
+# web/ — G.I. Joe Collection front end
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+The live React app (Vite 8, React 19, plain JSX + one `app.css`). It talks to the
+Express API in `../server/` over `/api/*`; the DB is `../gijoe_collection.db`.
 
-Currently, two official plugins are available:
+```bash
+npm run dev      # Vite on :5173, proxies /api to :3000 (start the server first: `npm start` at repo root)
+npm run build    # -> web/dist, which `npm start` at repo root serves on :3000
+npm run lint     # oxlint
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+There is no test suite — verify changes in the running app (see
+`.claude/skills/verify/SKILL.md`). Read/navigation is safe against the live DB;
+any write action (Add Figure, Apply Moves, Pull to Complete, …) persists to the
+owner's real collection.
 
-## React Compiler
+| File | What it holds |
+|---|---|
+| `main.jsx` | App root — page switch (Figures / Master Collection / Parts Bin) + Tweaks panel |
+| `store.js` | `JoeStore` (API client, sync XHR by design) + `JoeData` (completeness rollups) |
+| `app-inventory.jsx` | Figures page — year sections, list/gallery, filters, instance accordions |
+| `app-detail.jsx` | Figure detail modal, accessory rows (`AccItem`), ⚖ rebalance/swap engine |
+| `app-add-figure.jsx` | Add Figure overlay (FIND → DETAILS → CONDITION → FINALIZE) |
+| `parts-bin.jsx` | Parts Bin — loose stock, reverse lookup, Hose Balance, splittable parts |
+| `master-collection.jsx` | Master Collection page (star + per-variant targets, year thermometer) |
+| `set-card.jsx` | Figure Sets / Special Release cards |
+| `accessory-groups.jsx`, `acc-colors.jsx` | Pick-one group rendering, accessory color swatches |
+| `damage-map.jsx`, `assets/figure-{masks,zones}.js` | Damage-map diagram + grade engine |
+| `fig-identity.js`/`.jsx` | Shared 8-field figure identity formatter |
+| `filecards.jsx` | File-card catalog display |
+| `search-util.js` | `normalizeSearch()` — punctuation/`&`/`'n'` folding for search |
+| `tweaks-panel.jsx` | Theme + Export/Import panel |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Completeness math shared with the server lives in `../shared/completeness.js`.

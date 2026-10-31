@@ -2,7 +2,7 @@
   "name": "gijoe-tracker-handoff",
   "version": "1.0.0",
   "private": true,
-  "description": "G.I. Joe collection inventory + condition tracker — HTML/React-via-Babel design prototypes for local review. Design references, not production code.",
+  "description": "G.I. Joe collection inventory + condition tracker — Express + better-sqlite3 API (server/) serving the Vite React app (web/). Root-level HTML/JSX files are frozen design-reference prototypes.",
   "scripts": {
     "start": "node server/index.js",
     "dev": "node server/index.js",
