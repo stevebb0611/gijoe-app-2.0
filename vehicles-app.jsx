@@ -1,3 +1,4 @@
+// ⚠️ frozen prototype — no live counterpart yet (Vehicles is unbuilt, see OPEN_QUESTIONS.md Q15), do not edit here.
 // vehicles-app.jsx — the Vehicles destination.
 // Same chrome as Figures (header from chrome.css) + a vehicles body that mirrors
 // the figures layout: year sections → list rows / gallery cards, completeness off

@@ -1,3 +1,4 @@
+// ⚠️ frozen prototype — no live counterpart yet (Vehicles is unbuilt, see OPEN_QUESTIONS.md Q15), do not edit here.
 // vehicle-data.jsx — sample VEHICLES + PLAYSETS for the Vehicles page.
 // Mirrors the figure model so the page can reuse the figures layout language:
 //   year groups → rows/cards → completeness off a parts blueprint.

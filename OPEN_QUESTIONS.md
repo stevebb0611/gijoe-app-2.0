@@ -19,7 +19,7 @@ The v1 toolbar shipped (multi-select facets, More Filters panel, active-filter s
 - **`[Sort]` control** — order figures within each year section by Code Name · % Complete · Closest to done · Copies owned · Recently added/modified. Recency needs real `added_at`/`modified_at` on instances.
 - **`[＋ Save view]` chip** — save current chips + facets + sort as a named, one-tap view. Open sub-question: where do saved views live (local pref vs. server) once multi-user?
 - Both must sit **alongside** the v1 chips, not replace them (a "fold into a views bar" alternative was explicitly rejected).
-- Reference builds (not wired into the live bundle): `_archive/inventory-app (2nd-pass · v3 chips+sort+saved).jsx` and `_archive/inventory-app (2nd-pass · v2 folded-views).jsx`.
+- Reference builds (`inventory-app (2nd-pass · v3 chips+sort+saved).jsx`, `… v2 folded-views).jsx`) were never committed to this repo — redesign from this description if picked up.
 
 ### Q10. Identity, branding & legal
 Name is decided (**"G.I. Joe Collection,"** vintage-ARAH-file-card mark, live everywhere). **Still open:** the name uses the Hasbro G.I. Joe/Cobra trademark by deliberate choice — fine for private unpublished use, but **revisit before any public release** (an IP-attorney call; franchise names are safer as catalog *data* than as branding). A franchise-neutral fallback name set was explored and shelved for that scenario.
@@ -52,37 +52,40 @@ A planned major expansion (~3× the figures/accessories experience). Direction a
   - No virtualization library is installed (`web/package.json` has only `react`/`react-dom`) — the §6 gallery-virtualization plan was never built. Not urgent, but worth a look once Vehicles/Playsets roughly double the browsable item count.
 
 ### Q16. Sub-Team "chase" view — 🔭 parked idea, low priority
-Beyond sub-team as a filter/grouping axis (resolved, see `TAXONOMY.md`), an early prototype explored sub-teams (Tiger Force, Night Force, Battle Corps, etc.) as **collectible sets to chase to completion** — tile of member chips by owned-state, a SET FOCUS overlay, large-roster collapse. Low priority because it's a presentation layer only, addable anytime without schema work. If revived: needs an authored set→members table (rosters aren't in the seed catalog), a decision on whether "chase" status reuses complete-now logic, and a nav slot. Reference build (archived): `_archive/GI Joe Tracker - Sub-Team Chase.html` + `_archive/subteam-chase.jsx`.
+Beyond sub-team as a filter/grouping axis (resolved, see `TAXONOMY.md`), an early prototype explored sub-teams (Tiger Force, Night Force, Battle Corps, etc.) as **collectible sets to chase to completion** — tile of member chips by owned-state, a SET FOCUS overlay, large-roster collapse. Low priority because it's a presentation layer only, addable anytime without schema work. If revived: needs an authored set→members table (rosters aren't in the seed catalog), a decision on whether "chase" status reuses complete-now logic, and a nav slot. The prototype build (`GI Joe Tracker - Sub-Team Chase.html` + `subteam-chase.jsx`) was never committed to this repo.
 
 ### Q18. CSV data quality — `full_name` field review (flagged July 2026, mostly still open)
 An audit of `gijoe_db_figures_2.0.csv` found code names shared by multiple `full_name` values. 4 genuine distinct-character cases were resolved via `character_key` (migration 002). The rest — mostly typos, a few real file-card variation — need owner verification against physical cards or a trusted reference (YoJoe, HissTank) before correcting; **do not bulk-correct**.
 
 **Flint (F125/F701) is fully resolved** — worked end-to-end as the concrete case: three spellings (Faireborn/Faireborne/Fairborne) confirmed as real era-correct file-card text, not a typo; F125's `release_context` corrected `"1992 Convention"` → `retail`; F701 (the real 1992 Convention-exclusive Flint, previously silently dropped by `server/seed.mjs`'s dedup logic) recreated as its own catalog row with an owner-confirmed accessory blueprint.
 
-**Still open / un-audited** — 11 straightforward name-typo rows (General Flagg, Gung-Ho, Heavy Duty, Lightfoot, Low-Light, Lt. Falcon, Mutt, Ozone, Sci-Fi — plus Snake-Eyes and Storm Shadow, both intentional name-obfuscation, no fix needed) and a larger **systemic mainline/convention collision** affecting ~19 more code-name pairs, triaged but not resolved:
+**Still open / un-audited** — 11 straightforward name-typo rows (General Flagg, Gung-Ho, Heavy Duty, Lightfoot, Low-Light, Lt. Falcon, Mutt, Ozone, Sci-Fi — plus Snake-Eyes and Storm Shadow, both intentional name-obfuscation, no fix needed).
 
-| Code name | Likely shape | Notes |
+**Mainline/convention collision** — mostly resolved by the 2026-07-21 fixes and the **2026-10-30 convention sweep** (`FIGURE_SPLITS.md`), which ended with no convention gear on any retail row and every convention row in Special Release (series 15). Still open: Ice Viper, Steeler, Motor Viper, Starduster, and any per-letter Skystriker rows beyond v1.
+
+| Code name | Status | Notes |
 |---|---|---|
-| Ice Viper | Likely genuine split | Same shape as Flint/Quick Kick |
-| Steeler | Likely genuine split | Same shape as Flint/Quick Kick |
-| Python Officer | Likely split candidate | Already got `ACCESSORY_GROUPS.md`'s `release_context` treatment instead — a split would need to undo that |
-| Python Tele-Viper | Likely split candidate | Same caveat as Python Officer |
-| Motor Viper | Likely genuine split (variant A only) | |
-| Outback | Likely accidental duplicate | Already has an `ACCESSORY_GROUPS.md` entry; deeper collision left parked per owner instruction |
-| Undercover Scarlett | Likely accidental duplicate | Convention-exclusive, never had a retail counterpart to split from |
-| Falcon | Likely accidental duplicate | Already has an `ACCESSORY_GROUPS.md` entry |
-| Rumbler | Likely accidental duplicate | |
-| Heavy Metal | Likely accidental duplicate | Vehicle-driver flag only on the mainline row — needs a look |
-| Snow Serpent (v1 pair) | ✅ Resolved 2026-07-21 | Genuine split — see `FIGURE_SPLITS.md` |
-| Tripwire | Likely accidental duplicate | |
-| Shortfuse | Likely accidental duplicate | `faction_id` flips between rows — real data-corruption tell, verify which is right |
-| Zarana | Likely accidental duplicate | Same faction-flip tell as Shortfuse; already has an `ACCESSORY_GROUPS.md` entry |
-| Snake Eyes (convention pair) | Likely accidental duplicate | Distinct from the numbered v1–v4 retail lineage, which is fine |
-| Roadblock (v2 pair) | ✅ Resolved 2026-07-21 | Genuine split — see `FIGURE_SPLITS.md` |
-| Gung-Ho (v2 pair) | Likely accidental duplicate | Left parked per owner instruction |
-| Stalker (v1.5 B pair) | ✅ Resolved 2026-07-22 | Genuine split (3-way tie) — see `FIGURE_SPLITS.md` |
-| Skystriker / Starduster | Likely accidental duplicates (per-letter) | 3–4 rows per figure, same shape as the pairs above |
-| Fighter Pilot | Ambiguous — needs real research | Could be two real events or a mislabel |
+| Ice Viper | Open — likely genuine split | Same shape as Flint/Quick Kick |
+| Steeler | Open — likely genuine split | Same shape as Flint/Quick Kick |
+| Motor Viper | Open — likely genuine split (variant A only) | |
+| Skystriker / Starduster | Skystriker v1 ✅ split 2026-10-30 · rest open | Starduster + remaining per-letter rows still to check |
+| Python Officer | ✅ Split 2026-10-30 | Convention row F704 (id 533) |
+| Python Tele-Viper | ✅ Split 2026-10-30 | Convention row F705 (id 534) |
+| Python Trooper | ✅ Added 2026-10-30 | New code F725 (id 536), CONV. ACCESSORIES |
+| Outback | ✅ Split 2026-10-30 | Convention row F703 (id 531) |
+| Falcon | ✅ Split 2026-10-30 | Convention row F700 (id 530) |
+| Gung-Ho (v2 pair) | ✅ Split 2026-10-30 | Convention row F702 (id 529) |
+| Zarana | ✅ Split 2026-10-30 | A/B/C all retail; convention row F716 (id 535) |
+| Heavy Metal | ✅ Resolved 2026-10-30 | "Rampage" F706 (id 537) is its own convention figure |
+| Rumbler | ✅ Resolved 2026-10-30 | "Footloose" F721 (id 538) is its own convention figure |
+| Shortfuse | ✅ Resolved 2026-10-30 | Convention-only; `series_id` → 15 |
+| Fighter Pilot | ✅ Resolved 2026-10-30 | Convention-only; `series_id` → 15 |
+| Undercover Scarlett | ✅ Resolved 2026-07-21 | Convention-only; `series_id` → 15 |
+| Tripwire | ✅ Resolved 2026-07-21 | Convention edition; `series_id` → 15 |
+| Snake Eyes (convention pair) | ✅ Resolved 2026-07-21 | Convention edition; `series_id` → 15 |
+| Snow Serpent (v1 pair) | ✅ Split 2026-07-21 | |
+| Roadblock (v2 pair) | ✅ Split 2026-07-21 | |
+| Stalker (v1.5 B pair) | ✅ Split 2026-07-22 | 3-way tie |
 
 `FIGURE_SPLITS.md` is the per-figure log once any of these get resolved (split via `server/split-release-edition.mjs`, or confirmed as a duplicate). The systemic silent-drop bug that caused the Flint gap is fixed (dropped rows now log explicitly on every reseed).
 
@@ -134,8 +137,23 @@ Recommend lots of surplus copies to sell (owner's example: lots of 10 or 15), dr
   - **Clean-for-damaged swap before shipping** — should a damaged lot first trade clean accessories on outgoing copies onto keepers that hold damaged units (same idea as `swapAccessoryForClean`, but copy → copy instead of bin → copy), so the damaged unit ships and the keeper gets the clean one? Fits naturally beside step 2's pull-before-ship list.
   - **Loose damaged parts with no figure** — can a damaged lot include Parts Bin units alone (no figure attached), or are bin parts only ever added to lots that already contain figures?
 
+### Q25. Parts Bin "closest to completion" ranking + starred-copy protection — 📐 planned, not built
+Full plan in `PLANNING.md` (owner-confirmed scope, August 2026): route scarce bin parts to the copy they'd actually complete (today `buildSuggestions()` in `web/src/parts-bin.jsx` takes first-found order), and stop the ⚖ Rebalance engine from stripping Master Collection–starred copies. Tier 2 (cross-figure reallocation of attached units) stays deferred.
+
+### Q26. One accessory shared across a set's figures — reverted, needs redesign
+Case: 1985 Tomax & Xamot's Sky Hook + String; 1986 Mission Brazil's Cassette Tape. A figure-wide `shared_pool` flag was built and **reverted 2026-07-25** because it broadcast ownership to every owned copy of the figure (5 Tomax copies all showed the one hook). The next attempt should scope sharing to a specific group of instances through Figure Sets (`instances.set_id`, `FIGURE_SETS.md`), not to the catalog figure.
+
+### Q27. Variant letters spanning release years — waiting on owner data
+Steel Brigade v1 (A/B/C/D.1/D.2/E) and Duke v1 have letters from different release years. `variant_lookup` has no year/wave column. Add one when the owner has the mapping; until then, don't assume letter order is chronological.
+
+### Q28. Polly Claw (A0201) — intentionally unlinked, deletion floated
+The claw is molded onto Polly (A0200), so a broken claw is damage on Polly, not a missing accessory. Unlinked from Shipwreck v1 by `server/one-off/fix-shipwreck-v1-polly-claw.mjs`; the `accessories` row is left orphaned. The root CSVs still link F135/A0201, so a reseed would re-link it. Owner has floated deleting A0201 outright — not decided.
+
+### Q29. Instance ID on the detail modal — deferred
+Showing `instances.id` next to "No. N" was ruled out for this owner (copies aren't physically labeled, so the number connects to nothing). Revisit only for collectors who label copies at intake, e.g. if multi-user lands.
+
 ### F4. Explanation/help text — ongoing effort
-Standing rule, not a one-time fix: strip in-app "explanation/help text" wherever it appears, across every screen. Keep checking against this when adding new UI.
+Standing rule, not a one-time fix: strip in-app "explanation/help text" wherever it appears, across every screen. Keep checking against this when adding new UI. (The October 2026 sweep closed 2026-10-30 after three rounds. Kept by owner decision: the damage-map prompt, "Grades update live from the map…", the Add Figure search prompt, the empty-collection screen, and destructive-confirm consequence text.)
 
 ### F14. Figure "mark for upgrade"
 Idea, not started: a way to flag an owned figure as wanting a condition/completeness upgrade later.

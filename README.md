@@ -1,23 +1,49 @@
 # Handoff: G.I. Joe Collection — Inventory App
 
-> ✅ **The real app is built and running (July 2026).** `npm start` boots a local Express
-> server (`server/index.js`) that serves the ported Vite build (`web/`) and its `/api/*`
-> routes against the live `gijoe_collection.db` — that's the thing to open and test, not a
-> static server over the raw HTML. The "Run it locally" / "Overview" text below describes
-> the **original design-handoff prototype** and predates the port + weeks of feature work
-> (Add Figure, Add Instance, the Parts Bin, variants, damage tracking, file cards, COO,
-> the rebalance engine — all shipped; see `OPEN_QUESTIONS.md`). Kept below as
-> the prototype's own run instructions/overview, still accurate for the reference mockups.
+> ✅ **The real app is built and running.** A local Express + `better-sqlite3` server
+> (`server/`) serves the Vite React app (`web/`) and its `/api/*` routes against the live
+> `gijoe_collection.db`. The sections from **Overview** down were written for the original
+> design handoff. Its design rules (language, tokens, fidelity) still apply, but its file
+> names describe the frozen root-level prototype, not the live code. For what's built, see
+> **What's built** below and `OPEN_QUESTIONS.md`.
 
-## ▶ Run it locally (VS Code + Claude Code)
-The prototypes compile JSX in the browser, so they must be served over **http://localhost** — opening the HTML files directly (`file://`) leaves the screens blank.
+## ▶ Run it locally
 
-1. Open this folder in **VS Code** → open the integrated terminal.
-2. Start a static server: **`npx serve .`** (or `npm start`, or `python3 -m http.server 3000`).
-3. Open the printed URL (e.g. `http://localhost:3000`). **`index.html`** loads first — it links every screen and every spec doc.
-4. For **Claude Code**: run `claude` in this folder and start with *"Read CLAUDE.md, then the README and spec docs."*
+```bash
+npm install && (cd web && npm install)   # first time only
+(cd web && npm run build)                # build web/dist
+npm start                                # http://localhost:3000 — app + /api/*
+```
 
-Keep an internet connection for the first load (React, Babel, and fonts come from CDNs). See **`CLAUDE.md`** for the build-it-for-real primer.
+For front-end work, run `npm start` and `cd web && npm run dev` together. Vite serves on
+`:5173` with hot reload and proxies `/api` to `:3000`. `server/*.js` has **no hot reload** —
+restart `npm start` after server edits. Both servers are often already running; check with
+`lsof -nP -iTCP -sTCP:LISTEN | grep node` before starting new ones.
+
+| Command | What it does |
+|---|---|
+| `npm start` | Express on :3000 — serves `web/dist`, `/api/*`, and the root prototypes (`/index.html` is the landing page linking every prototype screen + spec doc) |
+| `npm run backup` | Snapshot the live DB into `backups/` (keeps 30; local only — the repo is public, the DB is never committed) |
+| `npm run export-catalog` | Human-readable CSV snapshot of the catalog tables into `exports/` (no owned-collection data) |
+| `npm run seed` | **Destructive:** rebuilds the DB from schema + root CSVs. Refuses if owned instances exist unless `--force`; backs up first. CSVs lag the live DB — see `OPEN_QUESTIONS.md` Q21 |
+
+## What's built
+The live app has three pages — **Figures**, **Master Collection**, **Parts Bin** — plus the
+Add Figure overlay, the figure detail modal, and a Tweaks panel (theme, JSON/xlsx export,
+import). Feature specs:
+
+| Area | Spec |
+|---|---|
+| Per-copy instances, damage map + derived grades, manual copy order (`pinned_no`), ⇄ move between copies | `INSTANCE_MODEL.md`, `DAMAGE_MAP.md` |
+| Production variants (A/B/C letters, `[A\|B\|C]` bracket, variant-scoped accessories) | `VARIANTS.md` |
+| Accessory completeness (`group_id` pick-one, `match_key`, `release_context`, splittable sheets) | `PARTS_BIN.md` → *Accessory completeness model*, `ACCESSORY_GROUPS.md` |
+| Parts Bin, ⚖ Rebalance (move / partial / swap-for-clean), Hose Balance, pull from bin | `PARTS_BIN.md` |
+| Master Collection (star + per-variant targets, year sections) | `MASTER_COLLECTION.md` |
+| Multi-pack sets / Special Release | `FIGURE_SETS.md` |
+| Retail vs convention/mail-in editions | `FIGURE_SPLITS.md`, `MAIL_RELEASES.md` |
+| File cards | `FILE_CARDS.md` |
+| Faction / series / sub-team taxonomy | `TAXONOMY.md` |
+| Search (`normalizeSearch()` punctuation + `&`/"and"/"n" folding — use it for any new search box) | `web/src/search-util.js` |
 
 ## Overview
 A personal **inventory + condition tracker** for a large vintage action-figure collection (target: **700–800 figures**, spanning 1982–1994+). The primary job is **inventory tracking**: knowing which figures you own, how many of each, which accessories each one still needs, and the condition of every copy. The landing screen is the full collection ("All"), grouped by release year, with fast filtering, search, and two display modes (List / Gallery).
@@ -251,13 +277,18 @@ Representative sizes: year number ~23px/700 (boxed ink tab) · figure name 16px/
 ---
 
 ## Assets
-- **No raster assets.** Every figure image is a **hatched placeholder** (`.wf-photo` / `PhotoSlot`) with a "FIG. PHOTO" tag. Real figure photography is a TODO and an open question (source + storage).
+- **Figure photos:** none yet. Every figure image is a **hatched placeholder** (`.wf-photo` / `PhotoSlot`) with a "FIG. PHOTO" tag. Real photography is open (`OPEN_QUESTIONS.md` Q11).
+- **Raster assets that do exist:** the damage-map body diagrams (`web/public/assets/fig/*.png`, mirrored in `assets/fig/` for the prototypes), PWA icons (`web/public/icon-*.png`), and the design color panel (`assets/design/color-panel.png`, re-render it whenever tokens change).
 - **Fonts** via Google Fonts (Oswald, Space Mono, Patrick Hand). In production, self-host or use the codebase's font pipeline.
 - **Brand / name** — decided (June 2026): **G.I. Joe Collection**, with a vintage-ARAH-file-card outline mark, applied consistently across every current surface (Figures, Vehicles, Parts Bin, and the Scale States reference). The prior “Joe Dossier” placeholder + its unicode-glyph mark are retired; the old working app and name-exploration sheet live in `_archive/` (OPEN_QUESTIONS.md Q10).
 
 ---
 
 ## Files in this bundle
+
+**Live app** — `web/src/` (see `web/README.md` for a per-file map), `server/` (Express routes + CLI tools; already-applied data fixes live in `server/one-off/`), `shared/completeness.js` (completeness math used by both), `migrations/` (numbered schema history), `gijoe_collection.sql` (base schema). Root `gijoe_db_*.csv` files are the seed sources `server/seed.mjs` reads; `seed/` is the original handoff copy, kept for cross-checking only. `_archive/` holds superseded mockups and handoff docs.
+
+**Frozen prototype** (root-level, design reference only — each `.jsx`/`.js` carries a header pointing at its live counterpart; don't edit):
 - `GI Joe Tracker - Inventory.html` — **the design of record** for the home screen. Full-page inventory: tokens + all component CSS + page shell.
 - `inventory-app.jsx` — inventory logic: `InventoryApp`, `YearSection`, `Row`, `GalleryCard`, `InvModal`, plus filter/sort/search.
 - `GI Joe Tracker - Instance Detail.html` + `instance-detail.jsx` — **the single-copy detail + damage-map condition system** (see `INSTANCE_MODEL.md`). Also hosts the **VARIANT IDENTITY** panel — for *correcting* a copy's variant (the identify-later / unidentified state was removed — `VARIANTS.md` §3).
@@ -278,5 +309,11 @@ Representative sizes: year number ~23px/700 (boxed ink tab) · figure name 16px/
 - `OPEN_QUESTIONS.md` — **open items still unresolved**, plus a one-line resolved-decision/bug-log for everything already decided or built. Read first; check here before assuming something is undesigned.
 - `BACKEND_AND_SCALE.md` — the backend/scale decision record (see its July 2026 update note for what actually got built vs. the original Next.js/Turso plan).
 - `FRONTEND_STANDARDS.md` — architecture, accessibility, performance, code standards.
+- `DAMAGE_MAP.md` — how the damage map works and how to edit its zones/masks.
+- `MASTER_COLLECTION.md` — keeper targets, the per-copy star, and the Master Collection page.
+- `FIGURE_SETS.md` — multi-pack sets (instance-level `set_id`) and the Special Release cards.
+- `FIGURE_SPLITS.md` — per-figure log of retail vs convention/mail-in edition splits.
+- `MAIL_RELEASES.md` — mail-in vs mail-order terminology and the per-figure log.
+- `PLANNING.md` — the planned (unbuilt) Parts Bin priority ranking + starred-copy protection (`OPEN_QUESTIONS.md` Q25).
 
-> Also in the project (not bundled, for reference): `GI Joe Tracker - Home Wireframes.html` holds three **archived alternate directions** (Roster Ledger, Cardback Wall, Mission Status) that were explored before this one was chosen. Ignore unless you want prior art.
+> Not in this repo: `GI Joe Tracker - Home Wireframes.html` (never committed) held three **archived alternate directions** (Roster Ledger, Cardback Wall, Mission Status) that were explored before this one was chosen. Ignore unless you want prior art.

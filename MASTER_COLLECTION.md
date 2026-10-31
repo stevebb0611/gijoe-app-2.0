@@ -186,11 +186,24 @@ prop/mode of `InventoryView`.
   (figure count + `YEAR ↑/↓` / `A–Z` buttons, `.txtbtn`) lets the list re-sort
   as it grows past a glance-able size. Year mode defaults to newest-first,
   matching the pre-toggle sort; clicking Year again flips direction; A–Z
-  ignores year entirely. Deliberately just a sort control, not the Figures
-  page's full collapsible `YearSection` grouping — Master Collection cards
-  already carry more per-card chrome (target chips, the note box, instance
-  rows) than a plain roster row, so year-header chrome was judged not worth
-  it for what's meant to stay a curated, scannable list.
+  ignores year entirely. *(Superseded 2026-07-25 — see the next bullet: Year
+  mode now groups into collapsible year sections.)*
+- **Year sections** (added 2026-07-25, Year sort mode only — A–Z stays a flat
+  list). Each year gets a "thermometer" separator: a black pill holding the
+  year (`.mcyr__dot` — a pill, not a fixed circle, so "Special Release" fits),
+  with a stem line running to the right edge carrying a per-year
+  kept/target tick-mark label (`yearTargetStats()`, same capped math as
+  `invMasterTotals()`). Sections **default collapsed**, with an Expand
+  All/Collapse All button. A **Stats** toggle (persisted to
+  `localStorage['mc_year_stats_v1']`) strips the tick-mark back to a plain
+  divider — an explicit owner ask, not dead UI. The per-card year is hidden
+  while grouped. Visually its own language, not the Figures page's boxed
+  `.ysec` header.
+- **Variant bracket** (2026-07-22) — each card header carries the shared
+  `VariantBracket` (`web/src/fig-identity.jsx`). On this page a letter fills
+  (gold) only when a **starred** copy of that variant exists, unlike the
+  Figures page, which fills on any owned copy. Display-only; changing a copy's
+  variant stays on the detail card's single-letter `VariantBadge`.
 - **Per-figure note** (added 2026-07-19) — a free-text input (`.mc-card__note`)
   inside the card's dark header bar, wired to `figures.master_notes`. Saved
   on blur (`JoeStore.setFigureMasterNotes`), same debounce-free
