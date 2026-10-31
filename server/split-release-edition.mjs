@@ -13,7 +13,7 @@
 //
 // IMPORTANT — do not add an entry here from CSV data alone. The seed
 // collision (seed.mjs, "Flint|1|"-style key) affects ~20 code names
-// (OPEN_QUESTIONS_Claude.md #18), and several of those pairs are accidental
+// (OPEN_QUESTIONS.md Q18), and several of those pairs are accidental
 // CSV duplicates, not real second editions (both rows already tagged
 // "convention" with near-identical data). Only add a SPLITS entry once a
 // human has confirmed, against a real reference or a physically-owned copy,
@@ -29,7 +29,7 @@ const SPLITS = [
     codeName: 'Flint',
     // F125's release_context was mislabeled "1992 Convention" in the source
     // CSV despite being the real 1985 retail release (series_id 5) —
-    // OPEN_QUESTIONS_Claude.md #18. Correct it as part of the split.
+    // OPEN_QUESTIONS.md Q18. Correct it as part of the split.
     retailReleaseContext: 'retail',
     newDisplayName: 'Flint (convention)',
     newFullName: 'Faireborn, Dashiell R.',
@@ -58,7 +58,7 @@ const SPLITS = [
   },
   {
     // Roadblock v2 — 1986 retail (F167) vs. 1992 Convention (F707).
-    // Previously logged in ACCESSORY_GROUPS.md/OPEN_QUESTIONS_Claude.md #18 as
+    // Previously logged in ACCESSORY_GROUPS.md/OPEN_QUESTIONS.md Q18 as
     // a "likely accidental duplicate" and given the release_context-on-one-row
     // treatment instead (both source CSV rows shared the same "1992
     // Convention" text). Owner instruction, 2026-07-21, reverses that call:

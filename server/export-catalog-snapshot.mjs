@@ -5,7 +5,7 @@
 // writes back to the DB or touches the actual seed CSVs server/seed.mjs reads
 // (gijoe_db_*.csv at repo root) — this is a read-only export for reference/
 // history/backup diversity, not a re-importable seed source (see
-// OPEN_QUESTIONS_Claude.md #21 for why the two are kept separate).
+// OPEN_QUESTIONS.md Q21 for why the two are kept separate).
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

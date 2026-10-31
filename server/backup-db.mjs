@@ -1,5 +1,5 @@
 // server/backup-db.mjs — on-demand snapshot of the live gijoe_collection.db into
-// backups/ (gitignored — see OPEN_QUESTIONS_Claude.md #21). Distinct from
+// backups/ (gitignored — see OPEN_QUESTIONS.md Q21). Distinct from
 // seed.mjs's pre-reseed safety .bak: this is a periodic manual backup, run
 // whenever ("npm run backup"), not tied to a destructive operation. Keeps the
 // most recent BACKUP_KEEP snapshots and prunes older ones so backups/ doesn't

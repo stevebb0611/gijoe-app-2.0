@@ -20,7 +20,7 @@ const COUNTRY = { 1: 'China', 2: 'Hong Kong', 3: 'Indonesia' };
 
 // The CSV's figure string doesn't always match figures.code_name verbatim —
 // these are typos in the source CSV, confirmed by name against the live
-// catalog (see OPEN_QUESTIONS_ISSUES_FOUND.md #17). Astro-Viper v2 is a
+// catalog (see OPEN_QUESTIONS.md F17). Astro-Viper v2 is a
 // separate case: `figures` stores it without the hyphen at v2 only.
 const NAME_CORRECTIONS = {
   'sneak peak': 'sneak peek',

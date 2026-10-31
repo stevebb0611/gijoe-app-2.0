@@ -197,7 +197,7 @@ if (skippedDupeLetters.length) {
 if (skippedBlankVariantRows.length) {
   console.log(`\nNOTE: ${skippedBlankVariantRows.length} rows were dropped entirely (same code_name+version, ` +
     `blank variant letter on both — often a mainline row colliding with a 700-block convention/mail-in row; ` +
-    `see OPEN_QUESTIONS_Claude.md #18 before restoring any of these — some are genuine second editions, ` +
+    `see OPEN_QUESTIONS.md Q18 before restoring any of these — some are genuine second editions, ` +
     `some are accidental CSV duplicates):`);
   skippedBlankVariantRows.forEach((s) => console.log('  -', s));
 }
