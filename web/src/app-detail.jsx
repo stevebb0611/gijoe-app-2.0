@@ -981,7 +981,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                     ) : null}
                   </div>
                   {fig.fullName && <div className="inv-modal__full">{fig.fullName}</div>}
-                  <div className="inv-modal__var">{fig.specialty} · {formatYear(fig.year)}</div>
+                  <div className="inv-modal__var">{[fig.specialty, formatYear(fig.year)].filter(Boolean).join(" · ")}</div>
                   {varEdit && (
                     <div className="inv-varpick">
                       {cf.variants.map(v => (

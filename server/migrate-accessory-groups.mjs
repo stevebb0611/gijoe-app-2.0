@@ -34,7 +34,7 @@ const GROUPS = [
   { extGroupId: 8412, figure: 'Scrap-Iron', accessories: ['A0111', 'A0112'] }, // Remote Activator thin/thick handle
   { extGroupId: null,  figure: 'Recoil',     accessories: ['A0616', 'A0617'] }, // Mine Case thin/thick handle
   { extGroupId: 8415, figure: 'Thunder',   accessories: ['A0125', 'A0126'] }, // Radio Headset / Radio Headset
-  { extGroupId: 8601, figure: 'A.V.A.C.',  accessories: ['A0225', 'A0226'] }, // Parachute pack soft/hard plastic
+  { extGroupId: 8601, figure: 'A.V.A.C.',  accessories: ['A0225', 'A0226'] }, // Parachute Pack soft/hard plastic
   { extGroupId: 8501, figure: 'Crimson Guard', accessories: ['A0161', 'A0162', 'A0163'] }, // Dress Backpack solid-back light/dark red + hollow-back light red
   // Dr. Mindbender (1986, v1, F154 -> catalog id 103): 'Dr. Mindbender' also
   // matches a later v2 (id 406, F500), but the lowest id (103, v1) is the one

@@ -648,7 +648,7 @@ another holds the cut pieces.
 
 - **Mechanism:** plain `group_id` — own any one member of the slot below.
 - **Variants:** none on file — single catalog row.
-- **Group_id slot:** Parachute pack (soft plastic) / Parachute pack (hard plastic)
+- **Group_id slot:** Parachute Pack (soft plastic) / Parachute Pack (hard plastic)
   (`accessory_groups.id` 8, ext CSV group `8601`). This is the other canonical "pick one"
   example cited in `PARTS_BIN.md` § *Accessory completeness model*.
 - **Source:** CSV `group_id` column, ext id `8601`.
