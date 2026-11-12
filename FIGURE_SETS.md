@@ -132,13 +132,13 @@ logging unless it's a genuine completionist unit (see above).
 - **Source:** YoJoe.com, cited 2026-07-16/19 in `ACCESSORY_GROUPS.md`.
 - **Reconstruction record:**
   ```
-  node server/add-figure-set.mjs --name "1982 JC Penney Cobra 3-Pack" --year 1982 \
+  node server/add-figure-set.mjs --name "JC Penney Cobra 3-Pack" --year 1982 \
     --description "Retail-exclusive 3-pack: two Cobra v1 (one with M-16/Bipod, one with a Bazooka) + one Cobra Officer v1 (Mortar + Bipod Stand). See ACCESSORY_GROUPS.md." \
     --members "3:2,5:1"
   ```
   ```sql
   INSERT OR IGNORE INTO figure_sets (set_id, name, year, description) VALUES
-      (1, '1982 JC Penney Cobra 3-Pack', 1982, 'Retail-exclusive 3-pack: two Cobra v1 (one with M-16/Bipod, one with a Bazooka) + one Cobra Officer v1 (Mortar + Bipod Stand). See ACCESSORY_GROUPS.md.');
+      (1, 'JC Penney Cobra 3-Pack', 1982, 'Retail-exclusive 3-pack: two Cobra v1 (one with M-16/Bipod, one with a Bazooka) + one Cobra Officer v1 (Mortar + Bipod Stand). See ACCESSORY_GROUPS.md.');
   INSERT OR IGNORE INTO figure_set_members (set_id, figure_id, quantity_required) VALUES
       (1, 3, 2), (1, 5, 1);
   ```

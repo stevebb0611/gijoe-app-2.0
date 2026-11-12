@@ -30,5 +30,8 @@ owner's real collection.
 | `filecards.jsx` | File-card catalog display |
 | `search-util.js` | `normalizeSearch()` — punctuation/`&`/`'n'` folding for search |
 | `tweaks-panel.jsx` | Theme + Export/Import panel |
+| `line-ui.jsx` | Line-profile UI: shared header `BrandHome`, `VehiclesNavLink` |
 
 Completeness math shared with the server lives in `../shared/completeness.js`.
+Brand, factions, vocabulary and line-only feature switches come from the line profile,
+`../shared/line-profile.js` (`LINE`, `factionByKey`, `facProps`). See `../LINE_PROFILES.md`.

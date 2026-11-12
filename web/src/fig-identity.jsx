@@ -81,7 +81,7 @@ export function EditionTag({ context, conventionKind, lg }) {
 // in the Special Release set card (set-card.jsx), not recomputed here too.
 export function SetTag({ sets, lg }) {
   if (!sets || !sets.length) return null;
-  const title = "Part of " + sets.map((s) => s.name).join('; ') + " — see Special Release";
+  const title = "Part of " + sets.map((s) => s.name + (s.year ? " (" + s.year + ")" : "")).join('; ') + " — see Special Release";
   return (
     <em className={"idset" + (lg ? " idset--lg" : "")} title={title}>
       SET

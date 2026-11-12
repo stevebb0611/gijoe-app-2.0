@@ -57,7 +57,7 @@ export function SetCard({ set, onOpen, onAddInstance }) {
   return (
     <section className={"setcard" + (open ? " is-open" : "")}>
       <button className="setcard__hd" onClick={() => setOpen((o) => !o)}>
-        <span className="setcard__name">{set.name}</span>
+        <span className="setcard__name">{set.name}{set.year ? " (" + set.year + ")" : ""}</span>
         <span className="setcard__prog">{p.owned}/{p.required} owned</span>
         <span className="setcard__chev">{open ? "▾" : "▸"}</span>
       </button>

@@ -60,6 +60,7 @@ cd web && npm run dev                    # :5173 with hot reload, proxies /api t
 | `server/*.mjs` | Reusable owner CLI tools: `add-figure`, `add-figure-set`, `split-release-edition`, `set-accessory-context`, `set-match-key`, `migrate-accessory-groups` (append-only group list), `migrate-file-cards`, `seed`, `backup-db`, `export-catalog-snapshot` |
 | `server/one-off/` | Data fixes already applied to the live DB — kept for provenance, idempotent |
 | `shared/completeness.js` | Completeness/group clustering math used by both server and client |
+| `shared/line-profile.js`, `shared/lines/gijoe.js` | Line profile: brand, factions + colors, vocabulary, Joe-only feature switches. Never hard-code these in components (`LINE_PROFILES.md`) |
 | `migrations/`, `gijoe_collection.sql` | Numbered schema history + base schema |
 | `gijoe_db_*.csv` (root) | Seed sources `server/seed.mjs` reads. `seed/` is the original handoff copy, used only for cross-checks |
 | `assets/` | Prototype damage-map assets + `assets/design/color-panel.png` (re-render it when tokens change) |
@@ -72,7 +73,7 @@ resolved log) · `FRONTEND_STANDARDS.md` · `INSTANCE_MODEL.md` · `DAMAGE_MAP.m
 `VARIANTS.md` · `PARTS_BIN.md` · `ACCESSORY_GROUPS.md` · `FIGURE_SPLITS.md` ·
 `FIGURE_SETS.md` · `MAIL_RELEASES.md` · `MASTER_COLLECTION.md` · `FILE_CARDS.md` ·
 `TAXONOMY.md` · `NAVIGATION.md` · `BACKEND_AND_SCALE.md` · `PLANNING.md` (planned,
-unbuilt Parts Bin work — Q25).
+unbuilt Parts Bin work — Q25) · `LINE_PROFILES.md` (multi-line groundwork + roadmap).
 
 Per-figure data decisions (splits, groups, release context) are logged in the spec
 docs, figure by figure. Check the relevant log before changing a figure's data.

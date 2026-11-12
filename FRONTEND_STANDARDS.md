@@ -60,6 +60,7 @@ Four color-coded faction tokens, all pitched at the same chroma/lightness family
 - **JOE** = olive `--olive`, **COBRA** = crimson `--crimson`, **OKTOBER** (Oktober Guard) = steel-blue `oklch(0.5 0.085 245)`, **DREADNOK** = warm ochre/orange `oklch(0.55 0.108 58)`.
 - Tags are **fixed-width and center-aligned** (`min-width` sized to fit the longest name — DREADNOK — so every tag in a column lines up and the label is truly centered; do **not** rely on `letter-spacing` hacks, and ensure the box is wide enough that long names don’t overflow into the next grid column). A `--mini` size variant is used inside list rows.
 - The **“Faction colors” theme toggle** desaturates all four to neutral ink — keep that path working for any new faction.
+- **Source of truth is the line profile** (`shared/lines/gijoe.js`, `LINE_PROFILES.md`): labels, tag text and colors live there, and `facProps()` applies them. Never hard-code a faction key, brand string or line vocabulary in a component.
 
 ## Iconography
 Replace unicode glyphs with a real icon library (Lucide/Feather recommended), one component per icon, sized to match (14–18px). Map: search ⌕, chevrons ▸/▾, close ✕, add ＋, check ✓, **list = three stacked horizontal lines, gallery = 2×2 grid of squares** (not lookalike box glyphs), instance ↳. Icons inherit `currentColor` so they invert with their button’s active state.
