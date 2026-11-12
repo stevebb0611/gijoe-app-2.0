@@ -35,7 +35,7 @@ function accessoryIdForName(figureId, name) {
 const instanceRowsStmt = db.prepare(`
   SELECT i.id, i.figure_id AS catalogId, vl.letter AS variant, i.is_moc AS moc,
          i.damage AS marks, i.location AS loc, i.notes,
-         i.filecard_on_file, i.filecard_id, i.filecard_color, i.filecard_grade, i.country_of_origin AS coo,
+         i.filecard_on_file, i.filecard_id, i.filecard_color, i.filecard_grade, i.filecard_cut, i.country_of_origin AS coo,
          i.is_master AS masterCollection, i.set_id AS setId, i.pinned_no AS pinnedNo,
          i.created_at
   FROM instances i
@@ -71,7 +71,7 @@ function shapeInstance(row, accByInstance, damageByInstance, damageUnitsByInstan
     marks: row.marks ? JSON.parse(row.marks) : null,
     loc: row.loc || '',
     notes: row.notes || '',
-    filecard: { onFile: !!row.filecard_on_file, fileCardId: row.filecard_id || null, color: row.filecard_color || '', grade: row.filecard_grade || null },
+    filecard: { onFile: !!row.filecard_on_file, fileCardId: row.filecard_id || null, color: row.filecard_color || '', grade: row.filecard_grade || null, cut: row.filecard_cut || null },
     coo: row.coo || '',
     masterCollection: !!row.masterCollection,
     setId: row.setId || null,
@@ -144,8 +144,8 @@ function resolveVariantId(figureId, letter) {
 }
 
 const insertInstance = db.prepare(`
-  INSERT INTO instances (figure_id, variant_id, is_moc, damage, location, notes, filecard_on_file, filecard_id, filecard_color, filecard_grade, country_of_origin, set_id)
-  VALUES (@figure_id, @variant_id, @is_moc, @damage, @location, @notes, @filecard_on_file, @filecard_id, @filecard_color, @filecard_grade, @country_of_origin, @set_id)
+  INSERT INTO instances (figure_id, variant_id, is_moc, damage, location, notes, filecard_on_file, filecard_id, filecard_color, filecard_grade, filecard_cut, country_of_origin, set_id)
+  VALUES (@figure_id, @variant_id, @is_moc, @damage, @location, @notes, @filecard_on_file, @filecard_id, @filecard_color, @filecard_grade, @filecard_cut, @country_of_origin, @set_id)
 `);
 const upsertInstanceAcc = db.prepare(`
   INSERT INTO instance_accessories (instance_id, accessory_id, units_owned) VALUES (?, ?, ?)
@@ -171,6 +171,7 @@ export const createInstance = db.transaction((payload) => {
     filecard_id: (filecard && filecard.fileCardId) || null,
     filecard_color: (filecard && filecard.color) || null,
     filecard_grade: (filecard && filecard.grade) || null,
+    filecard_cut: (filecard && filecard.cut) || null,
     country_of_origin: coo || null,
     set_id: setId || null,
   }).lastInsertRowid;
@@ -230,8 +231,8 @@ export const updateInstance = db.transaction((id, patch) => {
   if ('coo' in patch) setInstanceCoo.run(patch.coo || null, id);
   if ('setId' in patch) setInstanceSet.run(patch.setId || null, id);
   if ('filecard' in patch) {
-    db.prepare('UPDATE instances SET filecard_on_file = ?, filecard_id = ?, filecard_color = ?, filecard_grade = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
-      .run(patch.filecard.onFile ? 1 : 0, patch.filecard.fileCardId || null, patch.filecard.color || null, patch.filecard.grade || null, id);
+    db.prepare('UPDATE instances SET filecard_on_file = ?, filecard_id = ?, filecard_color = ?, filecard_grade = ?, filecard_cut = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+      .run(patch.filecard.onFile ? 1 : 0, patch.filecard.fileCardId || null, patch.filecard.color || null, patch.filecard.grade || null, patch.filecard.cut || null, id);
   }
   if ('acc' in patch) {
     const row = getInstanceFigure.get(id);

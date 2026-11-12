@@ -88,20 +88,31 @@ export function FileCardColorInput({ value, onChange, disabled }) {
 // Coarse 3-point grade for THIS owner's physical card. Deliberately not the generic
 // 5-point `conditions` lookup (Mint/Near Mint/Good/Fair/Poor) or file_cards.condition_id —
 // both describe a printing, not what condition this copy's card is actually in.
+// Row 1 (cut-out file card vs full cardback, instances.filecard_cut) sits above the
+// grade row; the grade describes whichever of the two this copy's card is.
+const CUTS = ["File Card", "Full Card"];
 const GRADES = ["Poor", "Good", "Mint"];
-export function FileCardGrade({ grade, onChange }) {
+function Bracket({ options, value, onChange }) {
   return (
-    <div className="fc-grade">
-      {GRADES.map((g) => (
+    <div className="fc-grade__row">
+      {options.map((g) => (
         <button
           key={g}
           type="button"
-          className={"fc-grade__l" + (grade === g ? " is-on" : "")}
-          onClick={() => onChange(grade === g ? null : g)}
+          className={"fc-grade__l" + (value === g ? " is-on" : "")}
+          onClick={() => onChange(value === g ? null : g)}
         >
           {g}
         </button>
       ))}
+    </div>
+  );
+}
+export function FileCardGrade({ cut, grade, onCut, onChange }) {
+  return (
+    <div className="fc-grade">
+      <Bracket options={CUTS} value={cut} onChange={onCut} />
+      <Bracket options={GRADES} value={grade} onChange={onChange} />
     </div>
   );
 }

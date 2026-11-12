@@ -88,6 +88,7 @@ function buildFiguresSheet(wb, catalog, instancesByFigure) {
     { header: 'Country of Origin', key: 'coo', width: 20 },
     { header: 'Card On File', key: 'card', width: 28 },
     { header: 'Card Color', key: 'cardColor', width: 14 },
+    { header: 'Card Type', key: 'cardCut', width: 12 },
     { header: 'Card Grade', key: 'cardGrade', width: 12 },
     { header: 'Notes', key: 'notes', width: 44 },
     { header: 'Master Collection Notes', key: 'masterNotes', width: 44 },
@@ -117,6 +118,12 @@ function buildFiguresSheet(wb, catalog, instancesByFigure) {
       if (!inst.filecard || !inst.filecard.onFile || !inst.filecard.color) return null;
       const label = insts.length > 1 ? `Copy ${idx + 1}: ` : '';
       return `${label}${inst.filecard.color}`;
+    }).filter(Boolean);
+
+    const cardCutVals = insts.map((inst, idx) => {
+      if (!inst.filecard || !inst.filecard.onFile || !inst.filecard.cut) return null;
+      const label = insts.length > 1 ? `Copy ${idx + 1}: ` : '';
+      return `${label}${inst.filecard.cut}`;
     }).filter(Boolean);
 
     const cardGradeVals = insts.map((inst, idx) => {
@@ -150,6 +157,7 @@ function buildFiguresSheet(wb, catalog, instancesByFigure) {
       coo: cooVals.join('; '),
       card: cardVals.join('; '),
       cardColor: cardColorVals.join('; '),
+      cardCut: cardCutVals.join('; '),
       cardGrade: cardGradeVals.join('; '),
       notes: noteVals.join('; '),
       masterNotes: fig.masterNotes || '',

@@ -221,6 +221,7 @@ CREATE TABLE IF NOT EXISTS instances (
     filecard_grade TEXT CHECK(filecard_grade IN ('Poor', 'Good', 'Mint')),
                 -- coarse grade for this copy's physical card, independent of file_cards.condition_id
                 -- (which describes a printing, not this owner's copy)
+    filecard_cut TEXT CHECK(filecard_cut IN ('File Card', 'Full Card')),  -- cut-out file card vs full cardback; the grade applies to whichever this is
     country_of_origin TEXT CHECK (country_of_origin IN ('China', 'Hong Kong', 'Indonesia')),
                 -- which of the figure's known origins (figure_coo) this physical copy is.
                 -- A notation, like filecard_printing — optional, doesn't affect completeness.

@@ -51,7 +51,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
   // commit() (cancelling the wizard never touches the bin). Always <= owned.
   const [pulled, setPulled] = React.useState({});
   const [moc, setMoc] = React.useState(false);       // Mint on Card (sealed) — counts 100% complete
-  const [filecard, setFilecard] = React.useState({ onFile: false, fileCardId: null, color: '', grade: null });
+  const [filecard, setFilecard] = React.useState({ onFile: false, fileCardId: null, color: '', grade: null, cut: null });
   const [coo, setCoo] = React.useState(''); // optional — country of origin, only offered when fig.coo has entries
   const [setId, setSetId] = React.useState(presetSetId); // optional — which known set (if any) this copy belongs to
   // condition — single zone-map value; dmg.clean is the explicit "no damage found"
@@ -78,7 +78,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
     if (!fig) return;
     setSelVar(isSingle(fig) ? '' : (presetVariant && fig.id === presetCatalogId ? presetVariant : fig.variants[0].letter));
     setOwnedAcc(presetAcc && fig.id === presetCatalogId ? presetAcc : {}); setPulled({});
-    setMoc(false); setFilecard({ onFile: false, fileCardId: null, color: '', grade: null }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male')); setCoo(''); setAccDamage({}); setAccDamageNotes({});
+    setMoc(false); setFilecard({ onFile: false, fileCardId: null, color: '', grade: null, cut: null }); setDmg(dmEmpty(fig.body === 'female' ? 'female' : 'male')); setCoo(''); setAccDamage({}); setAccDamageNotes({});
     setSetId(presetSetId && fig.id === presetCatalogId ? presetSetId : null);
   }, [selId]);
 
@@ -226,7 +226,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
       paint: moc ? null : (ungraded ? null : paint.grade),
       marks: moc ? null : dmg,
       loc: loc.trim(), notes: notes.trim(),
-      filecard: filecard.onFile ? { onFile: true, fileCardId: filecard.fileCardId, color: filecard.color, grade: filecard.grade } : { onFile: false, fileCardId: null, color: '', grade: null },
+      filecard: filecard.onFile ? { onFile: true, fileCardId: filecard.fileCardId, color: filecard.color, grade: filecard.grade, cut: filecard.cut } : { onFile: false, fileCardId: null, color: '', grade: null, cut: null },
       coo: coo || '',
       setId,
     }, moc ? [] : pulls);
@@ -235,7 +235,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
 
   const resetAll = () => {
     setDone(false); setSelId(null); setQuery(""); setSelVar(null); setLoc(""); setNotes("");
-    setOwnedAcc({}); setPulled({}); setMoc(false); setFilecard({ onFile: false, fileCardId: null, color: '', grade: null }); setDmg(dmEmpty('male')); setAccDamage({}); setAccDamageNotes({}); setYearF(""); setSetId(null); goto(0);
+    setOwnedAcc({}); setPulled({}); setMoc(false); setFilecard({ onFile: false, fileCardId: null, color: '', grade: null, cut: null }); setDmg(dmEmpty('male')); setAccDamage({}); setAccDamageNotes({}); setYearF(""); setSetId(null); goto(0);
   };
 
   return (
@@ -378,7 +378,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                     {filecard.onFile && <FileCardRow fig={fig} printing={filecard.fileCardId} onChange={fileCardId => setFilecard(s => ({ ...s, fileCardId }))} />}
                     <button type="button" className={"acc__box fc-box" + (filecard.onFile ? " is-on" : "")} onClick={() => setFilecard(s => ({ ...s, onFile: !s.onFile }))} title={filecard.onFile ? "Mark card not on file" : "Mark file card on file"}>{filecard.onFile ? "✓" : ""}</button>
                   </div>
-                  {filecard.onFile && <FileCardGrade grade={filecard.grade} onChange={grade => setFilecard(s => ({ ...s, grade }))} />}
+                  {filecard.onFile && <FileCardGrade cut={filecard.cut} grade={filecard.grade} onCut={cut => setFilecard(s => ({ ...s, cut }))} onChange={grade => setFilecard(s => ({ ...s, grade }))} />}
                   {filecard.onFile && <FileCardTell fig={fig} printing={filecard.fileCardId} />}
                 </div>
 

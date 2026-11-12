@@ -743,7 +743,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
   // ---- live per-copy reads + writes ----
   const raw = cur ? (JoeStore.get().instances.find(i => i.id === cur.id) || {}) : {};
   const moc = !!raw.moc;
-  const filecard = raw.filecard || { onFile: false, fileCardId: null, color: '', grade: null };
+  const filecard = raw.filecard || { onFile: false, fileCardId: null, color: '', grade: null, cut: null };
   const marks = (raw.marks && raw.marks.condition) ? raw.marks : dmEmpty(fig.body || 'male');
   // Scope the checklist to this copy's own production variant — a v1 A copy
   // shouldn't be asked (or able) to check off a v1 B-only accessory. See
@@ -1068,7 +1068,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                     {filecard.onFile && <FileCardRow fig={fig} printing={filecard.fileCardId} onChange={fileCardId => setCard({ fileCardId })} />}
                     <button className={"acc__box fc-box" + (filecard.onFile ? " is-on" : "")} onClick={() => setCard({ onFile: !filecard.onFile })} title={filecard.onFile ? "Mark card not on file" : "Mark file card on file"}>{filecard.onFile ? "✓" : ""}</button>
                   </div>
-                  {filecard.onFile && <FileCardGrade grade={filecard.grade} onChange={grade => setCard({ grade })} />}
+                  {filecard.onFile && <FileCardGrade cut={filecard.cut} grade={filecard.grade} onCut={cut => setCard({ cut })} onChange={grade => setCard({ grade })} />}
                   {filecard.onFile && <FileCardTell fig={fig} printing={filecard.fileCardId} />}
                 </div>
 
