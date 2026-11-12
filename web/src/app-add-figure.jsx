@@ -11,6 +11,7 @@ import { formatYear, SPECIAL_RELEASE_YEAR } from './fig-identity.js';
 import { normalizeSearch } from './search-util.js';
 import { FileCardRow, FileCardTell, FileCardColorInput, FileCardGrade } from './filecards.jsx';
 import { facProps } from './line-ui.jsx';
+import { LINE } from '../../shared/line-profile.js';
 const AF_CATALOG = JoeData.CAT || [];
 // SPECIAL_RELEASE_YEAR sorts to the end regardless of numeric value — it's not a
 // real year, so it doesn't belong interleaved by magnitude, but it does need
@@ -372,7 +373,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                   </React.Fragment>
                 )}
 
-                <div className="acc-list fc-list" style={{ marginTop: 18 }}>
+                {LINE.features.fileCards && <div className="acc-list fc-list" style={{ marginTop: 18 }}>
                   <div className="acc-list__cap"><span>FILE CARD</span><span>{filecard.onFile && <b>ON FILE</b>}</span></div>
                   <div className="acc fc-row">
                     <FileCardColorInput value={filecard.color} disabled={!filecard.onFile} onChange={color => setFilecard(s => ({ ...s, color }))} />
@@ -381,7 +382,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                   </div>
                   {filecard.onFile && <FileCardGrade cut={filecard.cut} grade={filecard.grade} onCut={cut => setFilecard(s => ({ ...s, cut }))} onChange={grade => setFilecard(s => ({ ...s, grade }))} />}
                   {filecard.onFile && <FileCardTell fig={fig} printing={filecard.fileCardId} />}
-                </div>
+                </div>}
 
                 <p className="af-seclab" style={{ marginTop: 18 }}><b>Bin / box location</b> <i style={{ fontStyle: 'normal', color: 'var(--ink-soft)' }}>(optional)</i></p>
                 <input className="af-in" value={loc} onChange={e => setLoc(e.target.value)} placeholder="box 1, box 2, small tote" />

@@ -9,6 +9,9 @@ import { JoeStore } from './store.js';
 import './app.css';
 import { LINE } from '../../shared/line-profile.js';
 
+// Active line on <html> — hook for a per-line palette (:root[data-line="…"]) in Phase 1+.
+document.documentElement.dataset.line = LINE.key;
+
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "paper": "kraft",
   "accent": "#6b6f39",

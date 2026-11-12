@@ -13,6 +13,7 @@ import { VersionChip } from './fig-identity.jsx';
 import { figIdentityText, formatYear } from './fig-identity.js';
 import { normalizeSearch } from './search-util.js';
 import { BrandHome, VehiclesNavLink } from './line-ui.jsx';
+import { LINE } from '../../shared/line-profile.js';
 
 // Splittable sheets (migration 022): parent accessory_id -> its piece names,
 // read off the catalog blueprints (tuple index 8 = splitOf).
@@ -518,16 +519,13 @@ function buildSections(items, mode) {
 }
 
 // ============================================================ app
-// ---- hose balance: the three generic black hose lengths (A1900–A1902) ----
+// ---- hose balance: generic shared parts (G.I. Joe: the three black hose lengths) ----
 // One physical part per length, shared across ~30 figures, so the useful view
 // is per-figure tallies (copies with / without) rather than per-copy needs —
 // tells the owner where a hose can come from and where it would finish a copy.
 // Read-only; sealed (MOC) copies are skipped, same as buildNeeds().
-const HOSE_LENGTHS = [
-  { code: 'A1900', label: 'SHORT HOSE · 1½"', short: 'short' },
-  { code: 'A1901', label: 'MEDIUM HOSE · 3"', short: 'med' },
-  { code: 'A1902', label: 'LONG HOSE · 6"', short: 'long' },
-];
+// The codes come from the line profile (features.hoseBalance); absent = no chip.
+const HOSE_LENGTHS = LINE.features.hoseBalance?.codes || [];
 
 function buildHoseBalance() {
   const byCode = new Map(HOSE_LENGTHS.map(h => [h.code, { ...h, rows: [], have: 0, need: 0, without: 0 }]));
@@ -725,10 +723,12 @@ function PartsBin({ onNavigate, onAddInstance }) {
                     </button>
                   ))}
                 </div>
-                <span className="pbp-bar__chipgap"></span>
-                <button className={"chip" + (filter === 'hose' ? " is-on" : "")} onClick={() => setChip('hose')}>
-                  Hose Balance{filter === 'hose' ? <span className="chip__x">✕</span> : null}
-                </button>
+                {HOSE_LENGTHS.length > 0 && <>
+                  <span className="pbp-bar__chipgap"></span>
+                  <button className={"chip" + (filter === 'hose' ? " is-on" : "")} onClick={() => setChip('hose')}>
+                    Hose Balance{filter === 'hose' ? <span className="chip__x">✕</span> : null}
+                  </button>
+                </>}
               </div>
               <span className="pbp-bar__spacer"></span>
               <span className="pbp-bar__lab">GROUP BY</span>

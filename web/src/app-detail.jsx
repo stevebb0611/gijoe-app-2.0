@@ -11,7 +11,7 @@ import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip, VariantBadge, EditionTag, SetTag, SubGroupTag } from './fig-identity.jsx';
 import { formatYear } from './fig-identity.js';
 import { FileCardRow, FileCardTell, FileCardColorInput, FileCardGrade } from './filecards.jsx';
-import { factionByKey } from '../../shared/line-profile.js';
+import { LINE, factionByKey } from '../../shared/line-profile.js';
 import { facProps } from './line-ui.jsx';
 
 const INV_CAT = JoeData.CAT || [];
@@ -1062,7 +1062,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                   </div>
                 )}
 
-                <div className="acc-list fc-list">
+                {LINE.features.fileCards && <div className="acc-list fc-list">
                   <div className="acc-list__cap"><span>FILE CARD</span><span>{filecard.onFile && <b>ON FILE</b>}</span></div>
                   <div className="acc fc-row">
                     <FileCardColorInput value={filecard.color} disabled={!filecard.onFile} onChange={color => setCard({ color })} />
@@ -1071,7 +1071,7 @@ function InvDetailModal({ catalogId, instId, onClose, onAddInstance }) {
                   </div>
                   {filecard.onFile && <FileCardGrade cut={filecard.cut} grade={filecard.grade} onCut={cut => setCard({ cut })} onChange={grade => setCard({ grade })} />}
                   {filecard.onFile && <FileCardTell fig={fig} printing={filecard.fileCardId} />}
-                </div>
+                </div>}
 
                 <div className="inv-copymeta">
                   <div className="inv-notes">

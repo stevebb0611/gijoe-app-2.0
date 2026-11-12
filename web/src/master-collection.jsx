@@ -86,7 +86,7 @@ function McRow({ ent, isOpen, onToggle, onOpen }) {
             <button key={c.id} className="inv-inst" onClick={() => onOpen(fig.id, c.id)}>
               <span className="inv-inst__tab">★</span>
               <span className="inv-inst__id"><span>{titleCase(fig.name)}<VariantBadge letter={c.variant} /> No. {c.no}</span><i>{gradeText(c)}</i></span>
-              <span className="inv-stock">{hasCoo && <span className={"mc-coo" + (c.coo ? "" : " is-missing")}>{c.coo || "COO"}</span>}<StockBar pct={c.pct} />{c.cardOnFile && <span className="inv-fc" title="File card on file">+ File Card</span>}</span>
+              <span className="inv-stock">{hasCoo && <span className={"mc-coo" + (c.coo ? "" : " is-missing")}>{c.coo || "COO"}</span>}<StockBar pct={c.pct} />{LINE.features.fileCards && c.cardOnFile && <span className="inv-fc" title="File card on file">+ File Card</span>}</span>
               <span className={"inv-need" + (c.pct === 100 ? " is-zero" : "")}>{c.pct === 100 ? "✓ Complete" : "Missing " + (c.req - c.own)}</span>
               <span className="inv-go">▸</span>
             </button>
