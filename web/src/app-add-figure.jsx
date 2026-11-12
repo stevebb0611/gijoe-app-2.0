@@ -10,8 +10,7 @@ import { VersionChip, VariantBadge, VehicleTag, EditionTag, SetTag } from './fig
 import { formatYear, SPECIAL_RELEASE_YEAR } from './fig-identity.js';
 import { normalizeSearch } from './search-util.js';
 import { FileCardRow, FileCardTell, FileCardColorInput, FileCardGrade } from './filecards.jsx';
-import { facProps } from './line-ui.jsx';
-import { LINE } from '../../shared/line-profile.js';
+import { LINE, facProps } from '../../shared/line-profile.js';
 const AF_CATALOG = JoeData.CAT || [];
 // SPECIAL_RELEASE_YEAR sorts to the end regardless of numeric value — it's not a
 // real year, so it doesn't belong interleaved by magnitude, but it does need

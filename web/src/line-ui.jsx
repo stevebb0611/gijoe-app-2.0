@@ -1,19 +1,10 @@
 // line-ui.jsx — the line profile's UI pieces (LINE_PROFILES.md): the brand
-// block every page header shares, the Vehicles nav link, and team-color props.
+// block every page header shares and the Vehicles nav link. (Team-color props:
+// facProps() in shared/line-profile.js.)
 // Line-specific strings/colors come from shared/line-profile.js — never
 // hard-code a brand name, team key or team color in a component.
 import React from 'react';
-import { LINE, factionByKey } from '../../shared/line-profile.js';
-
-// Team color for a .wf-fac pill or a facet .chip: the profile color rides in as
-// an inline --fac, and the --team modifier opts the element into app.css's
-// colored + "Faction colors off" rules. Unknown keys get neither (uncolored).
-export function facProps(key, base) {
-  const color = factionByKey(key).color;
-  return color
-    ? { className: base + " " + base + "--team", style: { '--fac': color } }
-    : { className: base, style: undefined };
-}
+import { LINE } from '../../shared/line-profile.js';
 
 // File-card outline mark + stacked wordmark. Click goes home (Figures).
 export function BrandHome({ onNavigate }) {

@@ -16,8 +16,8 @@ import {
 import { VersionChip, VariantBadge, VariantBracket, VehicleTag, EditionTag, SetTag, SubGroupTag } from './fig-identity.jsx';
 import { formatYear, SPECIAL_RELEASE_YEAR } from './fig-identity.js';
 import { normalizeSearch } from './search-util.js';
-import { BrandHome, VehiclesNavLink, facProps } from './line-ui.jsx';
-import { LINE, factionByKey } from '../../shared/line-profile.js';
+import { BrandHome, VehiclesNavLink } from './line-ui.jsx';
+import { LINE, factionByKey, facProps } from '../../shared/line-profile.js';
 
 function useStore() {
   const [, force] = React.useReducer(x => x + 1, 0);

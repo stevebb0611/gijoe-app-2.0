@@ -11,8 +11,7 @@ import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip, VariantBadge, EditionTag, SetTag, SubGroupTag } from './fig-identity.jsx';
 import { formatYear } from './fig-identity.js';
 import { FileCardRow, FileCardTell, FileCardColorInput, FileCardGrade } from './filecards.jsx';
-import { LINE, factionByKey } from '../../shared/line-profile.js';
-import { facProps } from './line-ui.jsx';
+import { LINE, factionByKey, facProps } from '../../shared/line-profile.js';
 
 const INV_CAT = JoeData.CAT || [];
 const INV_CAT_BY_ID = new Map(INV_CAT.map(f => [f.id, f]));

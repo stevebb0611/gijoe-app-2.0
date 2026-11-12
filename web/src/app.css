@@ -29,7 +29,7 @@
   /* ===== shared low-fi widgets ===== */
   .wf-fac { font-family: var(--font-mono); font-weight: 700; font-size: 10px; letter-spacing: 1px;
     padding: 2px 7px; border: 1.5px solid var(--ink); color: #fff; display: inline-block; text-align: center; min-width: 94px; line-height: 1.3; box-sizing: border-box; }
-  /* team color comes from the line profile (shared/lines/*.js) as an inline --fac; see facProps() in line-ui.jsx */
+  /* team color comes from the line profile (shared/lines/*.js) as an inline --fac; see facProps() in shared/line-profile.js */
   .wf-fac--team { background: var(--fac); }
   body.no-faction .wf-fac--team { background: var(--ink-soft); }
   .wf-fac--mini { font-size: 8px; padding: 1px 5px; min-width: 96px; letter-spacing: .4px; }

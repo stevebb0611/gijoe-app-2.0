@@ -15,6 +15,16 @@ export function factionByKey(key) {
   return BY_KEY.get(key) || { key, dbName: key, label: key, tag: key, color: null };
 }
 
+// Team color for a .wf-fac pill or a facet .chip (client only): the profile
+// color rides in as an inline --fac, and the --team modifier opts the element
+// into app.css's colored + "Faction colors off" rules. Unknown keys get neither.
+export function facProps(key, base) {
+  const color = factionByKey(key).color;
+  return color
+    ? { className: base + ' ' + base + '--team', style: { '--fac': color } }
+    : { className: base, style: undefined };
+}
+
 // factions.name → catalog code (server/catalog.js). Unknown names pass through.
 export function factionCodeForDbName(name) {
   return BY_DB_NAME.get(name)?.key || name;
