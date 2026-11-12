@@ -16,7 +16,7 @@
 //
 // Options:
 //   --name <code name>            required
-//   --faction <name>               required — G.I. Joe | Cobra | Oktober Guard | Dreadnoks
+//   --faction <name>               required — one of the line profile's factions (shared/lines/*.js)
 //   --year <year>                  required
 //   --series <label or id>         required if the year has more than one series
 //   --specialty <text>
@@ -27,6 +27,7 @@
 //   --variants "A:tell text;B:tell text"
 //   --accessories "accessoryId:qty,accessoryId:qty"   (look up ids via --search-accessories)
 import db from './db.js';
+import { LINE } from '../shared/line-profile.js';
 
 function parseArgs(argv) {
   const args = {};
@@ -93,7 +94,7 @@ if (!args.faction) fail('--faction is required');
 if (!args.year) fail('--year is required');
 
 const faction = db.prepare('SELECT faction_id FROM factions WHERE lower(name) = lower(?)').get(args.faction);
-if (!faction) fail(`Unknown faction "${args.faction}". Options: G.I. Joe, Cobra, Oktober Guard, Dreadnoks`);
+if (!faction) fail(`Unknown faction "${args.faction}". Options: ${LINE.factions.map(f => f.dbName).join(', ')}`);
 
 const year = +args.year;
 const seriesForYear = db.prepare('SELECT series_id, label, description FROM series WHERE year = ?').all(year);

@@ -5,7 +5,8 @@ see `INSTANCE_MODEL.md`). File card (on-file/not, and which printing) is tracked
 copy as a notation — it does **not** feed the completeness percentage.
 
 **This catalog is a slow, ongoing effort — ownership tracking does not wait on it.**
-`instances.filecard_color`/`filecard_grade` (migration 019) are a lightweight,
+`instances.filecard_color`/`filecard_grade` (migration 019) and `filecard_cut` (migration
+023, `File Card` cut-out vs `Full Card` cardback; the grade applies to whichever) are a lightweight,
 always-available pair of fields for what the owner actually has in hand: a hand-typed
 color note (e.g. "Peach", "Gray") and a coarse `Poor`/`Good`/`Mint` grade for the physical
 card. Both are independent of `filecard_id` and of this catalog being populated — set from
@@ -98,6 +99,17 @@ Upserts: re-running after editing a CSV row updates the matching DB row (matched
    base/release-type code(s) it actually used, and add a `FC050`+ code only if it also has
    a genuine figure-specific variant. Should mostly be quick lookups against an
    already-built reference, not fresh research per figure — the outcome of doing 1–3 first.
+
+5. **⚠ REMINDER — one-time backfill script once the catalog is usable.** Until then the
+   owner uses the Card Color field (`instances.filecard_color`) as a free-text notes slot,
+   including text identifying file card variants. When steps 1–3 give real `file_cards`
+   rows to match against, write a one-off (`server/one-off/`, idempotent, `npm run backup`
+   first) that reads every on-file copy's `filecard_color` text (plus `filecard_cut`) and
+   sets `instances.filecard_id` to the matching catalog printing. Go through the matches
+   with the owner instead of auto-applying fuzzy ones, and keep the original
+   `filecard_color` text (don't clear it). List all on-file copies first with
+   `SELECT id, figure_id, filecard_color, filecard_cut, filecard_grade FROM instances
+   WHERE filecard_on_file = 1 AND filecard_id IS NULL`.
 
 **Worklist:** `server/export-catalog-snapshot.mjs` dumps `v_figures_missing_file_card` (a
 DB view — figures with no `figure_file_cards` row yet) as

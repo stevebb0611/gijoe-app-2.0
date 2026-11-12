@@ -3,13 +3,7 @@
 // accessories/variant_lookup/figure_accessories tables instead of a static file (17d).
 import db from './db.js';
 import { disambiguateNames } from './blueprint-names.js';
-
-const FACTION_CODE = {
-  'G.I. Joe': 'JOE',
-  Cobra: 'COBRA',
-  'Oktober Guard': 'OKTOBER',
-  Dreadnoks: 'DREADNOK',
-};
+import { factionCodeForDbName } from '../shared/line-profile.js';
 
 const figuresStmt = db.prepare(`
   SELECT f.id, f.code_name, f.version, f.full_name, f.specialty, f.variant_lookup AS single_tell,
@@ -106,7 +100,7 @@ export function buildCatalog() {
     ver: f.version,
     fullName: f.full_name || null,
     year: f.year,
-    faction: FACTION_CODE[f.faction_name] || f.faction_name,
+    faction: factionCodeForDbName(f.faction_name),
     subGroup: f.sub_group_name || null,
     role: f.specialty,
     vehicle: f.is_vehicle_driver && f.vehicle ? f.vehicle : null,

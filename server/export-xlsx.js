@@ -6,10 +6,11 @@
 //
 // Deliberately excludes condition/paint grades and the exact damage map
 // (owner-confirmed scope, 2026-07-11) — this is a completeness + notation
-// roster, not a condition report. File card color/grade (Card Color/Card
+// roster, not a condition report. File card color/type/grade (Card Color/Card Type/Card
 // Grade columns below) is a narrow, deliberate carve-out to that rule — it's
 // ownership notation for the card itself, not the figure's condition.
 import ExcelJS from 'exceljs';
+import { LINE } from '../shared/line-profile.js';
 import { buildCatalog } from './catalog.js';
 import { getState } from './instances.js';
 import { buildAccessoryCatalog } from './accessories.js';
@@ -306,7 +307,7 @@ export function buildWorkbook() {
   }
 
   const wb = new ExcelJS.Workbook();
-  wb.creator = 'G.I. Joe Tracker';
+  wb.creator = LINE.brand.tool;
   wb.created = new Date();
 
   buildFiguresSheet(wb, catalog, instancesByFigure);

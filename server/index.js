@@ -9,6 +9,7 @@ import { buildCatalog, setFigureMasterTarget, setVariantMasterTarget, setFigureM
 import { buildAccessoryCatalog } from './accessories.js';
 import { buildWorkbook } from './export-xlsx.js';
 import * as store from './instances.js';
+import { LINE } from '../shared/line-profile.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
@@ -201,5 +202,5 @@ app.use(express.static(path.join(ROOT, 'web', 'dist')));
 app.use(express.static(ROOT, { dotfiles: 'ignore' }));
 
 app.listen(PORT, () => {
-  console.log(`G.I. Joe Tracker running at http://localhost:${PORT}`);
+  console.log(`${LINE.brand.tool} running at http://localhost:${PORT}`);
 });
