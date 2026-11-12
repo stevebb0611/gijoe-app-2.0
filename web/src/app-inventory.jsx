@@ -16,7 +16,8 @@ import {
 import { VersionChip, VariantBadge, VariantBracket, VehicleTag, EditionTag, SetTag, SubGroupTag } from './fig-identity.jsx';
 import { formatYear, SPECIAL_RELEASE_YEAR } from './fig-identity.js';
 import { normalizeSearch } from './search-util.js';
-import { BrandHome, VehiclesNavLink } from './line-ui.jsx';
+import { BrandHome, VehiclesNavLink, facProps } from './line-ui.jsx';
+import { LINE, factionByKey } from '../../shared/line-profile.js';
 
 function useStore() {
   const [, force] = React.useReducer(x => x + 1, 0);
@@ -172,7 +173,7 @@ function YearSection({ year, figs, view, open, onToggleYear, rowProps, sets = []
         view === 'list' ? (
           <div className="ysec__body">
             {sets.map(s => <SetCard key={'set-' + s.setId} set={s} onOpen={onOpen} onAddInstance={onAddInstance} />)}
-            {figs.length > 0 && <div className="inv-cols"><span></span><span>Code Name</span><span>Faction</span><span>Owned</span><span>Stock</span><span>Missing</span><span></span></div>}
+            {figs.length > 0 && <div className="inv-cols"><span></span><span>{LINE.labels.codeName}</span><span>{LINE.labels.team}</span><span>Owned</span><span>Stock</span><span>Missing</span><span></span></div>}
             {figs.map(f => <Row key={f.id} fig={f} {...rowProps} />)}
           </div>
         ) : (
@@ -193,8 +194,7 @@ const FILTER_GROUPS = [
   [{ key: 'all', label: 'All' }, { key: 'complete', label: 'Complete' }, { key: 'incomplete', label: 'Incomplete' }],
   [{ key: 'dupes', label: 'Show Duplicates' }, { key: 'gaps', label: 'Show Collection Gaps' }],
 ];
-const FAC_LABELS = { JOE: 'G.I. Joe', COBRA: 'Cobra', OKTOBER: 'Oktober Guard', DREADNOK: 'Dreadnoks' };
-const FACTION_OPTS = [...new Set(INV_CAT.map(f => f.faction))].map(k => ({ key: k, label: FAC_LABELS[k] || k }));
+const FACTION_OPTS = [...new Set(INV_CAT.map(f => f.faction))].map(k => ({ key: k, label: factionByKey(k).label }));
 // Derived from the data (TAXONOMY.md's "Sub-team" — sub_group_id, ~31% of
 // figures) so it only ever offers sub-teams that actually have a tagged
 // figure — several lookup rows (Crimson Guard, Iron Grenadiers, …) aren't
@@ -256,9 +256,10 @@ function FacetRow({ label, sub, options, selected, onToggle, facColors, off, not
           const key = typeof o === 'string' ? o : o.key;
           const lab = typeof o === 'string' ? o : o.label;
           const on = !off && selected.has(key);
-          const cls = "chip" + (facColors ? " chip--fac chip--" + key.toLowerCase() : "") + (on ? " is-on" : "");
+          const fp = facColors ? facProps(key, "chip") : null;
+          const cls = (fp ? fp.className + " chip--fac" : "chip") + (on ? " is-on" : "");
           return (
-            <button key={key} className={cls} disabled={off} onClick={off ? undefined : () => onToggle(key)}>
+            <button key={key} className={cls} style={fp?.style} disabled={off} onClick={off ? undefined : () => onToggle(key)}>
               {lab}{on ? <span className="chip__x">✕</span> : null}
             </button>
           );
@@ -354,8 +355,8 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
   // active-filter tokens
   const tokens = [];
   if (status !== 'all') tokens.push({ cat: 'Status', label: STATUS_LABEL[status], onClear: () => setStatus('all') });
-  facFactions.forEach(k => tokens.push({ cat: 'Faction', label: FAC_LABELS[k] || k, onClear: () => toggleSet(setFacFactions)(k) }));
-  facSubGroups.forEach(k => tokens.push({ cat: 'Sub-Team', label: k, onClear: () => toggleSet(setFacSubGroups)(k) }));
+  facFactions.forEach(k => tokens.push({ cat: LINE.labels.team, label: factionByKey(k).label, onClear: () => toggleSet(setFacFactions)(k) }));
+  facSubGroups.forEach(k => tokens.push({ cat: LINE.labels.subTeam, label: k, onClear: () => toggleSet(setFacSubGroups)(k) }));
   facComplete.forEach(k => tokens.push({ cat: 'Completeness', label: COMPLETE_LABEL[k], onClear: () => toggleSet(setFacComplete)(k) }));
   facDupes.forEach(k => tokens.push({ cat: 'Copies', label: DUPE_LABEL[k], onClear: () => toggleSet(setFacDupes)(k) }));
   if (yrNarrowed) tokens.push({ cat: 'Years', label: facYrMin + '–' + facYrMax, onClear: () => { setFacYrMin(YR_MIN); setFacYrMax(YR_MAX); } });
@@ -431,8 +432,8 @@ function InventoryView({ onAddFigure, onAddInstance, onNavigate }) {
 
             {showMore && (
               <div className="invp-facets">
-                <FacetRow label="FACTION" options={FACTION_OPTS} selected={facFactions} onToggle={toggleSet(setFacFactions)} facColors />
-                <FacetRow label="SUB-TEAM" sub="optional" options={SUBGROUP_OPTS} selected={facSubGroups} onToggle={toggleSet(setFacSubGroups)} />
+                <FacetRow label={LINE.labels.team.toUpperCase()} options={FACTION_OPTS} selected={facFactions} onToggle={toggleSet(setFacFactions)} facColors />
+                <FacetRow label={LINE.labels.subTeam.toUpperCase()} sub="optional" options={SUBGROUP_OPTS} selected={facSubGroups} onToggle={toggleSet(setFacSubGroups)} />
                 <FacetRow label="COMPLETENESS" options={COMPLETE_OPTS} selected={facComplete} onToggle={toggleSet(setFacComplete)} />
                 <FacetRow label="COPIES OWNED" options={DUPE_OPTS} selected={facDupes} onToggle={toggleSet(setFacDupes)} />
                 <div className="facet">

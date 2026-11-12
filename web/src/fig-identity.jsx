@@ -4,6 +4,7 @@
 // hand-rolling the markup, so field order/markup can't drift between screens
 // the way it had (see OPEN_QUESTIONS.md, F19).
 import React from 'react';
+import { LINE } from '../../shared/line-profile.js';
 
 export function VersionChip({ version, lg }) {
   if (!version) return null;
@@ -96,7 +97,7 @@ export function SetTag({ sets, lg }) {
 export function SubGroupTag({ subGroup, lg }) {
   if (!subGroup) return null;
   return (
-    <em className={"idsubteam" + (lg ? " idsubteam--lg" : "")} title={subGroup + " — sub-team"}>
+    <em className={"idsubteam" + (lg ? " idsubteam--lg" : "")} title={subGroup + " — " + LINE.labels.subTeam.toLowerCase()}>
       {subGroup.toUpperCase()}
     </em>
   );

@@ -10,6 +10,7 @@ import { VersionChip, VariantBadge, VehicleTag, EditionTag, SetTag } from './fig
 import { formatYear, SPECIAL_RELEASE_YEAR } from './fig-identity.js';
 import { normalizeSearch } from './search-util.js';
 import { FileCardRow, FileCardTell, FileCardColorInput, FileCardGrade } from './filecards.jsx';
+import { facProps } from './line-ui.jsx';
 const AF_CATALOG = JoeData.CAT || [];
 // SPECIAL_RELEASE_YEAR sorts to the end regardless of numeric value — it's not a
 // real year, so it doesn't belong interleaved by magnitude, but it does need
@@ -283,7 +284,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                   <button className={"af-res" + (f.id === selId ? " is-sel" : "")} onClick={() => setSelId(f.id)}>
                     <span className="af-res__thumb"></span>
                     <span className="af-res__name"><b>{f.name}</b><i>{sub} · {formatYear(f.year)}</i><EditionTag context={f.releaseContext} /><SetTag sets={f.sets} />{f.vehicle && <span className="idveh" title={"Vehicle driver — packaged with the " + f.vehicle}><b>VEHICLE</b> {f.vehicle}</span>}</span>
-                    <span className={"wf-fac wf-fac--" + f.faction.toLowerCase() + " wf-fac--mini"}>{f.faction}</span>
+                    <span className={facProps(f.faction, "wf-fac").className + " wf-fac--mini"} style={facProps(f.faction, "wf-fac").style}>{f.faction}</span>
                     <span className="af-res__own">{own === 0 ? "not owned" : "owned ×" + own}</span>
                     <span className="af-res__pick">{f.id === selId ? "● selected" : "select ›"}</span>
                   </button>
@@ -304,7 +305,7 @@ function AddFigureOverlay({ onClose, presetCatalogId = null, presetVariant = nul
                 <div>
                   <div className="af-fig__name">
                     {fig.name}<VersionChip version={fig.ver ? "v" + fig.ver : ""} /><EditionTag context={fig.releaseContext} /><SetTag sets={fig.sets} />
-                    <span className={"wf-fac wf-fac--" + fig.faction.toLowerCase() + " wf-fac--mini"}>{fig.faction}</span>
+                    <span className={facProps(fig.faction, "wf-fac").className + " wf-fac--mini"} style={facProps(fig.faction, "wf-fac").style}>{fig.faction}</span>
                     {multi && chosen ? <VariantBadge letter={chosen.letter} /> : null}
                   </div>
                   <div className="af-fig__var">{multi ? (varTell ? varTell + " · " + formatYear(fig.year) : formatYear(fig.year)) : (fig.role ? fig.role + " · " : "") + formatYear(fig.year)}</div>

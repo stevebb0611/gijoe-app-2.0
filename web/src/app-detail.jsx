@@ -11,6 +11,8 @@ import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip, VariantBadge, EditionTag, SetTag, SubGroupTag } from './fig-identity.jsx';
 import { formatYear } from './fig-identity.js';
 import { FileCardRow, FileCardTell, FileCardColorInput, FileCardGrade } from './filecards.jsx';
+import { factionByKey } from '../../shared/line-profile.js';
+import { facProps } from './line-ui.jsx';
 
 const INV_CAT = JoeData.CAT || [];
 const INV_CAT_BY_ID = new Map(INV_CAT.map(f => [f.id, f]));
@@ -372,11 +374,10 @@ function invMasterTotals() {
 // ---------------------------------------------------------------------------
 // Shared low-fi widgets
 // ---------------------------------------------------------------------------
-// Spelled-out labels for the two factions whose raw catalog code reads as an
-// abbreviation — COBRA/DREADNOK need no expansion, JOE and OKTOBER do.
-const FAC_TAG_LABEL = { JOE: 'G.I. JOE', OKTOBER: 'OKTOBER GUARD' };
+// Team pill — text + color from the line profile (shared/lines/*.js `tag`/`color`).
 function FactionTag({ faction, mini }) {
-  return <span className={"wf-fac wf-fac--" + faction.toLowerCase() + (mini ? " wf-fac--mini" : "")}>{FAC_TAG_LABEL[faction] || faction}</span>;
+  const p = facProps(faction, "wf-fac");
+  return <span className={p.className + (mini ? " wf-fac--mini" : "")} style={p.style}>{factionByKey(faction).tag}</span>;
 }
 // Compact military-badge motif for the Master Collection nav chip — layered
 // gold/paper/ink rings + a single gold star, echoing the per-instance star

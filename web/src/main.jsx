@@ -7,6 +7,7 @@ import { PartsBin } from './parts-bin.jsx';
 import { MasterCollectionView } from './master-collection.jsx';
 import { JoeStore } from './store.js';
 import './app.css';
+import { LINE } from '../../shared/line-profile.js';
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "paper": "kraft",
@@ -68,7 +69,7 @@ function App() {
         <TweakSection label="Paper & ink" />
         <TweakRadio label="Paper" value={t.paper} options={['kraft', 'white']} onChange={(v) => setTweak('paper', v)} />
         <TweakColor label="Accent" value={t.accent} options={['#6b6f39', '#b8402f', '#c9772f', '#3f6f86']} onChange={(v) => setTweak('accent', v)} />
-        <TweakToggle label="Faction colors" value={t.factionColors} onChange={(v) => setTweak('factionColors', v)} />
+        <TweakToggle label={LINE.labels.team + " colors"} value={t.factionColors} onChange={(v) => setTweak('factionColors', v)} />
         <TweakSection label="Collection data" />
         <TweakButton label="⬇ Export backup (.json)" onClick={doExport} />
         <TweakButton label="⬇ Export catalog (.xlsx)" onClick={doExportExcel} />

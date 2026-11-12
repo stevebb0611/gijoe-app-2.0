@@ -13,6 +13,7 @@ import {
 import { VersionChip, VariantBadge, VariantBracket, VehicleTag, EditionTag, SetTag, SubGroupTag } from './fig-identity.jsx';
 import { formatYear } from './fig-identity.js';
 import { BrandHome, VehiclesNavLink } from './line-ui.jsx';
+import { LINE } from '../../shared/line-profile.js';
 import { normalizeSearch } from './search-util.js';
 
 function useStore() {
@@ -96,7 +97,7 @@ function McRow({ ent, isOpen, onToggle, onOpen }) {
   );
 }
 
-const McCols = () => <div className="inv-cols"><span></span><span>Code Name</span><span>Faction</span><span className="mc-cols__starred">Starred</span><span>Targets</span><span>Need</span><span></span></div>;
+const McCols = () => <div className="inv-cols"><span></span><span>{LINE.labels.codeName}</span><span>{LINE.labels.team}</span><span className="mc-cols__starred">Starred</span><span>Targets</span><span>Need</span><span></span></div>;
 
 function MasterCollectionView({ onNavigate, onAddInstance }) {
   useStore();
