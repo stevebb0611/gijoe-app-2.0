@@ -12,6 +12,7 @@ import { AccSwatch } from './acc-colors.jsx';
 import { VersionChip } from './fig-identity.jsx';
 import { figIdentityText, formatYear } from './fig-identity.js';
 import { normalizeSearch } from './search-util.js';
+import { BrandHome, VehiclesNavLink } from './line-ui.jsx';
 
 // Splittable sheets (migration 022): parent accessory_id -> its piece names,
 // read off the catalog blueprints (tuple index 8 = splitOf).
@@ -687,22 +688,10 @@ function PartsBin({ onNavigate, onAddInstance }) {
       <div className="invp-chrome">
         <header className="invp-top">
           <div className="inv-brand">
-            <button type="button" className="inv-brand__home" onClick={() => onNavigate('figures')} aria-label="Go to Figures">
-              <span className="inv-brand__mk" aria-hidden="true">
-                <svg width="32" height="32" viewBox="0 0 34 34" fill="none">
-                  <rect x="3.5" y="8" width="27" height="18" rx="2" stroke="#f3eee2" strokeWidth="2" strokeLinejoin="round" />
-                  <line x1="3.5" y1="12.5" x2="30.5" y2="12.5" stroke="#f3eee2" strokeWidth="2" />
-                  <rect x="6.5" y="14.5" width="7.5" height="8.5" stroke="#f3eee2" strokeWidth="2" strokeLinejoin="round" />
-                  <line x1="17.5" y1="16" x2="27.5" y2="16" stroke="#f3eee2" strokeWidth="2" strokeLinecap="round" />
-                  <line x1="17.5" y1="19" x2="27.5" y2="19" stroke="#f3eee2" strokeWidth="2" strokeLinecap="round" />
-                  <path d="M29 21.5 H21 L22.7 24.5 H29 Z" fill="#f3eee2" />
-                </svg>
-              </span>
-              <span className="inv-brand__name">G.I. JOE<br/>COLLECTION</span>
-            </button>
+            <BrandHome onNavigate={onNavigate} />
             <nav className="inv-nav">
               <button type="button" onClick={() => onNavigate('figures')}>Figures</button>
-              <a className="inv-nav__soon" href="GI Joe Tracker - Vehicles.html" title="Vehicles & Playsets — in development">Vehicles<em className="inv-nav__tag">In Dev</em></a>
+              <VehiclesNavLink />
               <button type="button" className="is-active">Parts Bin</button>
             </nav>
           </div>
