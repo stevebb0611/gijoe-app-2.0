@@ -114,7 +114,7 @@ function PartRow({ entry, NEEDS, openId, setOpenId }) {
   const dmgBtnRef = React.useRef(null);
   const home = entry.shared ? fitsLabel(entry.homeFigureNames, entry.figureCount) : (entry.homeFigureName || "—");
   return (
-    <div id={"pb-part-" + entry.id} className={"pb-row" + (ev.needed ? " is-needed" : "")}>
+    <div className={"pb-row" + (ev.needed ? " is-needed" : "")}>
       <div className="pb-qty">
         <span className="pb-qty__n">×{entry.qty}</span>
         {entry.damaged > 0 && <span className="pb-qty__dmg" title={entry.damaged + " of these units are damaged"}>{entry.damaged} damaged</span>}
@@ -406,7 +406,7 @@ function RebalanceModal({ figs, onClose }) {
 }
 
 // ============================================================ group section
-function GroupSection({ sec, sep, collapsed, toggle, NEEDS, openId, setOpenId, jumpToShared, openFigure }) {
+function GroupSection({ sec, sep, collapsed, toggle, NEEDS, openId, setOpenId, openFigure }) {
   const t = sec.rows.reduce((o, { e, ev }) => { o.pieces += e.qty; o.fills += ev.fillable; return o; }, { pieces: 0, fills: 0 });
   // The head is a div (not a button) so the year links inside it can be real buttons.
   return (
@@ -435,17 +435,6 @@ function GroupSection({ sec, sep, collapsed, toggle, NEEDS, openId, setOpenId, j
       {!collapsed && (
         <div className="grp__body">
           {sec.rows.map(({ e }) => <PartRow key={e.id} entry={e} NEEDS={NEEDS} openId={openId} setOpenId={setOpenId} />)}
-          {sec.alsoShared && sec.alsoShared.length > 0 && (
-            <div className="grp__also">
-              also in Shared ↓{" "}
-              {sec.alsoShared.map(({ e }, i) => (
-                <React.Fragment key={e.id}>
-                  {i > 0 && " · "}
-                  <button type="button" className="grp__also-link" onClick={() => jumpToShared(e.id)}>{e.accessory}</button>
-                </React.Fragment>
-              ))}
-            </div>
-          )}
         </div>
       )}
     </section>
@@ -469,7 +458,7 @@ function buildSections(items, mode) {
     sortByCatId = true;
   } else if (mode === 'home') {
     keyOf = ({ e }) => e.shared ? 'Shared' : (e.homeFigureGroup || '—');
-    labelOf = (k) => k === 'Shared' ? 'SHARED · FITS MULTIPLE FIGURES' : k;
+    labelOf = (k) => k === 'Shared' ? 'SHARED · FITS MULTIPLE CHARACTERS' : k;
   } else {
     keyOf = ({ ev }) => ev.needed ? 'gap' : 'none'; order = ['gap', 'none'];
     labelOf = (k) => ({ gap: 'FILLS GAPS', none: 'NO CURRENT NEED' }[k]);
@@ -493,20 +482,12 @@ function buildSections(items, mode) {
     keys.sort((a, b) => order ? order.indexOf(a) - order.indexOf(b) : String(a).localeCompare(String(b)));
   }
   const rowSort = mode === 'home' ? byFigureThenNeed : byNeed;
-  // A part shared only between a few characters (often just one character's
-  // reissues — Barbecue's Tank Bracket Frame spans '85/'89) still lands in
-  // Shared, so its figure's header looked like it was missing. Point each
-  // figure group at those parts; capped at FITS_CAP characters so a battle
-  // stand (fits 92) doesn't echo under every figure.
-  const alsoSharedOf = (k) => mode !== 'home' || k === 'Shared' || !map.has('Shared') ? null
-    : map.get('Shared').filter(({ e }) => e.homeFigureGroups && e.homeFigureGroups.length <= FITS_CAP && e.homeFigureGroups.includes(k))
-        .sort((a, b) => a.e.accessory.localeCompare(b.e.accessory));
-  // Figure-group header years — one per distinct home figure among the
-  // group's own (single-use) rows, e.g. SPIRIT (1984 / 1989). Each opens that
+  // Figure-group header years — one per distinct figure the group's
+  // rows fit, e.g. SPIRIT (1984 / 1989). Each opens that
   // figure's detail modal, or Add Figure if it isn't owned yet.
   const figsOf = (k) => {
     if (mode !== 'home' || k === 'Shared') return null;
-    const ids = [...new Set(map.get(k).map(({ e }) => e.homeFigureId).filter(Boolean))];
+    const ids = [...new Set(map.get(k).flatMap(({ e }) => e.homeFigureIds || []))];
     const figs = ids.map(id => {
       const cf = JoeData.CAT_BY_ID.get(id);
       return { id, year: cf ? cf.year : null, ver: cf ? cf.ver : null, owned: JoeData.ownedCount(id) > 0 };
@@ -515,7 +496,7 @@ function buildSections(items, mode) {
     const dupYear = (f) => figs.filter(g => g.year === f.year).length > 1;
     return figs.map(f => ({ ...f, label: (f.year ? formatYear(f.year) : '?') + (dupYear(f) && f.ver ? ' v' + f.ver : '') }));
   };
-  return keys.map(k => ({ key: k, label: labelOf(k), rows: map.get(k).sort(rowSort), sep: mode === 'home' && k === 'Shared', alsoShared: alsoSharedOf(k), figs: figsOf(k) }));
+  return keys.map(k => ({ key: k, label: labelOf(k), rows: map.get(k).sort(rowSort), sep: mode === 'home' && k === 'Shared', figs: figsOf(k) }));
 }
 
 // ============================================================ app
@@ -610,7 +591,7 @@ function PartsBin({ onNavigate, onAddInstance }) {
   // bin entries decorated with real accessory metadata
   const bin = store.bin.map(e => {
     const meta = JoeData.ACC_BY_ID.get(e.id) || {};
-    return { ...e, categoryId: meta.categoryId != null ? meta.categoryId : null, categoryLabel: meta.categoryLabel || null, color: meta.color || null, shared: !!meta.shared, figureCount: meta.figureCount || null, homeFigureId: meta.homeFigureId || null, homeFigureGroup: meta.homeFigureGroup || null, homeFigureName: meta.homeFigureName || null, homeFigureNames: meta.homeFigureNames || null, homeFigureGroups: meta.homeFigureGroups || null };
+    return { ...e, categoryId: meta.categoryId != null ? meta.categoryId : null, categoryLabel: meta.categoryLabel || null, color: meta.color || null, shared: !!meta.shared, figureCount: meta.figureCount || null, homeFigureIds: meta.homeFigureIds || null, homeFigureGroup: meta.homeFigureGroup || null, homeFigureName: meta.homeFigureName || null, homeFigureNames: meta.homeFigureNames || null };
   });
   const NEEDS = React.useMemo(buildNeeds, [store]);
   const suggestions = buildSuggestions(bin, NEEDS);
@@ -649,20 +630,6 @@ function PartsBin({ onNavigate, onAddInstance }) {
 
   const setChip = (k) => setFilter(cur => cur === k ? 'all' : k);
   const toggle = (k) => setCollapsed(s => { const n = new Set(s); n.has(k) ? n.delete(k) : n.add(k); return n; });
-  // "also in Shared" link — expand Shared if collapsed, then scroll once it
-  // has rendered (effect below), not in the click handler.
-  const [jumpId, setJumpId] = React.useState(null);
-  const jumpToShared = (id) => {
-    setCollapsed(s => { if (!s.has('Shared')) return s; const n = new Set(s); n.delete('Shared'); return n; });
-    setJumpId(id);
-  };
-  React.useEffect(() => {
-    if (jumpId == null) return;
-    const el = document.getElementById('pb-part-' + jumpId);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setJumpId(null);
-  }, [jumpId]);
-
   const q = normalizeSearch(query);
   const items = bin
     .map(e => ({ e, ev: evaluate(e, NEEDS) }))
@@ -793,7 +760,7 @@ function PartsBin({ onNavigate, onAddInstance }) {
                 ? <div className="pbp-empty">No parts match.</div>
                 : sections.map((sec, i) => (
                     <GroupSection key={sec.key} sec={sec} sep={i > 0 && sec.sep} collapsed={collapsed.has(sec.key)} toggle={toggle}
-                      NEEDS={NEEDS} openId={openId} setOpenId={setOpenId} jumpToShared={jumpToShared} openFigure={openFigure} />
+                      NEEDS={NEEDS} openId={openId} setOpenId={setOpenId} openFigure={openFigure} />
                   ))}
             </section>
             )}

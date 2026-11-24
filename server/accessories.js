@@ -9,13 +9,12 @@ import db from './db.js';
 // Mail-In Block, not a real chronological year. Mirrors web/src/fig-identity.js's
 // formatYear(); duplicated here (not shared/) since it's two lines and server/
 // doesn't otherwise import from web/src.
-const CONVENTION_YEAR = 9999;
-const formatYear = (year) => (year === CONVENTION_YEAR ? 'Convention' : String(year));
+const SPECIAL_RELEASE_YEAR = 9999;
+const formatYear = (year) => (year === SPECIAL_RELEASE_YEAR ? 'Special Release' : String(year));
 
 const accessoriesStmt = db.prepare(`
   SELECT a.id, a.accessory_code, a.name, a.color, a.category_id, ac.name AS category_name,
-         COUNT(DISTINCT fa.figure_id) AS figure_count,
-         MIN(fa.figure_id) AS solo_figure_id
+         COUNT(DISTINCT fa.figure_id) AS figure_count
   FROM accessories a
   JOIN figure_accessories fa ON fa.accessory_id = a.id
   JOIN accessory_categories ac ON ac.category_id = a.category_id
@@ -23,31 +22,36 @@ const accessoriesStmt = db.prepare(`
   GROUP BY a.id
 `);
 
-// One row per (accessory, figure) — code_name + release year, so shared items
-// can distinguish "different characters" from "same character, reissued in a
-// later year" (e.g. Dusty's FAMAS gun spans the 1985 v1 and 1988 v2 rows;
-// Budo's Ornamental Sword spans 1988 v1 and 1993 v2). Both count toward
-// figure_count/"shared by N", but collapsing them to one bare name ("DUSTY")
-// hid *why* the count was >1 — see PARTS_BIN.md confusion 2026-07-14.
+// One row per (accessory, figure). character_key separates the few distinct
+// characters that reuse one code name (migration 002); NULL/'' falls back to it.
 const figureRowsStmt = db.prepare(`
-  SELECT fa.accessory_id, f.code_name, COALESCE(s.year, f.year_released) AS year
+  SELECT fa.accessory_id, fa.figure_id, f.code_name, f.version,
+         COALESCE(NULLIF(f.character_key, ''), UPPER(f.code_name)) AS character,
+         COALESCE(s.year, f.year_released) AS year
   FROM figure_accessories fa
   JOIN figures f ON f.id = fa.figure_id
   LEFT JOIN series s ON s.series_id = f.series_id
   WHERE fa.release_context = 'retail'
 `);
 
+// "DUSTY (1985/1988)" per code name. The year always shows, even for a single
+// release — a bare "MUSKRAT" hid which Muskrat a part fits (PARTS_BIN.md,
+// 2026-11-24). Two versions from one year add the version: "(1993 v1/1993 v2)".
 function nameYearLabels(rows) {
   const byName = new Map();
-  rows.forEach(({ code_name, year }) => {
-    const upper = (code_name || '').toUpperCase();
-    if (!byName.has(upper)) byName.set(upper, new Set());
-    if (year) byName.get(upper).add(year);
+  rows.forEach((r) => {
+    const upper = (r.code_name || '').toUpperCase();
+    if (!byName.has(upper)) byName.set(upper, []);
+    byName.get(upper).push(r);
   });
   return [...byName.entries()]
-    .map(([name, years]) => {
-      const sorted = [...years].sort((a, b) => a - b);
-      return sorted.length > 1 ? name + ' (' + sorted.map(formatYear).join('/') + ')' : name;
+    .map(([name, figs]) => {
+      const versionsIn = (year) => new Set(figs.filter((f) => f.year === year).map((f) => f.version)).size;
+      const years = figs
+        .filter((f) => f.year)
+        .sort((a, b) => a.year - b.year || a.version - b.version)
+        .map((f) => formatYear(f.year) + (versionsIn(f.year) > 1 ? ' v' + f.version : ''));
+      return years.length ? name + ' (' + [...new Set(years)].join('/') + ')' : name;
     })
     .sort();
 }
@@ -60,21 +64,11 @@ export function buildAccessoryCatalog() {
   }
 
   return accessoriesStmt.all().map((r) => {
-    const shared = r.figure_count > 1;
-    // Solo figure's own row (same source as the shared-case labels below).
-    // homeFigureGroup stays a bare name so same-named figures still share one
-    // group header ("BAZOOKA"); homeFigureName appends the release year so
-    // the per-row "figure:" line can still tell '85 apart from '88 — see
-    // PARTS_BIN.md confusion 2026-08-15.
-    const soloRow = !shared ? (rowsByAccessory.get(r.id) || [])[0] : null;
-    const homeFigureGroup = soloRow ? (soloRow.code_name || '').toUpperCase() : null;
-    const homeFigureNames = shared ? nameYearLabels(rowsByAccessory.get(r.id) || []) : null;
-    // Bare-name twin of homeFigureNames, in the same format as homeFigureGroup,
-    // so the Parts Bin can point a figure's group header at shared parts that
-    // fit it (the "also in Shared" line — PARTS_BIN.md, 2026-10-28).
-    const homeFigureGroups = shared
-      ? [...new Set((rowsByAccessory.get(r.id) || []).map(x => (x.code_name || '').toUpperCase()))].sort()
-      : null;
+    const rows = rowsByAccessory.get(r.id) || [];
+    // Shared = fits more than one CHARACTER. A part spanning versions of one
+    // character (Barbecue's '85/'89 backpack) has that character as its home.
+    const shared = new Set(rows.map((x) => x.character)).size > 1;
+    const labels = nameYearLabels(rows);
     return {
       id: r.id,
       code: r.accessory_code,
@@ -84,13 +78,12 @@ export function buildAccessoryCatalog() {
       categoryLabel: r.category_name,
       shared,
       figureCount: r.figure_count,
-      homeFigureId: shared ? null : r.solo_figure_id,
-      homeFigureGroup,
-      homeFigureName: soloRow
-        ? homeFigureGroup + (soloRow.year ? ' (' + formatYear(soloRow.year) + ')' : '')
-        : null,
-      homeFigureNames,
-      homeFigureGroups,
+      // Bare name for the group header ("BAZOOKA"); homeFigureName carries the
+      // release year(s) for the row's "figure:" line.
+      homeFigureIds: shared ? null : rows.map((x) => x.figure_id),
+      homeFigureGroup: shared ? null : (rows[0].code_name || '').toUpperCase(),
+      homeFigureName: shared ? null : labels[0],
+      homeFigureNames: shared ? labels : null,
     };
   });
 }

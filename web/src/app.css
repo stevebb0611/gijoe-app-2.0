@@ -1145,10 +1145,6 @@
   .pb-need { font-family: var(--font-mono); font-weight: 700; font-size: 11px; color: var(--ok); background: var(--paper); border: 1.5px solid var(--ok); padding: 4px 9px; cursor: pointer; }
   .pb-need:hover { background: var(--ok); color: #fff; }
   .pb-none { font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); font-style: italic; }
-  /* Thin sibling of .pb-row (same card/border/shadow, ~1/4 scale), indented to start under the ×qty. */
-  .grp__also { align-self: flex-start; margin-left: 40px; font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); background: var(--card); border: 1px solid var(--ink); box-shadow: 1.5px 1.5px 0 var(--ink); padding: 4px 10px; }
-  .grp__also-link { font-family: var(--font-display); font-weight: 500; font-size: 13px; color: var(--ink); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
-  .grp__also-link:hover { color: var(--ok); }
 
   .pb-needs { margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 8px; display: flex; flex-direction: column; gap: 5px; }
   .pb-needs__row { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; border: 1.5px solid var(--line); background: var(--paper); padding: 6px 10px; }

@@ -66,14 +66,14 @@ A standalone page, peer to Inventory, in the same field-manual style:
   - **“no current need.”**
   - A green left-border = fills a gap.
   - Row actions: **＋ / －** quantity, and a **⚠** trigger that opens a small popover (anchored to that button, not a separate panel) for marking units damaged + a notes field — same inline mechanism as the ＋ Add a loose part flow's own per-accessory ⚠ (August 2026, see the Damage marking note above and `OPEN_QUESTIONS.md` F24).
-- **"also in Shared" pointer (GROUP BY FIGURE, 2026-10-28).** Any part with `figure_count > 1` sorts into the trailing **SHARED · FITS MULTIPLE FIGURES** group, including one shared only between versions of the same character (Barbecue's Tank Bracket Frame Backpack spans '85/'89). That made the figure's own header look like the part was missing from the bin. Each figure group now ends with a muted `also in Shared ↓ <part> · <part>` line listing the shared bin parts that fit that character. Clicking a part name expands Shared if needed and scrolls to the row. Parts stay in Shared, and the group's part/pc counts don't include them. Capped to parts fitting ≤ `FITS_CAP` (5) distinct characters so generic pieces like the battle stand (fits 92) don't echo under every figure. Data: `homeFigureGroups` (bare uppercase code names) from `server/accessories.js`.
+- **Shared = crosses characters (GROUP BY FIGURE, 2026-11-24).** A part whose fits are all versions of **one character** (Barbecue's Tank Bracket Frame Backpack, '85/'89) lives under that character's header, and the header's years are every version its parts fit. A part that fits **two or more characters** lives only in the trailing **SHARED · FITS MULTIPLE CHARACTERS** group; it never creates a figure header or adds a year to one. Character = `character_key`, falling back to the code name. Every name in a `fits` / `figure:` line carries its release year(s) ("MUSKRAT (1989)"), plus the version when two share a year. The `Shared` / `Single-use` chips follow the same split. Data: `shared`, `homeFigureIds`, `homeFigureGroup`, `homeFigureName(s)` from `server/accessories.js`. *(Replaced the 2026-10-28 "also in Shared ↓" pointer line: it matched by bare name, so it put 1989 parts under a 1993-only header, and it only showed when the character happened to have another part in the bin.)*
 
 ### Reverse-lookup math (per entry)
 ```
 needs    = NEEDS where acc === entry.name AND entry.fits includes the copy's figure
 needed   = needs.length
 fillable = min(qty, needed)
-shared   = entry.fits.length > 1
+shared   = distinct characters in entry.fits > 1
 ```
 The **Fills Gaps** KPI sums `fillable`; **Loose Parts** sums `qty`. (`NEEDS` is derived from instance checklists in production; hand-built in the prototype.) The Parts Bin no longer computes a per-entry surplus — overflow is handled figure-side (see **C** above).
 
@@ -111,14 +111,14 @@ The compatibility question above is **answered by the real schema** (`route.js`)
   - **1925–1930** — soft-goods / patches
   - Gaps between blocks are deliberate headroom; new parts are allocated into the matching block by hand.
 - `figures` — the catalog of figures. Canonical file: **`gijoe_db_figures_2.0`** — the older per-variant file (708 rows) is **dropped** (confirmed June 2026). IDs are stable keys with intentional gaps: **001–629** main roster + **700–724** mail-in/convention/exclusive block; owner-extensible (see VARIANTS.md §7.5.1).
-- `figures_accessories` (**THE JOIN — pending export**) — `figure_id × accessory_id × quantity_required × group_id × release_context`. This is the source of truth for: which figures an accessory fits (compatibility / SHARED-vs-SINGLE = `count(distinct figure_id) > 1`), and required quantities per pairing.
+- `figures_accessories` (**THE JOIN — pending export**) — `figure_id × accessory_id × quantity_required × group_id × release_context`. This is the source of truth for: which figures an accessory fits (compatibility / SHARED-vs-SINGLE = more than one distinct character), and required quantities per pairing.
 - `owned_figures` — instances (`id`, `figure_id`, `notes`).
 - `owned_accessories` — per-instance marks (`owned_figure_id`, `accessory_id`, `quantity_owned`).
 
 **Derived facts (replace the prototype's hand-built data):**
 - A figure's **blueprint** = its `figures_accessories` rows.
 - A **gap** (the bin's reverse-lookup `NEEDS`) = blueprint rows where `quantity_owned < quantity_required` for an owned instance.
-- **Shared vs single-use** = distinct `figure_id` count per accessory (NOT the `relationship_count` column, which is a fuzzy convenience that was only used to seed the prototype's SHARED tag).
+- **Shared vs single-use** = distinct **character** count over the accessory's figures (2026-11-24; was distinct `figure_id` count) (NOT the `relationship_count` column, which is a fuzzy convenience that was only used to seed the prototype's SHARED tag).
 - A **bin entry** should reference `accessory_id`, not a name string.
 
 **Status / what's still needed before grounding the prototype on real data:**

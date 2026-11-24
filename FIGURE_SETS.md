@@ -146,24 +146,24 @@ logging unless it's a genuine completionist unit (see above).
   entry, applied straight to the live DB rather than via the CLI since it was the first
   entry and the tooling didn't exist yet), verified via `/api/catalog`.
 
-### Undated — Rapid Deployment Force
+### 1993 — Rapid Deployment Force
 
 - **Members:** Fast Draw v1 (figure id 140) ×1, Repeater v2 (figure id 246) ×1, Shockwave v2
   (figure id 250) ×1 — each with their own standard (retail-context) accessory loadout, no
   swapped/exclusive gear.
-- **Source:** Owner's own custom completionist grouping, not a factory-sold multi-pack — the
-  three figures aren't a real retail 3-pack (Fast Draw is a 1987 Series 6 release, Repeater
-  v2/Shockwave v2 are 1989 Series 8; none share `sub_group_id` — confirmed none are Night
-  Force sub-team figures either). No year set for this reason.
+- **Source:** Owner-confirmed 2026-11-12 as a real 1993 multi-pack: the three figures were first
+  sold individually (Fast Draw is a 1987 Series 6 release, Repeater v2/Shockwave v2 are 1989
+  Series 8), then packaged together later as the Rapid Deployment Force. None share
+  `sub_group_id`. Earlier logged as an undated custom completionist grouping; corrected.
 - **Reconstruction record:**
   ```
-  node server/add-figure-set.mjs --name "Rapid Deployment Force" \
-    --description "Custom completionist grouping: Fast Draw v1, Repeater v2, Shockwave v2, each with their standard accessories." \
+  node server/add-figure-set.mjs --name "Rapid Deployment Force" --year 1993 \
+    --description "1993 multi-pack of previously individually-sold figures: Fast Draw v1, Repeater v2, Shockwave v2, each with their standard accessories." \
     --members "140:1,246:1,250:1"
   ```
   ```sql
   INSERT OR IGNORE INTO figure_sets (set_id, name, year, description) VALUES
-      (2, 'Rapid Deployment Force', NULL, 'Custom completionist grouping: Fast Draw v1, Repeater v2, Shockwave v2, each with their standard accessories.');
+      (2, 'Rapid Deployment Force', 1993, '1993 multi-pack of previously individually-sold figures: Fast Draw v1, Repeater v2, Shockwave v2, each with their standard accessories.');
   INSERT OR IGNORE INTO figure_set_members (set_id, figure_id, quantity_required) VALUES
       (2, 140, 1), (2, 246, 1), (2, 250, 1);
   ```

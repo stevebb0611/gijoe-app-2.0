@@ -75,9 +75,9 @@ function ownedVariantSummary(insts) {
 function buildFiguresSheet(wb, catalog, instancesByFigure) {
   const ws = wb.addWorksheet('Figures');
   setupSheet(ws, [
-    { header: 'Code Name', key: 'name', width: 26 },
+    { header: LINE.labels.codeName, key: 'name', width: 26 },
     { header: 'Version', key: 'version', width: 9 },
-    { header: 'Faction', key: 'faction', width: 12 },
+    { header: LINE.labels.team, key: 'faction', width: 12 },
     { header: 'Year', key: 'year', width: 8 },
     { header: 'Specialty', key: 'role', width: 22 },
     { header: 'Vehicle', key: 'vehicle', width: 16 },
